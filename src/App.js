@@ -11,7 +11,7 @@ import {
 // [1] 구글 시트 웹 게시 URL
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vREzDg6YIAoZBiSeT58g6sksXFZkILyX0hKJeuQIdfKxWDRgu7SX7epVkuKMjXvp8n10-sNCoWRyJdJ/pub?gid=1259006970&single=true&output=csv";
 
-// --- 필터용 옵션 데이터 (오류 수정용) ---
+// --- 필터용 옵션 데이터 ---
 const rentalOptions = ['50만 이하', '50~60', '60~70', '70~80', '80~90', '90~100', '100만 이상'];
 const depositOptions = ['100만 이하', '100~200', '200~300', '300~400', '400~500', '500만 이상'];
 const mileageOptions = ['1만km 미만', '1~3만', '3~5만', '5~10만', '10만km 이상'];
@@ -318,7 +318,7 @@ const App = () => {
       `}</style>
       
       {/* --- 좌측 필터바 --- */}
-      <div className="w-[68px] bg-white flex flex-col z-[60] flex-shrink-0 border-r border-slate-200 relative shadow-sm font-sans">
+      <div className="w-[68px] bg-white flex flex-col z-[60] flex-shrink-0 border-r border-slate-200 relative shadow-sm">
         <div className="mt-[80px] flex flex-col items-center gap-1 px-1">
           {[
             { id: 'period', icon: <div className="flex flex-col items-center justify-center -space-y-0.5"><CalendarDays size={18}/><span className="text-[7px] font-black leading-none mt-0.5 uppercase">6-60M</span></div>, label: '기간' },
@@ -339,18 +339,18 @@ const App = () => {
                 </button>
                 {isActive && (
                   <div ref={sidebarPopupRef} className={`absolute left-full ml-3 w-[180px] bg-white border border-slate-200 shadow-xl z-[70] text-left font-normal normal-case rounded-none overflow-hidden ring-1 ring-black/5 font-sans ${isBottomAligned ? 'bottom-0' : 'top-[-10px]'}`}>
-                    <div className="p-2 border-b bg-slate-50 flex justify-between items-center font-sans">
+                    <div className="p-2 border-b bg-slate-50 flex justify-between items-center">
                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">필터 선택</span>
-                      <div className="flex items-center gap-2 font-sans">
+                      <div className="flex items-center gap-2">
                         <button onClick={() => { if (btn.id === 'period') setSelectedPeriods(['24M']); else setSidebarFilters(prev => ({...prev, [btn.id]: []})); }} className="text-[9px] text-blue-600 font-bold">초기화</button>
                         <button onClick={() => setActiveSidebarPopup(null)} className="text-slate-400 hover:text-slate-600 transition-colors p-0.5"><X size={12} /></button>
                       </div>
                     </div>
-                    <div className="max-h-60 overflow-y-auto p-1 hide-scrollbar font-sans">
+                    <div className="max-h-60 overflow-y-auto p-1 hide-scrollbar">
                       {(btn.id === 'period' ? ['6M', '12M', '24M', '36M', '48M', '60M'] : 
                         btn.id === 'rental' ? rentalOptions : btn.id === 'deposit' ? depositOptions : btn.id === 'mileage' ? mileageOptions : yearOptions
                       ).map(opt => (
-                        <label key={opt} className="flex items-center gap-2 p-2 hover:bg-slate-50 cursor-pointer text-[10px] rounded transition-colors group font-sans">
+                        <label key={opt} className="flex items-center gap-2 p-2 hover:bg-slate-50 cursor-pointer text-[10px] rounded transition-colors group">
                           <input type="checkbox" className="w-3.5 h-3.5 accent-blue-600" checked={btn.id === 'period' ? selectedPeriods.includes(opt) : sidebarFilters[btn.id].includes(opt)} onChange={() => btn.id === 'period' ? togglePeriod(opt) : toggleSidebarFilter(btn.id, opt)} />
                           <span className={`truncate flex-1 font-sans ${ (btn.id === 'period' ? selectedPeriods.includes(opt) : sidebarFilters[btn.id].includes(opt)) ? 'text-blue-700 font-bold' : 'text-slate-600' }`}>{opt}{btn.id === 'rental' || btn.id === 'deposit' ? (opt.includes('만') ? '' : '만원') : ''}</span>
                         </label>
@@ -365,22 +365,22 @@ const App = () => {
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 relative">
-        <header className="h-[50px] bg-white border-b border-slate-200 flex items-center px-4 gap-4 flex-shrink-0 z-20 shadow-sm font-sans">
+        <header className="h-[50px] bg-white border-b border-slate-200 flex items-center px-4 gap-4 flex-shrink-0 z-20 shadow-sm">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 text-slate-400 font-sans" size={16} />
-            <input type="text" placeholder="매물 통합 검색..." className="w-full pl-9 pr-4 py-1.5 border border-slate-300 rounded-none text-xs focus:outline-none focus:border-blue-600 bg-white font-sans font-sans" onChange={e => setSearchTerm(e.target.value)} />
+            <Search className="absolute left-2.5 top-2.5 text-slate-400" size={16} />
+            <input type="text" placeholder="매물 통합 검색..." className="w-full pl-9 pr-4 py-1.5 border border-slate-300 rounded-none text-xs focus:outline-none focus:border-blue-600 bg-white" onChange={e => setSearchTerm(e.target.value)} />
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <button onClick={downloadTemplate} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 font-bold text-[10px] hover:bg-slate-50 transition-all text-slate-600 rounded-none font-sans font-sans"><Download size={12}/> 양식다운로드</button>
-            <span className="text-slate-500 text-[11px] font-medium border-l pl-3 flex items-center gap-2 font-sans font-sans"><Database size={12} className="text-slate-400 font-sans"/> 매물수: <b className="text-blue-600 font-black font-sans">{filteredAndSortedData.length}</b>건</span>
-            <button onClick={fetchData} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 font-bold text-[11px] hover:bg-slate-50 active:scale-95 transition-all text-blue-600 rounded-none font-sans font-sans"><RefreshCw size={12}/> 최신화</button>
+            <button onClick={downloadTemplate} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 font-bold text-[10px] hover:bg-slate-50 transition-all text-slate-600 rounded-none"><Download size={12}/> 양식다운로드</button>
+            <span className="text-slate-500 text-[11px] font-medium border-l pl-3 flex items-center gap-2"><Database size={12} className="text-slate-400"/> 매물수: <b className="text-blue-600 font-black">{filteredAndSortedData.length}</b>건</span>
+            <button onClick={fetchData} className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 font-bold text-[11px] hover:bg-slate-50 active:scale-95 transition-all text-blue-600 rounded-none"><RefreshCw size={12}/> 최신화</button>
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto bg-white m-1.5 shadow-sm border border-slate-200 relative text-slate-800 font-sans">
-          <table className="w-full border-collapse text-left text-[11px] table-fixed font-sans">
+        <div className="flex-1 overflow-auto bg-white m-1.5 shadow-sm border border-slate-200 relative text-slate-800">
+          <table className="w-full border-collapse text-left text-[11px] table-fixed">
             <thead className="sticky top-0 bg-[#f8f9fb] border-b border-slate-300 z-40 font-bold text-slate-600 text-center uppercase tracking-tighter">
-              <tr className="divide-x divide-slate-200 font-sans">
+              <tr className="divide-x divide-slate-200">
                 {Object.keys(baseColumns).map((label) => {
                   const dataKey = baseColumns[label];
                   const isFiltered = columnFilters[dataKey]?.length > 0;
@@ -390,37 +390,37 @@ const App = () => {
                   const isStatusCol = label === '상태';
                   let columnWidth = label === '상태' ? "w-[65px]" : label === '구분' ? "w-[58px]" : label === '차량번호' ? "w-[100px]" : label === '제조사' ? "w-[90px]" : label === '모델' ? "w-[110px]" : label === '세부모델' ? "w-[120px]" : label === '세부트림(선택옵션)' ? "w-[160px]" : label === '외부색상' || label === '내부색상' ? "w-[85px]" : label === '주행거리' ? "w-[90px]" : "w-auto";
                   return (
-                    <th key={label} className={`py-1.5 px-1 relative transition-colors font-sans font-sans ${isSorted ? 'bg-blue-100/50' : ''} ${columnWidth}`}>
-                      <div className="flex flex-row items-center justify-center gap-1 leading-tight h-full relative overflow-hidden font-sans">
-                        <span className={`${isFiltered || isSorted ? 'text-blue-700 font-black font-sans' : ''} ${label === '세부트림(선택옵션)' ? 'whitespace-pre-line font-sans' : 'whitespace-nowrap font-sans'} ${isStatusCol ? '' : 'truncate font-sans'}`}>{label === '세부트림(선택옵션)' ? "세부트림\n(선택옵션)" : label}</span>
+                    <th key={label} className={`py-1.5 px-1 relative transition-colors ${isSorted ? 'bg-blue-100/50' : ''} ${columnWidth}`}>
+                      <div className="flex flex-row items-center justify-center gap-1 leading-tight h-full relative overflow-hidden">
+                        <span className={`${isFiltered || isSorted ? 'text-blue-700 font-black' : ''} ${label === '세부트림(선택옵션)' ? 'whitespace-pre-line' : 'whitespace-nowrap'} ${isStatusCol ? '' : 'truncate'}`}>{label === '세부트림(선택옵션)' ? "세부트림\n(선택옵션)" : label}</span>
                         {canFilter && (
-                          <div className="relative font-sans">
-                            <button onClick={(e) => { e.stopPropagation(); setActiveFilterColumn(prev => prev === dataKey ? null : dataKey); }} className={`p-0.5 rounded-none transition-colors filter-toggle-btn font-sans ${isFiltered ? 'text-blue-700 font-sans font-sans' : 'text-slate-300 hover:text-slate-600'}`}>
+                          <div className="relative">
+                            <button onClick={(e) => { e.stopPropagation(); setActiveFilterColumn(prev => prev === dataKey ? null : dataKey); }} className={`p-0.5 rounded-none transition-colors filter-toggle-btn ${isFiltered ? 'text-blue-700' : 'text-slate-300 hover:text-slate-600'}`}>
                               <Filter size={10} fill={isFiltered ? "currentColor" : "none"} />
                             </button>
-                            {isFiltered && <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-blue-600 rounded-full font-sans"></div>}
+                            {isFiltered && <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-blue-600 rounded-full"></div>}
                           </div>
                         )}
-                        {canSort && <button onClick={() => requestSort(dataKey)} className={`p-0.5 rounded-none transition-colors font-sans ${isSorted ? 'text-blue-700 font-sans font-sans' : 'text-slate-300 hover:text-slate-600 font-sans'}`}>{isSorted ? (sortConfig.direction === 'asc' ? <ArrowUp size={10} /> : <ArrowDown size={10} />) : <ArrowUpDown size={10} />}</button>}
+                        {canSort && <button onClick={() => requestSort(dataKey)} className={`p-0.5 rounded-none transition-colors ${isSorted ? 'text-blue-700' : 'text-slate-300 hover:text-slate-600'}`}>{isSorted ? (sortConfig.direction === 'asc' ? <ArrowUp size={10} /> : <ArrowDown size={10} />) : <ArrowUpDown size={10} />}</button>}
                       </div>
                       {canFilter && activeFilterColumn === dataKey && (
-                        <div ref={filterRef} className="absolute top-full left-0 mt-1 w-52 bg-white border border-slate-200 shadow-xl z-50 text-left font-normal normal-case rounded-none ring-1 ring-black/5 font-sans font-sans">
-                          <div className="p-2 border-b bg-slate-50 flex justify-between items-center font-sans">
+                        <div ref={filterRef} className="absolute top-full left-0 mt-1 w-52 bg-white border border-slate-200 shadow-xl z-50 text-left font-normal normal-case rounded-none ring-1 ring-black/5">
+                          <div className="p-2 border-b bg-slate-50 flex justify-between items-center">
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">필터</span>
                             <div className="flex items-center gap-2">
-                              <button onClick={() => setColumnFilters(p => ({...p, [dataKey]: []}))} className="text-[9px] text-blue-600 font-bold font-sans">초기화</button>
-                              <button onClick={(e) => { e.stopPropagation(); setActiveFilterColumn(null); }} className="text-slate-400 hover:text-slate-600 transition-colors p-0.5 font-sans"><X size={12} /></button>
+                              <button onClick={() => setColumnFilters(p => ({...p, [dataKey]: []}))} className="text-[9px] text-blue-600 font-bold">초기화</button>
+                              <button onClick={(e) => { e.stopPropagation(); setActiveFilterColumn(null); }} className="text-slate-400 hover:text-slate-600 transition-colors p-0.5"><X size={12} /></button>
                             </div>
                           </div>
-                          <div className="max-h-60 overflow-y-auto p-1 hide-scrollbar font-sans font-sans">
+                          <div className="max-h-60 overflow-y-auto p-1 hide-scrollbar">
                             {(() => {
                               const counts = data.reduce((acc, item) => { const val = String(item[dataKey] || "미정"); acc[val] = (acc[val] || 0) + 1; return acc; }, {});
                               const sortedOptions = Object.entries(counts).sort((a, b) => b[1] - a[1]);
                               return sortedOptions.map(([value, count]) => (
-                                <label key={value} className="flex items-center gap-2 p-2 hover:bg-slate-50 cursor-pointer text-[10px] rounded transition-colors group font-sans">
-                                  <input type="checkbox" className="w-3 h-3 accent-blue-600 font-sans" checked={(columnFilters[dataKey] || []).includes(value)} onChange={() => { const current = columnFilters[dataKey] || []; const next = current.includes(value) ? current.filter(v => v !== value) : [...current, value]; setColumnFilters(prev => ({ ...prev, [dataKey]: next })); }}/>
-                                  <span className="truncate flex-1 font-sans">{value}</span>
-                                  <span className="text-slate-400 text-[9px] font-medium ml-auto group-hover:text-blue-600 tracking-tighter font-sans font-sans">{count}</span>
+                                <label key={value} className="flex items-center gap-2 p-2 hover:bg-slate-50 cursor-pointer text-[10px] rounded transition-colors group">
+                                  <input type="checkbox" className="w-3 h-3 accent-blue-600" checked={(columnFilters[dataKey] || []).includes(value)} onChange={() => { const current = columnFilters[dataKey] || []; const next = current.includes(value) ? current.filter(v => v !== value) : [...current, value]; setColumnFilters(prev => ({ ...prev, [dataKey]: next })); }}/>
+                                  <span className="truncate flex-1">{value}</span>
+                                  <span className="text-slate-400 text-[9px] font-medium ml-auto group-hover:text-blue-600 tracking-tighter">{count}</span>
                                 </label>
                               ));
                             })()}
@@ -431,35 +431,35 @@ const App = () => {
                   );
                 })}
                 {selectedPeriods.map(p => (
-                  <th key={p} className="py-1.5 px-1 relative w-[130px] bg-blue-200/20 border-l border-blue-200 text-blue-800 font-sans font-sans">
+                  <th key={p} className="py-1.5 px-1 relative w-[130px] bg-blue-200/20 border-l border-blue-200 text-blue-800">
                     <div className="flex flex-col items-center justify-center leading-tight h-full font-black">
-                      <span className="text-[10px] uppercase whitespace-nowrap font-sans font-sans">{p} 대여료</span>
-                      <span className="text-[9px] opacity-70 font-bold font-sans font-sans">(보증금)</span>
+                      <span className="text-[10px] uppercase whitespace-nowrap">{p} 대여료</span>
+                      <span className="text-[9px] opacity-70 font-bold">(보증금)</span>
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-center font-sans font-sans font-sans">
+            <tbody className="divide-y divide-slate-100 text-center">
               {filteredAndSortedData.map((item, idx) => (
-                <tr key={idx} onClick={() => handleCarClick(item)} className={`hover:bg-blue-50/50 cursor-pointer divide-x divide-slate-50 h-[48px] transition-colors font-sans ${selectedCar?.차량_번호 === item.차량_번호 ? 'bg-blue-50 font-bold border-l-2 border-l-blue-600' : ''}`}>
+                <tr key={idx} onClick={() => handleCarClick(item)} className={`hover:bg-blue-50/50 cursor-pointer divide-x divide-slate-50 h-[48px] transition-colors ${selectedCar?.차량_번호 === item.차량_번호 ? 'bg-blue-50 font-bold border-l-2 border-l-blue-600' : ''}`}>
                   <td className="p-2 overflow-hidden whitespace-nowrap"><StatusBadge text={item.차량_상태} type="상태" /></td>
-                  <td className="p-2 truncate font-sans"><StatusBadge text={item.차량_구분} type="구분" /></td>
+                  <td className="p-2 truncate"><StatusBadge text={item.차량_구분} type="구분" /></td>
                   <td className="p-2 truncate font-bold text-slate-900">{item.차량_번호 || '-'}</td>
-                  <td className="p-2 truncate text-slate-700 font-sans">{item.차량_제조사 || '-'}</td>
-                  <td className="p-2 truncate font-bold text-center text-slate-900 font-sans">{item.차량_모델명 || '-'}</td>
-                  <td className="p-2 truncate text-slate-500 text-left font-sans font-sans font-sans">{item.차량_세부모델 || '-'}</td>
-                  <td className="p-2 text-left leading-none font-sans font-sans">
-                    <div className="font-bold text-slate-800 truncate font-sans font-sans font-sans">{item.차량_세부트림 || '-'}</div>
-                    <div className="text-slate-400 font-normal text-[9px] truncate mt-0.5 font-sans font-sans font-sans">{item.차량_선택옵션 || '옵션없음'}</div>
+                  <td className="p-2 truncate text-slate-700">{item.차량_제조사 || '-'}</td>
+                  <td className="p-2 truncate font-bold text-center text-slate-900">{item.차량_모델명 || '-'}</td>
+                  <td className="p-2 truncate text-slate-500 text-left">{item.차량_세부모델 || '-'}</td>
+                  <td className="p-2 text-left leading-none">
+                    <div className="font-bold text-slate-800 truncate">{item.차량_세부트림 || '-'}</div>
+                    <div className="text-slate-400 font-normal text-[9px] truncate mt-0.5">{item.차량_선택옵션 || '옵션없음'}</div>
                   </td>
-                  <td className="p-2 truncate text-slate-500 whitespace-nowrap font-sans font-sans">{item.차량_외부색상 || '-'}</td>
-                  <td className="p-2 truncate text-slate-500 whitespace-nowrap font-sans font-sans">{item.차량_내부색상 || '-'}</td>
-                  <td className="p-2 truncate text-right font-medium text-slate-600 tracking-tight font-sans font-sans font-sans">{item.차량_현재주행거리 || '0'}km</td>
+                  <td className="p-2 truncate text-slate-500 whitespace-nowrap">{item.차량_외부색상 || '-'}</td>
+                  <td className="p-2 truncate text-slate-500 whitespace-nowrap">{item.차량_내부색상 || '-'}</td>
+                  <td className="p-2 truncate text-right font-medium text-slate-600 tracking-tight">{item.차량_현재주행거리 || '0'}km</td>
                   {selectedPeriods.map(p => (
-                    <td key={p} className="p-2 bg-blue-50/20 text-blue-700 font-black text-center leading-none font-sans font-sans">
-                      <div className="text-[12px] font-sans font-sans font-sans font-sans">{item[`금액_대여료_${p}`] || '-'}</div>
-                      <div className="text-slate-400 font-bold text-[9px] mt-0.5 font-sans font-sans font-sans font-sans font-sans">{item[`금액_보증금_${p}`] || '-'}</div>
+                    <td key={p} className="p-2 bg-blue-50/20 text-blue-700 font-black text-center leading-none">
+                      <div className="text-[12px]">{item[`금액_대여료_${p}`] || '-'}</div>
+                      <div className="text-slate-400 font-bold text-[9px] mt-0.5">{item[`금액_보증금_${p}`] || '-'}</div>
                     </td>
                   ))}
                 </tr>
@@ -469,118 +469,115 @@ const App = () => {
         </div>
 
         {/* --- 상품 상세 정보 레이어 (Drawer) --- */}
-        <div key={selectedCar?.차량_번호 || 'none'} className={`absolute right-0 top-0 h-full w-[440px] bg-white shadow-[-15px_0_35px_rgba(0,0,0,0.12)] z-[100] flex flex-col border-l border-slate-200 transition-transform duration-300 ease-in-out rounded-none font-sans ${selectedCar ? 'translate-x-0 animate-drawer-reset' : 'translate-x-full'}`}>
+        <div key={selectedCar?.차량_번호 || 'none'} className={`absolute right-0 top-0 h-full w-[440px] bg-white shadow-[-15px_0_35px_rgba(0,0,0,0.12)] z-[100] flex flex-col border-l border-slate-200 transition-transform duration-300 ease-in-out rounded-none ${selectedCar ? 'translate-x-0 animate-drawer-reset' : 'translate-x-full'}`}>
           {selectedCar && (
             <>
-              {/* 상단 타이틀 바 - 11px 고정 */}
-              <div className="h-[44px] flex justify-between items-center px-4 bg-white border-b border-slate-100 text-slate-800 flex-shrink-0 font-sans">
-                <h2 className="font-black text-[11px] tracking-tighter uppercase flex items-center gap-2 font-sans font-sans font-sans font-sans">
+              {/* 상단 타이틀 바 */}
+              <div className="h-[44px] flex justify-between items-center px-4 bg-white border-b border-slate-100 text-slate-800 flex-shrink-0">
+                <h2 className="font-black text-[11px] tracking-tighter uppercase flex items-center gap-2">
                   <Car size={16} className="text-blue-600" /> 상품 상세 정보
                 </h2>
-                <button onClick={() => setSelectedCar(null)} className="text-slate-400 hover:text-slate-600 transition-colors font-sans"><X size={18} /></button>
+                <button onClick={() => setSelectedCar(null)} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={18} /></button>
               </div>
 
-              {/* 본문 영역 - 모든 텍스트 11px 통일 */}
-              <div className="flex-1 overflow-y-auto p-1.5 space-y-1.5 scrollbar-hide text-slate-800 bg-white text-[11px] font-sans font-sans font-sans">
+              {/* 본문 영역 */}
+              <div className="flex-1 overflow-y-auto p-1.5 space-y-1.5 scrollbar-hide text-slate-800 bg-white text-[11px]">
                 
-                {/* 1. 차량 상세 제원 (3개 구간) */}
-                <section className="border border-slate-200 bg-white shadow-sm font-sans font-sans">
-                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 flex justify-between items-center font-sans">
-                    <span className="font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase font-sans font-sans font-sans font-sans">
+                {/* 1. 차량 상세 제원 */}
+                <section className="border border-slate-200 bg-white shadow-sm">
+                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 flex justify-between items-center">
+                    <span className="font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase">
                       <Sparkles size={12} className="text-blue-600"/> 1. 차량 상세 제원
                     </span>
                   </div>
-                  <div className="p-2 space-y-2.5 font-sans font-sans">
-                    {/* [식별 구간] */}
-                    <div className="flex items-center gap-2.5 py-1 border-b border-slate-50 font-sans font-sans font-sans">
-                      <span className="font-black text-[11px] text-blue-700 leading-none tracking-tight font-sans font-sans font-sans font-sans">{selectedCar.차량_번호}</span>
-                      <span className="font-bold text-[11px] text-slate-900 leading-none font-sans font-sans font-sans font-sans font-sans">
+                  <div className="p-2 space-y-2.5">
+                    <div className="flex items-center gap-2.5 py-1 border-b border-slate-50">
+                      <span className="font-black text-[11px] text-blue-700 leading-none tracking-tight">{selectedCar.차량_번호}</span>
+                      <span className="font-bold text-[11px] text-slate-900 leading-none">
                         {selectedCar.차량_제조사} {selectedCar.차량_모델명} 
                         {selectedCar.차량_연료 ? ` ${selectedCar.차량_연료}` : ''}
                       </span>
-                      <div className="flex gap-1 ml-auto font-sans font-sans font-sans font-sans">
+                      <div className="flex gap-1 ml-auto">
                         <StatusBadge text={selectedCar.차량_구분} type="구분" />
                         <StatusBadge text={selectedCar.차량_상태} type="상태" />
                       </div>
                     </div>
 
-                    {/* [사양 구간] */}
-                    <div className="space-y-1 py-1 font-sans font-sans font-sans">
-                      <div className="flex gap-2 items-start font-sans font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold w-[55px] flex-shrink-0 tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans">세부모델</span>
-                        <span className="font-black text-[11px] text-slate-900 leading-tight font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_세부모델}</span>
+                    <div className="space-y-1 py-1">
+                      <div className="flex gap-2 items-start">
+                        <span className="text-slate-400 font-bold w-[55px] flex-shrink-0 tracking-tighter text-[11px]">세부모델</span>
+                        <span className="font-black text-[11px] text-slate-900 leading-tight">{selectedCar.차량_세부모델}</span>
                       </div>
-                      <div className="flex gap-2 items-start font-sans font-sans font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold w-[55px] flex-shrink-0 tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans">세부트림</span>
-                        <span className="font-bold text-[11px] text-blue-600 leading-tight font-sans font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_세부트림}</span>
+                      <div className="flex gap-2 items-start">
+                        <span className="text-slate-400 font-bold w-[55px] flex-shrink-0 tracking-tighter text-[11px]">세부트림</span>
+                        <span className="font-bold text-[11px] text-blue-600 leading-tight">{selectedCar.차량_세부트림}</span>
                       </div>
-                      <div className="flex gap-2 items-start font-sans font-sans font-sans font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold w-[55px] flex-shrink-0 tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans">선택옵션</span>
-                        <span className="font-medium text-[11px] text-slate-600 leading-tight font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_선택옵션 || '장착 정보 없음'}</span>
+                      <div className="flex gap-2 items-start">
+                        <span className="text-slate-400 font-bold w-[55px] flex-shrink-0 tracking-tighter text-[11px]">선택옵션</span>
+                        <span className="font-medium text-[11px] text-slate-600 leading-tight">{selectedCar.차량_선택옵션 || '장착 정보 없음'}</span>
                       </div>
                     </div>
 
-                    {/* [기술제원 구간] */}
-                    <div className="grid grid-cols-2 divide-x divide-slate-100 border border-slate-100 shadow-sm overflow-hidden bg-white text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">
-                      <div className="p-1.5 flex justify-between items-center font-sans font-sans">
-                        <span className="text-blue-600 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans">주행거리</span>
-                        <span className="font-black text-[11px] text-blue-600 font-sans font-sans font-sans font-sans">{formatPrice(selectedCar.차량_현재주행거리)}km</span>
+                    <div className="grid grid-cols-2 divide-x divide-slate-100 border border-slate-100 shadow-sm overflow-hidden bg-white text-[11px]">
+                      <div className="p-1.5 flex justify-between items-center">
+                        <span className="text-blue-600 font-bold tracking-tighter text-[11px]">주행거리</span>
+                        <span className="font-black text-[11px] text-blue-600">{formatPrice(selectedCar.차량_현재주행거리)}km</span>
                       </div>
-                      <div className="p-1.5 flex justify-between items-center pl-2 font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans">외부색상</span>
-                        <span className="font-bold text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_외부색상}</span>
+                      <div className="p-1.5 flex justify-between items-center pl-2">
+                        <span className="text-slate-400 font-bold tracking-tighter text-[11px]">외부색상</span>
+                        <span className="font-bold text-[11px]">{selectedCar.차량_외부색상}</span>
                       </div>
-                      <div className="p-1.5 flex justify-between items-center border-t border-slate-50 font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans">배기량</span>
-                        <span className="font-black text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_배기량 ? formatPrice(selectedCar.차량_배기량) + 'cc' : '-'}</span>
+                      <div className="p-1.5 flex justify-between items-center border-t border-slate-50">
+                        <span className="text-slate-400 font-bold tracking-tighter text-[11px]">배기량</span>
+                        <span className="font-black text-[11px]">{selectedCar.차량_배기량 ? formatPrice(selectedCar.차량_배기량) + 'cc' : '-'}</span>
                       </div>
-                      <div className="p-1.5 flex justify-between items-center pl-2 border-t border-slate-50 font-sans font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans">내부색상</span>
-                        <span className="font-bold text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_내부색상}</span>
+                      <div className="p-1.5 flex justify-between items-center pl-2 border-t border-slate-50">
+                        <span className="text-slate-400 font-bold tracking-tighter text-[11px]">내부색상</span>
+                        <span className="font-bold text-[11px]">{selectedCar.차량_내부색상}</span>
                       </div>
-                      <div className="p-1.5 flex justify-between items-center border-t border-slate-50 font-sans font-sans font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans">최초등록일</span>
-                        <span className="font-bold text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_최초등록일}</span>
+                      <div className="p-1.5 flex justify-between items-center border-t border-slate-50">
+                        <span className="text-slate-400 font-bold tracking-tighter text-[11px]">최초등록일</span>
+                        <span className="font-bold text-[11px]">{selectedCar.차량_최초등록일}</span>
                       </div>
-                      <div className="p-1.5 flex justify-between items-center pl-2 border-t border-slate-50 font-sans font-sans font-sans font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans">차령만료일</span>
-                        <span className="font-bold text-[11px] text-rose-600 font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.차량_차령만료일 || '-'}</span>
+                      <div className="p-1.5 flex justify-between items-center pl-2 border-t border-slate-50">
+                        <span className="text-slate-400 font-bold tracking-tighter text-[11px]">차령만료일</span>
+                        <span className="font-bold text-[11px] text-rose-600">{selectedCar.차량_차령만료일 || '-'}</span>
                       </div>
-                      <div className="p-1.5 bg-slate-50/50 flex justify-between items-center col-span-2 border-t border-slate-100 font-sans font-sans font-sans font-sans">
-                        <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans">세부상태</span>
+                      <div className="p-1.5 bg-slate-50/50 flex justify-between items-center col-span-2 border-t border-slate-100">
+                        <span className="text-slate-400 font-bold tracking-tighter text-[11px]">세부상태</span>
                         <StatusBadge text={selectedCar.차량_세부상태} type="세부상태" />
                       </div>
                     </div>
                     
-                    <button onClick={() => window.open(selectedCar.차량_사진링크, '_blank')} className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black transition-all flex items-center justify-center gap-1.5 border border-slate-200 rounded-none shadow-sm font-sans text-[11px] font-sans font-sans font-sans font-sans font-sans">
+                    <button onClick={() => window.open(selectedCar.차량_사진링크, '_blank')} className="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black transition-all flex items-center justify-center gap-1.5 border border-slate-200 rounded-none shadow-sm text-[11px]">
                       <ExternalLink size={11}/> 실물 차량 사진 확인 (링크)
                     </button>
                   </div>
                 </section>
 
-                {/* 2. 대여료 및 보증금 안내 (11px 통일) */}
-                <section className="border border-slate-200 bg-white shadow-sm font-sans font-sans font-sans">
-                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 flex items-center gap-1.5 uppercase font-sans font-sans font-sans font-sans">
-                    <Banknote size={12} className="text-blue-600"/> <span className="font-black text-[11px] text-slate-600 font-sans font-sans font-sans font-sans font-sans">2. 대여료 및 보증금 안내</span>
+                {/* 2. 대여료 및 보증금 안내 */}
+                <section className="border border-slate-200 bg-white shadow-sm">
+                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 flex items-center gap-1.5 uppercase">
+                    <Banknote size={12} className="text-blue-600"/> <span className="font-black text-[11px] text-slate-600">2. 대여료 및 보증금 안내</span>
                   </div>
-                  <table className="w-full text-center border-collapse font-sans text-[11px] font-sans font-sans font-sans">
-                    <thead className="bg-[#f8f9fb] border-b border-slate-200 font-bold text-slate-500 uppercase font-sans font-sans font-sans">
-                      <tr className="divide-x divide-slate-200 font-sans font-sans font-sans">
-                        <th className="py-1 text-[11px] font-bold font-sans font-sans font-sans">계약기간</th>
-                        <th className="py-1 text-blue-700 text-[11px] font-bold font-sans font-sans font-sans text-right pr-4">월 대여료 (부가세 포함)</th>
-                        <th className="py-1 text-slate-400 text-[11px] font-bold font-sans font-sans font-sans text-right pr-4">보증금</th>
+                  <table className="w-full text-center border-collapse text-[11px]">
+                    <thead className="bg-[#f8f9fb] border-b border-slate-200 font-bold text-slate-500 uppercase">
+                      <tr className="divide-x divide-slate-200">
+                        <th className="py-1 text-[11px] font-bold">계약기간</th>
+                        <th className="py-1 text-blue-700 text-[11px] font-bold text-right pr-4">월 대여료 (부가세 포함)</th>
+                        <th className="py-1 text-slate-400 text-[11px] font-bold text-right pr-4">보증금</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50 font-medium text-slate-800 font-sans font-sans font-sans">
+                    <tbody className="divide-y divide-slate-50 font-medium text-slate-800">
                       {['6M', '12M', '24M', '36M', '48M', '60M'].map(m => {
                         const fee = selectedCar[`금액_대여료_${m}`];
                         const dep = selectedCar[`금액_보증금_${m}`];
                         if (!fee || fee === '-' || fee === '0' || fee === '0원') return null;
                         return (
-                          <tr key={m} className="divide-x divide-slate-50 hover:bg-slate-50 transition-colors font-sans text-[11px] font-sans font-sans font-sans">
-                            <td className="py-1 font-black uppercase text-[11px] font-sans font-sans font-sans font-sans">{formatPeriod(m)}</td>
-                            <td className="py-1 text-blue-700 font-black text-[11px] font-sans font-sans font-sans text-right pr-4 font-sans font-sans font-sans">{fee}원</td>
-                            <td className="py-1 text-slate-500 font-sans text-[11px] font-sans font-sans font-sans text-right pr-4 font-sans font-sans font-sans">{dep}원</td>
+                          <tr key={m} className="divide-x divide-slate-50 hover:bg-slate-50 transition-colors">
+                            <td className="py-1 font-black uppercase text-[11px]">{formatPeriod(m)}</td>
+                            <td className="py-1 text-blue-700 font-black text-[11px] text-right pr-4">{fee}원</td>
+                            <td className="py-1 text-slate-500 text-[11px] text-right pr-4">{dep}원</td>
                           </tr>
                         );
                       })}
@@ -588,20 +585,20 @@ const App = () => {
                   </table>
                 </section>
 
-                {/* 3. 보험 보상 상세 (11px 통일) */}
-                <section className="border border-slate-200 bg-white shadow-sm font-sans font-sans font-sans">
-                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase tracking-tighter font-sans font-sans font-sans font-sans">
-                    <Shield size={12} className="text-blue-600"/> <span className="font-black text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans">3. 보험 보상 및 개별 면책금 상세</span>
+                {/* 3. 보험 보상 상세 */}
+                <section className="border border-slate-200 bg-white shadow-sm">
+                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase tracking-tighter">
+                    <Shield size={12} className="text-blue-600"/> <span className="font-black text-[11px]">3. 보험 보상 및 개별 면책금 상세</span>
                   </div>
-                  <table className="w-full text-center border-collapse text-[11px] font-sans font-sans font-sans">
-                    <thead className="bg-slate-50/50 font-bold text-slate-400 uppercase font-sans font-sans font-sans">
-                      <tr className="divide-x divide-slate-100 border-b border-slate-100 font-sans font-sans font-sans">
-                        <th className="py-1 px-2 text-left font-bold text-[11px] font-sans font-sans font-sans">항목</th>
-                        <th className="py-1 px-2 font-bold text-[11px] font-sans font-sans font-sans">보상한도</th>
-                        <th className="py-1 px-2 text-right font-bold text-[11px] font-sans font-sans font-sans pr-4">면책금</th>
+                  <table className="w-full text-center border-collapse text-[11px]">
+                    <thead className="bg-slate-50/50 font-bold text-slate-400 uppercase">
+                      <tr className="divide-x divide-slate-100 border-b border-slate-100">
+                        <th className="py-1 px-2 text-left font-bold text-[11px]">항목</th>
+                        <th className="py-1 px-2 font-bold text-[11px]">보상한도</th>
+                        <th className="py-1 px-2 text-right font-bold text-[11px] pr-4">면책금</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50 text-slate-800 font-sans font-sans font-sans">
+                    <tbody className="divide-y divide-slate-50 text-slate-800">
                       {[
                         { k: '대인 배상', v: selectedCar.보험_대인 || '무한', d: selectedCar.보험_대인면책금 || '0원' },
                         { k: '대물 배상', v: selectedCar.보험_대물 || '1억원', d: selectedCar.보험_대물면책금 || '10만' },
@@ -610,69 +607,69 @@ const App = () => {
                         { k: '자기차량(자차)', v: '차량가액', d: `수리비 20% (${selectedCar.보험_최소면책금 || '20만'}~${selectedCar.보험_최대면책금 || '50만'})`, highlight: true },
                         { k: '긴급 출동', v: `연 5회`, d: selectedCar.보험_긴급출동면책금 || '없음' }
                       ].map((row, i) => (
-                        <tr key={i} className={`divide-x divide-slate-50 ${row.highlight ? 'bg-blue-50/20' : ''} font-sans font-sans font-sans`}>
-                          <td className="p-1.5 text-left font-bold text-slate-500 font-sans text-[11px] font-sans font-sans font-sans">{row.k}</td>
-                          <td className="p-1.5 font-black font-sans text-[11px] font-sans font-sans font-sans">{row.v}</td>
-                          <td className={`p-1.5 text-right font-black ${row.highlight ? 'text-red-600' : 'text-blue-700'} font-sans text-[11px] font-sans font-sans font-sans pr-4 font-sans font-sans font-sans`}>{row.d}</td>
+                        <tr key={i} className={`divide-x divide-slate-50 ${row.highlight ? 'bg-blue-50/20' : ''}`}>
+                          <td className="p-1.5 text-left font-bold text-slate-500 text-[11px]">{row.k}</td>
+                          <td className="p-1.5 font-black text-[11px]">{row.v}</td>
+                          <td className={`p-1.5 text-right font-black ${row.highlight ? 'text-red-600' : 'text-blue-700'} text-[11px] pr-4`}>{row.d}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </section>
 
-                {/* 4. 계약 및 추가 비용 조건 (11px 통일) */}
-                <section className="border border-slate-200 bg-white shadow-sm font-sans font-sans font-sans">
-                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase font-sans font-sans font-sans font-sans">
-                    <FileText size={12} className="text-blue-600"/> <span className="font-black text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans">4. 계약 및 추가 비용 조건</span>
+                {/* 4. 계약 및 추가 비용 조건 */}
+                <section className="border border-slate-200 bg-white shadow-sm">
+                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase">
+                    <FileText size={12} className="text-blue-600"/> <span className="font-black text-[11px]">4. 계약 및 추가 비용 조건</span>
                   </div>
-                  <div className="grid grid-cols-2 divide-x divide-slate-100 border-b border-slate-100 bg-white text-[11px] font-sans font-sans font-sans">
-                    <div className="p-2 flex justify-between items-baseline font-sans font-sans font-sans">
-                      <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans">기본연령</span>
-                      <span className="font-black text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.계약_기본운전연령 || '만 26세'}</span>
+                  <div className="grid grid-cols-2 divide-x divide-slate-100 border-b border-slate-100 bg-white text-[11px]">
+                    <div className="p-2 flex justify-between items-baseline">
+                      <span className="text-slate-400 font-bold tracking-tighter text-[11px]">기본연령</span>
+                      <span className="font-black text-[11px]">{selectedCar.계약_기본운전연령 || '만 26세'}</span>
                     </div>
-                    <div className="p-2 flex justify-between items-baseline font-sans font-sans font-sans">
-                      <span className="text-slate-400 font-bold tracking-tighter text-[11px] font-sans font-sans font-sans font-sans font-sans">약정거리</span>
-                      <span className="font-black text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans">{selectedCar.계약_약정주행거리 || '2만km'}</span>
+                    <div className="p-2 flex justify-between items-baseline">
+                      <span className="text-slate-400 font-bold tracking-tighter text-[11px]">약정거리</span>
+                      <span className="font-black text-[11px]">{selectedCar.계약_약정주행거리 || '2만km'}</span>
                     </div>
                   </div>
-                  <div className="divide-y divide-slate-50 text-slate-800 bg-white text-[11px] font-sans font-sans font-sans">
-                    <div className="flex justify-between p-1.5 hover:bg-slate-50 transition-colors font-sans font-sans font-sans">
-                      <span className="text-slate-500 font-bold font-sans text-[11px] font-sans font-sans font-sans font-sans">만 21세 연령 하향</span>
-                      <span className="font-black text-blue-700 text-[11px] font-sans font-sans font-sans font-sans font-sans">+{formatPrice(selectedCar.계약_21세추가금)}원/월</span>
+                  <div className="divide-y divide-slate-50 text-slate-800 bg-white text-[11px]">
+                    <div className="flex justify-between p-1.5 hover:bg-slate-50 transition-colors">
+                      <span className="text-slate-500 font-bold text-[11px]">만 21세 연령 하향</span>
+                      <span className="font-black text-blue-700 text-[11px]">+{formatPrice(selectedCar.계약_21세추가금)}원/월</span>
                     </div>
-                    <div className="flex justify-between p-1.5 hover:bg-slate-50 transition-colors font-sans font-sans font-sans">
-                      <span className="text-slate-500 font-bold font-sans text-[11px] font-sans font-sans font-sans font-sans">만 23세 연령 하향</span>
-                      <span className="font-black text-blue-700 text-[11px] font-sans font-sans font-sans font-sans font-sans">+{formatPrice(selectedCar.계약_23세추가금)}원/월</span>
+                    <div className="flex justify-between p-1.5 hover:bg-slate-50 transition-colors">
+                      <span className="text-slate-500 font-bold text-[11px]">만 23세 연령 하향</span>
+                      <span className="font-black text-blue-700 text-[11px]">+{formatPrice(selectedCar.계약_23세추가금)}원/월</span>
                     </div>
-                    <div className="flex justify-between p-1.5 hover:bg-slate-50 transition-colors font-sans font-sans font-sans">
-                      <span className="text-slate-500 font-bold font-sans text-[11px] font-sans font-sans font-sans font-sans">연간 1만km 거리 추가</span>
-                      <span className="font-black text-blue-700 text-[11px] font-sans font-sans font-sans font-sans font-sans">+{formatPrice(selectedCar.계약_주행거리추가금)}원/월</span>
+                    <div className="flex justify-between p-1.5 hover:bg-slate-50 transition-colors">
+                      <span className="text-slate-500 font-bold text-[11px]">연간 1만km 거리 추가</span>
+                      <span className="font-black text-blue-700 text-[11px]">+{formatPrice(selectedCar.계약_주행거리추가금)}원/월</span>
                     </div>
                   </div>
                 </section>
 
-                {/* 5. 담당자 및 입금 계좌 안내 (11px 통일) */}
-                <section className="pb-1 border border-slate-200 bg-white shadow-sm font-sans font-sans font-sans">
-                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase tracking-tighter font-sans font-sans font-sans font-sans">
-                    <User size={12} className="text-blue-600"/> <span className="font-black text-[11px] font-sans font-sans font-sans font-sans font-sans font-sans font-sans font-sans">5. 담당자 및 입금 계좌 안내</span>
+                {/* 5. 담당자 및 입금 계좌 안내 */}
+                <section className="pb-1 border border-slate-200 bg-white shadow-sm">
+                  <div className="bg-slate-50 px-2 py-1 border-b border-slate-200 font-black text-[11px] text-slate-600 flex items-center gap-1.5 uppercase tracking-tighter">
+                    <User size={12} className="text-blue-600"/> <span className="font-black text-[11px]">5. 담당자 및 입금 계좌 안내</span>
                   </div>
-                  <div className="p-2 space-y-2 bg-white text-[11px] font-sans font-sans font-sans">
-                    <div className="grid grid-cols-2 gap-2 font-sans font-sans font-sans">
-                      <input type="text" placeholder="소속" className="p-1.5 border border-slate-200 outline-none font-bold focus:border-blue-500 bg-white text-[11px] font-sans font-sans h-[28px] font-sans font-sans font-sans" value={managerInfo.company} onChange={(e) => setManagerInfo({...managerInfo, company: e.target.value})} />
-                      <input type="text" placeholder="성명/직책" className="p-1.5 border border-slate-200 outline-none font-bold focus:border-blue-500 bg-white text-[11px] font-sans font-sans h-[28px] font-sans font-sans font-sans" value={managerInfo.nameTitle} onChange={(e) => setManagerInfo({...managerInfo, nameTitle: e.target.value})} />
-                      <input type="text" placeholder="연락처" className="p-1.5 border border-slate-200 outline-none font-bold focus:border-blue-500 col-span-2 bg-white text-[11px] font-sans font-sans h-[28px] font-sans font-sans font-sans" value={managerInfo.phone} onChange={(e) => setManagerInfo({...managerInfo, phone: e.target.value})} />
+                  <div className="p-2 space-y-2 bg-white text-[11px]">
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="text" placeholder="소속" className="p-1.5 border border-slate-200 outline-none font-bold focus:border-blue-500 bg-white text-[11px] h-[28px]" value={managerInfo.company} onChange={(e) => setManagerInfo({...managerInfo, company: e.target.value})} />
+                      <input type="text" placeholder="성명/직책" className="p-1.5 border border-slate-200 outline-none font-bold focus:border-blue-500 bg-white text-[11px] h-[28px]" value={managerInfo.nameTitle} onChange={(e) => setManagerInfo({...managerInfo, nameTitle: e.target.value})} />
+                      <input type="text" placeholder="연락처" className="p-1.5 border border-slate-200 outline-none font-bold focus:border-blue-500 col-span-2 bg-white text-[11px] h-[28px]" value={managerInfo.phone} onChange={(e) => setManagerInfo({...managerInfo, phone: e.target.value})} />
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100 space-y-2 font-sans font-sans font-sans">
-                      <label className="flex items-center gap-2 cursor-pointer group font-sans font-sans font-sans font-sans">
-                        <input type="checkbox" className="w-3.5 h-3.5 accent-blue-600 font-sans font-sans font-sans font-sans" checked={managerInfo.includeAccount} onChange={(e) => setManagerInfo({...managerInfo, includeAccount: e.target.checked})} />
-                        <span className="text-[11px] font-black text-blue-600 group-hover:text-blue-800 transition-colors font-sans font-sans font-sans font-sans font-sans">계좌번호 같이 보내기</span>
+                    <div className="pt-2 border-t border-slate-100 space-y-2">
+                      <label className="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" className="w-3.5 h-3.5 accent-blue-600" checked={managerInfo.includeAccount} onChange={(e) => setManagerInfo({...managerInfo, includeAccount: e.target.checked})} />
+                        <span className="text-[11px] font-black text-blue-600 group-hover:text-blue-800 transition-colors">계좌번호 같이 보내기</span>
                       </label>
                       
                       {managerInfo.includeAccount && (
-                        <div className="p-2 bg-blue-50 border border-blue-100 text-center animate-in fade-in slide-in-from-top-1 duration-200 font-sans font-sans font-sans">
-                          <p className="text-[11px] font-black text-blue-700 tracking-tighter font-sans font-sans font-sans font-sans font-sans">{selectedCar.계약_입금계좌번호 || '계좌 정보 미등록'}</p>
-                          <p className="text-[10px] mt-0.5 font-bold uppercase tracking-tighter text-blue-400 font-sans font-sans font-sans font-sans font-sans">우리은행 (예금주: 프레패스)</p>
+                        <div className="p-2 bg-blue-50 border border-blue-100 text-center animate-in fade-in slide-in-from-top-1 duration-200">
+                          <p className="text-[11px] font-black text-blue-700 tracking-tighter">{selectedCar.계약_입금계좌번호 || '계좌 정보 미등록'}</p>
+                          <p className="text-[10px] mt-0.5 font-bold uppercase tracking-tighter text-blue-400">우리은행 (예금주: 프레패스)</p>
                         </div>
                       )}
                     </div>
@@ -680,21 +677,21 @@ const App = () => {
                 </section>
               </div>
 
-              {/* 하단 버튼 (11px 통일) */}
-              <div className="p-2 border-t bg-white flex-shrink-0 grid grid-cols-2 gap-1.5 font-sans font-sans font-sans">
+              {/* 하단 버튼 */}
+              <div className="p-2 border-t bg-white flex-shrink-0 grid grid-cols-2 gap-1.5">
                 <button 
-                  className={`py-3 font-black text-[11px] flex items-center justify-center gap-1.5 rounded-none transition-all active:scale-[0.99] shadow-sm font-sans font-sans font-sans ${copyLinkFeedback ? 'bg-emerald-600 text-white border-emerald-600 font-sans' : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50 font-sans'}`}
+                  className={`py-3 font-black text-[11px] flex items-center justify-center gap-1.5 rounded-none transition-all active:scale-[0.99] shadow-sm ${copyLinkFeedback ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50'}`}
                   onClick={handleCopyLink}
                 >
                   {copyLinkFeedback ? <CheckCircle2 size={14}/> : <Share2 size={14}/>}
-                  <span className="font-sans font-sans font-sans font-sans font-sans">{copyLinkFeedback ? '주소 복사됨' : '고객용 링크'}</span>
+                  <span>{copyLinkFeedback ? '주소 복사됨' : '고객용 링크'}</span>
                 </button>
                 <button 
-                  className={`py-3 font-black text-[11px] flex items-center justify-center gap-1.5 rounded-none transition-all active:scale-[0.99] shadow-sm font-sans font-sans font-sans ${copyFeedback ? 'bg-green-600 text-white border-green-600 font-sans font-sans font-sans' : 'bg-slate-800 text-white hover:bg-slate-900 border-slate-800 font-sans'}`} 
+                  className={`py-3 font-black text-[11px] flex items-center justify-center gap-1.5 rounded-none transition-all active:scale-[0.99] shadow-sm ${copyFeedback ? 'bg-green-600 text-white border-green-600' : 'bg-slate-800 text-white hover:bg-slate-900 border-slate-800'}`} 
                   onClick={handleCopySummary}
                 >
                   {copyFeedback ? <CheckCircle2 size={14}/> : <Copy size={14}/>}
-                  <span className="font-sans font-sans font-sans font-sans font-sans">{copyFeedback ? '텍스트 복사됨' : '전달용 텍스트'}</span>
+                  <span>{copyFeedback ? '텍스트 복사됨' : '전달용 텍스트'}</span>
                 </button>
               </div>
             </>
