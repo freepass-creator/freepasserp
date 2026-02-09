@@ -166,6 +166,23 @@
 <!-- [정밀 수정] 메인 페이지 드래그 금지를 위해 select-none 적용 -->
 <body class="overflow-hidden border-none select-none">
 
+<!-- [정밀 수정] 새로고침 시 깜빡임 방지용 초고속 인증 패스 로직 (가장 상단에 배치) -->
+<script>
+    (function() {
+        const isGranted = localStorage.getItem('erp_access_granted');
+        const expireTime = localStorage.getItem('erp_access_expire');
+        const now = Date.now();
+        if (isGranted === 'true' && expireTime && now < parseInt(expireTime)) {
+            const css = '#access-gate { display: none !important; } #app { opacity: 1 !important; }';
+            const head = document.head || document.getElementsByTagName('head')[0];
+            const style = document.createElement('style');
+            style.type = 'text/css';
+            style.appendChild(document.createTextNode(css));
+            head.appendChild(style);
+        }
+    })();
+</script>
+
 <div id="system-alert"></div>
 
 <!-- 보안 접속 게이트 -->
@@ -181,15 +198,15 @@
             </div>
         </div>
 
-        <!-- [정밀 수정] 모바일에서는 정보 등록 섹션을 완전히 숨겨 심플하게 구성 -->
-        <div class="bg-white/5 p-6 rounded-none space-y-4 border border-white/10 text-left hidden md:block">
-            <p class="text-[11px] text-blue-400 font-black uppercase tracking-widest">사용자 정보 등록</p>
+        <!-- [정밀 수정] 사용자 정보 등록 (선택 사항으로 명시) -->
+        <div class="bg-white/5 p-6 rounded-none space-y-4 border border-white/10 text-left">
+            <p class="text-[11px] text-blue-400 font-black uppercase tracking-widest">사용자 정보 등록 (선택)</p>
             <div class="grid grid-cols-2 gap-2">
                 <input type="text" id="gate-co" placeholder="소속" class="p-3 bg-slate-800 border border-slate-700 text-xs text-white focus:border-blue-500 outline-none">
                 <input type="text" id="gate-nt" placeholder="성명/직책" class="p-3 bg-slate-800 border border-slate-700 text-xs text-white focus:border-blue-500 outline-none">
                 <input type="text" id="gate-ph" placeholder="연락처" class="p-3 bg-slate-800 border border-slate-700 text-xs text-white focus:border-blue-500 outline-none col-span-2">
             </div>
-            <p class="text-[10px] text-slate-500 font-medium text-center w-full">※ 입력하신 정보는 담당자정보에 자동 반영됩니다.</p>
+            <p class="text-[10px] text-slate-500 font-medium text-center w-full">※ 입력 시 담당자 정보에 자동 반영됩니다.</p>
         </div>
 
         <div class="space-y-4">
@@ -312,7 +329,7 @@
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             state.authorized = true;
-            // [정밀 수정] 중복 호출 방지를 위해 window.onload가 아닌 여기서만 단일 호출
+            // [정밀 수정] 인증 완료 시 데이터 로드
             fetchData(false);
         } else {
             initAuth();
@@ -373,27 +390,40 @@
 
     window.checkAccess = () => {
         const code = document.getElementById('security-code').value;
-        const isMobile = window.innerWidth < 768;
-
-        // [정밀 수정] 모바일이 아닐 때만 정보 입력 체크
-        if (!isMobile) {
-            const co = document.getElementById('gate-co').value;
-            const nt = document.getElementById('gate-nt').value;
-            const ph = document.getElementById('gate-ph').value;
-            if (!co || !nt || !ph) { showMsg("정보를 모두 입력해 주세요."); return; }
-            state.managerInfo = { company: co, nameTitle: nt, phone: ph, includeAccount: true, saveInfo: true };
-            localStorage.setItem('erp_manager_company', co);
-            localStorage.setItem('erp_manager_nameTitle', nt);
-            localStorage.setItem('erp_manager_phone', ph);
-            localStorage.setItem('erp_save_manager', 'true');
-        }
+        // [정밀 수정] 사용자 정보 입력은 선택 사항으로 변경 (비어있어도 진행 가능)
+        const co = document.getElementById('gate-co').value.trim();
+        const nt = document.getElementById('gate-nt').value.trim();
+        const ph = document.getElementById('gate-ph').value.trim();
         
         if (code === ACCESS_CODE) {
+            // [정밀 수정] 입력된 정보가 있는 경우에만 저장 및 업데이트
+            state.managerInfo = { 
+                company: co, 
+                nameTitle: nt, 
+                phone: ph, 
+                includeAccount: true, 
+                saveInfo: true 
+            };
+            
+            if (co || nt || ph) {
+                localStorage.setItem('erp_manager_company', co);
+                localStorage.setItem('erp_manager_nameTitle', nt);
+                localStorage.setItem('erp_manager_phone', ph);
+                localStorage.setItem('erp_save_manager', 'true');
+            } else {
+                // 아무것도 입력 안했을 경우 기존 기록 삭제
+                localStorage.removeItem('erp_manager_company');
+                localStorage.removeItem('erp_manager_nameTitle');
+                localStorage.removeItem('erp_manager_phone');
+                localStorage.setItem('erp_save_manager', 'false');
+            }
+            
+            const expireTime = Date.now() + (90 * 24 * 60 * 60 * 1000);
             localStorage.setItem('erp_access_granted', 'true');
+            localStorage.setItem('erp_access_expire', expireTime.toString());
+            
             document.getElementById('access-gate').style.display = 'none';
             document.getElementById('app').classList.remove('opacity-0');
-            
-            // [정밀 수정] 보안코드 인증 성공 시 fetchData(true)를 호출하여 즉시 서버 연동 시작
             fetchData(true);
         } else {
             showMsg("보안 코드가 일치하지 않습니다.");
@@ -401,17 +431,27 @@
         }
     };
 
+    /* [정밀 수정] 사용자 정보 노출 로직 정밀 수정 (공란일 경우 숨김 및 '님'자 제거) */
     function updateTopIdentity() {
         const identityArea = document.getElementById('identity-area');
-        if (!identityArea || !state.managerInfo.company) return;
+        if (!identityArea) return;
+
+        const co = state.managerInfo.company || '';
+        const nt = state.managerInfo.nameTitle || '';
+
+        // [정밀 수정] 소속과 성명이 모두 비어있으면 영역 자체를 숨김
+        if (!co && !nt) {
+            identityArea.classList.add('hidden');
+            return;
+        }
 
         const quote = dailyQuotes[new Date().getDate() % dailyQuotes.length];
         
         identityArea.innerHTML = `
             <div class="flex flex-col text-left leading-tight mr-6">
                 <div class="flex items-center gap-1.5">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${state.managerInfo.company}</span>
-                    <span class="text-[11px] text-slate-700 font-black">${state.managerInfo.nameTitle} 님</span>
+                    ${co ? `<span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${co}</span>` : ''}
+                    ${nt ? `<span class="text-[11px] text-slate-700 font-black">${nt} 님</span>` : ''}
                 </div>
                 <span class="text-[9px] text-slate-400 font-medium mt-0.5 tracking-tight">${quote}</span>
             </div>
@@ -452,7 +492,7 @@
     const getBatteryCapacity = (c) => {
         const isEV = String(c.차량_연료).includes('전기');
         if (!isEV) return null;
-        let cap = String(c.차량_배_터리용량 || c.차량_배기량 || '').trim();
+        let cap = String(c.차량_배터리용량 || c.차량_배기량 || '').trim();
         if (cap && cap !== '-' && cap !== '0' && isNaN(parseInt(cap)) === false) {
             return /^\d+$/.test(cap) ? cap + 'kWh' : cap;
         }
@@ -493,18 +533,16 @@
         const t = String(text);
 
         if (type === '구분') {
-            // [정밀 수정] 신차 강조 및 나머지 카테고리별 차별화
             if (t === '신차') colorClass = "bg-blue-600 text-white border-blue-700 shadow-sm font-black"; 
             else if (t.includes('재렌트')) colorClass = "bg-indigo-50 text-indigo-700 border-indigo-100";
             else if (t.includes('재구독')) colorClass = "bg-teal-50 text-teal-700 border-teal-100";
             else if (t.includes('중고')) colorClass = "bg-slate-100 text-slate-700 border-slate-200";
             else if (t.includes('구독')) colorClass = "bg-emerald-50 text-emerald-700 border-emerald-100";
-            else colorClass = "bg-purple-50 text-purple-700 border-purple-100"; // 신규 카테고리 대응
+            else colorClass = "bg-purple-50 text-purple-700 border-purple-100"; 
         } else if (type === '상태' || type === '세부상태') {
-            // [정밀 수정] 지능형 키워드 대응 (긍정/부정/대기)
             if (t.match(/가능|정상|통과|활성/)) colorClass = "bg-emerald-50 text-emerald-700 border-emerald-100";
             else if (t.match(/불가|완료|종료|매진|삭제/)) colorClass = "bg-rose-50 text-rose-700 border-rose-100";
-            else colorClass = "bg-amber-50 text-amber-700 border-amber-100"; // 상담/대기/미정 등
+            else colorClass = "bg-amber-50 text-amber-700 border-amber-100"; 
         }
         return `<span class="inline-flex items-center justify-center px-1.5 py-0.5 border text-[10px] font-black leading-none whitespace-nowrap rounded-none ${colorClass}">${text}</span>`;
     }
@@ -611,7 +649,6 @@
             const isActive = state.activeFilterColumn === dataKey;
             const isFilterable = filterableColumns.includes(label);
             
-            // [정밀 수정] 차량번호, 제조사, 모델, 주행거리 칸 너비 정밀 축소 (타이트하게 조정)
             let columnWidth = (label === '상태') ? "w-[72px]" : (label === '구분') ? "w-[72px]" : (label === '차량번호') ? "w-[90px]" : (label === '제조사') ? "w-[75px]" : (label === '모델') ? "w-[95px]" : (label === '세부모델') ? "w-[120px]" : (label === '세부트림(선택옵션)') ? "w-[220px]" : (label === '외부색상' || label === '내부색상') ? "w-[85px]" : (label === '주행거리') ? "w-[90px]" : "w-auto";
             
             let displayLabel = '';
@@ -626,10 +663,8 @@
                 displayLabel = `<span class="${isFiltered || isSorted ? 'text-blue-700 font-black' : ''} truncate">${label}</span>`;
             }
 
-            // [정밀 수정] 모바일에서 비필수 열 숨기기 (hidden md:table-cell)로 깨짐 방지
             let responsiveClass = (label === '구분' || label === '제조사' || label === '세부모델' || label === '외부색상' || label === '내부색상') ? 'hidden md:table-cell' : '';
 
-            // [정밀 수정] 모든 헤더 여백 축소 (py-2 -> py-1)
             html += `
                 <th class="py-1 px-1 relative transition-colors border-b border-slate-200 ${isSorted || isActive ? 'bg-blue-50' : ''} ${columnWidth} ${responsiveClass}">
                     <div ${isFilterable ? `onclick="toggleColumnFilter('${dataKey}'); event.stopPropagation();"` : ""} class="flex flex-row items-center justify-center gap-1 leading-tight h-full relative overflow-hidden ${isFilterable ? 'cursor-pointer' : ''}">
@@ -642,13 +677,11 @@
         });
         state.selectedPeriods.forEach(p => {
             const isSorted = state.sortConfig.key === `금액_대여료_${p}`;
-            // [정밀 수정] 대여료/보증금 헤더 너비 축소 (95px -> 82px) 및 (보증금) 색상 회색(text-slate-400)으로 변경
             html += `
                 <th class="py-1 px-1 relative w-[82px] bg-blue-50 border-l border-blue-100 text-blue-800 ${isSorted ? 'bg-blue-100' : ''}">
                     <div class="flex flex-row items-center justify-center gap-1 leading-tight h-full font-black text-center">
                         <div class="flex flex-col items-center text-center w-full">
                             <span class="text-[10px] uppercase">${formatPeriod(p)}</span>
-                            <!-- [정밀 수정] (보증금) 텍스트를 회색(text-slate-400)으로 정밀 수정 -->
                             <span class="text-[9px] text-slate-400 font-bold">(보증금)</span>
                         </div>
                         <button onclick="handleSort('금액_대여료_${p}')" class="p-0.5 ${isSorted ? 'text-blue-700' : 'text-slate-300'}"><i data-lucide="${isSorted ? (state.sortConfig.direction === 'asc' ? 'arrow-up' : 'arrow-down') : 'arrow-up-down'}" class="w-2.5 h-2.5"></i></button>
@@ -669,19 +702,14 @@
                 <td class="py-1 px-1 truncate font-black text-slate-900">${item.차량_모델명 || '-'}</td>
                 <td class="py-1 px-1 truncate text-slate-500 text-left font-medium hidden md:table-cell">${item.차량_세부모델 || '-'}</td>
                 <td class="py-1 px-1 text-left leading-none">
-                    <!-- [정밀 수정] 세부트림 2줄 제한 및 줄바꿈 최적화 -->
                     <div class="font-bold text-slate-800 line-clamp-2 leading-tight">${item.차량_세부트림 || '-'}</div>
-                    <!-- [정밀 수정] 선택옵션 한 줄 노출 및 초과 시 ... 처리 -->
                     <div class="text-slate-400 font-normal text-[9px] truncate mt-0.5 leading-tight">${item.차량_선택옵션 || '옵션없음'}</div>
                 </td>
                 <td class="py-1 px-1 truncate text-slate-500 whitespace-nowrap font-medium text-center hidden md:table-cell">${item.차량_외부색상 || '-'}</td>
                 <td class="py-1 px-1 truncate text-slate-500 whitespace-nowrap font-medium text-center hidden md:table-cell">${item.차량_내부색상 || '-'}</td>
-                <!-- [정밀 수정] 주행거리 셀 간격 축소 (pr-3 -> pr-1.5) -->
                 <td class="py-1 px-1 truncate text-right font-bold text-slate-700 pr-1.5">${formatPrice(item.차량_현재주행거리)}km</td>
                 ${state.selectedPeriods.map(p => `
-                    <!-- [정밀 수정] 대여료/보증금 셀 간격 축소 (pr-3 -> pr-1.5) -->
                     <td class="py-1 px-1 bg-blue-50/30 text-blue-800 font-black text-right pr-1.5 leading-none">
-                        <!-- [정밀 수정] 대여료 금액 폰트 사이즈 조정 (12px -> 11px) -->
                         <div class="text-[11px]">${item[`금액_대여료_${p}`] || '-'}</div>
                         <div class="text-slate-400 font-bold text-[9px] mt-1">${item[`금액_보증금_${p}`] || '-'}</div>
                     </td>
@@ -878,7 +906,6 @@
 
     window.handleCarClick = (no, event) => { 
         if (event) event.stopPropagation(); 
-        // [정밀 수정] 드래그 중(텍스트 선택 중)이라면 렌더링을 방지하여 선택 영역 유지
         if (window.getSelection().toString().length > 0) return;
 
         const drawer = document.getElementById('detail-drawer'); 
@@ -888,13 +915,12 @@
         if (state.selectedCar?.차량_번호 === no) { 
             state.selectedCar = null; 
         } else { 
-            state.selectedCar = rawData.find(c => c.차량_번호 === no); 
+            state.selectedCar = rawData.find(c => c.car_no === no || c.차량_번호 === no); 
         } 
         render(); 
     };
 
     window.closeDetail = () => { 
-        // [정밀 수정] 드래그 중이라면 닫기 방지하여 선택 영역 유지
         if (window.getSelection().toString().length > 0) return;
         state.selectedCar = null; 
         render(); 
@@ -971,23 +997,26 @@
 
     document.getElementById('searchInput').oninput = (e) => { state.searchTerm = e.target.value; render(); };
     window.onload = () => { 
-        const isGranted = localStorage.getItem('erp_access_granted') === 'true';
-        if (isGranted) {
+        const isGranted = localStorage.getItem('erp_access_granted');
+        const expireTime = localStorage.getItem('erp_access_expire');
+        const now = Date.now();
+        
+        if (isGranted === 'true' && expireTime && now < parseInt(expireTime)) {
             document.getElementById('access-gate').style.display = 'none';
             document.getElementById('app').classList.remove('opacity-0');
-            // [정밀 수정] 이미 로그인된 상태에서 새로 접속할 때도 fetchData(true)로 자동 최신화 (인증 핸들러와 충돌 방지 위해 이벤트를 단일화)
         } else {
+            localStorage.removeItem('erp_access_granted');
+            localStorage.removeItem('erp_access_expire');
+            document.getElementById('access-gate').style.display = 'flex';
             document.getElementById('app').classList.add('opacity-0');
         }
         lucide.createIcons(); 
     }; 
 
-    /* [정밀 수정] 데이터 경합(56건 vs 58건 플래핑) 방지를 위한 전역 카운터 */
     let fetchCounter = 0;
 
-    /* [정밀 수정] 단일 데이터 소스(CSV_URL)만 로드하도록 정밀 복구 */
     async function fetchData(isManual = false) {
-        const currentCounter = ++fetchCounter; // [정밀 수정] 요청 시퀀스 카운트
+        const currentCounter = ++fetchCounter; 
         const getIcon = () => document.getElementById('refresh-icon');
         const toast = document.getElementById('toast-msg');
         if (isManual && getIcon()) getIcon().classList.add('animate-spin');
@@ -995,15 +1024,12 @@
         try {
             const res = await fetch(`${CSV_URL}&cachebust=${Date.now()}`);
             const text = await res.text();
-            
-            // [정밀 수정] 최신 요청이 아니면 무시 (네트워크 속도 차이로 인한 구형 데이터 유입 방지)
             if (currentCounter !== fetchCounter) return;
 
             const rows = text.split(/\r?\n/).filter(r => r.trim());
             if (rows.length < 2) return [];
             const headers = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
             
-            // [정밀 수정] rawData를 형성한 후 한 번에 교체 (아토믹 업데이트)
             const newData = rows.slice(1).map(row => {
                 const values = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '').replace(/""/g, '"') : "");
                 return headers.reduce((obj, header, i) => { obj[header] = values[i] || ""; return obj; }, {});
@@ -1014,7 +1040,7 @@
             const params = new URLSearchParams(window.location.search);
             const carNo = params.get('car');
             if (carNo && !state.selectedCar) {
-                const targetCar = rawData.find(c => c.차량_번호 === carNo);
+                const targetCar = rawData.find(c => c.car_no === carNo || c.차량_번호 === carNo);
                 if (targetCar) { state.selectedCar = targetCar; }
             }
             
