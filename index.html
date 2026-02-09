@@ -200,8 +200,8 @@
             </div>
         </div>
 
-        <!-- [정밀 수정] 사용자 정보 등록 (선택 사항으로 명시) -->
-        <div class="bg-white/5 p-6 rounded-none space-y-4 border border-white/10 text-left">
+        <!-- [정밀 수정] 사용자 정보 등록 (선택 사항으로 명시) - 모바일에서는 숨김 처리 -->
+        <div class="bg-white/5 p-6 rounded-none space-y-4 border border-white/10 text-left hidden md:block">
             <p class="text-[11px] text-blue-400 font-black uppercase tracking-widest">사용자 정보 등록 (선택)</p>
             <div class="grid grid-cols-2 gap-2">
                 <input type="text" id="gate-co" placeholder="소속" class="p-3 bg-slate-800 border border-slate-700 text-xs text-white focus:border-blue-500 outline-none">
@@ -331,7 +331,6 @@
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             state.authorized = true;
-            // [정밀 수정] 인증 완료 시 데이터 로드 (게이트 로직과 별개로 작동)
             fetchData(false);
         } else {
             initAuth();
@@ -411,7 +410,6 @@
             
             document.getElementById('access-gate').style.display = 'none';
             document.getElementById('app').classList.remove('opacity-0');
-            // [정밀 수정] 로그인 즉시 최신 데이터 연동 및 시각적 효과 표시
             fetchData(true);
         } else {
             showMsg("보안 코드가 일치하지 않습니다.");
@@ -419,7 +417,7 @@
         }
     };
 
-    /* [정밀 수정] 사용자 정보 노출 로직 수정 (공란 시 숨김 및 '님'자 제거) */
+    /* [정밀 수정] 사용자 정보 노출 로직 (공란 시 숨김 및 '님'자 제거) */
     function updateTopIdentity() {
         const identityArea = document.getElementById('identity-area');
         if (!identityArea) return;
@@ -734,7 +732,7 @@
                             <div class="flex justify-between items-center"><span class="text-slate-400 font-bold text-[10px] uppercase">차령만료일</span><span class="font-black text-rose-600">${c.차령만료일 || c.차량_차령만료일 || "-"}</span></div>
                             <div class="col-span-2 flex flex-col mt-1 p-2.5 bg-slate-50 border border-slate-100">
                                 <span class="text-slate-400 font-black text-[9px] uppercase mb-1.5">차량 세부 상태 및 비고</span>
-                                <div class="font-medium text-slate-700 leading-relaxed">${(c.차량_세부상태 || c.차량_비고) ? `${c.차량_세부상태 ? c.차량_세부상태 + ' ' : ''}${c.차량_비고 || ''}` : '입력된 내용이 없습니다.'}</div>
+                                <div class="flex items-start gap-2"><span class="font-medium text-slate-700 leading-relaxed">${(c.차량_세부상태 || c.차량_비고) ? `${c.차량_세부상태 ? c.차량_세부상태 + ' ' : ''}${c.차량_비고 || ''}` : '입력된 내용이 없습니다.'}</span></div>
                             </div>
                         </div>
                         <button onclick="window.open('${c.차량_사진링크}','_blank')" class="w-full py-3 bg-white border border-slate-300 font-black text-[10px] uppercase apply-btn-shadow">차량 사진 확인 (링크)</button>
@@ -858,7 +856,7 @@
         let tableHtml = `<table><tr><td class="main-title" colspan="${headers.length}">장기렌터카 전용 ERP 매물 마스터 리스트</td></tr><tr><td style="border:none; height:5px;"></td></tr><tr>`;
         headers.forEach(h => { tableHtml += `<th>${h}</th>`; });
         tableHtml += `</tr>`;
-        dataToExport.forEach(item => { tableHtml += `<tr><td class="text-left">${item.차량_상태 || ''}</td><td class="text-left">${item.차량_세부상태 || ''}</td><td class="text-left">${item.차량_구분 || ''}</td><td class="text-left">${item.차량_번호 || ''}</td><td class="text-left">${item.차량_제조사 || ''}</td><td class="text-left">${item.차량_모델명 || ''}</td><td class="text-left">${item.차량_세부모델 || ''}</td><td class="text-left">${item.차량_세부트림 || ''}</td><td class="text-left">${item.차량_선택옵션 || ''}</td><td class="num-right">${item.차량_현재주행거리 || 0}km</td><td class="text-left">${item.차량_연료 || ''}</td><td class="text-left">${item.차량_배기량 || ''}</td><td class="text-left">${item.차량_최초등록일 || ''}</td><td class="text-left">${item.차령만료일 || ''}</td><td class="text-left">${item.차량_외부색상 || ''}</td><td class="text-left">${item.차량_내부색상 || ''}</td><td class="text-center">${(item.차량_사진링크 || "").trim() !== "#" ? '사진보기' : '-'}</td><td class="num-right">${item.금액_대여료_6M || '-'}</td><td class="num-right">${item.금액_보증금_6M || '-'}</td><td class="num-right">${item.금액_대여료_12M || '-'}</td><td class="num-right">${item.금액_보증금_12M || '-'}</td><td class="num-right">${item.금액_대여료_18M || '-'}</td><td class="num-right">${item.금액_보증금_18M || '-'}</td><td class="num-right">${item.금액_대여료_24M || '-'}</td><td class="num-right">${item.금액_보증금_24M || '-'}</td><td class="num-right">${item.금액_대여료_36M || '-'}</td><td class="num-right">${item.금액_보증금_36M || '-'}</td><td class="num-right">${item.금액_대여료_48M || '-'}</td><td class="num-right">${item.금액_보증금_48M || '-'}</td><td class="num-right">${item.금액_대여료_60M || '-'}</td><td class="num-right">${item.금액_보증금_60M || '-'}</td><td class="text-left">${item.보험_대인한도 || ''}</td><td class="text-left">${item.보험_대인면책 || ''}</td><td class="text-left">${item.보험_대물한도 || '1억원'}</td><td class="text-left">${item.보험_대물면책 || ''}</td><td class="text-left">${item.보험_자손한도 || ''}</td><td class="text-left">${item.보험_자손면책 || ''}</td><td class="text-left">${item.보험_무보험한도 || ''}</td><td class="text-left">${item.보험_무보험면책 || ''}</td><td class="text-left">${item.보험_자차한도 || ''}</td><td class="text-left">${item.보험_자차수리비율 || ''}</td><td class="text-left">${item.보험_자차면책최소 || ''}</td><td class="text-left">${item.보험_자차면책최대 || ''}</td><td class="text-left">${item.보험_긴급출동 || ''}</td><td class="text-left">${item.gauge_기본운전연령 || ''}</td><td class="text-left">${item.계약_21세추가금 || ''}</td><td class="text-left">${item.계약_23세추가금 || ''}</td><td class="text-left">${item.계약_약정주행거리 || ''}</td><td class="text-left">${item.계약_1만Km추가금 || ''}</td><td class="text-left">${item.계약_비고 || ''}</td><td class="text-left">${item.계약_입금계좌번호 || ''}</td></tr>`; });
+        dataToExport.forEach(item => { tableHtml += `<tr><td class="text-left">${item.차량_상태 || ''}</td><td class="text-left">${item.차량_세부상태 || ''}</td><td class="text-left">${item.차량_구분 || ''}</td><td class="text-left">${item.차량_번호 || ''}</td><td class="text-left">${item.차량_제조사 || ''}</td><td class="text-left">${item.차량_모델명 || ''}</td><td class="text-left">${item.차량_세부모델 || ''}</td><td class="text-left">${item.차량_세부트림 || ''}</td><td class="text-left">${item.차량_선택옵션 || ''}</td><td class="num-right">${item.차량_현재주행거리 || 0}km</td><td class="text-left">${item.차량_연료 || ''}</td><td class="text-left">${item.차량_배기량 || ''}</td><td class="text-left">${item.차량_최초등록일 || ''}</td><td class="text-left">${item.차령만료일 || ''}</td><td class="text-left">${item.차량_외부색상 || ''}</td><td class="text-left">${item.차량_내부색상 || ''}</td><td class="text-center">${(item.차량_사진링크 || "").trim() !== "#" ? '사진보기' : '-'}</td><td class="num-right">${item.금액_대여료_6M || '-'}</td><td class="num-right">${item.금액_보증금_6M || '-'}</td><td class="num-right">${item.금액_대여료_12M || '-'}</td><td class="num-right">${item.금액_보증금_12M || '-'}</td><td class="num-right">${item.금액_대여료_18M || '-'}</td><td class="num-right">${item.금액_보증금_18M || '-'}</td><td class="num-right">${item.금액_대여료_24M || '-'}</td><td class="num-right">${item.금액_보증금_24M || '-'}</td><td class="num-right" style="font-weightbold;">${item.금액_대여료_36M || '-'}</td><td class="num-right">${item.금액_보증금_36M || '-'}</td><td class="num-right" style="font-weightbold;">${item.금액_대여료_48M || '-'}</td><td class="num-right">${item.금액_보증금_48M || '-'}</td><td class="num-right">${item.금액_대여료_60M || '-'}</td><td class="num-right">${item.금액_보증금_60M || '-'}</td><td class="text-left">${item.보험_대인한도 || ''}</td><td class="text-left">${item.보험_대인면책 || ''}</td><td class="text-left">${item.보험_대물한도 || '1억원'}</td><td class="text-left">${item.보험_대물면책 || ''}</td><td class="text-left">${item.보험_자손한도 || ''}</td><td class="text-left">${item.보험_자손면책 || ''}</td><td class="text-left">${item.보험_무보험한도 || ''}</td><td class="text-left">${item.보험_무보험면책 || ''}</td><td class="text-left">${item.보험_자차한도 || ''}</td><td class="text-left">${item.보험_자차수리비율 || ''}</td><td class="text-left">${item.보험_자차면책최소 || ''}</td><td class="text-left">${item.보험_자차면책최대 || ''}</td><td class="text-left">${item.보험_긴급출동 || ''}</td><td class="text-left">${item.gauge_기본운전연령 || ''}</td><td class="text-left">${item.계약_21세추가금 || ''}</td><td class="text-left">${item.계약_23세추가금 || ''}</td><td class="text-left">${item.계약_약정주행거리 || ''}</td><td class="text-left">${item.계약_1만Km추가금 || ''}</td><td class="text-left">${item.계약_비고 || ''}</td><td class="text-left">${item.계약_입금계좌번호 || ''}</td></tr>`; });
         tableHtml += `</table>`;
         const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">${excelStyle}</head><body>${tableHtml}</body></html>`;
         const blob = new Blob([template], { type: 'application/vnd.ms-excel' });
@@ -874,7 +872,6 @@
         if (isGranted === 'true' && expireTime && now < parseInt(expireTime)) {
             document.getElementById('access-gate').style.display = 'none';
             document.getElementById('app').classList.remove('opacity-0');
-            // [정밀 수정] 이미 로그인된 상태에서 새로 접속할 때 즉시 최신 데이터를 불러오도록 강제 실행
             fetchData(true);
         } else {
             localStorage.removeItem('erp_access_granted');
@@ -892,7 +889,6 @@
         const toast = document.getElementById('toast-msg');
         if (isManual && getIcon()) getIcon().classList.add('animate-spin');
         try {
-            // [정밀 수정] cachebust=Date.now()를 통해 브라우저 캐시를 완전히 무력화하여 최신 데이터 강제 로드
             const res = await fetch(`${CSV_URL}&cachebust=${Date.now()}`);
             const text = await res.text();
             if (currentCounter !== fetchCounter) return;
