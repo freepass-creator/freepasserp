@@ -1,3 +1,7 @@
+## v002
+- [Deploy] Add Vercel serverless entry (api/index.py) + vercel.json with filesystem-first routing so /static assets (core.css, login.js, etc.) load correctly on Vercel.
+- [Deploy] Add requirements.txt for Vercel Python build.
+
 ## v021
 - [UX] Chat message panel scroll anchoring improved: on room enter and input focus, it scrolls to the latest message; while chatting, it keeps the view pinned to bottom only when you’re already near bottom (prevents jump to top and flicker).
 
@@ -137,6 +141,3 @@
 - Register 페이지 3패널(목록/등록/약관) 구성
 - 제조사/모델/세부모델 드랍다운(엑셀 마스터 기반) 적용
 - 약관 등록/편집 패널 항목 확장(보험/연령/주행/위약금) + 변경로그
-
-## 001
-- Add Vercel deployment support (serverless Python entrypoint, routes, requirements).
