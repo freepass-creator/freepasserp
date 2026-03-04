@@ -341,7 +341,81 @@ def _canon(value: Any) -> str:
         return ""
     return re.sub(r"[\s\-]+", "", s)
 
+# --- Firebase RTDB persistence (Vercel-safe) ---
+FIREBASE_DATABASE_URL = os.environ.get("FIREBASE_DATABASE_URL") or os.environ.get("FIREBASE_DB_URL") or ""
+FIREBASE_SERVICE_ACCOUNT_JSON = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON") or ""
+
+_FB_RTDB_READY = None  # tri-state: None unknown, True ready, False disabled
+
+def _rtdb() -> Any:
+    """Return firebase_admin.db module if RTDB is configured and initialized."""
+    global _FB_RTDB_READY
+    if _FB_RTDB_READY is False:
+        return None
+    if not FIREBASE_DATABASE_URL or not FIREBASE_SERVICE_ACCOUNT_JSON:
+        _FB_RTDB_READY = False
+        return None
+    try:
+        import firebase_admin  # type: ignore
+        from firebase_admin import credentials, db  # type: ignore
+    except Exception:
+        _FB_RTDB_READY = False
+        return None
+
+    try:
+        if not firebase_admin._apps:
+            cred_dict = json.loads(FIREBASE_SERVICE_ACCOUNT_JSON)
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred, {"databaseURL": FIREBASE_DATABASE_URL})
+        _FB_RTDB_READY = True
+        return db
+    except Exception as e:
+        # Keep server running even if RTDB init fails; fallback to file store.
+        print(f"[RTDB] init failed: {e}")
+        _FB_RTDB_READY = False
+        return None
+
+def _rtdb_ref(path: str) -> Any:
+    db = _rtdb()
+    if not db:
+        return None
+    try:
+        return db.reference(path)
+    except Exception as e:
+        print(f"[RTDB] reference failed: {e}")
+        return None
+
+def _vehicles_rtdb_path() -> str:
+    # Keep a stable, versioned path for ERP demo data.
+    return "freepasserp/vehicles"
+
 def _load_vehicles() -> List[Dict[str, Any]]:
+    # Prefer Firebase RTDB when configured (persistent on Vercel).
+    ref = _rtdb_ref(_vehicles_rtdb_path())
+    if ref is not None:
+        try:
+            val = ref.get() or {}
+            if isinstance(val, dict):
+                rows = [v for v in val.values() if isinstance(v, dict)]
+            elif isinstance(val, list):
+                rows = [v for v in val if isinstance(v, dict)]
+            else:
+                rows = []
+            # Legacy policy id migration (in-memory only; persist back if changed)
+            changed = False
+            legacy_map = {"POL_SAMPLE": "POL_01", "POL_DOM_1": "POL_02", "POL_DOM_2": "POL_03"}
+            for r in rows:
+                pid = str(r.get("policyId") or "").strip()
+                if pid in legacy_map:
+                    r["policyId"] = legacy_map[pid]
+                    changed = True
+            if changed:
+                _save_vehicles(rows)
+            return rows
+        except Exception as e:
+            print(f"[RTDB] load vehicles failed: {e}")
+            # fall through to file store
+
     _ensure_store()
     with open(VEHICLES_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -363,11 +437,29 @@ def _load_vehicles() -> List[Dict[str, Any]]:
         _save_vehicles(data)
 
     return data
+
 def _save_vehicles(rows: List[Dict[str, Any]]) -> None:
+    # Prefer Firebase RTDB when configured (persistent on Vercel).
+    ref = _rtdb_ref(_vehicles_rtdb_path())
+    if ref is not None:
+        try:
+            out: Dict[str, Any] = {}
+            for r in rows:
+                if not isinstance(r, dict):
+                    continue
+                car_no = str(r.get("carNo") or "").strip()
+                if not car_no:
+                    continue
+                out[car_no] = r
+            ref.set(out)
+            return
+        except Exception as e:
+            print(f"[RTDB] save vehicles failed: {e}")
+            # fall through to file store
+
     _ensure_store()
     with open(VEHICLES_JSON, "w", encoding="utf-8") as f:
         json.dump(rows, f, ensure_ascii=False, indent=2)
-
 
 def _load_chatrooms() -> List[Dict[str, Any]]:
     _ensure_store()
