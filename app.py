@@ -729,12 +729,49 @@ def _get_firebase_certs() -> dict:
     if _fb_certs_cache["certs"] and (now - _fb_certs_cache["ts"] < _FB_CERTS_TTL_SEC):
         return _fb_certs_cache["certs"]
 
-    try:
-        resp = requests.get(FIREBASE_CERTS_URL, timeout=5)
-        resp.raise_for_status()
-        certs = resp.json()
-    except Exception:
-        certs = {}
+    # Vercel/serverless environments can intermittently fail outbound HTTPS fetches
+    # (DNS/TLS/transient networking). To reduce flakiness, we:
+    #   1) retry a few times with progressive timeouts
+    #   2) fall back to urllib if requests fails
+    #   3) keep client-facing error stable ("cert_fetch_failed") but log details.
+    certs: dict = {}
+    last_err: str = ""
+    timeouts = (5, 8, 12)
+
+    for i, t in enumerate(timeouts, start=1):
+        try:
+            resp = requests.get(
+                FIREBASE_CERTS_URL,
+                timeout=t,
+                headers={"User-Agent": f"freepass-erp/{APP_VERSION} (python-requests)"},
+            )
+            resp.raise_for_status()
+            certs = resp.json() or {}
+            if certs:
+                break
+        except Exception as e:
+            last_err = f"requests attempt {i} failed: {type(e).__name__}: {e}"
+            certs = {}
+
+    if not certs:
+        for i, t in enumerate(timeouts, start=1):
+            try:
+                req = urllib.request.Request(
+                    FIREBASE_CERTS_URL,
+                    headers={"User-Agent": f"freepass-erp/{APP_VERSION} (urllib)"},
+                )
+                with urllib.request.urlopen(req, timeout=t) as r:
+                    raw = r.read().decode("utf-8", errors="ignore")
+                certs = json.loads(raw) if raw else {}
+                if certs:
+                    break
+            except Exception as e:
+                last_err = f"urllib attempt {i} failed: {type(e).__name__}: {e}"
+                certs = {}
+
+    if not certs and last_err:
+        # Keep user-facing error stable, but log for diagnosis in Vercel Functions logs.
+        print(f"[FIREBASE_CERTS] fetch failed: {last_err}")
 
     if certs:
         _fb_certs_cache["ts"] = now
