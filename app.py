@@ -72,6 +72,7 @@ PARTNERS_JSON = os.path.join(DATA_DIR, "partners.json")
 FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID", "freepasserp")
 FIREBASE_CERTS_URL = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
 FIREBASE_JWKS_URL = "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"
+FIREBASE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
 _fb_certs_cache = {"ts": 0.0, "certs": {}}
 _FB_CERTS_TTL_SEC = 60 * 60  # 1 hour
 _fb_jwk_client: PyJWKClient | None = None
@@ -782,15 +783,17 @@ def _get_firebase_certs() -> dict:
 def verify_firebase_id_token(id_token: str) -> dict:
     """Verify Firebase Auth ID token.
 
-    This verifies signature and standard claims (aud/iss/exp).
-    Returns decoded claims with normalized `uid` and `email` keys.
+    Primary path:
+      - Verify RS256 signature + standard claims using JWKS (PyJWT + crypto backend).
+
+    Fallback path (server-side verification by Google):
+      - If the runtime lacks RS256 crypto backend and PyJWT raises "Algorithm not supported",
+        call Google's tokeninfo endpoint and validate core claims (aud/iss/exp/sub).
+        This avoids local crypto and stabilizes serverless deployments.
     """
     if not id_token or not isinstance(id_token, str):
         raise ValueError("missing_token")
 
-    # Firebase ID Token is RS256 signed.
-    # Some environments intermittently fail to match KID against x509 cert map.
-    # We therefore try JWKS first (more robust), then fall back to x509 cert map.
     issuer = f"https://securetoken.google.com/{FIREBASE_PROJECT_ID}"
 
     def _decode_with_jwks() -> dict:
@@ -834,10 +837,67 @@ def verify_firebase_id_token(id_token: str) -> dict:
             options={"require": ["exp", "iat", "aud", "iss", "sub"]},
         )
 
+    def _decode_with_tokeninfo() -> dict:
+        try:
+            resp = requests.get(
+                FIREBASE_TOKENINFO_URL,
+                params={"id_token": id_token},
+                timeout=8,
+                headers={"User-Agent": f"freepass-erp/{APP_VERSION}"},
+            )
+        except Exception as e:
+            raise ValueError(f"tokeninfo_fetch_failed:{type(e).__name__}")
+
+        if resp.status_code != 200:
+            try:
+                j = resp.json()
+            except Exception:
+                j = {}
+            err = (j.get("error_description") or j.get("error") or "tokeninfo_error").strip()
+            raise ValueError(err or "tokeninfo_error")
+
+        try:
+            claims = resp.json() or {}
+        except Exception:
+            raise ValueError("tokeninfo_parse_failed")
+
+        aud = str(claims.get("aud") or "")
+        iss = str(claims.get("iss") or "")
+        sub = str(claims.get("sub") or "")
+        exp = str(claims.get("exp") or "")
+
+        if aud != FIREBASE_PROJECT_ID:
+            raise ValueError("aud_mismatch")
+        if iss != issuer:
+            raise ValueError("iss_mismatch")
+        if not sub:
+            raise ValueError("missing_uid")
+
+        try:
+            exp_i = int(exp)
+        except Exception:
+            exp_i = 0
+        if exp_i and exp_i < int(time.time()):
+            raise ValueError("token_expired")
+
+        return claims
+
     try:
         claims = _decode_with_jwks()
-    except Exception:
-        claims = _decode_with_x509()
+    except Exception as e1:
+        msg = str(e1) or ""
+        if "Algorithm not supported" in msg:
+            claims = _decode_with_tokeninfo()
+        else:
+            try:
+                claims = _decode_with_x509()
+            except Exception as e2:
+                msg2 = str(e2) or ""
+                if "Algorithm not supported" in msg2:
+                    claims = _decode_with_tokeninfo()
+                else:
+                    raise
+
     uid = claims.get("user_id") or claims.get("sub")
     email = (claims.get("email") or "").strip().lower()
     if not uid:
