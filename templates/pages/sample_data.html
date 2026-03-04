@@ -1,0 +1,38 @@
+{% extends "layout/shell.html" %}
+
+{% block content %}
+<section class="erp-content" data-page="sample_data">
+  <div class="erp-panel" style="grid-column: 1 / -1;">
+    <header class="section-header">
+      <div class="sh-title">샘플데이터</div>
+    </header>
+    <div class="panel-body" style="padding:12px;">
+      <div class="center-muted" style="text-align:left;">
+        이 페이지는 데모 데이터의 원본 확인용입니다.<br>
+        다른 페이지들은 동일 스키마로 이 데이터를 참조합니다(추후 DB/Firebase로 교체).
+      </div>
+
+      <pre id="sample-data-json"
+           style="margin-top:12px; font-size:11px; line-height:16px; border:var(--b2); padding:12px; overflow:auto; max-height:520px;"></pre>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+  (function(){
+    function render(){
+      const pre = document.getElementById("sample-data-json");
+      if(!pre) return;
+      if(window.FREEPASS_SAMPLE){
+        pre.textContent = JSON.stringify(window.FREEPASS_SAMPLE, null, 2);
+      } else {
+        pre.textContent = "FREEPASS_SAMPLE 로드 실패 (sample_data.js 로드/실행 여부 확인)";
+      }
+    }
+    window.addEventListener("load", render);
+    setTimeout(render, 50);
+  })();
+</script>
+{% endblock %}

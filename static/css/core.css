@@ -1,0 +1,64 @@
+/* v22: core.css is kept as backup. Actual styles are loaded via templates/layout/shell.html with multiple <link> tags from static/css/core/*.css */
+
+
+/* ===== Buttons (achromatic, unified) ===== */
+.btn-outline, .btn-primary, .btn-ghost{
+  appearance:none;
+  border-radius:8px;
+  height:28px;
+  padding:0 10px;
+  font-size:11px;
+  line-height:26px;
+  border:1px solid #d9dde3;
+  background:#fff;
+  color:#111;
+  cursor:pointer;
+  user-select:none;
+}
+.btn-outline:hover{ background:#f6f7f9; }
+.btn-outline:active{ background:#eef1f4; }
+
+.btn-primary{
+  border-color:#111;
+  background:#111;
+  color:#fff;
+}
+.btn-primary:hover{ background:#0b0b0b; }
+.btn-primary:active{ background:#000; }
+
+.btn-ghost{
+  border-color:transparent;
+  background:transparent;
+  color:#111;
+}
+.btn-ghost:hover{ background:#f2f4f6; border-color:#e6e9ee; }
+
+/* Disabled */
+.btn-outline:disabled, .btn-primary:disabled, .btn-ghost:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+/* ===== Toast (center, panel-friendly) ===== */
+.fp-toast{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:9999;
+  display:none;
+  max-width:min(520px, calc(100vw - 40px));
+  padding:10px 12px;
+  border:1px solid #d9dde3;
+  border-radius:10px;
+  background:#fff;
+  color:#111;
+  font-size:12px;
+  line-height:1.2;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+  white-space:pre-wrap;
+}
+.fp-toast.show{ display:block; }
+.fp-toast.error{
+  border-color:#111;
+}

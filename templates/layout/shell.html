@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FREEPASS ERP</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core/00_tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core/10_reset.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core/11_typography.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core/10_base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core/12_forms.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core/20_layout.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core/30_panels.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core/40_rows.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core/50_buttons.css') }}">
+</head>
+<body>
+  <div class="erp-shell">
+    <aside class="erp-sidebar">
+      <div class="sidebar-topspacer"></div>
+      <div class="nav-item {{ 'active' if active_page=='products' else '' }}" onclick="location.href='/products'">상품</div>
+      <div class="nav-item {{ 'active' if active_page=='chats' else '' }}" onclick="location.href='/chats'">대화</div>
+      {# 요청 페이지는 후순위(번외)지만, 현재는 화면만 유지 #}
+      <div class="nav-item {{ 'active' if active_page=='requests' else '' }}" onclick="location.href='/requests'">요청</div>
+
+      {# 등록: 공급사/관리자 #}
+      {% if current_user and current_user.role in ['PROVIDER','ADMIN'] %}
+      <div class="nav-item {{ 'active' if active_page=='register' else '' }}" onclick="location.href='/register'">등록</div>
+      {% endif %}
+
+      {# 승인/정산: 관리자 #}
+      {% if current_user and current_user.role == 'ADMIN' %}
+      <div class="nav-item {{ 'active' if active_page=='approvals' else '' }}" onclick="location.href='/approvals'">승인</div>
+      <div class="nav-item {{ 'active' if active_page=='settlements' else '' }}" onclick="location.href='/settlements'">정산</div>
+      {% endif %}
+      <div class="nav-spacer"></div>
+      <div class="nav-item {{ 'active' if active_page=='settings' else '' }}" onclick="location.href='/settings'">설정</div>
+    </aside>
+
+    <main class="erp-main">
+      <header class="erp-topbar">
+        <div class="tb-left">
+          <div class="tb-title">{{ page_title }} <span class="tb-ver">v{{ app_version }}</span></div>
+          <div class="tb-count" id="tb-count">0건</div>
+        </div>
+        <div class="tb-center" id="topbar-summary">
+          {% if current_user %}
+            <span class="tb-focus-label">로그인:</span>
+            <span id="tb-login">
+              {{ (current_user.name or current_user.email) }} · {{ current_user.role }} · {{ current_user.company_code }} · {{ current_user.code }}
+            </span>
+          {% else %}
+            <span class="tb-focus-label">로그인:</span> <span id="tb-login">-</span>
+          {% endif %}
+        </div>
+        <div class="tb-right">
+{% if active_page != "settings" %}<button class="btn-ghost" id="btn-filter">필터</button>{% endif %}
+        </div>
+      </header>
+
+      <div class="erp-content">
+        {% block content %}{% endblock %}
+{% if active_page != "settings" %}
+        <!-- Global Filter Backdrop + Panel (width=3 columns) -->
+        <div class="fp-filter-backdrop" id="fp-filter-backdrop" aria-hidden="true"></div>
+        <aside class="fp-filter-overlay" id="fp-filter-overlay" aria-hidden="true">
+          <div class="panel-head fp-filter-head">
+            <div class="sh-title" id="fp-filter-title">필터</div>
+            <div class="sh-actions">
+              <button class="btn-ghost" id="fp-filter-reset" type="button">초기</button>
+            </div>
+          </div>
+          <div class="panel-body fp-filter-body">
+            <div class="fp-filter-search-row">
+              <input class="input" id="fp-filter-keyword" placeholder="검색어 입력" />
+              <button class="btn-outline" id="fp-filter-search" type="button">검색</button>
+            </div>
+            <!-- 이후 필터 섹션은 여기에 추가 -->
+          </div>
+        </aside>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast (global) -->
+  <div class="fp-toast" id="fp-toast" aria-live="polite" aria-atomic="true"></div>
+  
+  <!-- Firebase (Realtime Database) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="{{ url_for('static', filename='js/firebase_config.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/firebase_runtime.js') }}"></script>
+
+  <!-- Current user (server session) -->
+  <script>
+    window.FP_CURRENT_USER = {{ (current_user or {}) | tojson }};
+  </script>
+
+  <!-- Core demo data (always) -->
+  <script src="{{ url_for('static', filename='js/sample_data.js') }}"></script>
+
+  <!-- Core JS (shared) -->
+  <script src="{{ url_for('static', filename='js/core/dom.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/core/format.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/core/storage.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/core/api.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/core/chat_store.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/core/topbar.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/core/filter_ui.js') }}"></script>
+
+  <!-- Page modules (safe to edit one-by-one) -->
+  <!-- products (split) -->
+  <script src="{{ url_for('static', filename='js/pages/products/shared.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/products/data.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/products/list_render.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/products/detail_render.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/products/events.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/products/index.js') }}"></script>
+
+  <!-- chats (unchanged) -->
+  <script src="{{ url_for('static', filename='js/pages/chats.js') }}"></script>
+
+  <!-- approvals/requests/settlements (unchanged) -->
+  <script src="{{ url_for('static', filename='js/pages/approvals.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/requests.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/settlements.js') }}"></script>
+
+  <!-- register (split) -->
+  <script src="{{ url_for('static', filename='js/pages/register/shared.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/register/data.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/register/ui.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/register/policy.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pages/register/index.js') }}"></script>
+
+  <!-- Bootstrap (loads data + dispatches by data-page) -->
+  <script src="{{ url_for('static', filename='js/demo.js') }}"></script>
+  {% block page_scripts %}{% endblock %}
+</body>
+</html>

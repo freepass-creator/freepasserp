@@ -1,0 +1,322 @@
+[
+  {
+    "category": "DOMESTIC",
+    "version": "2026.03.02",
+    "effective_from": "2026-03-02",
+    "driver": {
+      "base_min_age": 26
+    },
+    "mileage": {
+      "contract_km_per_year": 20000,
+      "over_km_fee": 120
+    },
+    "penalty": {
+      "over_mileage_rate": null
+    },
+    "insurance": {
+      "liability_bodily": {
+        "type": "UNLIMITED",
+        "amount": null,
+        "deductible_amount": 300000
+      },
+      "liability_property": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "personal_injury": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "uninsured": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "collision": {
+        "limit": {
+          "type": "UP_TO_VEHICLE_VALUE",
+          "amount_won": null
+        },
+        "deductible": {
+          "percent": 20,
+          "min_won": 500000,
+          "max_won": 1000000
+        }
+      }
+    },
+    "service": {
+      "roadside": {
+        "max_uses": 5,
+        "period": "PER_YEAR"
+      }
+    },
+    "extras": {},
+    "changeLog": [
+      {
+        "at": "2026-03-02 21:13:18",
+        "action": "seed",
+        "fields": []
+      }
+    ],
+    "id": "POL_01",
+    "name": "약관샘플"
+  },
+  {
+    "category": "DOMESTIC",
+    "version": "2026.03.02",
+    "effective_from": "2026-03-02",
+    "driver": {
+      "base_min_age": 26
+    },
+    "mileage": {
+      "contract_km_per_year": 20000,
+      "over_km_fee": 120
+    },
+    "penalty": {
+      "over_mileage_rate": null
+    },
+    "insurance": {
+      "liability_bodily": {
+        "type": "UNLIMITED",
+        "amount": null,
+        "deductible_amount": 300000
+      },
+      "liability_property": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "personal_injury": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "uninsured": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "collision": {
+        "limit": {
+          "type": "UP_TO_VEHICLE_VALUE",
+          "amount_won": null
+        },
+        "deductible": {
+          "percent": 20,
+          "min_won": 500000,
+          "max_won": 1000000
+        }
+      }
+    },
+    "service": {
+      "roadside": {
+        "max_uses": 5,
+        "period": "PER_YEAR"
+      }
+    },
+    "extras": {},
+    "changeLog": [
+      {
+        "at": "2026-03-02 21:13:18",
+        "action": "seed",
+        "fields": []
+      }
+    ],
+    "id": "POL_02",
+    "name": ""
+  },
+  {
+    "category": "DOMESTIC",
+    "version": "2026.03.02",
+    "effective_from": "2026-03-02",
+    "driver": {
+      "base_min_age": 26
+    },
+    "mileage": {
+      "contract_km_per_year": 20000,
+      "over_km_fee": 120
+    },
+    "penalty": {
+      "over_mileage_rate": null
+    },
+    "insurance": {
+      "liability_bodily": {
+        "type": "UNLIMITED",
+        "amount": null,
+        "deductible_amount": 300000
+      },
+      "liability_property": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "personal_injury": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "uninsured": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "collision": {
+        "limit": {
+          "type": "UP_TO_VEHICLE_VALUE",
+          "amount_won": null
+        },
+        "deductible": {
+          "percent": 20,
+          "min_won": 500000,
+          "max_won": 1000000
+        }
+      }
+    },
+    "service": {
+      "roadside": {
+        "max_uses": 5,
+        "period": "PER_YEAR"
+      }
+    },
+    "extras": {},
+    "changeLog": [
+      {
+        "at": "2026-03-02 21:13:18",
+        "action": "seed",
+        "fields": []
+      }
+    ],
+    "id": "POL_03",
+    "name": ""
+  },
+  {
+    "category": "DOMESTIC",
+    "version": "2026.03.02",
+    "effective_from": "2026-03-02",
+    "driver": {
+      "base_min_age": 26
+    },
+    "mileage": {
+      "contract_km_per_year": 20000,
+      "over_km_fee": 120
+    },
+    "penalty": {
+      "over_mileage_rate": null
+    },
+    "insurance": {
+      "liability_bodily": {
+        "type": "UNLIMITED",
+        "amount": null,
+        "deductible_amount": 300000
+      },
+      "liability_property": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "personal_injury": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "uninsured": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "collision": {
+        "limit": {
+          "type": "UP_TO_VEHICLE_VALUE",
+          "amount_won": null
+        },
+        "deductible": {
+          "percent": 20,
+          "min_won": 500000,
+          "max_won": 1000000
+        }
+      }
+    },
+    "service": {
+      "roadside": {
+        "max_uses": 5,
+        "period": "PER_YEAR"
+      }
+    },
+    "extras": {},
+    "changeLog": [
+      {
+        "at": "2026-03-02 21:13:18",
+        "action": "seed",
+        "fields": []
+      }
+    ],
+    "id": "POL_04",
+    "name": ""
+  },
+  {
+    "category": "DOMESTIC",
+    "version": "2026.03.02",
+    "effective_from": "2026-03-02",
+    "driver": {
+      "base_min_age": 26
+    },
+    "mileage": {
+      "contract_km_per_year": 20000,
+      "over_km_fee": 120
+    },
+    "penalty": {
+      "over_mileage_rate": null
+    },
+    "insurance": {
+      "liability_bodily": {
+        "type": "UNLIMITED",
+        "amount": null,
+        "deductible_amount": 300000
+      },
+      "liability_property": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "personal_injury": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "uninsured": {
+        "type": null,
+        "amount": null,
+        "deductible_amount": null
+      },
+      "collision": {
+        "limit": {
+          "type": "UP_TO_VEHICLE_VALUE",
+          "amount_won": null
+        },
+        "deductible": {
+          "percent": 20,
+          "min_won": 500000,
+          "max_won": 1000000
+        }
+      }
+    },
+    "service": {
+      "roadside": {
+        "max_uses": 5,
+        "period": "PER_YEAR"
+      }
+    },
+    "extras": {},
+    "changeLog": [
+      {
+        "at": "2026-03-02 21:13:18",
+        "action": "seed",
+        "fields": []
+      }
+    ],
+    "id": "POL_05",
+    "name": ""
+  }
+]

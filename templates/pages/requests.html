@@ -1,0 +1,32 @@
+{% extends "layout/shell.html" %}
+{% block content %}
+<section class="erp-content layout-requests" data-page="requests">
+  <div class="erp-panel panel-1" data-focus="목록">
+    <header class="section-header">
+      <div class="sh-title">요청 목록</div>
+      <div class="sh-meta" id="requests-count"></div>
+    </header>
+    <div class="panel-body" id="requests-list"></div>
+  </div>
+
+  <div class="erp-panel panel-2" data-focus="상세">
+    <header class="section-header"><div class="sh-title">요청 상세</div></header>
+    <div class="panel-body p12" id="requests-detail"><div class="center-muted">요청을 선택하세요.</div></div>
+  </div>
+
+  <div class="erp-panel panel-3">
+    <header class="section-header">
+      <div class="sh-title">응찰 목록</div>
+      <div class="sh-actions">
+        <button class="btn-outline" id="bids-sort-price">월납↑</button>
+        <button class="btn-outline" id="bids-sort-time">최신</button>
+      </div>
+    </header>
+    <div class="panel-body" id="bids-list" style="position:relative;" data-filter-host="1"><div class="center-muted">요청 선택 후 응찰이 표시됩니다.</div></div>
+    <div class="p12" style="border-top: var(--b1); display:flex; gap:8px;">
+      <button class="btn-primary" id="bid-confirm" disabled>확정</button>
+      <button class="btn-outline" id="bid-chat" disabled>채팅</button>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+/* FREEPASS ERP - panels (v22) */
+.section-header{
+  height:var(--section-h);
+  border-bottom:var(--b1);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 12px;
+  position:sticky; top:0; z-index:10;
+}
+
+

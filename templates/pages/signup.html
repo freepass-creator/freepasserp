@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign up</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}" />
+
+  <style>
+    body{ background:#fff; }
+
+    .auth-wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .auth-shell{
+      width:100%;
+      max-width:420px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .auth-card{
+      border:1px solid #e6e8eb;
+      background:#fff;
+      padding:20px;
+      border-radius:2px;
+    }
+
+    .auth-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .auth-title{
+      font-size:13px;
+      font-weight:400;
+      color:#111;
+      letter-spacing:-0.2px;
+    }
+
+    .auth-form{ display:flex; flex-direction:column; gap:12px; }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .label{
+      font-size:11px;
+      color:#222;
+      letter-spacing:-0.2px;
+    }
+    .input{
+      height:36px;
+      padding:0 10px;
+      border:1px solid #d6d9dd;
+      border-radius:2px;
+      outline:none;
+      font-size:12px;
+      color:#111;
+      background:#fff;
+    }
+    .input:focus{ border-color:#111; }
+
+    .divider{
+      margin:6px 0 2px;
+      border-top:1px solid #eef0f2;
+    }
+
+    .auth-actions{
+      display:flex;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .btn{
+      height:36px;
+      border-radius:2px;
+      border:1px solid #111;
+      background:#111;
+      color:#fff;
+      font-size:12px;
+      font-weight:400;
+      letter-spacing:-0.2px;
+      cursor:pointer;
+    }
+    .btn:disabled{ opacity:0.6; cursor:not-allowed; }
+
+    .btn.secondary{
+      background:#fff;
+      color:#111;
+      border:1px solid #cfd3d7;
+    }
+
+    .msg{
+      min-height:18px;
+      margin-top:4px;
+      font-size:11px;
+      color:#b00020;
+      letter-spacing:-0.2px;
+    }
+    .msg.ok{ color:#111; }
+
+    .auth-footer{
+      text-align:center;
+      font-size:10px;
+      color:#9aa0a6;
+      letter-spacing:-0.1px;
+      user-select:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-shell">
+      <div class="auth-card">
+        <div class="auth-head">
+          <div class="auth-title">계정 만들기</div>
+        </div>
+
+        <form id="signup-form" class="auth-form" autocomplete="on">
+
+          <!-- 필수 -->
+          <div class="field">
+            <div class="label">사업자등록번호</div>
+            <input
+              id="businessNo"
+              class="input"
+              type="text"
+              placeholder="000-00-00000"
+              inputmode="numeric"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="field">
+            <div class="label">이메일</div>
+            <input id="email" class="input" type="email" placeholder="example@company.com" autocomplete="username" />
+          </div>
+
+          <div class="field">
+            <div class="label">비밀번호</div>
+            <input id="password1" class="input" type="password" placeholder="비밀번호(6자리 이상)" autocomplete="new-password" />
+          </div>
+
+          <div class="field">
+            <div class="label">비밀번호 확인</div>
+            <input id="password2" class="input" type="password" placeholder="비밀번호 확인" autocomplete="new-password" />
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- 선택 -->
+          <div class="field">
+            <div class="label">이름/직책 (선택)</div>
+            <input id="nameTitle" class="input" type="text" placeholder="예: 홍길동 / 팀장" />
+          </div>
+
+          <div class="field">
+            <div class="label">연락처 (선택)</div>
+            <input id="phone" class="input" type="tel" placeholder="예: 010-0000-0000" autocomplete="tel" />
+          </div>
+
+          <div class="field">
+            <div class="label">근무지주소 (선택)</div>
+            <input id="workplace" class="input" type="text" placeholder="예: 서울시 강남구 ..." autocomplete="street-address" />
+          </div>
+
+          <!-- 기존 로직 호환용 -->
+          <input id="fax" type="hidden" value="" />
+
+          <div class="auth-actions">
+            <button type="submit" class="btn" style="flex:1;">계정만들기</button>
+            <a href="{{ url_for('login') }}"
+               class="btn secondary"
+               style="flex:1; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">
+              로그인페이지로 가기
+            </a>
+          </div>
+
+          <div id="msg" class="msg"></div>
+        </form>
+      </div>
+
+      <div class="auth-footer">© 2026 freepassmobility. All rights reserved.</div>
+    </div>
+  </div>
+
+  <script type="module" src="{{ url_for('static', filename='js/auth/signup.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+/* FREEPASS ERP - rows (v24 unified list density) */
+/* Goal: "목록줄" (상품/대화/승인/요청/정산) 모두 동일한 상하간격/폰트/행높이 */
+
+.row{
+  padding:7px 12px;                 /* 동일 padding */
+  min-height:46px;                  /* 11px+9px 2줄 기준 */
+}
+
+/* Main line (11px) */
+.row .main-line{
+  font-size:var(--fz-main);
+  line-height:16px;
+  font-weight:400;
+}
+
+/* Sub line (9px) */
+.row .sub-line{
+  font-size:var(--fz-sub);
+  line-height:14px;
+  font-weight:400;
+  color:var(--text-sub);
+}
+
+/* Products: term price columns must follow the same 11px/9px two-line rule */
+.terms-grid{
+  align-items:center;
+  gap:8px;
+}
+
+.term-col{
+  width:72px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:center;
+}
+
+.term-col .rent{
+  font-size:var(--fz-main);
+  line-height:16px;
+  font-weight:400;
+  white-space:nowrap;
+}
+
+.term-col .dep{
+  font-size:var(--fz-sub);
+  line-height:14px;
+  font-weight:400;
+  white-space:nowrap;
+}
+
+/* Small visual separation inside a term column (optional but consistent) */
+.term-col .dep{ margin-top:2px; }
+
+
+/* Product rows: pricing aligns to row's two-line structure (rent on main-line, deposit on sub-line) */
+.row.prd .main-line{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.row.prd .main-left{
+  min-width:0;
+  flex:1 1 auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow:hidden;
+}
+
+/* 메인줄: 필수(절대 안잘림) + 추가(길면 ...) */
+.row.prd .main-left .main-required{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+
+.row.prd .main-left .main-extra{
+  min-width:0;
+  flex:1 1 auto;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:var(--text-sub);
+}
+
+.row.prd .sub-line{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.row.prd .sub-line .sub-left{
+  min-width:0;
+  flex:1 1 auto;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.row.prd .sub-line .terms-grid{
+  flex:0 0 auto;
+}
+.row.prd .terms-grid.terms-rent .rent{ font-weight:500; line-height:16px; }
+.row.prd .terms-grid.terms-dep .dep{ line-height:14px; }
+
+
+/* Rows with right-side actions (edit/delete etc.)
+   Actions must NOT affect main/sub line vertical centering.
+   Use: <div class="row has-actions"><div class="row-body">...</div><div class="row-actions">...</div></div>
+*/
+.row.has-actions{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.row.has-actions .row-body{
+  min-width:0;
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:2px; /* main-sub gap */
+}
+
+.row.has-actions .row-actions{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* Register list main-line helper */
+.row.reg-row .reg-main-left{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow:hidden;
+}
+.row.reg-row .reg-main-left .ellipsis{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+
+/* Register: change log rows (keep same typography rules) */
+.reg-log{ padding:0; }
+.log-item{
+  padding:7px 12px;
+  border-top:1px solid #f1f3f4;
+}
+.log-item:first-child{ border-top:none; }
+.log-item .main-line{ font-size:var(--fz-main); line-height:16px; }
+.log-item .sub-line{ font-size:var(--fz-sub); line-height:14px; color:var(--text-sub); margin-top:2px; }
+.log-item .sub-line .k{ color:var(--text-sub); }
+
+/* Chats list badges/meta */
+.chat-row .main-line{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.chat-row .main-left{
+  min-width:0;
+  flex:1 1 auto;
+}
+.chat-row .main-text{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.chat-row .right-text{
+  flex:0 0 auto;
+  white-space:nowrap;
+  font-size:var(--fz-sub);
+  color:var(--text-sub);
+}
+.chat-row .sub-line{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.chat-row .badge{ margin-right:6px; color:#111; }
+.chat-row .submeta{ font-size:9px; color:#6b7280; margin-top:2px; }

@@ -1,0 +1,191 @@
+  width:3px; background:#222;
+}
+
+.prd-left{
+  flex:1;
+  min-width:0;
+  display:grid;
+  grid-template-columns: 160px 1fr; /* ✅ 헤더와 동일 */
+  gap:10px;
+}
+
+.prd-c1,.prd-c2{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center; /* ✅ 메인/보조 줄 수직 중앙정렬 */
+}
+
+.prd-main{
+  font-size:var(--fz-main); /* 12px */
+  font-weight:400;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.prd-sub{
+  font-size:var(--fz-sub); /* 10px */
+  color:var(--text-2);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-top:2px;
+}
+
+/* ===== v7 PRODUCT LIST STANDARD (match other pages row density) =====
+   - 메인 12px / 보조 10px
+   - 행 높이 44px 고정
+   - 우측: 36/48/60 컬럼 헤더 + (대여료/보증금) 2줄
+*/
+
+.prd-list-head{
+  display:grid;
+  grid-template-columns: 1fr 120px auto; /* 좌:타이틀 / 중:대수 / 우:기간 */
+  align-items:center;
+  column-gap:12px;
+}
+
+.prd-head-title,
+.prd-head-count{
+  font-size:12px;
+  line-height:16px;
+  font-weight:600;
+  color:var(--text);
+  white-space:nowrap;
+}
+
+.prd-head-count{ text-align:center; }
+
+.prd-head-terms{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.term-h{
+  width:84px;
+  text-align:right;
+  font-size:12px;
+  line-height:16px;
+  font-weight:600;
+  color:var(--text);
+  white-space:nowrap;
+}
+
+/* Row */
+.prd-row{
+  height:44px;
+  min-height:44px;
+  padding:0 12px;
+  border-bottom:var(--b2);
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.prd-left{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.prd-main{
+  font-size:12px;
+  line-height:16px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.prd-sub{
+  font-size:10px;
+  line-height:14px;
+  font-weight:400;
+  color:var(--text-2);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-top:2px;
+}
+
+/* Term columns */
+.terms-grid{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex:0 0 auto;
+}
+
+.term-col{
+  width:84px;
+  text-align:right;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.term-col .rent{
+  font-size:12px;
+  line-height:16px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.term-col .dep{
+  font-size:10px;
+  line-height:14px;
+  font-weight:400;
+  color:var(--text-2);
+  white-space:nowrap;
+  margin-top:2px;
+}
+
+/* Products list rows should reuse the global .row standard (same density as chats/approvals/etc.) */
+.row.prd .terms-grid{ align-items:flex-start; }
+
+
+
+
+/* ===== Global Filter Overlay (width = 3/12 of content area) ===== */
+.fp-filter-backdrop{
+  position:absolute;
+  top:0; left:0; bottom:0;
+  right:25%;
+  background:transparent;
+  display:none;
+  z-index:90;
+  pointer-events:none;
+}
+.fp-filter-overlay{
+  position:absolute;
+  top:0; right:0; bottom:0;
+  width:25%;
+  min-width:280px;
+  background:var(--bg);
+  border-left:var(--b1);
+  display:none;
+  z-index:100;
+  box-shadow:-10px 0 20px rgba(0,0,0,0.12);
+}
+.fp-filter-body{ padding:12px; }
+.fp-filter-search-row{ display:flex; align-items:center; gap:8px; }
+.fp-filter-search-row .input{ flex:1 1 auto; min-width:0; }
+
+.fp-filter-section{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.fp-filter-label{ font-size:11px; color:var(--text-3); }
+.fp-filter-actions{
+  display:flex;
+  gap:8px;
+  position:sticky;
+  bottom:0;
+  padding-top:12px;
+  background:var(--bg);
+}
+body.fp-filter-open .fp-filter-backdrop,
+body.fp-filter-open .fp-filter-overlay{
+  display:block;
+}

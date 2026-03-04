@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}" />
+
+  <style>
+    html, body { height:100%; margin:0; background:#fff; }
+
+    .auth-wrap{
+      height:100vh;                 /* 스크롤 방지 */
+      box-sizing:border-box;        /* padding 포함 */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .auth-shell{
+      width:100%;
+      max-width:420px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .auth-card{
+      border:1px solid #e6e8eb;
+      background:#fff;
+      padding:20px;
+      border-radius:2px; /* 각진 */
+    }
+
+    /* 헤더: 좌우 한 줄 */
+    .auth-head{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .auth-head-left{
+      font-size:11px;
+      color:#666;
+      letter-spacing:-0.2px;
+      line-height:1.2;
+      white-space:nowrap;
+    }
+    .auth-head-right{
+      font-size:13px;
+      font-weight:400;
+      color:#111;
+      letter-spacing:-0.2px;
+      line-height:1.2;
+      white-space:nowrap;
+    }
+
+    .auth-form{ display:flex; flex-direction:column; gap:12px; }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .label{
+      font-size:11px;
+      color:#222;
+      letter-spacing:-0.2px;
+    }
+    .input{
+      height:36px;
+      padding:0 10px;
+      border:1px solid #d6d9dd;
+      border-radius:2px;
+      outline:none;
+      font-size:12px;
+      color:#111;
+      background:#fff;
+    }
+    .input:focus{ border-color:#111; }
+
+    .auth-links{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:2px;
+    }
+    .auth-link{
+      font-size:11px;
+      color:#444;
+      text-decoration:none;
+      border-bottom:1px solid #d0d0d0;
+      padding-bottom:1px;
+    }
+    .auth-link:hover{ color:#111; border-bottom-color:#111; }
+
+    .auth-actions{
+      display:flex;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .btn{
+      height:36px;
+      border-radius:2px;
+      border:1px solid #111;
+      background:#111;
+      color:#fff;
+      font-size:12px;
+      font-weight:400;
+      letter-spacing:-0.2px;
+      cursor:pointer;
+    }
+    .btn:disabled{ opacity:0.6; cursor:not-allowed; }
+
+    .btn.secondary{
+      background:#fff;
+      color:#111;
+      border:1px solid #cfd3d7;
+    }
+
+    .msg{
+      min-height:18px;
+      margin-top:4px;
+      font-size:11px;
+      color:#b00020;
+      letter-spacing:-0.2px;
+    }
+    .msg.ok{ color:#111; }
+
+    .auth-footer{
+      text-align:center;
+      font-size:10px;
+      color:#9aa0a6;
+      letter-spacing:-0.1px;
+      user-select:none;
+      line-height:1.2;
+    }
+    /* Quick login (DEV only) */
+    .quick-login{ margin-top:12px; padding-top:12px; border-top:1px solid #eee; }
+    .quick-title{ font-size:12px; font-weight:600; margin-bottom:8px; color:#111; }
+    .quick-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+    .quick-grid .btn{ padding:10px 8px; font-size:12px; }
+    .quick-hint{ margin-top:8px; font-size:10px; color:#666; line-height:1.4; }
+
+  </style>
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-shell">
+      <div class="auth-card">
+        <div class="auth-head">
+          <div class="auth-head-left">장기렌터카 영업지원 ERP</div>
+          <div class="auth-head-right">로그인</div>
+        </div>
+
+        <form id="login-form" class="auth-form" autocomplete="on">
+          <div class="field">
+            <div class="label">아이디</div>
+            <input id="email" class="input" type="email" placeholder="example@company.com" autocomplete="username" />
+          </div>
+
+          <div class="field">
+            <div class="label">비밀번호</div>
+            <input id="password" class="input" type="password" placeholder="비밀번호" autocomplete="current-password" />
+          </div>
+
+          <div class="auth-links">
+            <a href="#" id="find-cred" class="auth-link">아이디/비밀번호찾기</a>
+          </div>
+
+          <div class="auth-actions">
+            <button type="submit" class="btn" style="flex:1;">접속하기</button>
+            <a href="{{ url_for('signup') }}"
+               class="btn secondary"
+               style="flex:1; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">
+              계정만들기
+            </a>
+          </div>
+
+
+          <div class="quick-login">
+            <div class="quick-title">테스트 로그인</div>
+            <div class="quick-grid">
+              <button type="button" class="btn secondary" data-quick-login data-email="agent1@freepass.local" data-role="영업자1">영업자1</button>
+              <button type="button" class="btn secondary" data-quick-login data-email="agent2@freepass.local" data-role="영업자2">영업자2</button>
+              <button type="button" class="btn secondary" data-quick-login data-email="agent3@freepass.local" data-role="영업자3">영업자3</button>
+        <button type="button" class="btn secondary" data-quick-login data-email="agent4@freepass.local" data-role="영업자4">영업자4</button>
+              <button type="button" class="btn secondary" data-quick-login data-email="provider1@freepass.local" data-role="공급사1">공급사1</button>
+              <button type="button" class="btn secondary" data-quick-login data-email="provider2@freepass.local" data-role="공급사2">공급사2</button>
+        <button type="button" class="btn secondary" data-quick-login data-email="provider3@freepass.local" data-role="공급사3">공급사3</button>
+              <button type="button" class="btn secondary" data-quick-login data-email="admin@freepassmobility.com" data-role="관리자">관리자</button>
+            </div>
+            <div class="quick-hint">비밀번호는 로그인 JS 상단 QUICK_DEFAULT_PASSWORD에서 한 번에 변경하세요.</div>
+          </div>
+
+          <div id="msg" class="msg"></div>
+        </form>
+      </div>
+
+      <div class="auth-footer">© 2026 freepassmobility. All rights reserved.</div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('find-cred')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      if (!msg) return;
+      msg.classList.remove('ok');
+      msg.textContent = '아이디/비밀번호찾기는 관리자에게 문의해 주세요.';
+    });
+  </script>
+
+  <script type="module" src="{{ url_for('static', filename='js/auth/login.js') }}"></script>
+</body>
+</html>

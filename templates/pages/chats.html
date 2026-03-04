@@ -1,0 +1,143 @@
+{% extends "layout/shell.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/chats.css') }}">
+<section class="erp-content layout-chats" data-page="chats">
+  <style>
+    /* ============================ */
+    /* Product detail (same as /products) */
+    /* ============================ */
+    .layout-chats .prd-doc{
+      padding:12px;
+      font-size:12px; /* 상세 패널 기본 폰트 12px 통일 */
+      line-height:18px;
+      color:#111;
+    }
+
+    /* 상단 1줄(13px): 차량번호/제조사/세부모델/연료 + [상태][구분] */
+    .layout-chats .prd-doc-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      font-weight:600;
+      line-height:20px;
+      padding-bottom:10px;
+      margin-bottom:12px;
+      border-bottom:1px solid #e6e6e6;
+    }
+    .layout-chats .prd-doc-head-left{
+      flex:1 1 auto;
+      min-width:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .layout-chats .prd-doc-head-right{
+      flex:0 0 auto;
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .layout-chats .prd-doc-badge{
+      display:inline-flex;
+      align-items:center;
+      height:20px;
+      padding:0 8px;
+      border:1px solid #dcdcdc;
+      border-radius:3px;
+      background:#fff;
+      font-size:12px;
+      line-height:18px;
+      white-space:nowrap;
+    }
+
+    /* 섹션 */
+    .layout-chats .prd-doc-sec{ margin-top:14px; }
+    .layout-chats .prd-doc-sec:first-child{ margin-top:0; }
+    .layout-chats .prd-doc-sec-title{
+      font-size:12px;
+      font-weight:700;
+      line-height:18px;
+      color:#111;
+      padding:0;
+      margin:0 0 6px 0;
+    }
+
+    /* 라벨/값 (좌/우 정렬) */
+    .layout-chats .prd-doc-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:6px 0;
+      border-bottom:1px solid #f2f2f2;
+    }
+    .layout-chats .prd-doc-row:last-child{ border-bottom:none; }
+    .layout-chats .prd-doc-k{
+      flex:0 0 140px;
+      color:#444;
+      white-space:nowrap;
+    }
+    .layout-chats .prd-doc-v{
+      flex:1 1 auto;
+      min-width:0;
+      text-align:right;
+      color:#111;
+      word-break:break-word;
+      overflow-wrap:anywhere;
+    }
+    .layout-chats .prd-doc-empty{ padding:8px 0; color:#777; text-align:left; }
+
+    /* 사진 링크 */
+    .layout-chats .prd-doc-links a{
+      color:#111;
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
+
+    /* 대여료|보증금: 최대값 기준 칸 고정 (9,999,999원 / 99,999,999원) */
+    .layout-chats .prd-doc-money{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:0;
+      font-variant-numeric: tabular-nums;
+      white-space:nowrap;
+    }
+    .layout-chats .prd-doc-money .m-rent{ width:10ch; text-align:right; }
+    .layout-chats .prd-doc-money .m-sep{ width:2ch; text-align:center; color:#999; }
+    .layout-chats .prd-doc-money .m-dep{ width:11ch; text-align:right; }
+  </style>
+
+  <div class="erp-panel panel-1" data-focus="목록">
+    <header class="section-header">
+      <div class="sh-title">차량 정보 및 대화내용</div>
+      <div class="sh-meta" id="chats-count"></div>
+    </header>
+    <div class="panel-body" id="chats-room-list"></div>
+  </div>
+  <div class="erp-panel panel-2" data-focus="대화">
+    <header class="section-header">
+      <div class="sh-title" id="chats-header">대화하기</div>
+      <div class="sh-meta" id="chats-roomcode"></div>
+    </header>
+    <div class="panel-body">
+      <div class="chat-wrap">
+        <div class="chat-messages" id="chats-messages"><div class="center-muted">대화방을 선택하세요.</div></div>
+        <div class="chat-inputbar hidden" id="chats-inputbar" data-focus="입력">
+          <input class="input" id="chats-input" placeholder="메시지 입력..." />
+          <button class="btn-primary" id="chats-send">전송</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="erp-panel panel-3" data-focus="요약">
+    <header class="section-header">
+      <div class="sh-title">상세정보</div>
+      <div class="sh-actions" id="chats-actions"></div>
+    </header>
+    <div class="panel-body" id="chats-summary" style="position:relative;" data-filter-host="1"><div class="center-muted">선택된 항목이 없습니다.</div></div>
+  </div>
+</section>
+{% endblock %}

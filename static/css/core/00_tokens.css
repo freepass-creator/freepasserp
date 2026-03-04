@@ -1,0 +1,28 @@
+/* FREEPASS ERP - tokens (v22) */
+:root{
+  --font-main:'Pretendard',-apple-system,system-ui,sans-serif;
+  --fz-title:12px;
+  --fz-main:12px;
+  --fz-sub:10px;
+  --fz-btn:11px;
+  --topbar-h:48px;
+  --section-h:40px;
+  --sidebar-w:64px;
+
+  --bg:#fff;
+  --bg-app:#fdfdfd;
+  --text:#111;
+  --text-2:#666;
+  --text-3:#888;
+
+  --b1:1px solid #e5e5e5;
+  --b2:1px solid #f0f0f0;
+  --b3:1px solid #dcdcdc;
+
+  --hover:#f8f8f8;
+  --btn-bg:#fff;
+  --btn-hover:#f6f6f6;
+  --active:#f6f6f6;
+
+  --shadow:none;
+}

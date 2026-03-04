@@ -1,0 +1,52 @@
+[
+  {
+    "company_code": "SC001",
+    "company_name": "영업 파트너사 1",
+    "business_no": "111-11-11111",
+    "partner_role": "SALES",
+    "created_at": "2026-03-03 12:00:00",
+    "updated_at": "2026-03-03 12:00:00",
+    "partner_code": "SC001",
+    "status": "ACTIVE"
+  },
+  {
+    "company_code": "SC002",
+    "company_name": "영업 파트너사 2",
+    "business_no": "222-22-22222",
+    "partner_role": "SALES",
+    "created_at": "2026-03-03 12:00:00",
+    "updated_at": "2026-03-03 12:00:00",
+    "partner_code": "SC002",
+    "status": "ACTIVE"
+  },
+  {
+    "company_code": "SC003",
+    "company_name": "영업 파트너사 3",
+    "business_no": "333-33-33333",
+    "partner_role": "SALES",
+    "created_at": "2026-03-03 12:00:00",
+    "updated_at": "2026-03-03 12:00:00",
+    "partner_code": "SC003",
+    "status": "ACTIVE"
+  },
+  {
+    "company_code": "PC001",
+    "company_name": "공급사 파트너사 1",
+    "business_no": "444-44-44444",
+    "partner_role": "PROVIDER",
+    "created_at": "2026-03-03 12:00:00",
+    "updated_at": "2026-03-03 12:00:00",
+    "partner_code": "PC001",
+    "status": "ACTIVE"
+  },
+  {
+    "company_code": "PC002",
+    "company_name": "공급사 파트너사 2",
+    "business_no": "555-55-55555",
+    "partner_role": "PROVIDER",
+    "created_at": "2026-03-03 12:00:00",
+    "updated_at": "2026-03-03 12:00:00",
+    "partner_code": "PC002",
+    "status": "ACTIVE"
+  }
+]

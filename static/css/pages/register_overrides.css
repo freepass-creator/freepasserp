@@ -1,0 +1,162 @@
+/* Register page only: button + toast visibility (achromatic, compact)
+   Scope strictly to the register content panels to avoid impacting other pages.
+*/
+
+.layout-register .btn-outline,
+.layout-register .btn-primary,
+.layout-register .btn-ghost{
+  appearance:none;
+  /* Match global ERP button spec (square, achromatic) */
+  border-radius:0;
+  height:28px;
+  padding:0 10px;
+  font-size:11px;
+  line-height:26px;
+  letter-spacing:-0.2px;
+  cursor:pointer;
+  user-select:none;
+  white-space:nowrap;
+  box-shadow:var(--shadow);
+}
+
+.layout-register .btn-outline{
+  border:var(--b3);
+  background:#fff;
+  color:var(--text-1);
+}
+.layout-register .btn-outline:hover{ background:var(--hover); }
+
+.layout-register .btn-ghost{
+  border:var(--b3);
+  background:var(--btn-bg);
+  color:var(--text-1);
+}
+.layout-register .btn-ghost:hover{ background:var(--btn-hover); }
+
+.layout-register .btn-primary{
+  border:1px solid #222;
+  background:#222;
+  color:#fff;
+}
+.layout-register .btn-primary:hover{ background:#111; border-color:#111; }
+
+.layout-register .btn-outline:disabled,
+.layout-register .btn-primary:disabled,
+.layout-register .btn-ghost:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+/* Center toast (global element) — keep minimal impact.
+   We only style it when register page is present by scoping through an attribute
+   on the HTML root that we set via JS (see register/index.js).
+*/
+html[data-active-page="register"] .fp-toast{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:9999;
+  display:none;
+  max-width:min(520px, calc(100vw - 40px));
+  padding:10px 12px;
+  border:1px solid #d9dde3;
+  border-radius:10px;
+  background:#fff;
+  color:#111;
+  font-size:12px;
+  line-height:1.2;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+  white-space:pre-wrap;
+}
+html[data-active-page="register"] .fp-toast.show{ display:block; }
+html[data-active-page="register"] .fp-toast.error{ border-color:#111; }
+
+
+/* 3-panel fixed layout: list / register / policy (4:5:3) */
+.layout-register{
+  display:grid;
+  grid-template-columns: 4fr 5fr 3fr;
+  gap:0;
+  height:100%;
+  min-height:0;
+}
+.layout-register .erp-panel{
+  min-width:0;
+  min-height:0;
+}
+.layout-register .erp-panel .panel-body{
+  min-height:0;
+}
+
+
+/* --- Policy panel: always two-field grid (no wrap break) --- */
+.layout-register .pol-two-field{
+  display:grid;
+  grid-template-columns: 110px 1fr;
+  gap:8px;
+  align-items:center;
+  min-width:0;
+}
+.layout-register .pol-two-field > *{
+  min-width:0;
+}
+
+/* Readonly input should look identical (no grey background) */
+.layout-register input[readonly]{
+  background:#fff;
+  color:inherit;
+  opacity:1;
+}
+
+/* Numeric inputs: align right for readability */
+.layout-register input.js-num-comma{
+  text-align:right;
+}
+
+/* Photo upload (ERP style, border-based, no color accents) */
+.layout-register .dropzone{
+  border:1px dashed #cfcfcf;
+  padding:10px;
+  font-size:11px;
+  line-height:16px;
+  cursor:pointer;
+  user-select:none;
+}
+.layout-register .dropzone.dragover{
+  border-style:solid;
+}
+.layout-register .photo-list{
+  margin-top:8px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:8px;
+}
+.layout-register .photo-item{
+  border:1px solid #e5e5e5;
+  padding:6px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.layout-register .photo-thumb{
+  width:100%;
+  aspect-ratio: 4 / 3;
+  background:#f7f7f7;
+  border:1px solid #eee;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.layout-register .photo-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.layout-register .photo-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+}

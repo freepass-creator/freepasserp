@@ -1,0 +1,146 @@
+  border:0; padding:0 8px;
+  font-size:11px; outline:none; background:transparent;
+}
+
+.tb-searchbtn{
+  height:26px;
+  border:0;
+  border-left:var(--b3);
+  background:#fff;
+  padding:0 10px;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:var(--fz-btn);
+}
+.tb-searchbtn:hover{ background:var(--hover); }
+
+
+.tb-center{ font-size:11px; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 12px; }
+
+.tb-right{ display:flex; align-items:center; gap:8px; }
+
+
+.btn-ghost{
+  height:28px; padding:0 10px;
+  border:var(--b3); background:var(--btn-bg);
+  cursor:pointer; font-family:inherit; font-size:var(--fz-btn);
+  border-radius:0; box-shadow:var(--shadow);
+}
+
+
+
+.btn-ghost.is-active{ background:var(--btn-hover); border:1px solid #222; }
+
+.btn-ghost:hover{ background:var(--btn-hover); }
+
+.btn-primary{
+  height:28px; padding:0 10px;
+  border:1px solid #222; background:#222; color:#fff;
+  cursor:pointer; font-family:inherit; font-size:var(--fz-btn);
+  border-radius:0; box-shadow:var(--shadow);
+}
+
+.btn-primary:disabled{ opacity:.4; cursor:not-allowed; }
+
+.btn-outline{
+  height:28px; padding:0 10px;
+  border:var(--b3); background:#fff;
+  cursor:pointer; font-family:inherit; font-size:var(--fz-btn);
+  border-radius:0; box-shadow:var(--shadow);
+}
+
+.btn-outline:hover{ background:var(--hover); }
+
+.btn-outline:disabled{ opacity:.4; cursor:not-allowed; }
+
+.erp-content{ flex:1; display:flex; overflow:hidden; 
+  position:relative;
+}
+
+.erp-panel{
+  height:100%;
+  display:flex; flex-direction:column;
+  border-right:var(--b1);
+  background:var(--bg);
+  min-width:0;
+}
+
+.erp-panel:last-child{ border-right:none; }
+
+.sh-title{ font-size:12px; font-weight:500; }
+
+.sh-meta{ font-size:11px; color:var(--text-3); }
+
+.sh-actions{ display:flex; align-items:center; gap:8px; }
+
+.panel-body{ flex:1; overflow:auto; position:relative; min-height:0; }
+
+.row{
+  padding:8px 12px;
+  border-bottom:var(--b2);
+  cursor:pointer;
+  position:relative;
+  min-height:44px;
+}
+
+.row:hover{ background:var(--hover); }
+
+.row.active{ background:var(--active); }
+
+.row.active::before{
+  content:"";
+  position:absolute; left:0; top:0; bottom:0;
+  width:3px; background:#222;
+}
+
+.row .main-line{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:2px; min-width:0; }
+
+.row .main-left{ display:flex; align-items:center; gap:8px; min-width:0; }
+
+.main-text{ font-size:var(--fz-main); font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.sub-line{ font-size:var(--fz-sub); color:var(--text-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.right-text{ width:140px; text-align:right; font-size:11px; white-space:nowrap; flex:0 0 auto; }
+
+.badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:18px; padding:0 8px;
+  border:1px solid #dcdcdc; background:#f4f4f4; color:#111;
+  font-size:10px; border-radius:0; white-space:nowrap;
+  font-weight:500;
+}
+
+.badge.dark{ border-color:#222; background:#222; color:#fff; }
+
+.badge.muted{ border-color:#e5e5e5; background:#f7f7f7; color:#666; }
+
+.box{ border:var(--b1); background:#fff; padding:12px; border-radius:0; }
+
+.box + .box{ margin-top:10px; }
+
+.box-title{ font-size:12px; font-weight:500; margin-bottom:10px; }
+
+.kv{ display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:var(--b2); }
+
+.kv:last-child{ border-bottom:none; }
+
+.kv .k{ color:var(--text-2); font-size:11px; }
+
+.kv .v{ color:var(--text); font-size:11px; text-align:right; }
+
+.input{ border:var(--b3); height:28px; padding:0 8px; font-size:11px; border-radius:0; outline:none; background:#fff; }
+
+.input:focus{ border-color:#bbb; }
+
+.layout-products .panel-1{ flex:9; } .layout-products .panel-2{ flex:3; }
+
+.layout-chats .panel-1{ flex:6; } .layout-chats .panel-2{ flex:3; } .layout-chats .panel-3{ flex:3; }
+
+.layout-approvals .panel-1{ flex:5; } .layout-approvals .panel-2{ flex:4; } .layout-approvals .panel-3{ flex:3; }
+
+.layout-register .panel-1{ flex:3; } .layout-register .panel-2{ flex:5; } .layout-register .panel-3{ flex:4; }
+
+.layout-settlements .panel-1{ flex:6; } .layout-settlements .panel-2{ flex:6; }
+
+.layout-settings .panel-1{ flex:12; }

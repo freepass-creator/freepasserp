@@ -1,0 +1,23 @@
+{% extends "layout/shell.html" %}
+{% block content %}
+<section class="erp-content layout-settings" data-page="settings">
+  <div class="erp-panel panel-1">
+    <header class="section-header"><div class="sh-title">시스템 설정</div></header>
+    <div class="panel-body p12">
+      <div class="box">
+        <div class="box-title">설정(데모)</div>
+        <div class="kv"><div class="k">버전</div><div class="v">UI Skeleton v25</div></div>
+        <div class="kv"><div class="k">폰트</div><div class="v">Pretendard</div></div>
+      </div>
+      <div class="box" style="margin-top:12px;">
+        <div class="box-title">계정</div>
+        <div class="kv"><div class="k">로그인</div><div class="v">{{ session.get('email','') }}</div></div>
+        <div class="kv"><div class="k">역할</div><div class="v">{{ session.get('role','') }}</div></div>
+        <div style="margin-top:12px; display:flex; justify-content:flex-end;">
+          <a class="btn-outline" href="{{ url_for('logout') }}">로그아웃</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

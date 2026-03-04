@@ -1,0 +1,212 @@
+
+.layout-requests .panel-1{ flex:4; } .layout-requests .panel-2{ flex:4; } .layout-requests .panel-3{ flex:4; }
+
+.chat-wrap{ height:100%; display:flex; flex-direction:column; }
+
+.chat-messages{ flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px; }
+
+.msg{ max-width:82%; border:var(--b1); background:#fff; padding:8px 10px; border-radius:0; font-size:12px; }
+
+.msg.sent{ align-self:flex-end; border-color:#222; background:#222; color:#fff; }
+
+.msg.recv{ align-self:flex-start; background:#f4f4f4; }
+
+.chat-inputbar{ height:var(--section-h); border-top:var(--b1); padding:0 10px; display:flex; gap:8px; align-items:center; background:#fff; }
+
+.chat-inputbar input{ flex:1; height:28px; }
+
+.p12{ padding:12px; }
+
+.center-muted{ color:var(--text-3); text-align:center; padding:24px 12px; }
+
+.hidden{ display:none !important; }
+
+/* Sidebar aligns nav start with panel headers (below topbar) */
+.sidebar-topspacer{
+  height: var(--topbar-h);
+  border-bottom: var(--b1);
+  background: var(--bg);
+}
+
+/* Products: header term strip */
+.term-strip{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.term-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:22px;
+  min-width:56px;
+  padding:0 8px;
+  border: var(--b3);
+  background:#fff;
+  font-size:11px;
+  border-radius:0;
+  box-shadow: var(--shadow);
+  white-space:nowrap;
+}
+
+.term-pill:hover{ background: var(--hover); }
+
+.term-pill.active{
+  border-color:#222;
+}
+
+/* Products: row right pricing grid (rent main, deposit sub) */
+.terms-grid{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  flex:0 0 auto;
+}
+
+.term-col{
+  width:72px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  line-height:1.15;
+}
+
+.term-col .rent{
+  font-size: var(--fz-main);
+  font-weight:400;
+}
+
+.term-col .dep{
+  font-size: var(--fz-sub);
+  color: var(--text-2);
+}
+
+/* Products: filter overlay that covers the ENTIRE right panel (header + body) */
+.panel-filter-overlay{
+  position:absolute;
+  inset:0;              /* ✅ panel-2 전체(헤더 포함) 덮기 */
+  background:#fff;
+  z-index:200;          /* ✅ 헤더보다 위 */
+  display:flex;
+  flex-direction:column;
+}
+
+/* overlay header (필터 패널 헤드) */
+.panel-filter-overlay .fo-head{
+  height: var(--section-h);     /* 40px */
+  border-bottom: var(--b1);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 12px;
+  background:#fff;
+}
+
+.panel-filter-overlay .fo-title{
+  font-size:12px;
+  font-weight:500;
+}
+
+.panel-filter-overlay .fo-body{
+  flex:1;
+  padding:12px;
+  overflow:auto;
+}
+
+.chk{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border: var(--b3);
+  height:28px;
+  padding:0 8px;
+  background:#fff;
+}
+
+.chk input{ width:14px; height:14px; }
+
+/* ERP: 무채색 체크박스 */
+input[type="checkbox"]{
+  accent-color: #444;
+}
+
+/* ===== Panel head (column header) ===== */
+.panel-head{
+  height: var(--section-h);
+  border-bottom: var(--b1);
+  background: var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 12px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+/* Products: list column header + rows (grid aligned) */
+.prd-list-head{ padding-right:12px; }
+
+.prd-head-left{
+  flex:1;
+  min-width:0;
+  display:grid;
+  grid-template-columns: 160px 1fr;  /* ✅ 차량정보 / 목록제목줄 */
+  gap:10px;
+  align-items:center;
+}
+
+.prd-hcell{
+  font-size:12px;
+  font-weight:500;
+  color:var(--text);
+  white-space:nowrap;
+}
+
+.prd-head-terms{
+  display:flex;
+  align-items:center;
+  gap:8px; /* ✅ term-col gap 과 동일 */
+  flex:0 0 auto;
+}
+
+.term-h{
+  width:72px;            /* ✅ term-col width 와 동일 */
+  text-align:right;
+  font-size:12px;
+  font-weight:500;
+  color:var(--text);
+  white-space:nowrap;
+}
+
+.prd-row{
+  padding:8px 12px;
+  border-bottom:var(--b2);
+  cursor:pointer;
+  position:relative;
+  min-height:44px;
+  display:flex;
+  align-items:stretch;
+  gap:10px;
+}
+
+.prd-row:hover{ background:var(--hover); }
+
+.prd-row.active{ background:var(--active); }
+
+.prd-row.active::before{
+  content:"";
+  position:absolute; left:0; top:0; bottom:0;
+
+
+/* --- Policy editor layout helpers --- */
+.grid-2{display:grid; grid-template-columns: 1fr 1fr; gap:10px; align-items:start;}
+.grid-3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; align-items:start;}
+.field .label{font-size:11px; color:#333; margin:0 0 6px 0;}
+.sep-line{height:1px; background:#e8e8e8; width:100%;}
+.reg-log{border:1px solid #eee; background:#fff; padding:8px; max-height:220px; overflow:auto;}
+.log-row{padding:6px 2px; border-bottom:1px solid #f2f2f2;}
+.log-row:last-child{border-bottom:none;}
+.log-main{font-size:11px; color:#222;}
+.log-sub{font-size:10px; color:#666; margin-top:2px;}

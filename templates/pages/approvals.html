@@ -1,0 +1,61 @@
+{% extends "layout/shell.html" %}
+{% block content %}
+<section class="erp-content layout-approvals" data-page="approvals">
+  <style>
+  /* Approvals page only (do not affect other pages) */
+  .layout-approvals .badges{ display:inline-flex; align-items:center; gap:6px; }
+  .layout-approvals .badge{ height:18px; padding:0 8px; }
+
+  .layout-approvals .role-row{ display:flex; gap:8px; }
+  .layout-approvals .role-btn{ flex:1; height:30px; border:1px solid var(--line-100, #e9ecef); border-radius:0; font-size:11px; display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; }
+  .layout-approvals .role-btn input{ display:none; }
+  .layout-approvals .role-btn span{ color:#111; }
+  .layout-approvals .role-btn.active{ border-color:#111; }
+
+  /* Detail: table-like KV (label left, value right) */
+  .layout-approvals .kv-table{ border-top:var(--b2); }
+  .layout-approvals .kv-tr{ display:grid; grid-template-columns:140px 1fr; gap:12px; padding:8px 0; border-bottom:var(--b2); }
+  .layout-approvals .kv-th{ font-size:11px; color:var(--text-2); text-align:left; }
+  .layout-approvals .kv-td{ font-size:11px; color:var(--text); min-width:0; text-align:right; }
+  .layout-approvals .kv-td .muted{ color:var(--text-2); }
+  .layout-approvals .kv-td .input{ width:100%; text-align:left; }
+
+  /* Action area density */
+  .layout-approvals .actions-row{ display:flex; gap:8px; margin-top:12px; }
+
+  /* Center header action button */
+  .layout-approvals .sh-actions{ margin-left:auto; display:flex; gap:8px; }
+  .layout-approvals .btn.small{ height:28px; padding:0 10px; font-size:11px; border-radius:0; }
+</style>
+
+  <!-- 좌측: 처리 완료(승인/반려) -->
+  <div class="erp-panel panel-1" data-focus="완료">
+    <header class="section-header">
+      <div class="sh-title">처리 완료</div>
+    </header>
+    <div class="panel-body" id="approvals-archive"></div>
+  </div>
+
+  <!-- 중앙: 세부정보 + 액션 -->
+  <div class="erp-panel panel-2" data-focus="상세">
+    <header class="section-header">
+      <div class="sh-title" id="approvals-center-title">승인 처리</div>
+      <div class="sh-actions">
+        <button class="btn small" id="btn-open-partner">+ 파트너 등록</button>
+      </div>
+    </header>
+    <div class="panel-body p12" id="approvals-detail" style="position:relative;" data-filter-host="1">
+      <div class="center-muted">항목을 선택하세요.</div>
+    </div>
+  </div>
+
+  <!-- 우측: 승인 대기 -->
+  <div class="erp-panel panel-3" data-focus="대기">
+    <header class="section-header">
+      <div class="sh-title" id="approvals-pending-title">승인대기 0건</div>
+    </header>
+    <div class="panel-body" id="approvals-pending"></div>
+  </div>
+</section>
+
+{% endblock %}

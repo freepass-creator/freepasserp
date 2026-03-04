@@ -1,0 +1,80 @@
+/* FREEPASS ERP - base (v22) */
+*{ box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+
+html,body{
+  height:100%; width:100%;
+  margin:0; padding:0;
+  font-family:var(--font-main);
+  font-size:var(--fz-title);
+  line-height:1.35;
+  color:var(--text);
+  background:var(--bg-app);
+  overflow:hidden;
+}
+
+.erp-shell{ display:flex; height:100vh; width:100vw; }
+
+.erp-sidebar{
+  width:var(--sidebar-w);
+  border-right:var(--b1);
+  background:var(--bg);
+  display:flex; flex-direction:column;
+}
+
+.nav-item{
+  height:48px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  color:var(--text-3);
+  border-bottom:var(--b2);
+  user-select:none;
+}
+
+.nav-item:hover{ background:var(--hover); }
+
+.nav-item.active{ color:var(--text); position:relative; }
+
+.nav-item.active::before{
+  content:"";
+  position:absolute; left:0; top:0; bottom:0;
+  width:3px; background:#222;
+}
+
+.nav-spacer{ flex:1; }
+
+.erp-main{ flex:1; display:flex; flex-direction:column; min-width:0; }
+
+.erp-topbar{
+  height:var(--topbar-h);
+  border-bottom:var(--b1);
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px;
+}
+
+.tb-left{ display:flex; align-items:center; gap:12px; min-width:0; }
+
+.tb-title{ font-size:13px; font-weight:400; white-space:nowrap; }
+
+.tb-count{
+  height:20px;
+  display:inline-flex; align-items:center;
+  padding:0 8px;
+  border:var(--b3);
+  font-size:11px;
+  color:var(--text-2);
+  background:#fff;
+}
+
+.tb-focus-label{ color:var(--text-3); }
+.tb-sep{ margin:0 8px; color:var(--text-3); }
+
+.tb-searchbox{
+  display:flex; align-items:center;
+  height:28px;
+  border:var(--b3);
+  background:#fff;
+}
+
+.tb-search{
+  width:220px; height:26px;

@@ -1,0 +1,7 @@
+/* FREEPASS ERP - buttons (baseline)
+   NOTE: Global button styling is intentionally minimal.
+   Page-specific button styles should live in page-scoped CSS.
+*/
+
+/* Keep only safe resets */
+button{ font: inherit; }

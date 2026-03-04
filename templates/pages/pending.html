@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FREEPASS ERP — 승인 대기</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}" />
+  <style>
+    body{ background:#fff; }
+    .auth-wrap{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .auth-card{ width:520px; border:1px solid var(--line-100, #e9ecef); border-radius:10px; padding:20px; }
+    .auth-title{ font-size:13px; font-weight:400; color:#111; margin:0 0 12px 0; }
+    .auth-sub{ font-size:11px; color:#666; margin:0 0 16px 0; line-height:1.5; }
+    .box{ border:1px solid var(--line-100, #e9ecef); border-radius:10px; padding:12px; }
+    .kv{ display:grid; grid-template-columns: 120px 1fr; gap:8px 10px; font-size:11px; }
+    .k{ color:#666; }
+    .v{ color:#111; }
+    .auth-actions{ display:flex; gap:8px; margin-top:14px; }
+    .btn{ height:34px; border:1px solid var(--line-100, #e9ecef); background:#111; color:#fff; border-radius:8px; font-size:11px; padding:0 12px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+    .btn.secondary{ background:#fff; color:#111; }
+  </style>
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1 class="auth-title">{{ '승인 대기' if status!='REJECTED' else '반려' }}</h1>
+      <p class="auth-sub">
+        {% if status=='REJECTED' %}
+          가입요청이 반려되었습니다. 필요하면 관리자에게 재심사를 요청하세요.
+        {% else %}
+          가입요청이 접수되었습니다. 관리자가 승인하면 로그인할 수 있습니다.
+        {% endif %}
+      </p>
+
+      <div class="box">
+        <div class="kv">
+          <div class="k">이메일</div>
+          <div class="v">{{ email or '-' }}</div>
+          <div class="k">상태</div>
+          <div class="v">{{ status or 'PENDING' }}</div>
+          {% if status=='REJECTED' %}
+          <div class="k">사유</div>
+          <div class="v">{{ reason or '-' }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="auth-actions">
+        <a class="btn" href="{{ url_for('login') }}">로그인으로</a>
+        <a class="btn secondary" href="{{ url_for('signup') }}">다른 계정으로 가입</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

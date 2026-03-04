@@ -1,0 +1,85 @@
+/* FREEPASS ERP - layout (v56)
+   Core shell layout + toast
+*/
+
+.erp-shell{ height:100vh; display:flex; background:var(--bg); overflow:hidden; }
+
+.erp-sidebar{
+  width:56px;
+  border-right: var(--b1);
+  background: var(--bg);
+  display:flex;
+  flex-direction:column;
+}
+.sidebar-topspacer{ height:48px; border-bottom: var(--b1); }
+.nav-item{
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  color: var(--text-3);
+  cursor:pointer;
+  user-select:none;
+  border-bottom: var(--b2);
+}
+.nav-item:hover{ background: var(--hover); }
+.nav-item.active{ color: var(--text-1); position:relative; background:transparent; }
+.nav-item.active::before{
+  content:"";
+  position:absolute; left:0; top:0; bottom:0;
+  width:3px; background:#222;
+}
+.nav-spacer{ flex:1; }
+
+.erp-main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+
+.erp-topbar{
+  height:48px;
+  flex:0 0 48px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 12px;
+  border-bottom: var(--b1);
+  background: var(--bg);
+}
+.tb-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+.tb-title{ font-size:12px; color:var(--text-1); }
+.tb-ver{ font-size:9px; color:var(--text-3); margin-left:6px; letter-spacing:0; }
+
+.tb-count{ font-size:11px; color:var(--text-3); }
+.tb-center{ font-size:10px; color:var(--text-3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tb-right{ display:flex; align-items:center; gap:8px; }
+
+.erp-content{ flex:1; min-height:0; position:relative; }
+
+/* Toast */
+.fp-toast{
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  min-width: 240px;
+  max-width: calc(100vw - 24px);
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 11px;
+  letter-spacing: -0.2px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+  z-index: 1000;
+}
+.fp-toast.show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(calc(-50% - 2px));
+}
+.fp-toast.error{
+  border-color: #fecaca;
+  color: #7f1d1d;
+}

@@ -1,0 +1,195 @@
+{% extends "layout/shell.html" %}
+
+{% block content %}
+<section class="erp-content layout-products" data-page="products">
+  <style>
+    /* Products page only: term header must align with term columns and never wrap */
+    .layout-products .prd-list-head{
+      display:flex;
+      height:40px; /* 패널헤드 높이 기준 */
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .layout-products .prd-head-left{
+      flex:1 1 auto;
+      min-width:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      font-weight:600;
+      line-height:40px; /* 세로 중앙 고정 */
+    }
+    .layout-products #products-term-head{
+      display:flex;               /* share the same flex/term-col sizing as rows */
+      align-items:center;
+      gap:8px;                    /* must match .terms-grid gap */
+      padding-right: var(--prd-sbw, 0px); /* 스크롤바 폭 보정: 헤더 기간 정렬 */
+      flex:0 0 auto;
+    }
+    .layout-products #products-term-head .term-col{
+      width:72px;                 /* must match .term-col width in core CSS */
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      justify-content:center;
+    }
+    .layout-products #products-term-head .term-h{
+      font-size:11px;
+      line-height:16px;
+      white-space:nowrap;
+      word-break:keep-all;
+      letter-spacing:-0.2px;
+      color:#222;
+      padding-right:1px;           /* 미세: 숫자 우측끝과 시각 정렬 */
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ============================ */
+    /* Products detail panel styles */
+    /* ============================ */
+    .layout-products .prd-doc{
+      padding:12px;
+      font-size:12px; /* 상세 패널 기본 폰트 12px 통일 */
+      line-height:18px;
+      color:#111;
+    }
+
+    /* 상단 1줄(13px): 차량번호/제조사/세부모델/연료 + [상태][구분] */
+    .layout-products .prd-doc-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      font-weight:600;
+      line-height:20px;
+      padding-bottom:10px;
+      margin-bottom:12px;
+      border-bottom:1px solid #e6e6e6;
+    }
+    .layout-products .prd-doc-head-left{
+      flex:1 1 auto;
+      min-width:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .layout-products .prd-doc-head-right{
+      flex:0 0 auto;
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .layout-products .prd-doc-badge{
+      display:inline-flex;
+      align-items:center;
+      height:20px;
+      padding:0 8px;
+      border:1px solid #dcdcdc;
+      border-radius:3px;
+      background:#fff;
+      font-size:12px;
+      line-height:18px;
+      white-space:nowrap;
+    }
+
+    /* 섹션 */
+    .layout-products .prd-doc-sec{
+      margin-top:14px;
+    }
+    .layout-products .prd-doc-sec:first-child{
+      margin-top:0;
+    }
+    .layout-products .prd-doc-sec-title{
+      font-size:12px;
+      font-weight:700;
+      line-height:18px;
+      color:#111;
+      padding:0;
+      margin:0 0 6px 0;
+    }
+
+/* 라벨/값 (좌/우 정렬) */
+    .layout-products .prd-doc-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:6px 0;
+      border-bottom:1px solid #f2f2f2;
+    }
+    .layout-products .prd-doc-row:last-child{
+      border-bottom:none;
+    }
+    .layout-products .prd-doc-k{
+      flex:0 0 140px;
+      color:#444;
+      white-space:nowrap;
+    }
+    .layout-products .prd-doc-v{
+      flex:1 1 auto;
+      min-width:0;
+      text-align:right;
+      color:#111;
+      word-break:break-word;
+      overflow-wrap:anywhere;
+    }
+    .layout-products .prd-doc-empty{
+      padding:8px 0;
+      color:#777;
+      text-align:left;
+    }
+
+    /* 사진 링크 */
+    .layout-products .prd-doc-links a{
+      color:#111;
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
+
+    /* 대여료|보증금: 최대값 기준 칸 고정 (9,999,999원 / 99,999,999원) */
+    .layout-products .prd-doc-money{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:0;
+      font-variant-numeric: tabular-nums;
+      white-space:nowrap;
+    }
+    .layout-products .prd-doc-money .m-rent{
+      width:10ch; /* 9,999,999원 */
+      text-align:right;
+    }
+    .layout-products .prd-doc-money .m-sep{
+      width:2ch;
+      text-align:center;
+      color:#999;
+    }
+    .layout-products .prd-doc-money .m-dep{
+      width:11ch; /* 99,999,999원 */
+      text-align:right;
+    }
+  </style>
+
+  <div class="erp-panel panel-1" data-focus="목록">
+    <!-- 목록 패널 헤드: 좌측(차량정보) | 우측(기간 컬럼 헤더) -->
+    <header class="panel-head prd-list-head">
+      <div class="prd-head-left">차량정보</div>
+      <div class="terms-grid prd-head-terms" id="products-term-head"></div>
+    </header>
+
+    <div class="panel-body" id="products-list"></div>
+  </div>
+
+  <div class="erp-panel panel-2" data-focus="상세">
+    <header class="section-header">
+      <div class="sh-title">상세정보</div>
+      <div class="sh-actions" id="products-actions"></div>
+    </header>
+    <div class="panel-body" id="products-detail" style="position:relative;" data-filter-host="1">
+      <div class="center-muted">차량을 선택해 주세요.</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

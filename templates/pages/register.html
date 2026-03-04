@@ -1,0 +1,377 @@
+{% extends "layout/shell.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/register_overrides.css') }}">
+<section class="erp-content layout-register" data-page="register">
+  <div class="erp-panel panel-1" data-focus="목록">
+    <header class="section-header"><div class="sh-title">등록 상품 목록</div></header>
+    <div class="panel-body" id="register-list"></div>
+  </div>
+
+  <div class="erp-panel panel-2" data-focus="입력">
+    <header class="section-header">
+      <div class="sh-title">상품 등록/변경</div>
+      <div class="sh-actions" style="margin-left:auto; display:flex; gap:8px;">
+        <button class="btn-outline" type="button" id="reg-reset">초기</button>
+        <button class="btn-primary" type="button" id="reg-save">저장</button>
+      </div>
+    </header>
+
+    <div class="panel-body p12">
+      <!-- 입력 규격: 2열 그리드, 필요한 항목은 2칸(span 2) 사용 -->
+      <div class="grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div>
+            <div class="label">차량번호 (필수)</div>
+            <input class="input" id="reg-carNo" placeholder="예: 12가 3456" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">적용약관 (필수)</div>
+            <select class="input" id="reg-policy" style="width:100%;">
+              <!-- JS에서 정책 목록 세팅 (기본: 국산차 기본 약관) -->
+            </select>
+          </div>
+
+          <div>
+            <div class="label">차량상태 (필수)</div>
+            <select class="input" id="reg-status" style="width:100%;"></select>
+          </div>
+          <div>
+            <div class="label">세부상태</div>
+            <input class="input" id="reg-subStatus" placeholder="예: 단순수리" style="width:100%;">
+          </div>
+
+          <div>
+            <div class="label">상품구분 (필수)</div>
+            <select class="input" id="reg-kind" style="width:100%;"></select>
+          </div>
+          <div>
+            <div class="label">제조사 (필수)</div>
+            <select class="input" id="reg-maker" style="width:100%;"></select>
+          </div>
+          <div>
+            <div class="label">모델 (필수)</div>
+            <select class="input" id="reg-model" style="width:100%;"></select>
+          </div>
+          <div>
+            <div class="label">세부모델 (필수)</div>
+            <select class="input" id="reg-detailModel" style="width:100%;"></select>
+          </div>
+          <div>
+            <div class="label">세부트림</div>
+            <input class="input" id="reg-trim" placeholder="예: 2.5 가솔린 프리미엄" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">연료</div>
+            <select class="input" id="reg-fuel" style="width:100%;"></select>
+          </div>
+          
+          <div>
+            <div class="label">외부색상</div>
+            <input class="input" id="reg-exColor" placeholder="예: 화이트" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">내부색상</div>
+            <input class="input" id="reg-inColor" placeholder="예: 블랙" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">연식</div>
+            <input class="input" id="reg-year" placeholder="예: 2022" style="width:100%;">
+          </div>
+          
+          <div>
+            <div class="label">신차가격(원)</div>
+            <input class="input js-num-comma" id="reg-newCarPrice" placeholder="예: 35000000" style="width:100%;">
+          </div>
+
+<div>
+            <div class="label">주행거리(km)</div>
+            <input class="input" id="reg-mileageKm" placeholder="예: 24000" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">배기량(cc)</div>
+            <input class="input" id="reg-displacement" placeholder="예: 1598" style="width:100%;">
+          </div>
+
+          <div>
+            <div class="label">최초등록일</div>
+            <input class="input" id="reg-firstReg" type="date" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">차령만료일</div>
+            <input class="input" id="reg-expire" type="date" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">만21세 운영</div>
+            <select class="input" id="reg-age21Op" style="width:100%;">
+              <option value="계약불가" selected>계약불가</option>
+              <option value="계약가능">계약가능</option>
+            </select>
+          </div>
+          <div>
+            <div class="label">만23세 운영</div>
+            <select class="input" id="reg-age23Op" style="width:100%;">
+              <option value="계약불가" selected>계약불가</option>
+              <option value="계약가능">계약가능</option>
+            </select>
+          </div>
+          <div style="grid-column: 1 / span 2;">
+            <div class="label">선택옵션</div>
+            <input class="input" id="reg-optionsText" placeholder="예: 선루프 | 내비" style="width:100%;">
+          </div>
+
+          <div style="grid-column: 1 / span 2;">
+            <div class="label">사진링크</div>
+            <input class="input" id="reg-photoLink" placeholder="예: https://..." style="width:100%;">
+          </div>
+
+          <div style="grid-column: 1 / span 2;">
+            <div class="label">사진 업로드</div>
+            <div id="reg-photo-drop" class="dropzone">여기에 사진을 드래그하거나 클릭해서 선택</div>
+            <input type="file" id="reg-photo-file" accept="image/*" multiple style="display:none;">
+            <div id="reg-photo-list" class="photo-list"></div>
+          </div>
+
+          <div>
+            <div class="label">신용등급</div>
+            <select class="input" id="reg-credit" style="width:100%;"></select>
+          </div>
+          <div>
+            <div class="label">심사여부</div>
+            <select class="input" id="reg-review" style="width:100%;">
+              <option value="">-</option>
+              <option value="Y">필요</option>
+              <option value="N">불필요</option>
+            </select>
+          </div>
+
+          <!-- ADMIN 전용: 관리자가 차량을 특정 공급사(사업자번호)로 귀속시키는 칸 -->
+          <div id="reg-supplierBiz-wrap" style="grid-column: 1 / span 2; display:none;">
+            <div class="label">공급사 사업자번호 (관리자)</div>
+            <select class="input" id="reg-supplierBiz" style="width:100%;"></select>
+            <div class="center-muted" style="margin-top:6px;">※ 관리자는 선택한 사업자번호로 차량이 귀속됩니다.</div>
+          </div>
+        </div>
+
+        <!-- 차량정보 ↔ 기간별 금액: 1px 경계선으로만 구분 -->
+        <div style="height:1px; background:#eee; margin:12px 0;"></div>
+
+        <div>
+          <div class="label" style="margin:0 0 8px 0;">기간별 대여료/보증금 (선택)</div>
+          <div class="grid" style="display:grid; grid-template-columns: 72px 1fr 1fr 1fr; gap:8px; align-items:center;">
+            <div class="label" style="margin:0;">기간</div>
+            <div class="label" style="margin:0;">대여료(월)</div>
+            <div class="label" style="margin:0;">보증금</div>
+            <div class="label" style="margin:0;">인수가격</div>
+
+            <div class="muted">6개월</div>
+            <input class="input" id="reg-rent-6" placeholder="예: 650000" style="width:100%;">
+            <input class="input" id="reg-dep-6" placeholder="예: 3000000" style="width:100%;">
+            <input class="input" id="reg-buy-6" placeholder="예: 20000000" style="width:100%;">
+
+            <div class="muted">12개월</div>
+            <input class="input" id="reg-rent-12" placeholder="" style="width:100%;">
+            <input class="input" id="reg-dep-12" placeholder="" style="width:100%;">
+            <input class="input" id="reg-buy-12" placeholder="" style="width:100%;">
+
+            <div class="muted">24개월</div>
+            <input class="input" id="reg-rent-24" placeholder="" style="width:100%;">
+            <input class="input" id="reg-dep-24" placeholder="" style="width:100%;">
+            <input class="input" id="reg-buy-24" placeholder="" style="width:100%;">
+
+            <div class="muted">36개월</div>
+            <input class="input" id="reg-rent-36" placeholder="" style="width:100%;">
+            <input class="input" id="reg-dep-36" placeholder="" style="width:100%;">
+            <input class="input" id="reg-buy-36" placeholder="" style="width:100%;">
+
+            <div class="muted">48개월</div>
+            <input class="input" id="reg-rent-48" placeholder="" style="width:100%;">
+            <input class="input" id="reg-dep-48" placeholder="" style="width:100%;">
+            <input class="input" id="reg-buy-48" placeholder="" style="width:100%;">
+
+            <div class="muted">60개월</div>
+            <input class="input" id="reg-rent-60" placeholder="" style="width:100%;">
+            <input class="input" id="reg-dep-60" placeholder="" style="width:100%;">
+            <input class="input" id="reg-buy-60" placeholder="" style="width:100%;">
+          </div>
+          <div class="center-muted" style="margin-top:8px;">※ 숫자만 입력 (원 단위). 비우면 저장 시 무시됩니다.</div>
+        </div>
+
+        <div class="center-muted" style="margin-top:10px;">
+          ※ v26: 로컬 JSON 저장(서버) — 등록 → 상품목록 반영까지 우선 연결
+        </div>
+        <div class="center-muted" id="reg-msg" style="margin-top:6px;"></div>
+
+        <!-- (자주 사용 X) 구글시트 링크 업로드: 수정로그 위에 배치 -->
+        <div style="border-top:1px solid #eee; padding-top:10px; margin-top:10px;">
+          <div class="label" style="margin:0 0 6px 0;">구글시트 링크 업로드</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input class="input" id="reg-sheet-url" placeholder="구글시트 링크 또는 CSV export 링크" style="flex:1;">
+            <button class="btn-outline" type="button" id="reg-sheet-import">가져오기</button>
+          </div>
+          <div class="center-muted" id="reg-sheet-msg" style="margin-top:6px;"></div>
+        </div>
+
+      <!-- 하단: 수정 로그 (선택 차량 기준) -->
+      <div class="box" style="margin-top:12px;">
+        <div class="box-title" style="margin-bottom:8px;">수정 로그</div>
+        <div id="reg-log" class="reg-log">
+          <div class="center-muted">차량을 선택하면 수정 로그가 표시됩니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="erp-panel panel-3" data-focus="약관">
+    <header class="section-header">
+      <div class="sh-title">약관(정책) 등록/변경</div>
+      <div class="sh-actions" style="margin-left:auto; display:flex; gap:8px;">
+        <button class="btn-outline" type="button" id="pol-reload">초기</button>
+        <button class="btn-primary" type="button" id="pol-save">저장</button>
+      </div>
+    </header>
+
+    <div class="panel-body p12" id="policy-panel">
+      <div class="box" style="margin-bottom:12px;">
+        <div class="label">편집할 약관 선택</div>
+        <select class="input" id="pol-id" style="width:100%; margin-top:6px;">
+          <!-- JS에서 로딩 -->
+        </select>
+        <div class="muted" style="margin-top:6px; font-size:10px;">
+          차량등록 패널의 ‘적용약관’은 이 정책 ID를 참조합니다. 정책을 수정하면, 같은 정책을 쓰는 차량은 자동으로 반영됩니다.
+        </div>
+      </div>
+
+      <div class="grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div style="grid-column:1 / span 2;">
+          <div class="label">약관명</div>
+          <input class="input" id="pol-name" placeholder="예: 샘플기본" style="width:100%;">
+        </div>
+
+        <div>
+          <div class="label">대인 보상한도</div>
+          <input class="input" id="ins-bodily-limit" value="무한" readonly style="width:100%;">
+        </div>
+        <div>
+          <div class="label">대인 면책금 (원)</div>
+          <input class="input js-num-comma" id="ins-bodily-ded" placeholder="예: 300000" style="width:100%;">
+        </div>
+
+        <div>
+          <div class="label">대물 보상한도 (원)</div>
+          <input class="input js-num-comma" id="ins-prop-limit" placeholder="예: 200000000" style="width:100%;">
+        </div>
+        <div>
+          <div class="label">대물 면책금 (원)</div>
+          <input class="input js-num-comma" id="ins-prop-ded" placeholder="예: 300000" style="width:100%;">
+        </div>
+
+        <div>
+          <div class="label">자손 보상한도 (원)</div>
+          <input class="input js-num-comma" id="ins-pinj-limit" placeholder="예: 15000000" style="width:100%;">
+        </div>
+        <div>
+          <div class="label">자손 면책금 (원)</div>
+          <input class="input js-num-comma" id="ins-pinj-ded" placeholder="예: 300000" style="width:100%;">
+        </div>
+
+        <div>
+          <div class="label">무보험차 보상한도 (원)</div>
+          <input class="input js-num-comma" id="ins-unins-limit" placeholder="예: 200000000" style="width:100%;">
+        </div>
+        <div>
+          <div class="label">무보험차 면책금 (원)</div>
+          <input class="input js-num-comma" id="ins-unins-ded" placeholder="예: 300000" style="width:100%;">
+        </div>
+
+        <div>
+          <div class="label">자차 한도</div>
+          <div class="pol-two-field">
+            <select class="input" id="col-limit-type" style="width:100%;">
+              <option value="UP_TO_VEHICLE_VALUE">차량가액</option>
+              <option value="AMOUNT">금액입력</option>
+            </select>
+            <input class="input js-num-comma" id="col-limit-amount-won" placeholder="금액입력 선택 시 (원)" style="width:100%;">
+          </div>
+        </div>
+
+        <div>
+          <div class="label">자차수리비율 (%)</div>
+          <input class="input" id="col-ded-percent" placeholder="예: 20" style="width:100%;">
+        </div>
+
+        <div>
+          <div class="label">자차면책최소 (원)</div>
+          <input class="input js-num-comma" id="col-ded-min-won" placeholder="예: 500000" style="width:100%;">
+        </div>
+        <div>
+          <div class="label">자차면책최대 (원)</div>
+          <input class="input js-num-comma" id="col-ded-max-won" placeholder="예: 1000000" style="width:100%;">
+        </div>
+
+
+
+          <div>
+            <div class="label">만 21세 추가 대여료</div>
+            <div class="pol-two-field">
+              <select class="input" id="drv-21-mode" style="width:100%;">
+                <option value="none">운영안함</option>
+                <option value="fixed">정액(원)</option>
+                <option value="percent">대여료의 %</option>
+              </select>
+              <input class="input js-num-comma" id="drv-21-val" placeholder="예: 50000 또는 10" style="width:100%;">
+            </div>
+          </div>
+
+          <div>
+            <div class="label">만 23세 추가 대여료</div>
+            <div class="pol-two-field">
+              <select class="input" id="drv-23-mode" style="width:100%;">
+                <option value="none">운영안함</option>
+                <option value="fixed">정액(원)</option>
+                <option value="percent">대여료의 %</option>
+              </select>
+              <input class="input js-num-comma" id="drv-23-val" placeholder="예: 50000 또는 10" style="width:100%;">
+            </div>
+          </div>
+
+          <div>
+            <div class="label">약정주행거리 (km/년)</div>
+            <input class="input js-num-comma" id="mil-contract" placeholder="예: 20000" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">1만Km 상향시</div>
+            <div class="pol-two-field">
+              <select class="input" id="mil-plus10k-mode" style="width:100%;">
+                <option value="fixed">정액(원)</option>
+                <option value="percent">대여료의 %</option>
+              </select>
+              <input class="input js-num-comma" id="mil-plus10k-val" placeholder="예: 120000 또는 10" style="width:100%;">
+            </div>
+          </div>
+
+	          <div>
+	            <div class="label">1Km 초과시 금액 (원)</div>
+	            <input class="input js-num-comma" id="mil-over1km" placeholder="예: 120" style="width:100%;">
+	          </div>
+	          <div>
+	            <div class="label">긴급출동 (연 / 회)</div>
+	            <input class="input js-num-comma" id="svc-emergency-per-year" placeholder="예: 5" style="width:100%;">
+	          </div>
+
+          <div>
+            <div class="label">위약금률 (1년 미만, %)</div>
+            <input class="input" id="pen-lt1y" placeholder="예: 30" style="width:100%;">
+          </div>
+          <div>
+            <div class="label">위약금률 (1년 이상, %)</div>
+            <input class="input" id="pen-gte1y" placeholder="예: 20" style="width:100%;">
+          </div>
+
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+</section>
+{% endblock %}

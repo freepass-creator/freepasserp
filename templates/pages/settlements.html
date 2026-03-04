@@ -1,0 +1,16 @@
+{% extends "layout/shell.html" %}
+{% block content %}
+<section class="erp-content layout-settlements" data-page="settlements">
+  <div class="erp-panel panel-1" data-focus="목록">
+    <header class="section-header">
+      <div class="sh-title">정산 내역</div>
+      <div class="sh-meta" id="settlements-count"></div>
+    </header>
+    <div class="panel-body" id="settlements-list"></div>
+  </div>
+  <div class="erp-panel panel-2" data-focus="상세">
+    <header class="section-header"><div class="sh-title">정산 상세</div></header>
+    <div class="panel-body p12" id="settlements-detail" style="position:relative;" data-filter-host="1"><div class="center-muted">항목을 선택하세요.</div></div>
+  </div>
+</section>
+{% endblock %}
