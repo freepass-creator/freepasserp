@@ -49,8 +49,25 @@ def inject_app_version():
 # -----------------------------
 # Local storage (safe MVP)
 # -----------------------------
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-UPLOAD_VEHICLE_DIR = os.path.join(app.static_folder, "uploads", "vehicles")
+# NOTE (IMPORTANT):
+# - Local dev: store JSON under repo's ./data directory.
+# - Vercel/serverless: project filesystem is read-only. MUST write to /tmp.
+#
+# You can override storage location via FREEPASS_DATA_DIR.
+REPO_DIR = os.path.dirname(__file__)
+REPO_DATA_DIR = os.path.join(REPO_DIR, "data")
+
+_is_vercel = bool(os.environ.get("VERCEL"))
+DATA_DIR = os.environ.get("FREEPASS_DATA_DIR") or (
+    os.path.join("/tmp", "freepasserp_data") if _is_vercel else REPO_DATA_DIR
+)
+
+# Upload dir: keep writable on serverless. (Serving uploaded images on Vercel is
+# out-of-scope for this MVP; we still keep a writable target to avoid crashes.)
+UPLOAD_VEHICLE_DIR = os.path.join(
+    ("/tmp" if _is_vercel else app.static_folder), "uploads", "vehicles"
+)
+
 VEHICLES_JSON = os.path.join(DATA_DIR, "vehicles.json")
 CHATROOMS_JSON = os.path.join(DATA_DIR, "chat_rooms.json")
 
@@ -63,6 +80,29 @@ USERS_REJECTED_JSON = os.path.join(DATA_DIR, "users_rejected.json")
 
 # Partners (소속 파트너/회사) master (Local MVP)
 PARTNERS_JSON = os.path.join(DATA_DIR, "partners.json")
+
+
+def _ensure_runtime_data_dir() -> None:
+    """Ensure writable runtime DATA_DIR exists."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+
+
+def _seed_runtime_file_if_missing(filename: str) -> None:
+    """Copy seed JSON from repo data dir into runtime DATA_DIR if missing."""
+    _ensure_runtime_data_dir()
+    dst = os.path.join(DATA_DIR, filename)
+    if os.path.exists(dst):
+        return
+    src = os.path.join(REPO_DATA_DIR, filename)
+    if os.path.exists(src):
+        try:
+            with open(src, "rb") as fsrc:
+                raw = fsrc.read()
+            with open(dst, "wb") as fdst:
+                fdst.write(raw)
+        except Exception:
+            # If copying fails, caller will create default file later.
+            pass
 
 # -----------------------------
 # Firebase Auth (ID token verification)
@@ -92,7 +132,8 @@ def _ensure_policies_store() -> None:
       - 사용자가 변경 가능한 건 name(표시명)과 숫자/조건 데이터
       - 차량은 policyId만 저장하며, 정책을 수정하면 같은 policyId 차량에 자동 반영됨
     """
-    os.makedirs(DATA_DIR, exist_ok=True)
+    _ensure_runtime_data_dir()
+    _seed_runtime_file_if_missing("policies.json")
 
     now = datetime.now()
     now_ver = now.strftime("%Y.%m.%d")
@@ -252,7 +293,9 @@ def _save_policies(rows: List[Dict[str, Any]]) -> None:
 
 
 def _ensure_store() -> None:
-    os.makedirs(DATA_DIR, exist_ok=True)
+    _ensure_runtime_data_dir()
+    _seed_runtime_file_if_missing("vehicles.json")
+    _seed_runtime_file_if_missing("chat_rooms.json")
     if not os.path.exists(VEHICLES_JSON):
         with open(VEHICLES_JSON, "w", encoding="utf-8") as f:
             json.dump([], f, ensure_ascii=False, indent=2)
@@ -268,7 +311,7 @@ AUDIT_LOG = os.path.join(DATA_DIR, "audit.jsonl")
 def _append_audit(action: str, entity: str, entity_id: str, before: Any = None, after: Any = None, meta: Any = None) -> None:
     """Append an audit trail record as JSON lines. Best-effort; never raise."""
     try:
-        os.makedirs(DATA_DIR, exist_ok=True)
+        _ensure_runtime_data_dir()
         rec = {
             "ts": _now_iso(),
             "action": action,
@@ -598,7 +641,14 @@ def _read_csv_rows(csv_text: str) -> List[Dict[str, str]]:
 # Local users (safe MVP auth)
 # -----------------------------
 def _ensure_user_stores() -> None:
-    os.makedirs(DATA_DIR, exist_ok=True)
+    _ensure_runtime_data_dir()
+
+    # Seed runtime files from repo data (serverless uses /tmp, repo FS is read-only)
+    _seed_runtime_file_if_missing("users.json")
+    _seed_runtime_file_if_missing("users_pending.json")
+    _seed_runtime_file_if_missing("users_rejected.json")
+    _seed_runtime_file_if_missing("partners.json")
+
     if not os.path.exists(USERS_JSON):
         with open(USERS_JSON, "w", encoding="utf-8") as f:
             json.dump([], f, ensure_ascii=False, indent=2)
@@ -626,7 +676,7 @@ def _load_users(path: str) -> List[Dict[str, Any]]:
         return []
 
 def _save_users(path: str, rows: List[Dict[str, Any]]) -> None:
-    os.makedirs(DATA_DIR, exist_ok=True)
+    _ensure_runtime_data_dir()
     with open(path, "w", encoding="utf-8") as f:
         json.dump(rows, f, ensure_ascii=False, indent=2)
 
@@ -644,7 +694,7 @@ def _load_partners() -> List[Dict[str, Any]]:
 
 
 def _save_partners(rows: List[Dict[str, Any]]) -> None:
-    os.makedirs(DATA_DIR, exist_ok=True)
+    _ensure_runtime_data_dir()
     with open(PARTNERS_JSON, "w", encoding="utf-8") as f:
         json.dump(rows, f, ensure_ascii=False, indent=2)
 
