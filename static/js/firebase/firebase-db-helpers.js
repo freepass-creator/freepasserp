@@ -6,7 +6,7 @@
  */
 
 import {
-  get, onValue, update, query, orderByChild, equalTo, limitToLast, limitToFirst
+  get, onValue, update, query, orderByChild, equalTo
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
 import { db } from './firebase-config.js';
 import { ref } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
@@ -117,85 +117,6 @@ export async function fetchCollection(path, { filter, sort, mode = 'values', ent
   return items;
 }
 
-// ─── 서버 사이드 쿼리 헬퍼 ───────────────────────────────────────────────────
-
-/**
- * 서버 사이드 쿼리 제약 조건을 빌드한다.
- * @param {import('firebase/database').DatabaseReference} dbRef
- * @param {object} [queryOptions]
- * @param {string} [queryOptions.orderBy]       orderByChild 대상 필드
- * @param {*}      [queryOptions.equalToValue]  equalTo 값
- * @param {number} [queryOptions.limitLast]     limitToLast 수
- * @param {number} [queryOptions.limitFirst]    limitToFirst 수
- * @returns {import('firebase/database').Query}
- */
-function buildQuery(dbRef, queryOptions = {}) {
-  const { orderBy, equalToValue, limitLast, limitFirst } = queryOptions;
-  const constraints = [];
-  if (orderBy) constraints.push(orderByChild(orderBy));
-  if (equalToValue !== undefined) constraints.push(equalTo(equalToValue));
-  if (limitLast > 0) constraints.push(limitToLast(limitLast));
-  if (limitFirst > 0) constraints.push(limitToFirst(limitFirst));
-  return constraints.length ? query(dbRef, ...constraints) : dbRef;
-}
-
-/**
- * 서버 사이드 쿼리로 한 번 조회하여 배열로 반환.
- * queryOptions가 없으면 기존 fetchCollection과 동일하게 동작.
- *
- * @param {string} path           Firebase 경로
- * @param {object} options
- * @param {object}  [options.queryOptions]  서버 사이드 쿼리 조건 ({ orderBy, equalToValue, limitLast, limitFirst })
- * @param {Function} [options.filter]       클라이언트 사이드 후처리 필터 (서버 쿼리 후 추가 필터링)
- * @param {Function} [options.sort]         정렬 함수
- * @param {'values'|'entries'} [options.mode]
- * @param {string}  [options.entryKey]
- */
-export async function queryCollection(path, { queryOptions, filter, sort, mode = 'values', entryKey = 'uid' } = {}) {
-  const dbRef = ref(db, path);
-  const targetRef = queryOptions ? buildQuery(dbRef, queryOptions) : dbRef;
-  const snapshot = await get(targetRef);
-  let items = mode === 'entries'
-    ? snapshotToEntries(snapshot, entryKey)
-    : snapshotToValues(snapshot);
-
-  if (typeof filter === 'function') items = items.filter(filter);
-  if (typeof sort === 'function') items = items.sort(sort);
-  return items;
-}
-
-/**
- * 서버 사이드 쿼리로 실시간 감시. queryOptions가 있으면 Firebase 서버에서 필터링.
- *
- * @param {string} path
- * @param {Function} callback
- * @param {object} options
- * @param {object}  [options.queryOptions]
- * @param {Function} [options.filter]
- * @param {Function} [options.sort]
- * @param {'values'|'entries'} [options.mode]
- * @param {string}  [options.entryKey]
- * @returns unsubscribe 함수
- */
-export function watchQueryCollection(path, callback, {
-  queryOptions,
-  mode = 'values',
-  entryKey = 'uid',
-  filter,
-  sort
-} = {}) {
-  const dbRef = ref(db, path);
-  const targetRef = queryOptions ? buildQuery(dbRef, queryOptions) : dbRef;
-  return onValue(targetRef, (snapshot) => {
-    let items = mode === 'entries'
-      ? snapshotToEntries(snapshot, entryKey)
-      : snapshotToValues(snapshot);
-
-    if (typeof filter === 'function') items = items.filter(filter);
-    if (typeof sort === 'function') items = items.sort(sort);
-    callback(items);
-  });
-}
 
 /**
  * 특정 필드 값으로 단일 쿼리 조회 (중복 검사 등에 사용).

@@ -165,6 +165,10 @@ function createLink(item) {
 }
 
 export function renderRoleMenu(container, role) {
+  if (container.dataset.renderedRole === role) {
+    setMenuActive(container.closest('.sidebar') || container);
+    return;
+  }
   const items = ROUTE_REGISTRY.filter((item) => item.roles.includes(role));
   const frag = document.createDocumentFragment();
 
@@ -194,5 +198,6 @@ export function renderRoleMenu(container, role) {
     sidebar.appendChild(bottomWrap);
   }
 
+  container.dataset.renderedRole = role;
   setMenuActive(sidebar || container);
 }

@@ -127,11 +127,6 @@ async function init() {
     uid = auth.user.uid;
     companyCode = profile.company_code || '';
 
-    // SPA 페이지 전환 후 사이드바 re-render 대응 (딜레이 적용)
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('.sidebar-link')) setTimeout(syncAllBadges, 200);
-    });
-
     watchRooms((rooms) => { counts.chat = countUnreadRooms(rooms); syncAllBadges(); });
     watchContracts((items) => { counts.contract = countActionContracts(items); syncAllBadges(); });
     watchSettlements((items) => { counts.settlement = countActionSettlements(items); syncAllBadges(); });

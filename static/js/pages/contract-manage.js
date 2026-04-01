@@ -1,7 +1,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { qs, registerPageCleanup, runPageCleanup, formatMoney } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
-import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier , syncTopBarPageCount } from '../core/management-skeleton.js';
+import { applyManagementButtonTones, createManagedFormModeApplier, syncTopBarPageCount } from '../core/management-skeleton.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { renderBadgeRow } from '../shared/badge.js';
 import { showToast, showConfirm } from '../core/toast.js';
@@ -21,8 +21,6 @@ import { formatContractCodeDisplay, parseMoneyValue, ensureSelectValue, buildVeh
 let menu = qs('#sidebar-menu');
 let listBody = qs('#contract-list');
 let message = qs('#contract-message');
-let filterToggleButton = qs('#openContractFilterBtn');
-let filterOverlay = qs('#contractFilterOverlay');
 let resetButton = null;
 let saveButton = qs('#contract-submit-head');
 let deleteButton = qs('#contract-delete-head');
@@ -65,8 +63,6 @@ function bindDOM() {
   menu = qs('#sidebar-menu');
   listBody = qs('#contract-list');
   message = qs('#contract-message');
-  filterToggleButton = qs('#openContractFilterBtn');
-  filterOverlay = qs('#contractFilterOverlay');
   resetButton = null;
   saveButton = qs('#contract-submit-head');
   deleteButton = qs('#contract-delete-head');
@@ -377,7 +373,8 @@ const CONTRACT_COLS = [
 const contractThead = qs('#contract-list-head');
 
 function renderList() {
-  const visible = allContracts.filter(contractVisible).sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+  const roleVisible = allContracts.filter(contractVisible).sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+  const visible = roleVisible;
   syncTopBarPageCount(visible.length);
   renderTableGrid({
     thead: contractThead,
@@ -594,8 +591,6 @@ async function bootstrap() {
     const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
     currentProfile = { ...profile, uid: user.uid };
     renderRoleMenu(menu, profile.role);
-
-    bindFilterOverlayToggle(filterToggleButton, filterOverlay, { storageKey: 'fp.contract-filter.v1' });
 
     chatButton?.addEventListener('click', async () => {
       if (!currentContract) return;

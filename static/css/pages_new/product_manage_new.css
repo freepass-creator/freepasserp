@@ -1,1 +1,172 @@
-@import url('../pages/product-manage.css');
+.product-manage-page-shell .panel--form {
+  position: relative;
+}
+
+.product-form-panel-body {
+  position: relative;
+}
+
+.product-form-feedback {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  border-radius: var(--radius-ui);
+  margin-bottom: 12px;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.product-form-feedback.is-hidden {
+  display: none;
+}
+
+.product-form-feedback.is-visible {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+}
+
+.product-form-feedback.is-leaving {
+  display: flex;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.product-form-feedback[data-tone="progress"] .form-feedback__spinner {
+  display: inline-block;
+}
+
+.product-form-feedback:not([data-tone="progress"]) .form-feedback__spinner {
+  display: none;
+}
+
+.product-image-editor[hidden] {
+  display: none !important;
+}
+
+.image-preview-toolbar.is-view-only {
+  justify-content: flex-start;
+}
+
+.image-preview-toolbar.is-view-only .image-preview-summary {
+  color: var(--text-subtle);
+}
+
+.image-preview-action.is-primary {
+  color: #1b2a4a;
+}
+
+.image-preview-media {
+  cursor: zoom-in;
+}
+
+
+@media (max-width: 900px) {}
+
+
+#product-form.ui-mode-view .product-image-editor,
+#product-form.ui-mode-view #product-sheet-import-section,
+#product-form.ui-mode-view .sheet-apply-row,
+#product-form.ui-mode-view .helper-row {
+  display: none !important;
+}
+
+
+
+
+.product-manage-page-shell .panel-head-title-wrap {
+  gap: 4px;
+}
+
+.product-manage-page-shell .panel-head-subtitle {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--text-subtle);
+}
+
+#product-form .field > label {
+  min-height: 16px;
+}
+
+#product-form .action-row,
+#product-form .action-row-between,
+#product-form .action-group-right {
+  align-items: center;
+}
+
+
+
+/* 044 rescue: inventory-manage panel stability */
+.product-manage-page-shell,
+.product-manage-page-shell > .panel,
+.product-manage-page-shell > .panel-slot,
+.product-manage-page-shell .panel {
+  min-width: 0;
+  min-height: 0;
+}
+
+.product-manage-page-shell .panel-slot {
+  display: grid;
+}
+
+.product-manage-page-shell .panel-head {
+  align-items: center;
+}
+
+.product-manage-page-shell .panel-head-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.product-manage-page-shell .panel-head-title {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.product-manage-page-shell .panel-head-subtitle {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-manage-page-shell .panel-head-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+#product-form .form-grid,
+#product-form .price-manage-grid {
+  min-width: 0;
+}
+
+#product-form .field > :is(input, select, textarea) {
+  min-width: 0;
+}
+
+#product-form .price-manage-grid {
+  align-items: center;
+}
+
+#product-register-list.summary-list {
+  min-height: 0;
+}
+
+@media (max-width: 1200px) {
+  .product-manage-page-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .product-manage-page-shell .panel-slot {
+    min-height: 720px;
+  }
+}
+
+#product-form.ui-mode-view #product-photo-section {
+  display: grid;
+}

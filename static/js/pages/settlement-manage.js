@@ -1,7 +1,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
-import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier , syncTopBarPageCount } from '../core/management-skeleton.js';
+import { applyManagementButtonTones, createManagedFormModeApplier, syncTopBarPageCount } from '../core/management-skeleton.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { renderBadgeRow } from '../shared/badge.js';
 import { showToast, showConfirm } from '../core/toast.js';
@@ -20,8 +20,6 @@ let clawbackButton = qs('#settlement-clawback-btn');
 let chatButton = qs('#settlement-chat-btn');
 let message = qs('#settlement-message');
 let modeField = qs('#settlement-form_mode');
-let filterBtn = qs('#openSettlementFilterBtn');
-let filterOverlay = qs('#settlementFilterOverlay');
 
 let fields = {
   settlement_code: qs('#settlement_code'),
@@ -53,8 +51,6 @@ function bindDOM() {
   chatButton = qs('#settlement-chat-btn');
   message = qs('#settlement-message');
   modeField = qs('#settlement-form_mode');
-  filterBtn = qs('#openSettlementFilterBtn');
-  filterOverlay = qs('#settlementFilterOverlay');
   fields = {
     settlement_code: qs('#settlement_code'),
     settlement_status: qs('#settlement_status'),
@@ -129,9 +125,6 @@ function initFormMode() {
 
 
 
-function formatContractCodeDisplay(value) {
-  return formatSequenceCodeDisplay(value, { prefix: 'CT' });
-}
 
 function formatSettlementCodeDisplay(value) {
   return formatSequenceCodeDisplay(value, { prefix: 'ST' });
@@ -380,6 +373,7 @@ function renderList() {
   });
 }
 
+
 async function bootstrap() {
   try {
     const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
@@ -388,8 +382,6 @@ async function bootstrap() {
 
     initFormMode();
     applyManagementButtonTones({ resetButtons: [resetButton], submitButtons: [submitButton], deleteButtons: [deleteButton] });
-
-    bindFilterOverlayToggle(filterBtn, filterOverlay, { storageKey: 'fp.settlement-filter.v1' });
 
     resetButton?.addEventListener('click', () => { resetForm(); showToast('신규 등록 상태입니다.', 'info'); });
 

@@ -1,1 +1,228 @@
-@import url('../pages/settings.css');
+/* settings page uses common panel/form/list rules */
+
+.settings-page-shell {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: var(--panel-gap);
+  align-items: stretch;
+}
+
+.settings-page-shell > .panel {
+  grid-column: span 1 !important;
+  min-width: 0;
+}
+
+.settings-page-shell > .panel[hidden] {
+  display: none !important;
+}
+
+.settings-left-panel-body,
+.settings-right-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-subsection-title {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-heavy);
+  color: var(--text-main);
+}
+
+.settings-subsection-title.is-small {
+  font-size: 12px;
+}
+
+.settings-helper {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-subtle);
+}
+
+.settings-empty-state {
+  min-height: 100%;
+}
+
+.settings-admin-tab-button {
+  min-width: 72px;
+}
+
+.settings-admin-tab-button.active {
+  background: var(--text-main);
+  color: #ffffff;
+  border-color: var(--text-main);
+}
+
+.settings-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-grid--master {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.setting-value-ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-upload-card,
+.settings-sample-card,
+.settings-code-list-card,
+.settings-code-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-base);
+}
+
+.settings-action-row,
+.settings-inline-actions,
+.settings-subsection-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-subsection-head {
+  justify-content: space-between;
+}
+
+.settings-test-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-code-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 12px;
+}
+
+.settings-code-list {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.settings-code-message,
+#settings-code-message {
+  min-height: 16px;
+}
+
+@media (max-width: 1200px) {
+  .settings-code-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── 계정관리 ─────────────────────────────────────────────────────────── */
+
+.settings-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.settings-profile-form .form-section {
+  padding: 0;
+  border: 0;
+}
+
+.settings-profile-form .form-grid {
+  gap: var(--form-field-gap, 4px);
+}
+
+.settings-account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-account-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-soft);
+  cursor: pointer;
+  font-size: var(--font-size-main);
+  color: var(--text-main);
+}
+
+.settings-account-action-row:hover {
+  color: var(--text-main);
+  background: var(--interactive-hover-bg);
+}
+
+.settings-account-action-row svg {
+  flex-shrink: 0;
+  color: var(--text-subtle);
+  transition: transform 0.15s;
+}
+
+.settings-account-action-row.is-open svg {
+  transform: rotate(90deg);
+}
+
+.settings-action-label {
+  font-size: var(--font-size-main);
+  font-weight: var(--font-weight-base);
+}
+
+.settings-action-label--danger {
+  color: var(--badge-status-error-text, #c0392b);
+}
+
+.settings-account-action-expand {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-ui);
+  background: var(--surface-subtle, #f8fafc);
+}
+
+.settings-account-action-expand[hidden] {
+  display: none;
+}
+
+.settings-account-action-expand .field {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .settings-page-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .settings-page-shell > .panel {
+    grid-column: span 1 !important;
+  }
+
+  .settings-grid--master {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-test-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-subsection-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

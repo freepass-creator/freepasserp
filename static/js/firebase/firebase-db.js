@@ -161,10 +161,6 @@ export async function deletePartner(partnerCode) {
 
 // ─── 코드 시퀀스 / 코드 항목 ─────────────────────────────────────────────────
 
-export function watchCodeSequences(callback) {
-  return onValue(ref(db, 'code_sequences'), (snapshot) => callback(snapshot.val() || {}));
-}
-
 export async function saveCodeItem({ group_code, item_code, item_name, note = '', sort_order = 0, is_active = true, created_by = '' }) {
   const normalizedGroup = sanitizeCodeValue(group_code);
   const normalizedCode = sanitizeCodeValue(item_code);

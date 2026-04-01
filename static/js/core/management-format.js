@@ -59,6 +59,12 @@ export function formatSequenceCodeDisplay(value, { prefix = '', minLength = 4, f
 }
 
 
+export function formatMoney(value, { suffix = '', fallback = '-' } = {}) {
+  const digits = String(value ?? '').replace(/[^\d]/g, '');
+  if (!digits) return fallback;
+  return `${Number(digits).toLocaleString('ko-KR')}${suffix}`;
+}
+
 export function formatMileageSummary(value, fallback = '-') {
   const digits = String(value ?? '').replace(/[^\d]/g, '');
   if (!digits) return fallback;

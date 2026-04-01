@@ -1,8 +1,8 @@
-import { runPageCleanup } from './core/utils.js';
+import { runPageCleanup } from './core/utils.js'; // logout/unload 시 사용
 import { savePageState } from './core/page-state.js';
 import { showToast, showConfirm } from './core/toast.js';
 
-const PAGE_STYLE_SELECTOR = 'link[data-page-style], link[href*="/static/css/pages/"], link[href*="/static/css/pages_new/"], link[href*="/static/css/shared_new/"]';
+const PAGE_STYLE_SELECTOR = 'link[data-page-style], link[href*="/static/css/pages/"], link[href*="/static/css/shared_new/"]';
 const DASHBOARD_SELECTOR = '.dashboard-shell';
 const MAIN_SHELL_SELECTOR = '.main-shell';
 let pendingNavigationPath = '';
@@ -27,13 +27,13 @@ const PAGE_MODULE_PATHS = {
   '/terms':        '/static/js/pages/policy-manage.js',
   '/partner':      '/static/js/pages/partner-manage.js',
   '/member':       '/static/js/pages/member-manage.js',
+  '/admin':        '/static/js/pages/admin.js',
   '/settings':     '/static/js/pages/settings.js',
 };
 
-// 페이지별 캐시: { container, styles[], doc, title, bodyPage }
+// 페이지별 캐시: { container, styles[], doc, title, bodyPage, module }
 const pageCache = new Map();
 let currentPageKey = '';
-let pageLoadSeq = 0;
 
 // ─── 우클릭 방지 ────────────────────────────────────────────────────────────
 document.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -149,39 +149,24 @@ async function loadPage(url, options = {}) {
     const mainShell = document.querySelector(MAIN_SHELL_SELECTOR);
     if (!mainShell) { window.location.href = url; return; }
 
-    // 페이드아웃 (50ms — 뚝 끊기는 느낌 방지)
-    mainShell.classList.add('is-navigating');
-    await new Promise((r) => setTimeout(r, 50));
+    // ── 이전 페이지 숨기기 (Firebase 구독 유지 — cleanup 없음) ──
+    if (currentPageKey && currentPageKey !== nextPathname) {
+      const cur = pageCache.get(currentPageKey);
+      if (cur?.container) {
+        savePageState(currentPageKey, { scrollTop: cur.container.scrollTop || 0, _autoSaved: true });
+        cur.container.style.display = 'none';
+      }
+      clearDirtyCheck();
+    }
 
-    // ── HTML 준비 ──
     let cached = pageCache.get(nextPathname);
 
-    if (cached) {
-      // 재방문 — 캐시된 HTML로 새 컨테이너 즉시 생성
-      await ensureStyles(cached.styles || []);
-      const container = document.createElement('div');
-      container.className = 'page-tab';
-      container.dataset.page = nextPathname;
-      const nextMainShell = cached.doc.querySelector(MAIN_SHELL_SELECTOR);
-      container.replaceChildren(...Array.from(nextMainShell.childNodes).map((n) => n.cloneNode(true)));
-      mainShell.appendChild(container);
-
-      // 이전 페이지 제거 (새 컨테이너가 이미 있으므로 화면이 비지 않음)
-      if (currentPageKey) {
-        const cur = pageCache.get(currentPageKey);
-        if (cur?.container) {
-          savePageState(currentPageKey, { scrollTop: cur.container.scrollTop || 0, _autoSaved: true });
-          cur.container.remove();
-        }
-        runPageCleanup();
-      }
-      // 이전 재방문 컨테이너도 제거 (ID 충돌 방지)
-      if (cached.container && cached.container.parentNode) cached.container.remove();
-      cached.container = container;
-
+    if (cached?.mounted) {
+      // ── 재방문: 컨테이너 즉시 표시 (구독 살아있음, DOM 최신) ──
+      cached.container.style.display = '';
       if (cached.doc) syncTopBar(cached.doc);
     } else {
-      // 처음 방문 — HTML fetch
+      // ── 처음 방문: HTML fetch + mount (1회) ──
       prefetchModule(nextPathname);
       const response = await fetch(url, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -198,33 +183,37 @@ async function loadPage(url, options = {}) {
       const styleHrefs = collectStyleHrefs(nextDoc);
       await ensureStyles(styleHrefs);
 
-      // 새 컨테이너를 먼저 추가
       const container = document.createElement('div');
       container.className = 'page-tab';
       container.dataset.page = nextPathname;
       container.replaceChildren(...Array.from(nextMainShell.childNodes).map((n) => n.cloneNode(true)));
       mainShell.appendChild(container);
 
-      // 이전 페이지 제거 (새 컨테이너가 이미 있으므로 깜빡임 없음)
-      if (currentPageKey) {
-        const cur = pageCache.get(currentPageKey);
-        if (cur?.container) {
-          savePageState(currentPageKey, { scrollTop: cur.container.scrollTop || 0, _autoSaved: true });
-          cur.container.remove();
-        }
-        runPageCleanup();
-      }
-
       cached = {
         container,
         styles: styleHrefs,
         doc: nextDoc,
         title: nextDoc.title || '',
-        bodyPage: nextDoc.body?.dataset?.page || ''
+        bodyPage: nextDoc.body?.dataset?.page || '',
+        module: null,
+        mounted: false
       };
       pageCache.set(nextPathname, cached);
-
       syncTopBar(nextDoc);
+
+      // 기존 script 태그 제거
+      document.querySelectorAll('script[data-page-script]').forEach((n) => n.remove());
+
+      const modulePath = PAGE_MODULE_PATHS[nextPathname];
+      if (modulePath) {
+        try {
+          if (!cached.module) cached.module = await import(modulePath);
+          if (typeof cached.module.mount === 'function') await cached.module.mount();
+        } catch (e) {
+          console.error('[app] module error', e);
+        }
+      }
+      cached.mounted = true;
     }
 
     normalizeRequiredFields(cached.container);
@@ -236,28 +225,6 @@ async function loadPage(url, options = {}) {
     if (pushState) {
       window.history.pushState({ path: url }, '', url);
     }
-
-    // 기존 script 태그 제거
-    document.querySelectorAll('script[data-page-script]').forEach((n) => n.remove());
-
-    // ── 모듈 실행 (항상 새 인스턴스 — 이벤트 바인딩 보장) ──
-    const modulePath = PAGE_MODULE_PATHS[nextPathname];
-    if (modulePath) {
-      pageLoadSeq += 1;
-      try {
-        // ?v= 쿼리로 새 모듈 인스턴스 → 최상위 코드 재실행
-        // modulepreload로 HTTP 캐시 히트 → 네트워크 0ms
-        const mod = await import(`${modulePath}?v=${pageLoadSeq}`);
-        if (typeof mod.mount === 'function') {
-          await mod.mount();
-        }
-      } catch (e) {
-        console.error('[app] module error', e);
-      }
-    }
-
-    // 페이드인
-    mainShell.classList.remove('is-navigating');
 
   } finally {
     isPageNavigating = false;
@@ -283,7 +250,9 @@ function registerInitialPage() {
     styles: collectStyleHrefs(document),
     doc: null,
     title: document.title,
-    bodyPage: document.body.dataset.page || ''
+    bodyPage: document.body.dataset.page || '',
+    module: null,
+    mounted: true   // script 태그로 이미 mount됨
   });
   currentPageKey = pathname;
 }

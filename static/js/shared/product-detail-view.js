@@ -1,20 +1,8 @@
 import { renderBadge } from './badge.js';
-
-function safeText(value) {
-  return String(value ?? '').trim() || '-';
-}
+import { safeText, escapeHtml } from '../core/management-format.js';
 
 function hasContent(value) {
   return String(value ?? '').trim() !== '' && String(value ?? '').trim() !== '-';
-}
-
-function escapeHtml(value = '') {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
 
 function formatMileage(value) {

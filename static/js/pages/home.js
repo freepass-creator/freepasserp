@@ -1,20 +1,18 @@
-import { onValue, push, ref, remove, set } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
+import { onValue, ref } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
+import { escapeHtml } from '../core/management-format.js';
 import { requireAuth } from '../core/auth-guard.js';
-import { runPageCleanup } from '../core/utils.js';
+import { registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { db } from '../firebase/firebase-config.js';
 import { watchContracts, watchPartners, watchProducts, watchRooms, watchSettlements, watchTerms, watchUsers } from '../firebase/firebase-db.js';
 
 let menu, sectionsWrap, roleSummary;
-let noticeForm, noticeTitleInput, noticeBodyInput, noticeMessage, noticeList, noticeMeta;
+let noticeMessage, noticeList, noticeMeta;
 
 function bindDOM() {
   menu = document.getElementById('sidebar-menu');
   sectionsWrap = document.getElementById('homeSections');
   roleSummary = document.getElementById('homeRoleSummary');
-  noticeForm = document.getElementById('homeNoticeForm');
-  noticeTitleInput = document.getElementById('home_notice_title');
-  noticeBodyInput = document.getElementById('home_notice_body');
   noticeMessage = document.getElementById('homeNoticeMessage');
   noticeList = document.getElementById('homeNoticeList');
   noticeMeta = document.getElementById('homeNoticeMeta');
@@ -38,7 +36,6 @@ function saveOpenSections() {
 }
 let ds = { products: [], rooms: [], contracts: [], settlements: [], terms: [], partners: [], users: [] };
 
-function esc(v = '') { return String(v).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'); }
 function fmtDate(v) {
   const d = new Date(Number(v || 0));
   if (Number.isNaN(d.getTime()) || d.getTime() <= 0) return '-';
@@ -144,15 +141,15 @@ function topModels(items, n = 5) {
 
 function row(label, value, accent = false) {
   const cls = accent ? ' rpt--accent' : '';
-  return `<div class="rpt-row${cls}"><span class="rpt-label">${esc(label)}</span><span class="rpt-value">${esc(String(value))}</span></div>`;
+  return `<div class="rpt-row${cls}"><span class="rpt-label">${escapeHtml(label)}</span><span class="rpt-value">${escapeHtml(String(value))}</span></div>`;
 }
 
 function rptGroup(title, rows, totalLabel = '') {
   const filtered = rows.filter(Boolean);
   if (!filtered.length) return '';
   const titleHtml = totalLabel
-    ? `<div class="rpt-group__title"><span>${esc(title)}</span><span class="rpt-group__total">${esc(totalLabel)}</span></div>`
-    : `<div class="rpt-group__title"><span>${esc(title)}</span></div>`;
+    ? `<div class="rpt-group__title"><span>${escapeHtml(title)}</span><span class="rpt-group__total">${escapeHtml(totalLabel)}</span></div>`
+    : `<div class="rpt-group__title"><span>${escapeHtml(title)}</span></div>`;
   return `<div class="rpt-group">${titleHtml}<div class="rpt-group__body">${filtered.join('')}</div></div>`;
 }
 
@@ -381,19 +378,19 @@ function buildPolicySection() {
 function renderSection(sec) {
   const isOpen = openSections.has(sec.key);
   const badge = sec.pending > 0 ? `<span class="home-section-badge">${sec.pending}</span>` : '';
-  const summary = sec.summary ? `<span class="home-section-summary">${esc(sec.summary)}</span>` : '';
+  const summary = sec.summary ? `<span class="home-section-summary">${escapeHtml(sec.summary)}</span>` : '';
 
   return `
     <div class="home-section${isOpen ? ' is-open' : ''}" data-section="${sec.key}">
       <div class="home-section-head" data-toggle="${sec.key}">
         <div class="home-section-head__left">
           <svg class="home-section-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-          <span class="home-section-title">${esc(sec.title)}</span>
+          <span class="home-section-title">${escapeHtml(sec.title)}</span>
           ${badge}
           ${summary}
         </div>
         <div class="home-section-head__right">
-          <span class="home-section-desc">${esc(sec.desc)}</span>
+          <span class="home-section-desc">${escapeHtml(sec.desc)}</span>
           <a class="home-section-link" href="${sec.href}">바로가기 →</a>
         </div>
       </div>
@@ -444,9 +441,9 @@ function renderNotices(items = []) {
       </button>
       <div class="home-notice-body">
         <div class="home-notice-copy">${String(notice.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+        ${notice.image_url ? `<img class="home-notice-img" src="${String(notice.image_url).replace(/"/g, '')}" alt="" loading="lazy">` : ''}
         <div class="home-notice-foot">
           <div class="home-notice-writer">${notice.writer_name || '관리자'}</div>
-          ${currentProfile?.role === 'admin' ? '<button type="button" class="inline-button home-notice-delete">삭제</button>' : ''}
         </div>
       </div>`;
     return wrap;
@@ -454,44 +451,25 @@ function renderNotices(items = []) {
 }
 
 function bindNoticeEvents() {
-  noticeList.addEventListener('click', async (e) => {
+  noticeList.addEventListener('click', (e) => {
     const trigger = e.target.closest('.home-notice-trigger');
-    if (trigger) { trigger.closest('.home-notice-item')?.classList.toggle('is-open'); return; }
-    const del = e.target.closest('.home-notice-delete');
-    if (del && currentProfile?.role === 'admin') {
-      const id = del.closest('.home-notice-item')?.dataset.noticeId;
-      if (id) { try { await remove(ref(db, `home_notices/${id}`)); noticeMessage.textContent = '삭제 완료'; } catch (err) { noticeMessage.textContent = err.message; } }
-    }
-  });
-  noticeForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const t = String(noticeTitleInput?.value || '').trim();
-    const b = String(noticeBodyInput?.value || '').trim();
-    if (!t || !b) { noticeMessage.textContent = '제목과 내용을 모두 입력하세요.'; return; }
-    try {
-      await set(push(ref(db, 'home_notices')), {
-        title: t, body: b, writer_uid: currentUid,
-        writer_name: currentProfile?.name || currentProfile?.user_name || currentProfile?.email || '관리자',
-        created_at: Date.now()
-      });
-      noticeTitleInput.value = ''; noticeBodyInput.value = ''; noticeMessage.textContent = '등록 완료';
-    } catch (err) { noticeMessage.textContent = err.message; }
+    if (trigger) { trigger.closest('.home-notice-item')?.classList.toggle('is-open'); }
   });
 }
 
 // ─── 초기화 ─────────────────────────────────────────────────────────────────
 
 function mountWatchers() {
-  watchProducts(items => { ds.products = items || []; renderDashboard(); });
-  watchRooms(items => { ds.rooms = items || []; renderDashboard(); });
-  watchContracts(items => { ds.contracts = items || []; renderDashboard(); });
-  watchSettlements(items => { ds.settlements = items || []; renderDashboard(); });
+  registerPageCleanup(watchProducts(items => { ds.products = items || []; renderDashboard(); }));
+  registerPageCleanup(watchRooms(items => { ds.rooms = items || []; renderDashboard(); }));
+  registerPageCleanup(watchContracts(items => { ds.contracts = items || []; renderDashboard(); }));
+  registerPageCleanup(watchSettlements(items => { ds.settlements = items || []; renderDashboard(); }));
   if (currentProfile?.role === 'provider' || currentProfile?.role === 'admin') {
-    watchTerms(items => { ds.terms = items || []; renderDashboard(); });
+    registerPageCleanup(watchTerms(items => { ds.terms = items || []; renderDashboard(); }));
   }
   if (currentProfile?.role === 'admin') {
-    watchPartners(items => { ds.partners = items || []; renderDashboard(); });
-    watchUsers(items => { ds.users = items || []; renderDashboard(); });
+    registerPageCleanup(watchPartners(items => { ds.partners = items || []; renderDashboard(); }));
+    registerPageCleanup(watchUsers(items => { ds.users = items || []; renderDashboard(); }));
   } else { ds.partners = []; ds.users = []; }
 }
 
@@ -501,13 +479,12 @@ async function bootstrap() {
     currentProfile = profile; currentUid = user.uid;
     renderRoleMenu(menu, profile.role);
     roleSummary.textContent = `${roleName(profile.role)} · 미처리 현황`;
-    noticeForm.hidden = profile.role !== 'admin';
     bindNoticeEvents();
     mountWatchers();
-    onValue(ref(db, 'home_notices'), snap => {
+    registerPageCleanup(onValue(ref(db, 'home_notices'), snap => {
       const raw = snap.val() || {};
       renderNotices(Object.entries(raw).map(([id, v]) => ({ id, ...(v || {}) })));
-    });
+    }));
     renderDashboard();
   } catch (err) {
     console.error(err);

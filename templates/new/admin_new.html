@@ -4,146 +4,108 @@
 {% endblock %}
 {% block page_title_text %}관리자 페이지{% endblock %}
 {% block workspace_body %}
-<div class="work-page min-h-work layout-39 admin-page-shell">
+<div class="work-page min-h-work layout-39">
 
-<!-- ━━━ 좌측: 관리 항목 목록 ━━━ -->
-<section class="panel admin-panel admin-panel--menu">
-<div class="panel-head panel-head-default">
-<div class="panel-head-title-wrap">
-<div class="panel-head-title">관리 항목</div>
-</div>
-</div>
-<div class="panel-body admin-menu-body">
-<nav class="admin-menu" id="adminMenu">
-<button class="admin-menu-item is-active" data-tab="code-manage" type="button">코드 관리</button>
-<button class="admin-menu-item" data-tab="vehicle-master" type="button">차종 마스터</button>
-<button class="admin-menu-item" data-tab="integrity" type="button">정합성 검사</button>
-<button class="admin-menu-item" data-tab="notice" type="button">안내사항 관리</button>
-<button class="admin-menu-item" data-tab="data-overview" type="button">데이터 현황</button>
-</nav>
-</div>
-</section>
+  <!-- ━━━ 좌측(3): 관리 메뉴 ━━━ -->
+  <section class="panel pls-grid-panel">
+    <div class="panel-head panel-head-default">
+      <div class="panel-head-title-wrap">
+        <div class="panel-head-title">관리 항목</div>
+      </div>
+    </div>
+    <div class="pls-grid-scroll">
+      <nav class="admin-menu" id="adminMenu">
+        <div class="admin-menu-row">
+          <button class="admin-menu-item is-active" data-tab="settlement" type="button">정산서 관리</button>
+          <div class="admin-menu-stl-tools" id="adminStlHeadTools">
+            <div class="admin-stl-mpick">
+              <button class="admin-stl-mpick-btn" id="adminStlMonthPrev" type="button" title="이전 달">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="admin-stl-mpick-label" id="adminStlMonthLabel"></span>
+              <button class="admin-stl-mpick-btn" id="adminStlMonthNext" type="button" title="다음 달">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <span id="adminStlCount" class="admin-stl-count"></span>
+            <button class="admin-menu-item-btn" id="adminStlExportCsv" type="button" title="엑셀 다운로드">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+            </button>
+          </div>
+        </div>
+        <button class="admin-menu-item" data-tab="notice" type="button">안내사항 관리</button>
+      </nav>
+    </div>
+  </section>
 
-<!-- ━━━ 우측: 작업 영역 ━━━ -->
-<section class="panel admin-panel admin-panel--workspace">
-<div class="panel-head panel-head-default">
-<div class="panel-head-title-wrap">
-<div class="panel-head-title" id="adminWorkspaceTitle">코드 관리</div>
-</div>
-<div class="panel-head-actions" id="adminWorkspaceActions"></div>
-</div>
-<div class="panel-body admin-workspace-body">
+  <!-- ━━━ 우측(9): 작업 영역 ━━━ -->
+  <section class="panel admin-workspace-panel">
+    <!-- 일반 탭용 패널헤드 (정산서 탭에서는 숨김) -->
+    <div class="panel-head panel-head-default" id="adminWorkspaceHead" hidden>
+      <div class="panel-head-title-wrap">
+        <div class="panel-head-title" id="adminWorkspaceTitle"></div>
+      </div>
+      <div class="panel-head-actions">
+        <button class="inline-button btn-icon-only btn-tone-neutral" id="adminNoticeNew" title="신규" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        </button>
+        <button class="inline-button btn-icon-only btn-tone-save" id="adminNoticeEditSave" title="수정/저장" type="button">
+          <span class="btn-mode-icon btn-mode-icon--view">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
+          </span>
+          <span class="btn-mode-icon btn-mode-icon--write">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
+          </span>
+        </button>
+        <button type="button" class="inline-button btn-icon-only btn-danger" id="adminNoticeDelete" title="삭제">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- 정산 컬럼 헤더 (스크롤 밖 고정, 패널헤드 역할) -->
+    <div class="admin-stl-col-bar" id="adminStlColBar" hidden>
+      <table class="pls-table admin-stl-table">
+        <thead id="adminStlHead"></thead>
+      </table>
+    </div>
 
-<!-- 차종 마스터 -->
-<div class="admin-tab-panel" data-tab-panel="vehicle-master" hidden>
-<div class="admin-card-stack">
-<p class="admin-helper">구글시트 링크를 넣고 적용하면 제조사 / 모델명 / 세부모델명 / 색상 드롭다운 기준값이 즉시 갱신됩니다.</p>
-<div class="admin-stat-grid">
-<div class="admin-stat-row"><span>등록 제조사</span><strong id="vehicle-master-maker-count">0</strong></div>
-<div class="admin-stat-row"><span>등록 모델</span><strong id="vehicle-master-model-count">0</strong></div>
-<div class="admin-stat-row"><span>등록 세부모델</span><strong id="vehicle-master-submodel-count">0</strong></div>
-<div class="admin-stat-row"><span>등록 외부색상</span><strong id="vehicle-master-ext-color-count">0</strong></div>
-<div class="admin-stat-row"><span>등록 내부색상</span><strong id="vehicle-master-int-color-count">0</strong></div>
-<div class="admin-stat-row"><span>마지막 반영</span><strong id="vehicle-master-updated-at">-</strong></div>
-<div class="admin-stat-row"><span>반영 링크</span><strong class="admin-value-ellipsis" id="vehicle-master-source-file" title="-">-</strong></div>
-<div class="admin-stat-row"><span>반영자</span><strong id="vehicle-master-updated-by">-</strong></div>
-</div>
-<div class="admin-upload-card">
-<div class="field full">
-<label for="vehicle-master-link">차종 마스터 링크</label>
-<input autocomplete="off" id="vehicle-master-link" inputmode="url" placeholder="예: https://docs.google.com/spreadsheets/d/.../edit?gid=0#gid=0" type="url"/>
-</div>
-<div class="admin-helper">필수 컬럼: 제조사, 모델명, 세부모델명, 생산 기간, 코드명, 분류, 외부색상, 내부색상</div>
-<div class="admin-action-row">
-<button class="btn-primary btn-icon-only" id="vehicle-master-apply-button" title="적용하기" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg></button>
-<button class="inline-button btn-icon-only" id="vehicle-master-clear-button" title="입력비우기" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-</div>
-</div>
-<div class="admin-test-card">
-<div class="admin-subsection-title">차종 / 색상 드롭다운 테스트</div>
-<div class="form-grid">
-<div class="field"><label for="vehicle-master-test-maker">제조사</label><select id="vehicle-master-test-maker"></select></div>
-<div class="field"><label for="vehicle-master-test-model">모델명</label><select id="vehicle-master-test-model"></select></div>
-<div class="field"><label for="vehicle-master-test-submodel">세부모델명</label><select id="vehicle-master-test-submodel"></select></div>
-<div class="field"><label for="vehicle-master-test-ext-color">외부색상</label><select id="vehicle-master-test-ext-color"></select></div>
-<div class="field"><label for="vehicle-master-test-int-color">내부색상</label><select id="vehicle-master-test-int-color"></select></div>
-</div>
-</div>
-<p class="message" id="vehicle-master-message"></p>
-</div>
-</div>
+    <div class="panel-body admin-workspace-body">
 
-<!-- 코드 관리 -->
-<div class="admin-tab-panel" data-tab-panel="code-manage">
-<div class="admin-code-layout">
-<div class="admin-code-list-card">
-<div class="admin-subsection-head">
-<div class="admin-subsection-title">코드목록</div>
-<button class="inline-button btn-icon-only btn-tone-neutral" id="admin-code-form-reset" title="신규" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>
-</div>
-<div class="summary-list admin-summary-list admin-code-list" id="admin-code-item-list"></div>
-</div>
-<div class="admin-code-form-card">
-<div class="admin-subsection-head">
-<div class="admin-subsection-title">코드 정보</div>
-<div class="admin-inline-actions">
-<button class="inline-button btn-icon-only btn-tone-save" id="admin-code-submit" title="저장" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg></button>
-<button class="inline-button btn-icon-only btn-danger" id="admin-code-delete" title="삭제" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
-</div>
-</div>
-<form class="form-grid" id="admin-code-form">
-<input id="admin-editing_code_key" type="hidden"/>
-<div class="field"><label for="admin-group_code">그룹코드</label><input id="admin-group_code" required/></div>
-<div class="field"><label for="admin-item_code">항목코드</label><input id="admin-item_code" required/></div>
-<div class="field"><label for="admin-item_name">항목명</label><input id="admin-item_name" required/></div>
-<div class="field"><label for="admin-code_note">메모</label><input id="admin-code_note"/></div>
-<div class="field"><label for="admin-sort_order">정렬순서</label><input id="admin-sort_order" type="number" value="0"/></div>
-<div class="field"><label for="admin-is_active">사용여부</label><select id="admin-is_active"><option value="true">사용</option><option value="false">미사용</option></select></div>
-</form>
-<p class="message" id="admin-code-message"></p>
-</div>
-</div>
-</div>
+      <!-- 정산서 관리 -->
+      <div class="admin-tab-panel" data-tab-panel="settlement">
+        <div class="pls-grid-scroll">
+          <table class="pls-table admin-stl-table">
+            <tbody id="adminStlList"></tbody>
+          </table>
+        </div>
+      </div>
 
-<!-- 정합성 검사 -->
-<div class="admin-tab-panel" data-tab-panel="integrity" hidden>
-<div class="admin-card-stack">
-<p class="admin-helper">DB에 저장된 이미지 URL과 실제 Storage 파일을 대조하여 참조가 끊긴 고아 파일을 찾아냅니다.</p>
-<div class="admin-stat-grid">
-<div class="admin-stat-row"><span>DB 참조 URL</span><strong id="integrity-db-count">-</strong></div>
-<div class="admin-stat-row"><span>Storage 파일</span><strong id="integrity-storage-count">-</strong></div>
-<div class="admin-stat-row"><span>고아 파일</span><strong id="integrity-orphan-count">-</strong></div>
-<div class="admin-stat-row"><span>누락 참조</span><strong id="integrity-missing-count">-</strong></div>
-</div>
-<div class="admin-action-row">
-<button class="btn-primary" id="integrity-check-button" type="button">정합성 검사 실행</button>
-<button class="inline-button btn-danger" id="integrity-cleanup-button" type="button" disabled>고아 파일 일괄 삭제</button>
-</div>
-<div class="summary-list admin-summary-list" id="integrity-orphan-list" style="max-height: 240px; overflow-y: auto;"></div>
-<p class="message" id="integrity-message"></p>
-</div>
-</div>
+      <!-- 안내사항 관리 -->
+      <div class="admin-tab-panel" data-tab-panel="notice" hidden>
+        <div class="manage-form-body admin-notice-body">
+          <div class="manage-idle-hint" id="adminNoticeIdleHint">목록에서 안내사항을 선택하거나<br>신규를 눌러주세요.</div>
+          <form class="admin-notice-form" id="adminNoticeForm" hidden>
+            <div class="field full"><label for="admin_notice_title">제목</label>
+              <input id="admin_notice_title" type="text" maxlength="80" placeholder="안내사항 제목" autocomplete="off">
+            </div>
+            <div class="field full"><label for="admin_notice_body">내용</label>
+              <textarea id="admin_notice_body" rows="4" maxlength="2000" placeholder="안내사항 내용을 입력하세요."></textarea>
+            </div>
+            <div class="field full">
+              <label>이미지 첨부 <span class="field-hint">(선택)</span></label>
+              <input type="file" id="admin_notice_img" accept="image/*" style="display:none">
+              <label class="inline-button btn-sm" id="adminNoticeImgPickBtn" for="admin_notice_img">이미지 선택</label>
+              <div class="img-thumb-list" id="adminNoticeThumbList" style="margin-top:8px"></div>
+            </div>
+            <p class="message" id="adminNoticeMessage"></p>
+          </form>
+          <div id="adminNoticeList" class="admin-notice-list"></div>
+        </div>
+      </div>
 
-<!-- 안내사항 -->
-<div class="admin-tab-panel" data-tab-panel="notice" hidden>
-<div class="admin-card-stack">
-<form class="admin-notice-form" id="adminNoticeForm">
-<div class="field full"><label for="admin_notice_title">제목</label><input id="admin_notice_title" type="text" maxlength="80" placeholder="공지 제목"></div>
-<div class="field full"><label for="admin_notice_body">내용</label><textarea id="admin_notice_body" rows="5" maxlength="2000" placeholder="공지 내용을 입력하세요."></textarea></div>
-<div class="admin-action-row"><button type="submit" class="btn-primary">등록</button></div>
-</form>
-<p class="message" id="adminNoticeMessage"></p>
-<div id="adminNoticeList" class="admin-notice-list"></div>
-</div>
-</div>
+    </div>
+  </section>
 
-<!-- 데이터 현황 -->
-<div class="admin-tab-panel" data-tab-panel="data-overview" hidden>
-<div class="admin-card-stack" id="adminDataOverview"></div>
-</div>
-
-</div>
-</section>
 </div>
 {% endblock %}
 {% block workspace_page_js %}

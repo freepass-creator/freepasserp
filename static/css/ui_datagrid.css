@@ -179,7 +179,7 @@
   padding: 0 2px;
   margin: 0;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 2px;
+  border-radius: var(--list-badge-radius, var(--radius-ui, 8px));
   font-size: 10px;
   font-weight: 500;
   line-height: 1;
@@ -201,7 +201,7 @@
 
 /* ─── 색상 배지 (호환) ────────────────────────────────────────────────────── */
 
-.color-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 3px; font-size: 10px; font-weight: 600; line-height: 1; border: 1px solid rgba(0,0,0,0.08); }
+.color-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: var(--list-badge-radius, var(--radius-ui, 8px)); font-size: 10px; font-weight: 600; line-height: 1; border: 1px solid rgba(0,0,0,0.08); }
 .color-badge--on-dark { color: #fff; }
 .color-badge--on-light { color: #333; }
 .color-badge--empty { background: transparent; border: 1px dashed #cbd5e1; color: #94a3b8; }

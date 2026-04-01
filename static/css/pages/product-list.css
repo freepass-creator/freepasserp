@@ -57,7 +57,7 @@
   overflow: hidden;
   max-width: 0;
   opacity: 0;
-  transition: max-width 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+  transition: opacity 0.1s ease;
   margin-right: 0;
 }
 
@@ -119,7 +119,7 @@
   border: none; border-radius: var(--radius-ui, 2px) 0 0 var(--radius-ui, 2px);
   background: #fff;
   box-shadow: -8px 0 24px rgba(60, 64, 67, 0.12), -2px 0 8px rgba(60, 64, 67, 0.06);
-  transform: translateX(100%); transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(100%);
 }
 .pls-detail-panel .panel-head {
   background: var(--new-bg-panel-head, #f0f4f9);
