@@ -217,14 +217,10 @@ async function loadPage(url, options = {}) {
     }
 
     normalizeRequiredFields(cached.container);
-    document.title = cached.title || document.title;
+    document.title = 'FREEPASS ERP';
     document.body.dataset.page = cached.bodyPage || '';
     setActiveSidebar(nextPathname);
     currentPageKey = nextPathname;
-
-    if (pushState) {
-      window.history.pushState({ path: url }, '', url);
-    }
 
   } finally {
     isPageNavigating = false;
@@ -334,20 +330,6 @@ function initShellNavigation() {
     }
   });
 
-  window.addEventListener('popstate', async () => {
-    if (!isDashboardPage()) return;
-    if (!await confirmLeave()) {
-      window.history.pushState(null, '', currentPageKey);
-      setActiveSidebar(currentPageKey);
-      return;
-    }
-    try {
-      await loadPage(window.location.pathname, { pushState: false });
-    } catch (error) {
-      console.error(error);
-      window.location.reload();
-    }
-  });
 }
 
 function initKeyboardListNavigation() {
