@@ -375,6 +375,7 @@ initKeyboardListNavigation();
 initShellNavigation();
 initSidebarCollapse();
 registerInitialPage();
+if (window.location.pathname !== '/') history.replaceState(null, '', '/');
 
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
