@@ -32,16 +32,11 @@ watchAuth(async (user) => {
     return;
   }
 
-  if (profile.role === 'admin') {
-    window.location.href = '/partner';
-    return;
-  }
+  const landingPage = profile.settings?.landing_page;
+  if (landingPage) { window.location.href = landingPage; return; }
 
-  if (profile.role === 'provider') {
-    window.location.href = '/product-new';
-    return;
-  }
-
+  if (profile.role === 'admin') { window.location.href = '/partner'; return; }
+  if (profile.role === 'provider') { window.location.href = '/product-new'; return; }
   window.location.href = '/product-list';
 });
 

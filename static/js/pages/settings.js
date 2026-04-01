@@ -4,15 +4,23 @@ import { renderRoleMenu } from '../core/role-menu.js';
 import { logoutCurrentUser, sendPasswordReset, deleteCurrentUser } from '../firebase/firebase-auth.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { syncEditSaveButtonTone } from '../core/management-skeleton.js';
-import { watchCodeItems, watchVehicleMaster, updateUserProfile } from '../firebase/firebase-db.js';
+import { updateUserProfile } from '../firebase/firebase-db.js';
 import { fillProfile } from './settings/helpers.js';
-import { createVehicleMasterController } from './settings/vehicle-master.js';
-import { createCodeSettingsController } from './settings/code-settings.js';
-import { createIntegrityController } from './settings/integrity.js';
+
+const LANDING_OPTIONS = [
+  { href: '/home',         label: '대시보드',           roles: ['provider', 'agent', 'admin'] },
+  { href: '/product-list', label: '전체 상품 검색',     roles: ['provider', 'agent', 'admin'] },
+  { href: '/chat',         label: '실시간 문의·응대',   roles: ['provider', 'agent', 'admin'] },
+  { href: '/contract',     label: '계약 관리',          roles: ['provider', 'agent', 'admin'] },
+  { href: '/settlement',   label: '정산 · 수수료',      roles: ['provider', 'agent', 'admin'] },
+  { href: '/product-new',  label: '재고 관리',          roles: ['provider', 'admin'] },
+  { href: '/terms',        label: '운영 정책',          roles: ['provider', 'admin'] },
+  { href: '/partner',      label: '파트너사 관리',      roles: ['admin'] },
+  { href: '/member',       label: '사용자 관리',        roles: ['admin'] },
+  { href: '/admin',        label: '관리자 페이지',      roles: ['admin'] },
+];
 
 let currentProfile = null;
-let currentAdminTab = 'vehicle-master';
-let adminTabEventsBound = false;
 
 
 let profileEditMode = false;
@@ -122,7 +130,31 @@ function bindCommonEvents() {
   });
 }
 
-function getCodeField(id) { return document.querySelector(`#settings-${id}`); }
+function bindAppSettings(profile) {
+  const select = document.getElementById('settings-landing-page');
+  const saveBtn = document.getElementById('settings-app-save');
+  const msg = document.getElementById('settings-app-message');
+  if (!select) return;
+
+  const options = LANDING_OPTIONS.filter(o => o.roles.includes(profile.role));
+  const saved = profile.settings?.landing_page || '';
+  select.innerHTML = options.map(o =>
+    `<option value="${o.href}"${o.href === saved ? ' selected' : ''}>${o.label}</option>`
+  ).join('');
+
+  saveBtn?.addEventListener('click', async () => {
+    const landing = select.value;
+    try {
+      const newSettings = { ...(currentProfile.settings || {}), landing_page: landing };
+      await updateUserProfile(currentProfile.uid, { settings: newSettings });
+      currentProfile.settings = newSettings;
+      if (msg) msg.textContent = '저장 완료';
+      setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
+    } catch (err) {
+      if (msg) msg.textContent = `저장 실패: ${err.message}`;
+    }
+  });
+}
 
 async function bootstrap() {
   try {
@@ -133,97 +165,7 @@ async function bootstrap() {
     setProfileViewMode(true);
     bindCommonEvents();
 
-    const adminActions = document.getElementById('settings-admin-actions');
-    const adminGuest = document.getElementById('settings-admin-guest');
-    const adminContent = document.getElementById('settings-admin-content');
-    const adminTabButtons = [...document.querySelectorAll('.settings-admin-tab-button')];
-    const adminTabPanels = [...document.querySelectorAll('.settings-admin-tab-panel')];
-
-    function setAdminTabLocal(tabName = 'vehicle-master') {
-      currentAdminTab = tabName;
-      adminTabButtons.forEach((b) => b.classList.toggle('active', b.dataset.tab === tabName));
-      adminTabPanels.forEach((p) => { p.hidden = p.dataset.tabPanel !== tabName; });
-    }
-
-    const rightPanel = document.querySelector('.settings-right-panel');
-    if (profile.role !== 'admin') {
-      if (rightPanel) rightPanel.hidden = true;
-    }
-
-    if (profile.role === 'admin') {
-      if (rightPanel) rightPanel.hidden = false;
-      if (adminActions) adminActions.hidden = false;
-      if (adminGuest) adminGuest.hidden = true;
-      if (adminContent) adminContent.hidden = false;
-
-      if (!adminTabEventsBound) {
-        adminTabEventsBound = true;
-        adminTabButtons.forEach((b) => b.addEventListener('click', () => setAdminTabLocal(b.dataset.tab || 'vehicle-master')));
-      }
-
-      const vehicleMasterController = createVehicleMasterController({
-        getProfile: () => currentProfile,
-        elements: {
-          linkInput: document.getElementById('vehicle-master-link'),
-          applyButton: document.getElementById('vehicle-master-apply-button'),
-          clearButton: document.getElementById('vehicle-master-clear-button'),
-          message: document.getElementById('vehicle-master-message'),
-          sourceValue: document.getElementById('vehicle-master-source-file'),
-          testMaker: document.getElementById('vehicle-master-test-maker'),
-          testModel: document.getElementById('vehicle-master-test-model'),
-          testSubModel: document.getElementById('vehicle-master-test-submodel'),
-          testExtColor: document.getElementById('vehicle-master-test-ext-color'),
-          testIntColor: document.getElementById('vehicle-master-test-int-color'),
-          countMaker: document.getElementById('vehicle-master-maker-count'),
-          countModel: document.getElementById('vehicle-master-model-count'),
-          countSubModel: document.getElementById('vehicle-master-submodel-count'),
-          countExtColor: document.getElementById('vehicle-master-ext-color-count'),
-          countIntColor: document.getElementById('vehicle-master-int-color-count'),
-          updatedAt: document.getElementById('vehicle-master-updated-at'),
-          updatedBy: document.getElementById('vehicle-master-updated-by')
-        }
-      });
-
-      const integrityController = createIntegrityController({
-        elements: {
-          checkButton: document.getElementById('integrity-check-button'),
-          cleanupButton: document.getElementById('integrity-cleanup-button'),
-          message: document.getElementById('integrity-message'),
-          dbCountEl: document.getElementById('integrity-db-count'),
-          storageCountEl: document.getElementById('integrity-storage-count'),
-          orphanCountEl: document.getElementById('integrity-orphan-count'),
-          missingCountEl: document.getElementById('integrity-missing-count'),
-          orphanListEl: document.getElementById('integrity-orphan-list')
-        }
-      });
-
-      const codeController = createCodeSettingsController({
-        getProfile: () => currentProfile,
-        elements: {
-          list: document.getElementById('settings-code-item-list'),
-          form: document.getElementById('settings-code-form'),
-          message: document.getElementById('settings-code-message'),
-          resetButton: document.getElementById('settings-code-form-reset'),
-          submitButton: document.getElementById('settings-code-submit'),
-          deleteButton: document.getElementById('settings-code-delete'),
-          editingKeyInput: document.getElementById('settings-editing_code_key'),
-          getField: getCodeField
-        }
-      });
-
-      vehicleMasterController.bindEvents();
-      codeController.bindEvents();
-      integrityController.bindEvents();
-      setAdminTabLocal(currentAdminTab);
-      codeController.resetCodeForm({ keepMessage: true });
-
-      registerPageCleanup(watchVehicleMaster((payload) => vehicleMasterController.applySnapshot(payload)));
-      registerPageCleanup(watchCodeItems((items) => codeController.applyItems(items)));
-    } else {
-      if (adminActions) adminActions.hidden = true;
-      if (adminGuest) adminGuest.hidden = false;
-      if (adminContent) adminContent.hidden = true;
-    }
+    bindAppSettings(profile);
   } catch (error) {
     showToast(error.message, 'error');
   }
