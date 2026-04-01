@@ -375,14 +375,17 @@ function bindNoticeEvents() {
   });
   applyManagementButtonTones({ submitButtons: [editSaveBtn], deleteButtons: [deleteBtn] });
 
-  imgInput?.addEventListener('change', () => {
+  const onImgChange = () => {
     const file = imgInput.files?.[0];
     if (file) { noticeImgFile = file; noticeImgCleared = false; renderNoticeThumb(file); }
-  });
+  };
+  imgInput?.addEventListener('change', onImgChange);
+  registerPageCleanup(() => imgInput?.removeEventListener('change', onImgChange));
 
-  document.getElementById('adminNoticeThumbList')?.addEventListener('click', e => {
-    if (e.target.closest('#adminNoticeImgRemove')) clearNoticeImg();
-  });
+  const thumbList = document.getElementById('adminNoticeThumbList');
+  const onThumbClick = e => { if (e.target.closest('#adminNoticeImgRemove')) clearNoticeImg(); };
+  thumbList?.addEventListener('click', onThumbClick);
+  registerPageCleanup(() => thumbList?.removeEventListener('click', onThumbClick));
 
   // 목록 클릭 → 선택 (edit 중이면 확인)
   const onNoticeListClick = async (e) => {
@@ -397,7 +400,8 @@ function bindNoticeEvents() {
   registerPageCleanup(() => noticeList?.removeEventListener('click', onNoticeListClick));
 
   // 신규
-  document.getElementById('adminNoticeNew')?.addEventListener('click', async () => {
+  const noticeNewBtn = document.getElementById('adminNoticeNew');
+  const onNoticeNew = async () => {
     if (noticeFormMode === 'edit' && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
     selectedNoticeId = null;
     document.querySelectorAll('#adminNoticeList .admin-notice-row').forEach(r => r.classList.remove('is-active'));
@@ -406,10 +410,12 @@ function bindNoticeEvents() {
     setNoticeMode('create');
     document.getElementById('admin_notice_title')?.focus();
     showToast('신규 등록 상태입니다.', 'info');
-  });
+  };
+  noticeNewBtn?.addEventListener('click', onNoticeNew);
+  registerPageCleanup(() => noticeNewBtn?.removeEventListener('click', onNoticeNew));
 
   // 수정/저장 버튼 (2-step)
-  editSaveBtn?.addEventListener('click', async () => {
+  const onEditSave = async () => {
     const currentMode = noticeFormMode; // confirm await 중 모드 변경 방지를 위해 스냅샷
     if (currentMode === 'view') {
       if (!await showConfirm('수정하시겠습니까?')) return;
@@ -421,10 +427,12 @@ function bindNoticeEvents() {
       if (!await showConfirm('저장하시겠습니까?')) return;
       noticeForm?.requestSubmit();
     }
-  });
+  };
+  editSaveBtn?.addEventListener('click', onEditSave);
+  registerPageCleanup(() => editSaveBtn?.removeEventListener('click', onEditSave));
 
   // 저장 (신규/수정)
-  noticeForm?.addEventListener('submit', async (e) => {
+  const onNoticeSubmit = async (e) => {
     e.preventDefault();
     const title = document.getElementById('admin_notice_title')?.value.trim();
     const body  = document.getElementById('admin_notice_body')?.value.trim();
@@ -466,10 +474,12 @@ function bindNoticeEvents() {
       // 실패 시 버튼 재활성화 (성공 시엔 setNoticeMode가 처리)
       if (editSaveBtn) editSaveBtn.disabled = false;
     }
-  });
+  };
+  noticeForm?.addEventListener('submit', onNoticeSubmit);
+  registerPageCleanup(() => noticeForm?.removeEventListener('submit', onNoticeSubmit));
 
   // 삭제
-  deleteBtn?.addEventListener('click', async () => {
+  const onNoticeDelete = async () => {
     if (!selectedNoticeId) return;
     if (!await showConfirm('이 안내사항을 삭제하시겠습니까?')) return;
     try {
@@ -480,7 +490,9 @@ function bindNoticeEvents() {
       if (noticeMsg) noticeMsg.textContent = err.message;
       showToast(`삭제 실패: ${err.message}`, 'error');
     }
-  });
+  };
+  deleteBtn?.addEventListener('click', onNoticeDelete);
+  registerPageCleanup(() => deleteBtn?.removeEventListener('click', onNoticeDelete));
 
   const unsubNotice = onValue(ref(db, 'home_notices'), (snap) => {
     const raw = snap.val() || {};
@@ -505,7 +517,7 @@ async function bootstrap() {
     currentProfile = { ...profile, uid: user.uid };
     renderRoleMenu(menu, profile.role);
 
-    adminMenu?.addEventListener('click', async (e) => {
+    const onAdminMenuClick = async (e) => {
       const btn = e.target.closest('.admin-menu-item');
       if (!btn) return;
       const panel = document.querySelector('.admin-workspace-panel');
@@ -515,7 +527,9 @@ async function bootstrap() {
         if (!ok) return;
       }
       switchTab(btn.dataset.tab);
-    });
+    };
+    adminMenu?.addEventListener('click', onAdminMenuClick);
+    registerPageCleanup(() => adminMenu?.removeEventListener('click', onAdminMenuClick));
 
     // 정산서 관리
     bindStlEvents();
