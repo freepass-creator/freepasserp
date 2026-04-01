@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/request-manage.css') }}">{% endblock %}
+{% block body %}
+<div class="dashboard-shell">
+  <aside class="sidebar">
+    <div class="sidebar-head">FREEPASS ERP</div>
+    <nav id="sidebar-menu" class="sidebar-menu"></nav>
+  </aside>
+  <main class="main-shell">
+    <div class="page-header">
+      <div class="page-title">13 요청하기</div>
+      <div class="page-header-actions"><button type="button" class="btn-filter" id="openRequestFilterBtn">필터</button></div>
+    </div>
+    <div class="work-page grid-12 min-h-work management-skeleton">
+      <section class="panel panel--list col-6">
+        <div class="panel-head panel-head-default">
+          <div class="panel-head-title-wrap"><div class="panel-head-title">요청목록</div></div>
+          <div class="panel-head-actions"><button type="button" class="inline-button" id="request-form-reset">신규</button></div>
+        </div>
+        <div class="panel-body no-pad">
+          <div id="request-list" class="summary-list admin-summary-list">
+            <button type="button" class="summary-row admin-summary-row management-summary-row" data-mock-item="true" data-mock-code="RQ001">
+              <span class="summary-inline summary-inline-strong">RQ001</span>
+              <span class="summary-inline-sep" aria-hidden="true">·</span>
+              <span class="summary-inline">샘플 요청</span>
+              <span class="summary-inline-sep" aria-hidden="true">·</span>
+              <span class="summary-inline">작성중</span>
+            </button>
+          </div>
+        </div>
+      </section>
+      <div class="panel-slot col-6">
+      <section class="panel panel--form">
+        <div class="panel-head panel-head-default">
+          <div class="panel-head-title-wrap"><div class="panel-head-title">요청 정보</div></div>
+          <div class="panel-head-actions">
+            <button type="button" id="request-submit-head" class="inline-button">저장</button>
+            <button type="button" id="request-delete-head" class="inline-button btn-danger">삭제</button>
+          </div>
+        </div>
+        <div class="panel-body manage-form-body">
+          <form id="request-form" class="form-grid manage-form-shell">
+            <input id="request-form_mode" type="hidden" value="create">
+            <div class="field"><label for="request_code">요청코드</label><input id="request_code" data-auto-code readonly placeholder="자동 배정"></div>
+            <div class="field"><label for="request_status">상태</label><input id="request_status" placeholder="예: 작성중"></div>
+            <div class="field"><label for="request_title">요청제목</label><input id="request_title" placeholder="요청제목 입력"></div>
+            <div class="field full"><label for="request_note">요청내용</label><textarea id="request_note" placeholder="요청 관련 내용을 입력합니다."></textarea></div>
+          </form>
+          <p id="request-message" class="message"></p>
+        </div>
+      </section>
+
+      <aside class="filter-overlay panel panel--filter" id="requestFilterOverlay" aria-hidden="true">
+        <div class="panel-head panel-head-default">
+          <div class="panel-head-title-wrap"><div class="panel-head-title">필터</div></div>
+          <div class="panel-head-actions"><button type="button" class="inline-button" data-filter-reset>초기화</button><button type="button" class="inline-button btn-tone-hide" data-filter-close>닫기</button></div>
+        </div>
+        <div class="panel-body panel-body--filter">
+          <div class="empty-block">필터 영역</div>
+        </div>
+      </aside>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+{% block page_js %}<script type="module" src="{{ url_for('static', filename='js/pages/request-manage.js') }}"></script>{% endblock %}

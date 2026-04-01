@@ -1,0 +1,30 @@
+/* ===== ERP UI STATE CLASSES ===== */
+.ui-mode-view {
+  --ui-current-mode: view;
+}
+
+.ui-mode-edit {
+  --ui-current-mode: edit;
+}
+
+.ui-mode-create {
+  --ui-current-mode: create;
+}
+
+.ui-selected,
+.is-selected,
+.is-active,
+.active {
+  --ui-current-selected: 1;
+}
+
+.ui-empty,
+.list-empty,
+.empty-block {
+  --ui-current-empty: 1;
+}
+
+.ui-required,
+.field.is-required {
+  --ui-current-required: 1;
+}

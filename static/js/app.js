@@ -1,0 +1,433 @@
+import { runPageCleanup } from './core/utils.js';
+import { savePageState } from './core/page-state.js';
+import { showToast, showConfirm } from './core/toast.js';
+
+const PAGE_STYLE_SELECTOR = 'link[data-page-style], link[href*="/static/css/pages/"], link[href*="/static/css/pages_new/"], link[href*="/static/css/shared_new/"]';
+const DASHBOARD_SELECTOR = '.dashboard-shell';
+const MAIN_SHELL_SELECTOR = '.main-shell';
+let pendingNavigationPath = '';
+let isPageNavigating = false;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 탭 전환 + 모듈 재실행 하이브리드
+//
+// - DOM: 컨테이너를 유지(hide/show)하여 뼈대가 즉시 보임
+// - JS: ?v=N으로 매번 새 모듈 인스턴스 (이벤트 바인딩 재실행)
+// - CSS: modulepreload로 코드 HTTP 캐시 → 네트워크 0ms
+// - 재방문: 캐시된 HTML 컨테이너 재활용 + 모듈만 새로 실행
+// ═══════════════════════════════════════════════════════════════════════════
+
+const PAGE_MODULE_PATHS = {
+  '/home':         '/static/js/pages/home.js',
+  '/product-list': '/static/js/pages/product-list.js',
+  '/chat':         '/static/js/pages/chat.js',
+  '/contract':     '/static/js/pages/contract-manage.js',
+  '/settlement':   '/static/js/pages/settlement-manage.js',
+  '/product-new':  '/static/js/pages/product-manage.js',
+  '/terms':        '/static/js/pages/policy-manage.js',
+  '/partner':      '/static/js/pages/partner-manage.js',
+  '/member':       '/static/js/pages/member-manage.js',
+  '/settings':     '/static/js/pages/settings.js',
+};
+
+// 페이지별 캐시: { container, styles[], doc, title, bodyPage }
+const pageCache = new Map();
+let currentPageKey = '';
+let pageLoadSeq = 0;
+
+// ─── 우클릭 방지 ────────────────────────────────────────────────────────────
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// ─── 작업 중 이탈 방지 ──────────────────────────────────────────────────────
+let _dirtyCheck = null;
+
+/** 페이지 모듈이 호출: 수정/등록 중이면 true를 반환하는 함수 등록 */
+export function setDirtyCheck(fn) { _dirtyCheck = typeof fn === 'function' ? fn : null; }
+export function clearDirtyCheck() { _dirtyCheck = null; }
+
+function isPageDirty() { return typeof _dirtyCheck === 'function' && _dirtyCheck(); }
+
+async function confirmLeave() {
+  if (!isPageDirty()) return true;
+  return showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.');
+}
+
+window.addEventListener('beforeunload', (e) => {
+  if (isPageDirty()) { e.preventDefault(); e.returnValue = ''; }
+});
+
+// ─── 프리패치 ───────────────────────────────────────────────────────────────
+const prefetched = new Set();
+
+function prefetchModule(pathname) {
+  if (prefetched.has(pathname)) return;
+  const modulePath = PAGE_MODULE_PATHS[pathname];
+  if (!modulePath) return;
+  prefetched.add(pathname);
+  const link = document.createElement('link');
+  link.rel = 'modulepreload';
+  link.href = modulePath;
+  document.head.appendChild(link);
+}
+
+// ─── 유틸 ───────────────────────────────────────────────────────────────────
+
+function isDashboardPage() {
+  return Boolean(document.querySelector(DASHBOARD_SELECTOR));
+}
+
+function normalizeRequiredFields(root = document) {
+  root.querySelectorAll('.field label').forEach((label) => {
+    label.textContent = String(label.textContent || '').replace(/\s*\*+\s*$/, '').trim();
+  });
+  root.querySelectorAll('.field').forEach((field) => {
+    const requiredControl = field.querySelector('input[required], select[required], textarea[required]');
+    field.classList.toggle('is-required', Boolean(requiredControl));
+  });
+}
+
+function setActiveSidebar(pathname) {
+  document.querySelectorAll('.sidebar-link').forEach((link) => {
+    const isActive = link.getAttribute('href') === pathname;
+    link.classList.toggle('active', isActive);
+  });
+}
+
+// ─── CSS 관리 ───────────────────────────────────────────────────────────────
+
+function collectStyleHrefs(doc) {
+  return [...doc.querySelectorAll(PAGE_STYLE_SELECTOR)].map((l) => l.href);
+}
+
+function ensureStyles(hrefs) {
+  const currentHrefs = [...document.querySelectorAll(PAGE_STYLE_SELECTOR)].map((l) => l.href);
+  const promises = hrefs
+    .filter((href) => !currentHrefs.includes(href))
+    .map((href) => new Promise((resolve) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.dataset.pageStyle = 'true';
+      link.onload = resolve;
+      link.onerror = resolve;
+      document.head.appendChild(link);
+    }));
+  return Promise.all(promises);
+}
+
+// ─── 상단바 ─────────────────────────────────────────────────────────────────
+
+function syncTopBar(nextDoc) {
+  const curPageName = document.querySelector('.top-bar-page-name');
+  const nextPageName = nextDoc?.querySelector('.top-bar-page-name');
+  if (curPageName && nextPageName) curPageName.textContent = nextPageName.textContent;
+
+  const curActions = document.querySelector('.top-bar-actions');
+  const nextActions = nextDoc?.querySelector('.top-bar-actions');
+  if (curActions && nextActions) curActions.replaceChildren(...Array.from(nextActions.childNodes).map((n) => n.cloneNode(true)));
+
+  const sep = document.getElementById('topBarStateSep');
+  const identEl = document.getElementById('topBarIdentity');
+  const badge = document.getElementById('topBarWorkBadge');
+  if (sep) sep.hidden = true;
+  if (identEl) { identEl.textContent = ''; identEl.hidden = true; }
+  if (badge) badge.textContent = '';
+}
+
+// ─── 페이지 전환 ────────────────────────────────────────────────────────────
+
+async function loadPage(url, options = {}) {
+  const { pushState = true } = options;
+  const nextPathname = new URL(url, window.location.origin).pathname;
+  if (isPageNavigating && pendingNavigationPath === nextPathname) return;
+  if (nextPathname === window.location.pathname && pushState) return;
+
+  isPageNavigating = true;
+  pendingNavigationPath = nextPathname;
+
+  try {
+    const mainShell = document.querySelector(MAIN_SHELL_SELECTOR);
+    if (!mainShell) { window.location.href = url; return; }
+
+    // 페이드아웃 (50ms — 뚝 끊기는 느낌 방지)
+    mainShell.classList.add('is-navigating');
+    await new Promise((r) => setTimeout(r, 50));
+
+    // ── HTML 준비 ──
+    let cached = pageCache.get(nextPathname);
+
+    if (cached) {
+      // 재방문 — 캐시된 HTML로 새 컨테이너 즉시 생성
+      await ensureStyles(cached.styles || []);
+      const container = document.createElement('div');
+      container.className = 'page-tab';
+      container.dataset.page = nextPathname;
+      const nextMainShell = cached.doc.querySelector(MAIN_SHELL_SELECTOR);
+      container.replaceChildren(...Array.from(nextMainShell.childNodes).map((n) => n.cloneNode(true)));
+      mainShell.appendChild(container);
+
+      // 이전 페이지 제거 (새 컨테이너가 이미 있으므로 화면이 비지 않음)
+      if (currentPageKey) {
+        const cur = pageCache.get(currentPageKey);
+        if (cur?.container) {
+          savePageState(currentPageKey, { scrollTop: cur.container.scrollTop || 0, _autoSaved: true });
+          cur.container.remove();
+        }
+        runPageCleanup();
+      }
+      // 이전 재방문 컨테이너도 제거 (ID 충돌 방지)
+      if (cached.container && cached.container.parentNode) cached.container.remove();
+      cached.container = container;
+
+      if (cached.doc) syncTopBar(cached.doc);
+    } else {
+      // 처음 방문 — HTML fetch
+      prefetchModule(nextPathname);
+      const response = await fetch(url, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin'
+      });
+      if (!response.ok) { window.location.href = url; return; }
+
+      const html = await response.text();
+      const parser = new DOMParser();
+      const nextDoc = parser.parseFromString(html, 'text/html');
+      const nextMainShell = nextDoc.querySelector(MAIN_SHELL_SELECTOR);
+      if (!nextMainShell) { window.location.href = url; return; }
+
+      const styleHrefs = collectStyleHrefs(nextDoc);
+      await ensureStyles(styleHrefs);
+
+      // 새 컨테이너를 먼저 추가
+      const container = document.createElement('div');
+      container.className = 'page-tab';
+      container.dataset.page = nextPathname;
+      container.replaceChildren(...Array.from(nextMainShell.childNodes).map((n) => n.cloneNode(true)));
+      mainShell.appendChild(container);
+
+      // 이전 페이지 제거 (새 컨테이너가 이미 있으므로 깜빡임 없음)
+      if (currentPageKey) {
+        const cur = pageCache.get(currentPageKey);
+        if (cur?.container) {
+          savePageState(currentPageKey, { scrollTop: cur.container.scrollTop || 0, _autoSaved: true });
+          cur.container.remove();
+        }
+        runPageCleanup();
+      }
+
+      cached = {
+        container,
+        styles: styleHrefs,
+        doc: nextDoc,
+        title: nextDoc.title || '',
+        bodyPage: nextDoc.body?.dataset?.page || ''
+      };
+      pageCache.set(nextPathname, cached);
+
+      syncTopBar(nextDoc);
+    }
+
+    normalizeRequiredFields(cached.container);
+    document.title = cached.title || document.title;
+    document.body.dataset.page = cached.bodyPage || '';
+    setActiveSidebar(nextPathname);
+    currentPageKey = nextPathname;
+
+    if (pushState) {
+      window.history.pushState({ path: url }, '', url);
+    }
+
+    // 기존 script 태그 제거
+    document.querySelectorAll('script[data-page-script]').forEach((n) => n.remove());
+
+    // ── 모듈 실행 (항상 새 인스턴스 — 이벤트 바인딩 보장) ──
+    const modulePath = PAGE_MODULE_PATHS[nextPathname];
+    if (modulePath) {
+      pageLoadSeq += 1;
+      try {
+        // ?v= 쿼리로 새 모듈 인스턴스 → 최상위 코드 재실행
+        // modulepreload로 HTTP 캐시 히트 → 네트워크 0ms
+        const mod = await import(`${modulePath}?v=${pageLoadSeq}`);
+        if (typeof mod.mount === 'function') {
+          await mod.mount();
+        }
+      } catch (e) {
+        console.error('[app] module error', e);
+      }
+    }
+
+    // 페이드인
+    mainShell.classList.remove('is-navigating');
+
+  } finally {
+    isPageNavigating = false;
+    pendingNavigationPath = '';
+  }
+}
+
+// ─── 초기 페이지 등록 ───────────────────────────────────────────────────────
+
+function registerInitialPage() {
+  const mainShell = document.querySelector(MAIN_SHELL_SELECTOR);
+  if (!mainShell) return;
+  const pathname = window.location.pathname;
+
+  const container = document.createElement('div');
+  container.className = 'page-tab';
+  container.dataset.page = pathname;
+  container.replaceChildren(...Array.from(mainShell.childNodes));
+  mainShell.appendChild(container);
+
+  pageCache.set(pathname, {
+    container,
+    styles: collectStyleHrefs(document),
+    doc: null,
+    title: document.title,
+    bodyPage: document.body.dataset.page || ''
+  });
+  currentPageKey = pathname;
+}
+
+// ─── 네비게이션 ─────────────────────────────────────────────────────────────
+
+function getSidebarPath(link) {
+  if (!link) return '';
+  const href = link.getAttribute('href') || '';
+  if (!href.startsWith('/')) return '';
+  return new URL(href, window.location.origin).pathname;
+}
+
+function shouldIntercept(link, event) {
+  if (!link) return false;
+  if (event.defaultPrevented) return false;
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
+  if (link.target && link.target !== '_self') return false;
+  const pathname = getSidebarPath(link);
+  if (!pathname) return false;
+  if (pathname === pendingNavigationPath) return false;
+  return true;
+}
+
+function closeFilterOverlay(overlay) {
+  if (!overlay) return;
+  overlay.classList.remove('is-open');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
+function initGlobalFilterOverlayClose() {
+  document.addEventListener('click', (event) => {
+    const closeButton = event.target.closest('[data-filter-close], #closeFilterBtn');
+    if (!closeButton) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const overlay = closeButton.closest('.filter-overlay');
+    closeFilterOverlay(overlay);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    document.querySelectorAll('.filter-overlay.is-open').forEach((overlay) => closeFilterOverlay(overlay));
+  });
+}
+
+function initShellNavigation() {
+  if (!isDashboardPage()) return;
+
+  document.addEventListener('pointerenter', (event) => {
+    const link = event.target.closest?.('.sidebar-link');
+    if (!link) return;
+    const pathname = getSidebarPath(link);
+    if (pathname) prefetchModule(pathname);
+  }, true);
+
+  document.addEventListener('click', async (event) => {
+    const link = event.target.closest('.sidebar-link');
+    if (!link) return;
+    const nextPathname = getSidebarPath(link);
+    if (!nextPathname) return;
+    if (nextPathname === window.location.pathname || nextPathname === pendingNavigationPath) {
+      event.preventDefault();
+      setActiveSidebar(window.location.pathname);
+      return;
+    }
+    if (!shouldIntercept(link, event)) return;
+    event.preventDefault();
+    if (!await confirmLeave()) {
+      setActiveSidebar(window.location.pathname);
+      return;
+    }
+    pendingNavigationPath = nextPathname;
+    setActiveSidebar(nextPathname);
+    try {
+      await loadPage(link.href);
+    } catch (error) {
+      console.error(error);
+      window.location.href = link.href;
+    }
+  });
+
+  window.addEventListener('popstate', async () => {
+    if (!isDashboardPage()) return;
+    if (!await confirmLeave()) {
+      window.history.pushState(null, '', currentPageKey);
+      setActiveSidebar(currentPageKey);
+      return;
+    }
+    try {
+      await loadPage(window.location.pathname, { pushState: false });
+    } catch (error) {
+      console.error(error);
+      window.location.reload();
+    }
+  });
+}
+
+function initKeyboardListNavigation() {
+  const ROW_SELECTOR = '.summary-row, .product-row, #room-list .room-item';
+  document.addEventListener('keydown', (event) => {
+    const { key } = event;
+    if (key !== 'ArrowUp' && key !== 'ArrowDown') return;
+    const active = document.activeElement;
+    if (!active || !active.matches(ROW_SELECTOR)) return;
+    const parent = active.parentElement;
+    if (!parent) return;
+    const rows = [...parent.querySelectorAll(ROW_SELECTOR)];
+    const idx = rows.indexOf(active);
+    if (idx === -1) return;
+    event.preventDefault();
+    const next = key === 'ArrowDown' ? rows[idx + 1] : rows[idx - 1];
+    if (next) { next.focus(); next.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  });
+}
+
+function initSidebarCollapse() {
+  const btn = document.getElementById('sidebarToggleBtn');
+  const sidebar = document.querySelector('.sidebar--new');
+  if (!btn || !sidebar) return;
+  const STORAGE_KEY = 'fp.sidebar.collapsed';
+  btn.title = sidebar.classList.contains('sidebar-collapsed') ? '메뉴 펼치기' : '메뉴 접기';
+  btn.setAttribute('aria-label', btn.title);
+  btn.addEventListener('click', () => {
+    const collapsed = sidebar.classList.toggle('sidebar-collapsed');
+    localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
+    btn.title = collapsed ? '메뉴 펼치기' : '메뉴 접기';
+    const label = btn.querySelector('.sidebar-toggle-label');
+    if (label) label.textContent = collapsed ? '메뉴 펼치기' : '메뉴 접기';
+    btn.setAttribute('aria-label', btn.title);
+  });
+}
+
+// ─── 초기화 ─────────────────────────────────────────────────────────────────
+
+normalizeRequiredFields(document);
+initGlobalFilterOverlayClose();
+initKeyboardListNavigation();
+initShellNavigation();
+initSidebarCollapse();
+registerInitialPage();
+
+window.addEventListener('unhandledrejection', (event) => {
+  const error = event.reason;
+  const message = error?.message || String(error || '알 수 없는 오류');
+  if (message.includes('auth/') || message.includes('로그인')) return;
+  showToast(message, 'error');
+});

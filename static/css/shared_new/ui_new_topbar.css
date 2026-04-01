@@ -1,0 +1,84 @@
+/* ===== TOP BAR ===== */
+
+.top-bar {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 12px;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* ── 좌: 소속 이름 직급 ── */
+.top-bar-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.top-bar-user-item {
+  font-size: 12px;
+  color: var(--new-text-subtle, var(--text-subtle));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.03em;
+}
+
+/* ── 중앙: 페이지명 | 선택항목 ── */
+.top-bar-state {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.top-bar-page-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--new-text-main, var(--text-main));
+  letter-spacing: -0.03em;
+}
+
+.top-bar-identity {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--new-text-sub, #64748b);
+  letter-spacing: -0.02em;
+}
+
+.top-bar-state-sep {
+  font-size: 12px;
+  color: var(--new-text-subtle, #94a3b8);
+  font-weight: 400;
+  user-select: none;
+}
+
+.top-bar-work-badge {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--new-text-sub, #64748b);
+  letter-spacing: -0.02em;
+}
+
+.top-bar-work-badge:empty {
+  display: none;
+}
+
+.top-bar-identity {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--new-text-main, var(--text-main));
+  letter-spacing: -0.03em;
+}
+
+/* ── 우: 액션 (필터 등) ── */
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}

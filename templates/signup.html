@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages_new/login_new.css') }}">{% endblock %}
+{% block body %}
+<div class="auth-shell">
+  <div class="auth-brand">FREEPASS ERP</div>
+  <section class="auth-card auth-card--wide" aria-label="계정 만들기">
+    <header class="auth-card__head">
+      <h2 class="auth-card__title">계정 만들기</h2>
+      <p class="auth-card__sub">사업자등록번호로 소속을 자동 매칭합니다.</p>
+    </header>
+    <form id="signup-form" class="auth-form" novalidate>
+      <div class="auth-field">
+        <label for="business_number">소속 사업자등록번호</label>
+        <input id="business_number" name="business_number" placeholder="숫자만 입력" required>
+      </div>
+      <div id="partner-preview" class="auth-match-badge auth-match-badge--unmatched">매칭 대기</div>
+      <div class="auth-field">
+        <label for="email">이메일</label>
+        <input id="email" name="email" type="email" placeholder="name@company.com" required>
+      </div>
+      <div class="auth-field">
+        <label for="password">비밀번호</label>
+        <input id="password" name="password" type="password" placeholder="8자 이상" required>
+      </div>
+      <div class="auth-field">
+        <label for="password_confirm">비밀번호 확인</label>
+        <input id="password_confirm" name="password_confirm" type="password" placeholder="비밀번호 재입력" required>
+      </div>
+      <div class="auth-field">
+        <label for="name">이름</label>
+        <input id="name" name="name" placeholder="홍길동">
+      </div>
+      <div class="auth-field">
+        <label for="position">직급</label>
+        <input id="position" name="position" placeholder="선택 입력">
+      </div>
+      <div class="auth-field">
+        <label for="phone">연락처</label>
+        <input id="phone" name="phone" placeholder="010-0000-0000">
+      </div>
+      <button type="submit" class="auth-submit">계정 만들기</button>
+    </form>
+    <p class="auth-guide">가입 후 기본 상태는 대기이며, 관리자가 회원유형 · 소속코드 · 상태를 확정합니다.</p>
+    <footer class="auth-footer">
+      <span>이미 계정이 있으면</span>
+      <a href="{{ url_for('auth.login') }}">로그인</a>
+    </footer>
+    <p id="signup-message" class="auth-message" aria-live="polite"></p>
+  </section>
+  <div class="auth-copyright">&copy; 2026 freepassmobility. All Rights Reserved.</div>
+</div>
+{% endblock %}
+{% block page_js %}<script type="module" src="{{ url_for('static', filename='js/pages/signup.js') }}"></script>{% endblock %}

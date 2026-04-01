@@ -1,0 +1,232 @@
+/* ===== GLOBAL BUTTON SYSTEM ===== */
+
+:root {
+  --btn-bg: var(--surface-base);
+  --btn-border: var(--border-soft);
+  --btn-text: var(--text-main);
+  --btn-min-width: 58px;
+  --btn-inline-gap: 6px;
+
+  /* ── tone: edit (파란색) ── */
+  --btn-edit-text:        #1b2a4a;
+  --btn-edit-bg:          #eef2ff;
+  --btn-edit-border:      #c7d2fe;
+  --btn-edit-hover-bg:    #e0e7ff;
+  --btn-edit-hover-border:#a5b4fc;
+
+  /* ── tone: save (초록색) ── */
+  --btn-save-text:        #166534;
+  --btn-save-bg:          #f0fdf4;
+  --btn-save-border:      #bbf7d0;
+  --btn-save-hover-bg:    #dcfce7;
+  --btn-save-hover-border:#86efac;
+
+  /* ── tone: danger (빨간색) ── */
+  --btn-danger-text:        #b42318;
+  --btn-danger-bg:          #fef2f2;
+  --btn-danger-border:      #fecaca;
+  --btn-danger-hover-bg:    #fee4e2;
+  --btn-danger-hover-border:#fda29b;
+
+  /* ── tone: hide (회색) ── */
+  --btn-hide-text:        #475467;
+  --btn-hide-bg:          var(--surface-subtle);
+  --btn-hide-border:      #d0d5dd;
+  --btn-hide-hover-bg:    #f1f5f9;
+  --btn-hide-hover-border:#cbd5e1;
+
+  /* ── tone: share (보라색) ── */
+  --btn-share-text:        #6d28d9;
+  --btn-share-bg:          #f5f3ff;
+  --btn-share-border:      #ddd6fe;
+  --btn-share-hover-bg:    #ede9fe;
+  --btn-share-hover-border:#c4b5fd;
+
+  /* ── tone: inquiry (주황색) ── */
+  --btn-inquiry-text:        #92400e;
+  --btn-inquiry-bg:          #fffbeb;
+  --btn-inquiry-border:      #fde68a;
+  --btn-inquiry-hover-bg:    #fef3c7;
+  --btn-inquiry-hover-border:#fcd34d;
+
+  /* ── tone: contract (하늘색) ── */
+  --btn-contract-text:        #0369a1;
+  --btn-contract-bg:          #f0f9ff;
+  --btn-contract-border:      #bae6fd;
+  --btn-contract-hover-bg:    #e0f2fe;
+  --btn-contract-hover-border:#7dd3fc;
+}
+
+.inline-button,
+.btn-filter,
+.btn-primary,
+button[data-filter-reset] {
+  min-width: var(--btn-min-width);
+  min-height: var(--btn-height);
+  height: var(--btn-height);
+  padding: 0 var(--btn-padding-x);
+  border: var(--btn-border-width) solid var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-size: var(--btn-font-size);
+  font-weight: var(--font-weight-base);
+  line-height: 1;
+  border-radius: var(--radius-ui);
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.inline-button:hover,
+.btn-filter:hover,
+.btn-primary:hover,
+button[data-filter-reset]:hover {
+  background: var(--interactive-hover-bg);
+  border-color: var(--interactive-hover-border);
+}
+
+.inline-button:active,
+.btn-filter:active,
+.btn-primary:active,
+button[data-filter-reset]:active {
+  background: var(--interactive-active-bg);
+  border-color: var(--interactive-active-border);
+}
+
+.inline-button:disabled,
+.btn-filter:disabled,
+.btn-primary:disabled,
+button[data-filter-reset]:disabled {
+  color: var(--text-muted);
+  background: var(--surface-subtle);
+  border-color: var(--border-soft);
+  cursor: default;
+}
+
+/* ── 색조 버튼 ── */
+
+.btn-tone-neutral {
+  color: var(--text-main);
+  background: var(--surface-base);
+  border-color: var(--border-main);
+}
+
+.btn-tone-edit {
+  color: var(--btn-edit-text);
+  background: var(--btn-edit-bg);
+  border-color: var(--btn-edit-border);
+}
+
+.btn-tone-save {
+  color: var(--btn-save-text);
+  background: var(--btn-save-bg);
+  border-color: var(--btn-save-border);
+}
+
+.btn-danger {
+  color: var(--btn-danger-text);
+  background: var(--btn-danger-bg);
+  border-color: var(--btn-danger-border);
+}
+
+.btn-tone-hide {
+  color: var(--btn-hide-text);
+  background: var(--btn-hide-bg);
+  border-color: var(--btn-hide-border);
+}
+
+.btn-tone-share {
+  color: var(--btn-share-text);
+  background: var(--btn-share-bg);
+  border-color: var(--btn-share-border);
+}
+
+.btn-tone-inquiry {
+  color: var(--btn-inquiry-text);
+  background: var(--btn-inquiry-bg);
+  border-color: var(--btn-inquiry-border);
+}
+
+.btn-tone-contract {
+  color: var(--btn-contract-text);
+  background: var(--btn-contract-bg);
+  border-color: var(--btn-contract-border);
+}
+
+/* ── 색조 버튼 disabled ── */
+
+[class*="btn-tone-"]:disabled,
+.btn-danger:disabled {
+  color: var(--text-muted);
+  background: var(--surface-subtle);
+  border-color: var(--border-soft);
+  cursor: default;
+}
+
+/* ── 색조 버튼 hover ── */
+
+.btn-tone-neutral:hover {
+  background: var(--interactive-hover-bg);
+  border-color: var(--interactive-hover-border);
+}
+
+.btn-tone-edit:hover {
+  background: var(--btn-edit-hover-bg);
+  border-color: var(--btn-edit-hover-border);
+}
+
+.btn-tone-save:hover {
+  background: var(--btn-save-hover-bg);
+  border-color: var(--btn-save-hover-border);
+}
+
+.btn-danger:hover {
+  background: var(--btn-danger-hover-bg);
+  border-color: var(--btn-danger-hover-border);
+}
+
+.btn-tone-hide:hover {
+  background: var(--btn-hide-hover-bg);
+  border-color: var(--btn-hide-hover-border);
+}
+
+.btn-tone-share:hover {
+  background: var(--btn-share-hover-bg);
+  border-color: var(--btn-share-hover-border);
+}
+
+.btn-tone-inquiry:hover {
+  background: var(--btn-inquiry-hover-bg);
+  border-color: var(--btn-inquiry-hover-border);
+}
+
+.btn-tone-contract:hover {
+  background: var(--btn-contract-hover-bg);
+  border-color: var(--btn-contract-hover-border);
+}
+
+/* ── panel-mode icon switching ──
+   Default (no data-panel-mode or create/edit): write/save icon visible.
+   When panel[data-panel-mode="view"]: pencil/edit icon visible.
+   JS sets panel.dataset.panelMode; no innerHTML injection needed.
+*/
+.btn-mode-icon {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+/* write icon shows by default (create / edit mode) */
+.btn-mode-icon--write { display: inline-flex; }
+
+/* view mode: flip */
+.panel[data-panel-mode="view"] .btn-mode-icon--view  { display: inline-flex; }
+.panel[data-panel-mode="view"] .btn-mode-icon--write { display: none; }

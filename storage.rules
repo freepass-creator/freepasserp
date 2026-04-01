@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidFileSize() {
+      return request.resource.size < 10 * 1024 * 1024;
+    }
+
+    function isImageContentType() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    // ─── 상품 이미지 ─────────────────────────────────────────────────────────
+    match /product-images/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      // 업로드/덮어쓰기: 본인 UID 폴더 + 이미지 타입 + 10MB 제한
+      allow create, update: if isOwner(userId)
+                            && isImageContentType()
+                            && isValidFileSize();
+      // 삭제: 본인 UID 폴더만 (request.resource 없음 → 타입/크기 검증 불필요)
+      allow delete: if isOwner(userId);
+    }
+
+    // ─── 계약 첨부 파일 ──────────────────────────────────────────────────────
+    match /contract-files/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      // 업로드/덮어쓰기: 본인 UID 폴더 + 10MB 제한
+      allow create, update: if isOwner(userId)
+                            && isValidFileSize();
+      // 삭제: 본인 UID 폴더만
+      allow delete: if isOwner(userId);
+    }
+
+    // ─── 기본 거부 ───────────────────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

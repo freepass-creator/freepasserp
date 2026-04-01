@@ -1,0 +1,4 @@
+.auth-panel { width: 100%; max-width: 420px; }
+.auth-panel.wide { max-width: 520px; }
+.settings-grid { display: grid; gap: 12px; }
+.setting-row { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }

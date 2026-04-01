@@ -1,0 +1,55 @@
+/* ===== ERP UI PRIMITIVES ===== */
+.ui-panel-head,
+.panel-head {
+  min-height: var(--ui-panel-head-height);
+}
+
+.ui-panel-body,
+.panel-body {
+  padding: var(--ui-panel-body-pad);
+}
+
+/*
+  리스트 규격은 static/css/list.css 에서만 관리한다.
+  여기서는 범용 primitive 만 유지해서, 같은 selector 를 여러 파일이 동시에 잡지 않게 한다.
+*/
+.ui-list-row {
+  min-height: var(--ui-list-row-min-h);
+  border-bottom-color: var(--ui-list-row-border);
+}
+
+.ui-list-row:hover {
+  background: var(--ui-surface-hover);
+}
+
+.ui-list-row.ui-selected {
+  background: var(--ui-surface-active);
+}
+
+.ui-control,
+.field input,
+.field select,
+.field textarea,
+input,
+select,
+textarea {
+  border-radius: var(--ui-radius);
+}
+
+.ui-control:not(textarea),
+.field input,
+.field select,
+input,
+select {
+  min-height: var(--ui-control-height);
+  height: var(--ui-control-height);
+}
+
+.ui-button,
+.inline-button,
+.btn-filter,
+.btn-primary,
+button[data-filter-reset] {
+  min-height: var(--ui-btn-height);
+  font-size: var(--ui-btn-font);
+}

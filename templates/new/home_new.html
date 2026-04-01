@@ -1,0 +1,42 @@
+{% extends 'new/layout/workspace_new.html' %}
+{% block workspace_page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages_new/home_new.css') }}" data-page-style="true">
+{% endblock %}
+{% block page_title_text %}대시보드{% endblock %}
+{% block workspace_body %}
+<div class="work-page min-h-work layout-66 home-page-shell">
+  <section class="panel home-panel home-panel--dashboard">
+    <div class="panel-head panel-head-default">
+      <div class="panel-head-title-wrap">
+        <div class="panel-head-title">ERP 현황</div>
+        <div id="homeRoleSummary" class="panel-head-subtitle">내가 진행하는 항목을 한눈에 봅니다.</div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="section-stack home-new-shell">
+        <div id="homeSections" class="home-sections"></div>
+      </div>
+    </div>
+  </section>
+  <section class="panel home-panel home-panel--notice">
+    <div class="panel-head panel-head-default">
+      <div class="panel-head-title-wrap"><div class="panel-head-title">안내사항</div></div>
+      <div class="panel-head-actions"><span id="homeNoticeMeta" class="panel-head-subtitle"></span></div>
+    </div>
+    <div class="panel-body">
+      <div class="section-stack home-new-shell">
+        <form id="homeNoticeForm" class="home-notice-form" hidden>
+          <div class="field full"><label for="home_notice_title">제목</label><input id="home_notice_title" type="text" maxlength="80" placeholder="공지 제목"></div>
+          <div class="field full"><label for="home_notice_body">내용</label><textarea id="home_notice_body" rows="5" maxlength="2000" placeholder="공지 내용을 입력하세요."></textarea></div>
+          <div class="home-notice-form__actions"><button type="submit" class="inline-button">등록</button></div>
+        </form>
+        <p id="homeNoticeMessage" class="message"></p>
+        <div id="homeNoticeList" class="home-notice-list"></div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block workspace_page_js %}
+<script type="module" src="{{ url_for('static', filename='js/pages/home.js') }}" data-page-script="true"></script>
+{% endblock %}

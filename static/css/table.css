@@ -1,0 +1,53 @@
+/* ===== SHARED TABLE SYSTEM ===== */
+
+.price-table,
+.insurance-table,
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 0 0 12px;
+}
+
+.price-table:last-child,
+.insurance-table:last-child,
+.detail-table:last-child {
+  margin-bottom: 0;
+}
+
+.price-table th,
+.price-table td,
+.insurance-table th,
+.insurance-table td,
+.detail-table th,
+.detail-table td {
+  padding: var(--table-cell-py) var(--table-cell-px);
+  border: 1px solid var(--border-soft);
+  font-size: var(--font-size-main);
+  line-height: 1.4;
+  text-align: right;
+  word-break: break-word;
+  white-space: nowrap;
+}
+
+.price-table th:first-child,
+.price-table td:first-child,
+.insurance-table th:first-child,
+.insurance-table td:first-child,
+.detail-table th:first-child,
+.detail-table td:first-child {
+  text-align: left;
+}
+
+.price-table th,
+.insurance-table th,
+.detail-table th {
+  font-weight: var(--font-weight-strong);
+  background: var(--table-head-bg);
+  color: var(--table-head-color);
+}
+
+.insurance-table td:last-child,
+.detail-table--wrap-last td:last-child {
+  white-space: normal;
+}

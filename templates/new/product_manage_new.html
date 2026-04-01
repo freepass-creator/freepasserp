@@ -1,0 +1,135 @@
+{% extends 'new/layout/workspace_new.html' %}
+{% block workspace_page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages_new/product_manage_new.css') }}" data-page-style="true">
+{% endblock %}
+{% block page_title_text %}재고 관리{% endblock %}
+{% block top_bar_actions %}{% endblock %}
+{% block workspace_body %}
+<div class="work-page min-h-work layout-66 management-skeleton product-manage-page-shell">
+<section class="panel pls-grid-panel">
+<div class="pls-grid-scroll"><table class="pls-table"><thead id="product-register-list-head"></thead><tbody id="product-register-list"></tbody></table></div>
+</section>
+<div class="panel-slot">
+<section class="panel panel--form">
+<div class="panel-head panel-head-default">
+<div class="panel-head-title-wrap">
+<div class="panel-head-title" id="product-manage-title">재고정보</div>
+</div>
+<div class="panel-head-actions">
+<button class="inline-button btn-icon-only btn-tone-neutral" id="product-form-reset" title="신규" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>
+<button class="inline-button btn-icon-only btn-tone-save" id="product-submit-head" title="저장" type="button"><span class="btn-mode-icon btn-mode-icon--view"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg></span><span class="btn-mode-icon btn-mode-icon--write"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg></span></button>
+<button class="inline-button btn-icon-only btn-danger" disabled id="product-delete-head" title="삭제" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+</div>
+</div>
+<div class="panel-body manage-form-body product-form-panel-body">
+<div class="manage-idle-hint">좌측 목록에서 상품을 선택하거나 신규를 눌러주세요.</div>
+<div aria-atomic="true" aria-live="polite" class="form-feedback product-form-feedback is-hidden" data-tone="info" id="product-feedback">
+<span aria-hidden="true" class="form-feedback__spinner"></span>
+<span class="form-feedback__text" id="product-message"></span>
+</div>
+<form class="form-stack manage-form-shell" id="product-form">
+<input id="editing_product_code" type="hidden"/>
+<input id="existing_image_url" type="hidden"/>
+<input id="existing_image_urls" type="hidden"/>
+<section class="form-section">
+<div class="section-title">차량정보</div>
+<div class="form-grid">
+<div class="field"><label for="partner_code">공급사코드</label><select id="partner_code" name="partner_code"><option value="">선택</option></select></div>
+<div class="field"><label for="policy_code">정책코드</label><select id="policy_code" name="policy_code"><option value="">선택</option></select></div>
+<div class="field"><label for="car_number">차량번호</label><input id="car_number" name="car_number" required=""/></div>
+<div class="field"><label for="product_code_display">상품코드</label><input id="product_code_display" name="product_code_display" placeholder="저장 시 자동부여" readonly="" type="text"/></div>
+<div class="field"><label for="vehicle_status">차량상태</label><select data-code-group="PRODUCT_VEHICLE_STATUS" id="vehicle_status" name="vehicle_status"><option value="">선택</option></select></div>
+<div class="field"><label for="product_type">상품구분</label><select data-code-group="PRODUCT_TYPE" id="product_type" name="product_type"><option value="">선택</option></select></div>
+<div class="field"><label for="maker">제조사</label><select data-code-group="PRODUCT_MAKER" id="maker" name="maker"><option value="">선택</option></select></div>
+<div class="field"><label for="model_name">모델명</label><select data-code-group="PRODUCT_MODEL_NAME" id="model_name" name="model_name"><option value="">선택</option></select></div>
+<div class="field"><label for="sub_model">세부모델</label><select data-code-group="PRODUCT_SUB_MODEL" id="sub_model" name="sub_model"><option value="">선택</option></select></div>
+<div class="field"><label for="trim_name">세부트림</label><input id="trim_name" name="trim_name" placeholder="예: 1.6 하이브리드 2WD 캘리그래피" type="text"/></div>
+<div class="field"><label for="options">선택옵션</label><input id="options" name="options"/></div>
+<div class="field"><label for="vehicle_price">차량가격</label><input id="vehicle_price" inputmode="numeric" name="vehicle_price" type="text"/></div>
+<div class="field"><label for="ext_color">외부색상</label><select id="ext_color" name="ext_color"><option value="">선택</option></select></div>
+<div class="field"><label for="int_color">내부색상</label><select id="int_color" name="int_color"><option value="">선택</option></select></div>
+<div class="field"><label for="year">연식</label><select id="year" name="year"><option value="">선택</option></select></div>
+<div class="field"><label for="mileage">주행거리</label><input id="mileage" inputmode="numeric" name="mileage" type="text"/></div>
+<div class="field"><label for="fuel_type">연료</label><select data-code-group="PRODUCT_FUEL_TYPE" id="fuel_type" name="fuel_type"><option value="">선택</option></select></div>
+<div class="field"><label for="vehicle_class">차종구분</label><input id="vehicle_class" name="vehicle_class" placeholder="모델 선택 시 자동입력" readonly="" type="text"/></div>
+<div class="field"><label for="first_registration_date">최초등록일</label><input id="first_registration_date" inputmode="numeric" name="first_registration_date" placeholder="예: 230315 또는 20230315" type="text"/></div>
+<div class="field"><label for="vehicle_age_expiry_date">차령만료일</label><input id="vehicle_age_expiry_date" inputmode="numeric" name="vehicle_age_expiry_date" placeholder="예: 330314 또는 20330314" type="text"/></div>
+<div class="field"><label for="partner_memo">특이사항(공급사메모)</label><input id="partner_memo" name="partner_memo" placeholder="예: 앞범퍼 미세스크래치 / 비흡연 / 단기출고 우선" type="text"/></div>
+<div class="field"><label for="photo_link">사진링크</label><input id="photo_link" name="photo_link" placeholder="예: https://..." type="text"/></div>
+</div>
+</section>
+<section class="form-section" id="product-photo-section">
+<div class="section-title">사진업로드</div>
+<div class="field full product-image-editor" id="product-image-editor-field">
+<label for="product_image">차량 사진</label>
+<div class="upload-dropzone" id="upload-dropzone">
+<input accept="image/*" id="product_image" multiple="" name="product_image" type="file"/>
+<svg class="upload-dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+<div class="upload-dropzone-text">파일을 드래그하거나 여기를 눌러 업로드</div>
+<div class="upload-dropzone-sub">차량 사진을 등록합니다.</div>
+</div>
+</div>
+<div class="field full">
+<div class="img-thumb-list" id="image-preview-list"></div>
+<div class="img-thumb-footer" id="image-preview-toolbar">
+<span class="img-thumb-summary" id="image-preview-summary">등록된 사진이 없습니다.</span>
+<button class="inline-button btn-tone-hide" id="image-preview-clear-btn" type="button">전체 삭제</button>
+</div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title">대여료/보증금 정보</div>
+<div class="field full rent-plan-field">
+<label>기간별 대여료 및 보증금</label>
+<div class="price-manage-grid">
+<div class="price-manage-head">기간</div>
+<div class="price-manage-head">대여료</div>
+<div class="price-manage-head">보증금</div>
+<div class="price-manage-head">수수료</div>
+<div class="price-manage-period">1개월</div>
+<input id="rent_1" inputmode="numeric" name="rent_1" type="text"/>
+<input id="deposit_1" inputmode="numeric" name="deposit_1" type="text"/>
+<input id="fee_1" inputmode="numeric" name="fee_1" type="text"/>
+<div class="price-manage-period">12개월</div>
+<input id="rent_12" inputmode="numeric" name="rent_12" type="text"/>
+<input id="deposit_12" inputmode="numeric" name="deposit_12" type="text"/>
+<input id="fee_12" inputmode="numeric" name="fee_12" type="text"/>
+<div class="price-manage-period">24개월</div>
+<input id="rent_24" inputmode="numeric" name="rent_24" type="text"/>
+<input id="deposit_24" inputmode="numeric" name="deposit_24" type="text"/>
+<input id="fee_24" inputmode="numeric" name="fee_24" type="text"/>
+<div class="price-manage-period">36개월</div>
+<input id="rent_36" inputmode="numeric" name="rent_36" type="text"/>
+<input id="deposit_36" inputmode="numeric" name="deposit_36" type="text"/>
+<input id="fee_36" inputmode="numeric" name="fee_36" type="text"/>
+<div class="price-manage-period">48개월</div>
+<input id="rent_48" inputmode="numeric" name="rent_48" type="text"/>
+<input id="deposit_48" inputmode="numeric" name="deposit_48" type="text"/>
+<input id="fee_48" inputmode="numeric" name="fee_48" type="text"/>
+<div class="price-manage-period">60개월</div>
+<input id="rent_60" inputmode="numeric" name="rent_60" type="text"/>
+<input id="deposit_60" inputmode="numeric" name="deposit_60" type="text"/>
+<input id="fee_60" inputmode="numeric" name="fee_60" type="text"/>
+</div>
+</div>
+</section>
+<section class="form-section" id="product-sheet-import-section">
+<div class="section-title">구글시트 반영</div>
+<div class="field full">
+<label for="sheet_url">구글시트 주소</label>
+<div class="sheet-apply-row">
+<input id="sheet_url" name="sheet_url" placeholder="https://docs.google.com/spreadsheets/d/..." type="text"/>
+<button class="inline-button" id="sheet-apply-btn" type="button">반영</button>
+</div>
+</div>
+<div class="field full helper-row">헤더는 한글(code) 형식 권장입니다. 차량정보와 기간별 대여료/보증금/수수료 컬럼만 반영하며 정책 조건 컬럼은 무시됩니다.</div>
+</section>
+</form>
+</div>
+</section>
+</div>
+</div>
+{% endblock %}
+{% block workspace_page_js %}
+<script type="module" src="{{ url_for('static', filename='js/pages_new/product_manage_new.js') }}" data-page-script="true"></script>
+{% endblock %}

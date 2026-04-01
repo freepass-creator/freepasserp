@@ -1,0 +1,161 @@
+:root {
+  --panel-bg: var(--surface-base);
+  --panel-head-bg: var(--new-bg-panel-head, var(--surface-base));
+  --panel-border: var(--border-main);
+  --panel-head-px: 12px;
+  --panel-head-gap: 12px;
+  --panel-title-size: var(--font-size-main);
+  --panel-title-weight: var(--font-weight-strong);
+  --panel-subtitle-size: var(--font-size-sub);
+  --panel-subtitle-color: var(--text-subtle);
+}
+
+.panel {
+  border: none;
+  border-radius: var(--radius-ui);
+  background: var(--panel-bg);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12), 0 4px 8px 3px rgba(60, 64, 67, 0.08);
+  display: grid;
+  grid-template-rows: var(--panel-head-height) minmax(0, 1fr);
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.panel-head {
+  min-height: var(--panel-head-height);
+  height: var(--panel-head-height);
+  padding: 0 var(--panel-head-px);
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel-head-bg);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  scrollbar-gutter: stable;
+}
+
+.panel-head-default,
+.panel-head-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--panel-head-gap);
+  white-space: nowrap;
+}
+
+.panel-head--meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--panel-head-gap);
+}
+
+.panel-head-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.panel-head-title {
+  min-width: 0;
+  font-size: var(--panel-title-size);
+  font-weight: var(--panel-title-weight);
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.panel-head-subtitle {
+  min-width: 0;
+  font-size: var(--panel-subtitle-size);
+  color: var(--panel-subtitle-color);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel-head-subtitle[hidden] {
+  display: none;
+}
+
+.panel-head-meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.panel-head-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--btn-inline-gap);
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.panel-head-actions--compact {
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.panel-head-actions:empty {
+  display: none;
+}
+
+.panel-body {
+  padding: var(--panel-body-pad);
+  overflow: auto;
+  min-height: 0;
+  min-width: 0;
+  scrollbar-gutter: auto;
+}
+
+.panel-body.no-pad,
+.panel-body--flush {
+  padding: 0;
+}
+
+.panel-body--form,
+.panel-body--detail,
+.panel-body--filter,
+.panel-body-filter {
+  padding: var(--panel-body-pad);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+
+.panel-body--chat {
+  padding: 0;
+}
+
+.panel--list,
+.panel--product-list,
+.panel--detail,
+.panel--chat,
+.panel--form,
+.panel--filter {
+  min-height: 0;
+}
+
+.panel--list .panel-body,
+.panel--product-list .panel-body {
+  padding: 0;
+}
+
+.panel--chat {
+  grid-template-rows: var(--panel-head-height) minmax(0, 1fr);
+}
+
+.panel-head-type {
+  display: none;
+}
+
+.detail-actions-hidden {
+  display: none !important;
+}

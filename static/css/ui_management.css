@@ -1,0 +1,369 @@
+/* ===== ERP MANAGEMENT STANDARDIZATION LAYER ===== */
+
+.panel-head {
+  gap: var(--ui-panel-gap);
+}
+
+
+.panel-head-title {
+  letter-spacing: -0.01em;
+}
+
+.panel-head-actions > .inline-button,
+.panel-head-actions > .btn-filter,
+.panel-head-actions > button {
+  flex: 0 0 auto;
+}
+
+.panel--form .panel-body,
+.panel--detail .panel-body,
+.panel--filter .panel-body {
+  padding: var(--ui-panel-body-pad);
+}
+
+.panel--form form,
+.panel--detail form {
+  align-content: start;
+}
+
+.panel--form .field,
+.panel--detail .field {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.panel--form .field > label,
+.panel--detail .field > label {
+  font-size: var(--ui-font-label);
+  color: var(--ui-text-secondary);
+  line-height: var(--form-label-line-height);
+}
+
+.panel--form .field > input,
+.panel--form .field > select,
+.panel--form .field > textarea,
+.panel--detail .field > input,
+.panel--detail .field > select,
+.panel--detail .field > textarea {
+  width: 100%;
+}
+
+.panel--form .field > textarea,
+.panel--detail .field > textarea {
+  min-height: 92px;
+}
+
+.panel--form :is(input, select, textarea):read-only,
+.panel--detail :is(input, select, textarea):read-only,
+.panel--form :is(input, select, textarea):disabled,
+.panel--detail :is(input, select, textarea):disabled {
+  cursor: default;
+  opacity: 1;
+  color: var(--form-control-text);
+  -webkit-text-fill-color: var(--form-control-text);
+}
+
+.ui-mode-view :is(input, textarea)::placeholder {
+  color: transparent;
+}
+
+.management-summary-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--list-line-gap);
+  align-content: center;
+  padding-top: var(--list-row-py);
+  padding-bottom: var(--list-row-py);
+}
+
+.management-summary-row__line {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+}
+
+.management-summary-row__item {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  font-size: var(--list-main-font);
+  line-height: 1.35;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.management-summary-row__item--strong {
+  font-weight: var(--font-weight-strong);
+}
+
+.management-summary-row__item--badges {
+  flex: 0 0 auto;
+  margin-right: var(--list-badge-gap-x);
+}
+
+.management-summary-row__item--date,
+.management-summary-row__item--muted {
+  color: var(--text-subtle);
+  font-size: var(--font-size-sub);
+}
+
+.management-summary-row__item--end {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.management-summary-row__sep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 0 var(--list-dot-gap);
+  color: var(--text-subtle);
+  font-size: var(--font-size-sub);
+  flex: 0 0 auto;
+}
+
+.management-summary-row .fp-badge-row {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+.panel--filter .empty-block,
+.panel--list .empty-block,
+.panel--product-list .empty-block {
+  min-height: 120px;
+}
+
+
+.management-summary-row--single {
+  min-height: var(--list-row-min-h);
+}
+
+.management-summary-row--double {
+  min-height: var(--list-row-min-h);
+}
+
+.management-summary-row--double .management-summary-row__line + .management-summary-row__line {
+  margin-top: var(--list-line-gap);
+}
+
+
+.panel-head-actions > .inline-button,
+.panel-head-actions > .btn-filter,
+.panel-head-actions > button {
+  min-height: var(--btn-panel-height);
+}
+
+.panel--detail .panel-body,
+.panel--form .panel-body {
+  padding-top: var(--ui-panel-body-pad);
+  padding-right: var(--ui-panel-body-pad);
+  padding-bottom: var(--ui-panel-body-pad);
+  padding-left: var(--ui-panel-body-pad);
+}
+
+
+:root {
+  --ui-field-gap: var(--form-field-gap);
+  --ui-field-row-gap: var(--form-gap);
+  --ui-field-label-size: var(--ui-font-label);
+  --ui-field-label-min-h: var(--form-label-min-h);
+  --ui-control-height: var(--form-control-height);
+  --ui-control-textarea-min-h: var(--form-control-textarea-min-h);
+  --ui-control-radius: var(--form-control-radius);
+  --ui-control-select-pr: var(--form-control-select-pr);
+  --ui-control-readonly-bg: var(--ui-surface-subtle);
+  --ui-control-readonly-border: var(--border-soft);
+  --ui-control-disabled-text: var(--text-subtle);
+  --ui-checkbox-size: var(--form-checkbox-size);
+  --ui-checkbox-gap: var(--form-check-gap);
+}
+
+.panel--form form,
+.panel--detail form {
+  row-gap: var(--form-section-gap);
+}
+
+.panel--form .field,
+.panel--detail .field {
+  gap: var(--ui-field-gap);
+}
+
+.panel--form .field > label,
+.panel--detail .field > label {
+  font-size: var(--ui-field-label-size);
+  min-height: var(--ui-field-label-min-h);
+}
+
+.panel--form .field > :is(input, select, textarea),
+.panel--detail .field > :is(input, select, textarea) {
+  box-sizing: border-box;
+}
+
+.panel--form .field.is-readonly > label,
+.panel--detail .field.is-readonly > label,
+.panel--form .field.is-disabled > label,
+.panel--detail .field.is-disabled > label {
+  color: var(--text-subtle);
+}
+
+.panel--form .field.is-readonly > :is(input, select, textarea),
+.panel--detail .field.is-readonly > :is(input, select, textarea) {
+  cursor: default;
+}
+
+.panel--form .field.is-disabled > :is(input, select, textarea),
+.panel--detail .field.is-disabled > :is(input, select, textarea) {
+  color: var(--ui-control-disabled-text);
+}
+
+.panel--form .field.field--textarea > textarea,
+.panel--detail .field.field--textarea > textarea {
+  min-height: 96px;
+}
+
+.panel--form .field.field--checkbox,
+.panel--detail .field.field--checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel--form .field.field--checkbox > label,
+.panel--detail .field.field--checkbox > label {
+  order: 2;
+  min-height: auto;
+}
+
+.panel--form .field.field--checkbox > :is(input, select, textarea),
+.panel--detail .field.field--checkbox > :is(input, select, textarea) {
+  order: 1;
+  width: auto;
+  min-height: auto;
+  height: auto;
+}
+
+.panel--form .field.is-empty.is-readonly > :is(input, textarea),
+.panel--detail .field.is-empty.is-readonly > :is(input, textarea) {
+  color: var(--text-subtle);
+}
+
+
+.panel--form .field.field--text > :is(input, select),
+.panel--detail .field.field--text > :is(input, select),
+.panel--form .field.field--select > :is(input, select),
+.panel--detail .field.field--select > :is(input, select) {
+  min-height: var(--ui-control-height);
+  height: var(--ui-control-height);
+  border-radius: var(--ui-control-radius);
+}
+
+.panel--form .field.field--select > select,
+.panel--detail .field.field--select > select {
+  padding-right: var(--ui-control-select-pr);
+}
+
+.panel--form .field.field--textarea > textarea,
+.panel--detail .field.field--textarea > textarea {
+  min-height: var(--ui-control-textarea-min-h);
+  border-radius: var(--ui-control-radius);
+}
+
+.panel--form .field.field--checkbox,
+.panel--detail .field.field--checkbox {
+  gap: var(--ui-checkbox-gap);
+}
+
+.panel--form .field.field--checkbox > input[type='checkbox'],
+.panel--detail .field.field--checkbox > input[type='checkbox'],
+.panel--form .field.field--checkbox > input[type='radio'],
+.panel--detail .field.field--checkbox > input[type='radio'] {
+  width: var(--ui-checkbox-size);
+  height: var(--ui-checkbox-size);
+}
+
+
+/* ===== IDLE STATE ===== */
+
+.manage-idle-hint {
+  display: none;
+}
+
+.panel[data-panel-mode="idle"] .manage-form-shell {
+  display: none;
+}
+
+.panel[data-panel-mode="idle"] .manage-idle-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  padding: 24px;
+  color: var(--text-muted, #9ca3af);
+  font-size: var(--font-size-main, 12px);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* idle 시 패널바디가 flex로 채우도록 */
+.panel[data-panel-mode="idle"] .manage-form-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.panel[data-panel-mode="idle"] .panel-head-actions button {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.panel[data-panel-mode="idle"] .panel-head-actions button.btn-tone-neutral {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── mode badge on panel title ──────────────────────────── */
+.panel-head-title-wrap::after {
+  content: none;
+}
+
+.panel[data-panel-mode="create"] .panel-head-title-wrap::after {
+  content: '신규';
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: var(--font-size-sub);
+  font-weight: 600;
+  line-height: 18px;
+  background: var(--badge-status-info-bg, #E7F1FF);
+  color: var(--badge-status-info-text, #1C63D5);
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+
+.panel[data-panel-mode="edit"] .panel-head-title-wrap::after {
+  content: '수정';
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: var(--font-size-sub);
+  font-weight: 600;
+  line-height: 18px;
+  background: var(--badge-status-warning-bg, #FFF8E1);
+  color: var(--badge-status-warning-text, #B78103);
+  letter-spacing: 0;
+  flex-shrink: 0;
+}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_theme.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_panel.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_topbar.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_form.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_list.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_viewmode.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_section.css') }}" data-page-style="true">
+{% block workspace_page_css %}{% endblock %}
+{% endblock %}
+{% block body %}
+<div class="dashboard-shell dashboard-shell--new">
+  <aside class="sidebar sidebar--new"><script>try{if('1'===localStorage.getItem('fp.sidebar.collapsed'))document.currentScript.parentElement.classList.add('sidebar-collapsed')}catch(e){}</script>
+    <div class="sidebar-head">
+      <button class="sidebar-toggle-btn" id="sidebarToggleBtn" title="사이드바 접기" aria-label="사이드바 접기">
+        <svg class="sidebar-toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+    </div>
+    <nav id="sidebar-menu" class="sidebar-menu"></nav>
+  </aside>
+  <div class="main-area">
+    <div class="top-bar">
+      <div class="top-bar-user">
+        <span class="top-bar-user-item" id="topBarOrg">-</span>
+        <span class="top-bar-user-item" id="topBarName">-</span>
+        <span class="top-bar-user-item" id="topBarRank">-</span>
+      </div>
+      <div class="top-bar-state">
+        <span class="top-bar-page-name">{% block page_title_text %}페이지{% endblock %}</span>
+        <span class="top-bar-state-sep" id="topBarStateSep" hidden>|</span>
+        <span class="top-bar-identity" id="topBarIdentity" hidden></span>
+        <span class="top-bar-work-badge" id="topBarWorkBadge"></span>
+      </div>
+      <div class="top-bar-actions">{% block top_bar_actions %}{% endblock %}</div>
+    </div>
+    <main class="main-shell main-shell--new">
+      {% block workspace_body %}{% endblock %}
+      {% block workspace_overlays %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}
+{% block page_js %}
+<script type="module" src="{{ url_for('static', filename='js/core/top-bar.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/core/sidebar-alerts.js') }}"></script>
+{% block workspace_page_js %}{% endblock %}
+{% endblock %}

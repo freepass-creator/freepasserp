@@ -1,0 +1,1 @@
+.dashboard-shell--new .manage-form-shell.ui-mode-view .field > :is(input, select, textarea) { color: var(--new-text-main); }

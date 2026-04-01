@@ -1,0 +1,336 @@
+.auth-shell {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.dashboard-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid var(--border-soft);
+  background: var(--surface-sidebar);
+}
+
+.sidebar-head {
+  display: none;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 8px;
+  gap: 6px;
+}
+
+.sidebar-link {
+  position: relative;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  font-size: var(--font-size-main);
+  font-weight: var(--font-weight-base);
+  color: var(--text-main);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--radius-ui);
+  background: transparent;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background-color .12s ease, color .12s ease;
+}
+
+.sidebar-link-icon {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-subtle);
+}
+
+.sidebar-link-svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.sidebar-link-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-link:hover {
+  background: var(--interactive-hover-bg);
+  border-color: var(--interactive-hover-border);
+  color: var(--text-main);
+  box-shadow: var(--interactive-shadow-hover);
+}
+
+.sidebar-link:hover .sidebar-link-icon {
+  color: var(--text-main);
+}
+
+.sidebar-link.active {
+  background: var(--interactive-selected-bg);
+  border-color: var(--interactive-selected-border);
+  color: var(--text-main);
+  font-weight: var(--font-weight-strong);
+  box-shadow: none;
+}
+
+
+.sidebar-link.active .sidebar-link-icon {
+  color: var(--text-main);
+}
+
+.sidebar-link.active:hover {
+  background: var(--interactive-selected-bg);
+  border-color: var(--interactive-selected-border);
+}
+
+.sidebar-link:focus-visible {
+  outline: none;
+  border-color: var(--interactive-selected-border);
+  box-shadow: var(--interactive-shadow-focus);
+}
+
+.main-area {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.main-shell {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 14px 14px;
+  gap: 14px;
+}
+
+.page-header {
+  flex: 0 0 auto;
+  min-height: 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+.page-title {
+  align-self: center;
+  font-size: var(--font-size-main);
+  font-weight: var(--font-weight-strong);
+  color: var(--text-main);
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  align-self: center;
+  gap: 6px;
+}
+
+.work-page {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  margin: 0;
+  display: grid;
+  gap: var(--panel-gap);
+  align-items: stretch;
+  --panel-span-3-width: calc(25% - (var(--panel-gap) * 0.75));
+}
+
+.work-page.one-col {
+  grid-template-columns: 1fr;
+}
+
+.work-page.grid-12 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.work-page.layout-66,
+.work-page.layout-39,
+.work-page.layout-93,
+.work-page.layout-633 {
+  display: grid;
+  width: 100%;
+  gap: var(--panel-gap);
+  height: 100%;
+  min-height: 0;
+}
+
+.work-page.layout-66 {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+
+.work-page.layout-39,
+.work-page.layout-93,
+.work-page.layout-633 {
+  grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+}
+
+.work-page.layout-39 > :nth-child(1) {
+  grid-column: 1 / span 3;
+}
+
+.work-page.layout-39 > :nth-child(2) {
+  grid-column: 4 / span 9;
+}
+
+.work-page.layout-93 > :nth-child(1) {
+  grid-column: 1 / span 9;
+}
+
+.work-page.layout-93 > :nth-child(2) {
+  grid-column: 10 / span 3;
+}
+
+.work-page.layout-633 > :nth-child(1) {
+  grid-column: 1 / span 6;
+}
+
+.work-page.layout-633 > :nth-child(2) {
+  grid-column: 7 / span 3;
+}
+
+.work-page.layout-633 > :nth-child(3) {
+  grid-column: 10 / span 3;
+}
+
+.work-page.layout-66 > *,
+.work-page.layout-39 > *,
+.work-page.layout-93 > *,
+.work-page.layout-633 > * {
+  min-width: 0;
+}
+.panel-slot {
+  position: static;
+  min-height: 0;
+  height: 100%;
+}
+
+.panel-slot > .panel {
+  width: 100%;
+  height: 100%;
+}
+
+.filter-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  display: grid;
+  grid-template-rows: var(--panel-head-height) minmax(0, 1fr);
+  transform: translateX(100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 40;
+  transition: transform 0.18s ease, opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.filter-overlay.is-open {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.col-3 { grid-column: span 3; }
+.col-4 { grid-column: span 4; }
+.col-5 { grid-column: span 5; }
+.col-6 { grid-column: span 6; }
+.col-7 { grid-column: span 7; }
+.col-8 { grid-column: span 8; }
+.col-9 { grid-column: span 9; }
+.col-12 { grid-column: span 12; }
+
+.min-h-work {
+  min-height: 0;
+  height: 100%;
+}
+
+/*
+ * 화면 너비가 900px 이하일 때 work-page.layout-66 도 1열로 쌓이도록 했던 규칙을
+ * 수정합니다. 홈 화면은 좌우 6:6 분할이 유지되기를 원하므로, 반응형 전환 시점을
+ * 축소하여 더 넓은 영역에서는 2열 구성을 유지합니다. 600px 이하에서만 1열로 전환합니다.
+ */
+@media (max-width: 600px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .main-area {
+    height: auto;
+    overflow: visible;
+  }
+
+  .main-shell {
+    flex: none;
+    min-height: unset;
+    overflow: visible;
+  }
+
+  /*
+   * 좁은 화면에서는 모든 레이아웃(12열, 6:6, 9:3, 6:3:3)을 하나의 열로 쌓습니다.
+   * 이전 버전에서 홈 화면을 위해 layout-66만 2열로 유지하도록 수정했으나,
+   * 다른 페이지들과 규격이 맞지 않게 되어 다시 통일합니다. 이제 화면 폭이
+   * 600px 이하일 때는 layout-66도 함께 1열로 전환되어 다른 레이아웃과 동일한
+   * 반응형 규칙을 따릅니다.
+   */
+  .work-page.grid-12,
+  .work-page.layout-66,
+  .work-page.layout-39,
+  .work-page.layout-93,
+  .work-page.layout-633 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-7,
+  .col-8,
+  .col-9,
+  .col-12 {
+    grid-column: span 1;
+  }
+}

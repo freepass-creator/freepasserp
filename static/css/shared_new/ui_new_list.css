@@ -1,0 +1,2 @@
+.dashboard-shell--new .summary-list > *:hover, .dashboard-shell--new .admin-summary-list > *:hover, .dashboard-shell--new .product-row:hover, .dashboard-shell--new .room-item:hover, .dashboard-shell--new .home-row:hover { background: var(--new-hover); }
+.dashboard-shell--new .summary-list > *.is-active, .dashboard-shell--new .admin-summary-list > *.is-active, .dashboard-shell--new .product-row.is-active, .dashboard-shell--new .room-item.is-active { background: var(--new-selected); }

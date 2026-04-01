@@ -1,0 +1,263 @@
+/* ===== CHAT — 카카오톡 스타일 ===== */
+
+.chat-panel-body {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
+  min-height: 0;
+  height: 100%;
+  padding-bottom: 0;
+}
+
+.chat-head .panel-head-subtitle {
+  font-size: var(--font-size-main);
+  color: var(--text-subtle);
+}
+
+/* 패널 바디 패딩 제거 — 대화영역 꽉 채움 */
+.panel--chat .panel-body {
+  padding: 0;
+}
+
+/* ─── 메시지 리스트 (카톡 배경) ──────────────────────────────────────────── */
+
+.message-list {
+  border: 0;
+  background: #f0f2f5;
+  padding: 16px 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  margin: 0;
+  border-radius: 0;
+}
+
+/* ─── 메시지 래퍼 ────────────────────────────────────────────────────────── */
+
+.message-wrap {
+  display: flex;
+  gap: 3px;
+  max-width: 72%;
+}
+
+.message-wrap.out {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+}
+
+.message-wrap.in {
+  align-self: flex-start;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+/* ─── 보낸 사람 정보 ─────────────────────────────────────────────────────── */
+
+.message-sender {
+  font-size: 10px;
+  color: var(--text-subtle, #64748b);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.message-sender.sender-provider { background: rgba(59, 130, 246, 0.08); }
+.message-sender.sender-agent { background: rgba(234, 179, 8, 0.1); }
+.message-sender.sender-admin { background: rgba(100, 116, 139, 0.1); }
+
+.message-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.message-wrap.out .message-content { flex-direction: row-reverse; }
+.message-wrap.out .message-sender { display: none; }
+
+.message-wrap.out .message-content { align-items: flex-end; }
+.message-wrap.in .message-content { align-items: flex-start; }
+
+/* ─── 말풍선 (카톡 스타일) ───────────────────────────────────────────────── */
+
+.message-bubble {
+  position: relative;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+}
+
+/* ── 내 메시지 (오른쪽) 기본 ── */
+.message-wrap.out .message-bubble { color: #1a1a1a; }
+.message-wrap.out .message-bubble::after {
+  content: ''; position: absolute; right: -6px; bottom: 8px;
+  width: 0; height: 0; border-style: solid;
+  border-width: 0 0 8px 8px;
+}
+
+/* ── 상대 메시지 (왼쪽) 기본 ── */
+.message-wrap.in .message-bubble { color: #1a1a1a; }
+.message-wrap.in .message-bubble::after {
+  content: ''; position: absolute; left: -6px; bottom: 8px;
+  width: 0; height: 0; border-style: solid;
+  border-width: 0 8px 8px 0;
+}
+
+/* ── 역할별 색상: 공급사 = 연파랑, 영업자 = 연초록, 관리자 = 슬레이트 ── */
+
+/* 공급사 = 화이트 */
+.message-bubble.role-provider { background: #ffffff; border: 1px solid rgba(0,0,0,0.06); }
+.message-wrap.out .message-bubble.role-provider::after { border-color: transparent transparent transparent #ffffff; }
+.message-wrap.in .message-bubble.role-provider { background: #ffffff; }
+.message-wrap.in .message-bubble.role-provider::after { border-color: transparent #ffffff transparent transparent; }
+
+/* 영업자 = 크림 */
+.message-bubble.role-agent { background: #fef3c7; }
+.message-wrap.out .message-bubble.role-agent::after { border-color: transparent transparent transparent #fef3c7; }
+.message-wrap.in .message-bubble.role-agent { background: #fefce8; }
+.message-wrap.in .message-bubble.role-agent::after { border-color: transparent #fefce8 transparent transparent; }
+
+/* 관리자 = 쿨그레이 */
+.message-bubble.role-admin { background: #e2e8f0; }
+.message-wrap.out .message-bubble.role-admin::after { border-color: transparent transparent transparent #e2e8f0; }
+.message-wrap.in .message-bubble.role-admin { background: #f1f5f9; }
+.message-wrap.in .message-bubble.role-admin::after { border-color: transparent #f1f5f9 transparent transparent; }
+
+/* ─── 역할 뱃지 (보낸 사람 옆) ──────────────────────────────────────────── */
+
+.message-role-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.message-role-badge--agent { background: #e8f5e9; color: #2e7d32; }
+.message-role-badge--provider { background: #e3f2fd; color: #1565c0; }
+.message-role-badge--admin { background: #ede7f6; color: #4527a0; }
+
+/* ─── 시간 ───────────────────────────────────────────────────────────────── */
+
+.message-time {
+  font-size: 9px;
+  color: #6b7a8d;
+  padding: 0 2px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ─── 날짜 구분선 ────────────────────────────────────────────────────────── */
+
+.message-date-divider {
+  align-self: center;
+  font-size: 10px;
+  color: #5f6368;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 3px 12px;
+  border-radius: 12px;
+  margin: 8px 0;
+}
+
+/* ─── 입력폼 ─────────────────────────────────────────────────────────────── */
+
+.message-form {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 8px 10px;
+  margin-top: auto;
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+.message-form-code {
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+  user-select: none;
+}
+
+.message-form input {
+  flex: 1 1 0;
+  min-height: 40px;
+  border: 1px solid #dadce0;
+  border-radius: 20px;
+  padding: 0 16px;
+  background: #f8f9fa;
+  font-size: 13px;
+  color: #1f1f1f;
+  outline: none;
+  transition: border-color 0.12s;
+}
+
+.message-form input::placeholder { color: #80868b; }
+.message-form input:focus { border-color: #1b2a4a; background: #ffffff; }
+
+.message-send-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-left: 6px;
+  border: none;
+  border-radius: 50%;
+  background: #1b2a4a;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.12s, box-shadow 0.12s;
+}
+
+.message-send-btn:hover {
+  background: #142038;
+  box-shadow: 0 1px 3px rgba(27, 42, 74, 0.3);
+}
+
+.message-send-btn:active { background: #0f1a2e; }
+
+/* ─── 기타 ───────────────────────────────────────────────────────────────── */
+
+.chat-grid-room {
+  min-height: 0;
+  height: 100%;
+}
+
+#chat-message {
+  margin: 0;
+  font-size: var(--font-size-sub);
+  color: var(--text-subtle);
+}
+
+.message-list .empty-block {
+  align-self: center;
+  margin: auto;
+  color: var(--text-muted, #9ca3af);
+  font-size: var(--font-size-main, 12px);
+}
+
+/* 대화방 미선택 시 입력폼 비활성 */
+.message-form.is-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.message-form.is-disabled input {
+  cursor: default;
+}

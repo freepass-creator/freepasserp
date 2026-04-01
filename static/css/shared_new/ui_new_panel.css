@@ -1,0 +1,7 @@
+.dashboard-shell--new .page-header { padding-bottom: 10px; }
+.dashboard-shell--new .work-page { gap: 12px; }
+.dashboard-shell--new .panel, .dashboard-shell--new .filter-overlay.panel { background: var(--new-bg-panel); border: none; }
+.dashboard-shell--new .panel-head { background: var(--new-bg-panel-head); border-bottom: 1px solid rgba(0, 0, 0, 0.04); }
+.dashboard-shell--new .panel-body { background: transparent; }
+.dashboard-shell--new .panel-slot { min-width: 0; }
+.dashboard-shell--new .home-summary-card, .dashboard-shell--new .settings-section-block, .dashboard-shell--new .settings-upload-card, .dashboard-shell--new .settings-sample-card, .dashboard-shell--new .settings-code-list-card, .dashboard-shell--new .settings-code-form-card { background: color-mix(in srgb, var(--new-bg-panel) 92%, #ffffff 8%); border-color: var(--new-border-soft); }

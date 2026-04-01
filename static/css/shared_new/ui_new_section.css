@@ -1,0 +1,2 @@
+.dashboard-shell--new .section-stack, .dashboard-shell--new .ui-group-stack { display: flex; flex-direction: column; gap: 18px; }
+.dashboard-shell--new [data-ui-section], .dashboard-shell--new .ui-group, .dashboard-shell--new .form-section, .dashboard-shell--new .settings-section-block { min-width: 0; }

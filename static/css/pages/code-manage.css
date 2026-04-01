@@ -1,0 +1,22 @@
+.code-detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.code-detail-block {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.code-detail-title {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.code-detail-value {
+  font-size: 12px;
+  color: #111827;
+  word-break: break-all;
+}

@@ -1,0 +1,602 @@
+/* ===== GLOBAL LIST SYSTEM (single source of truth) ===== */
+/* 실제 summary/product/chat 목록 selector 는 이 파일에서만 관리한다. */
+
+:root {
+  --list-row-px: 12px;
+  --list-row-py: 8px;
+  --list-row-min-h: 40px;
+  --list-product-row-py: var(--list-row-py);
+  --list-product-row-min-h: var(--list-row-min-h);
+  --list-main-font: var(--font-size-main);
+  --list-sub-font: var(--font-size-sub);
+  --list-line-gap: 2px;
+  --list-border: var(--border-soft);
+  --list-hover: var(--interactive-hover-bg);
+  --list-selected: var(--interactive-selected-bg);
+  --list-bar: var(--text-main);
+  --list-dot-gap: 4px;
+  --list-badge-gap-x: 6px;
+  --list-badge-gap-y: 4px;
+  --list-badge-h: 20px;
+  --list-badge-px: 8px;
+  --list-badge-radius: var(--radius-ui);
+  --list-chat-badge-h: var(--list-badge-h);
+
+  /* ── 뱃지 상태 색상 (Industrial-Plus 톤) ── */
+  --badge-status-info-bg:      #eef2ff;
+  --badge-status-info-border:  #c7d2fe;
+  --badge-status-info-text:    #1b2a4a;
+
+  --badge-status-success-bg:     #f0fdf4;
+  --badge-status-success-border: #bbf7d0;
+  --badge-status-success-text:   #15803d;
+
+  --badge-status-warning-bg:     #fffbeb;
+  --badge-status-warning-border: #fde68a;
+  --badge-status-warning-text:   #a16207;
+
+  --badge-status-danger-bg:     #fef2f2;
+  --badge-status-danger-border: #fecaca;
+  --badge-status-danger-text:   #b91c1c;
+
+  /* ── 뱃지 카테고리 색상 ── */
+  --badge-category-sales-bg:     #EDF8F7;
+  --badge-category-sales-border: #CDEBE7;
+  --badge-category-sales-text:   #266F67;
+
+  --badge-category-member-bg:     #F1F3F5;
+  --badge-category-member-border: #D8DEE4;
+  --badge-category-member-text:   #495057;
+
+  --badge-category-rent-new-bg:     #EEF4FF;
+  --badge-category-rent-new-border: #D6E4FF;
+  --badge-category-rent-new-text:   #31558C;
+
+  --badge-category-rent-used-bg:     #F1F4F8;
+  --badge-category-rent-used-border: #D9E0E8;
+  --badge-category-rent-used-text:   #5E7188;
+
+  --badge-category-sub-new-bg:     #F3EEFB;
+  --badge-category-sub-new-border: #E0D5F5;
+  --badge-category-sub-new-text:   #6A4599;
+
+  --badge-category-sub-used-bg:     #F3F1F6;
+  --badge-category-sub-used-border: #DDD7E8;
+  --badge-category-sub-used-text:   #6D627F;
+
+  /* ── 채팅 뱃지 색상 ── */
+  --badge-chat-unread-text:   #7c2d12;
+  --badge-chat-unread-bg:     #fef2f2;
+  --badge-chat-unread-border: #fecaca;
+
+  --badge-chat-pending-text:   #92400e;
+  --badge-chat-pending-bg:     #fffbeb;
+  --badge-chat-pending-border: #fde68a;
+
+  --badge-chat-done-text:   #065f46;
+  --badge-chat-done-bg:     #ecfdf5;
+  --badge-chat-done-border: #a7f3d0;
+}
+
+.panel-body.no-pad,
+.panel-body--flush,
+.summary-list,
+.product-list,
+.room-list {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.summary-list,
+.product-list,
+.room-list,
+#room-list.room-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.summary-row,
+.product-row,
+#room-list .room-item {
+  position: relative;
+  width: 100%;
+  margin: 0 !important;
+  border: 0;
+  border-bottom: 1px solid var(--list-border);
+  background: var(--surface-base);
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--list-main-font);
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+}
+
+.summary-row,
+#room-list .room-item {
+  min-height: var(--list-row-min-h);
+  padding: var(--list-row-py) var(--list-row-px);
+}
+
+.product-row {
+  min-height: var(--list-product-row-min-h);
+  padding: var(--list-product-row-py) var(--list-row-px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.summary-row:hover,
+.product-row:hover,
+#room-list .room-item:hover {
+  background: var(--list-hover);
+}
+
+.summary-row.is-selected,
+.product-row.is-active,
+.product-row.is-selected,
+#room-list .room-item.active {
+  background: var(--list-selected);
+}
+
+.summary-row.is-selected::before,
+.product-row.is-active::before,
+.product-row.is-selected::before,
+#room-list .room-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--list-bar);
+}
+
+.summary-inline,
+.summary-inline-strong {
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+  min-width: 0;
+  font-size: var(--list-main-font);
+  line-height: 1.2;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.summary-inline {
+  font-size: var(--list-main-font);
+  font-weight: var(--font-weight-base);
+  color: var(--text-main);
+}
+
+.summary-inline-strong {
+  font-size: var(--list-main-font);
+  font-weight: var(--font-weight-strong);
+  color: var(--text-main);
+}
+
+
+
+.fp-badge-row {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--list-badge-gap-y) var(--list-badge-gap-x);
+  min-width: 0;
+}
+
+.fp-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  min-height: 20px;
+  padding: 0 2px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--list-badge-radius);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  background: var(--surface-base);
+  color: var(--text-main);
+}
+
+.fp-badge--solid {
+  background: var(--text-main);
+  border-color: var(--text-main);
+  color: #ffffff;
+}
+
+.fp-badge--soft {
+  background: var(--surface-subtle);
+  border-color: var(--border-main);
+  color: var(--text-main);
+}
+
+.fp-badge--outline {
+  background: var(--surface-base);
+  border-color: var(--text-subtle);
+  color: var(--text-main);
+}
+
+.fp-badge--muted {
+  background: #f9fafb;
+  border-color: var(--border-soft);
+  color: var(--text-muted);
+}
+
+.fp-badge[class*="fp-badge--kind-"] {
+  background: var(--badge-bg, var(--surface-base));
+  border-color: var(--badge-border, var(--border-main));
+  color: var(--badge-text, var(--text-main));
+}
+
+
+.fp-badge--kind-status-info {
+  --badge-bg:     var(--badge-status-info-bg);
+  --badge-border: var(--badge-status-info-border);
+  --badge-text:   var(--badge-status-info-text);
+}
+
+.fp-badge--kind-status-success {
+  --badge-bg:     var(--badge-status-success-bg);
+  --badge-border: var(--badge-status-success-border);
+  --badge-text:   var(--badge-status-success-text);
+}
+
+.fp-badge--kind-status-warning {
+  --badge-bg:     var(--badge-status-warning-bg);
+  --badge-border: var(--badge-status-warning-border);
+  --badge-text:   var(--badge-status-warning-text);
+}
+
+.fp-badge--kind-status-danger {
+  --badge-bg:     var(--badge-status-danger-bg);
+  --badge-border: var(--badge-status-danger-border);
+  --badge-text:   var(--badge-status-danger-text);
+}
+
+.fp-badge--kind-status-neutral,
+
+.fp-badge--kind-category-sales {
+  --badge-bg:     var(--badge-category-sales-bg);
+  --badge-border: var(--badge-category-sales-border);
+  --badge-text:   var(--badge-category-sales-text);
+}
+
+.fp-badge--kind-category-member {
+  --badge-bg:     var(--badge-category-member-bg);
+  --badge-border: var(--badge-category-member-border);
+  --badge-text:   var(--badge-category-member-text);
+}
+
+.summary-inline-badges {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.summary-inline-badges + .summary-inline,
+.summary-inline-badges + .summary-inline-strong,
+.summary-inline + .summary-inline-badges,
+.summary-inline-strong + .summary-inline-badges,
+.summary-inline-truncate + .summary-inline-badges {
+  margin-left: var(--list-badge-gap-x);
+}
+
+.summary-inline-truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+}
+
+.summary-inline-date {
+  margin-left: auto;
+  padding-left: 12px;
+  color: var(--text-subtle);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.summary-inline-sep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin: 0 var(--list-dot-gap);
+  color: var(--text-muted);
+  font-size: var(--font-size-sub);
+  line-height: 1;
+  font-weight: var(--font-weight-base);
+}
+
+.product-main-line,
+.product-sub-line,
+.product-row-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-main-line + .product-sub-line,
+.product-row-line + .product-row-line {
+  margin-top: var(--list-line-gap);
+}
+
+.product-main-left,
+.product-sub-left {
+  min-width: 0;
+}
+
+.product-main-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pl-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.pl-line > * {
+  flex-shrink: 0;
+}
+
+.pl-line--main {
+  font-size: var(--list-main-font);
+  color: var(--text-main);
+}
+
+.pl-line--sub {
+  font-size: var(--list-sub-font);
+  color: var(--text-subtle);
+}
+
+.pl-carno {
+  font-weight: var(--font-weight-medium);
+}
+
+.pl-trim {
+  color: var(--text-subtle);
+}
+
+.pl-sep {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+
+.product-main-text,
+.product-sub-left {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-main-left,
+.product-main-price {
+  font-size: var(--list-main-font);
+  font-weight: var(--font-weight-base);
+  line-height: 1.2;
+  color: var(--text-main);
+}
+
+.product-sub-left,
+.product-sub-price {
+  font-size: var(--list-sub-font);
+  font-weight: var(--font-weight-base);
+  line-height: 1.2;
+  color: var(--text-subtle);
+}
+
+.color-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--list-badge-radius);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1;
+  border: 1px solid rgba(0,0,0,0.18);
+  white-space: nowrap;
+}
+.color-badge--on-dark  { color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.4); }
+.color-badge--on-light { color: #1a1a1a; }
+.color-badge--empty    { background: transparent; border-color: var(--border-main); color: var(--text-muted); }
+
+.product-right-grid {
+  --product-period-col-width: 72px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto;
+  grid-auto-columns: minmax(52px, var(--product-period-col-width));
+  flex-shrink: 0;
+  justify-content: end;
+  align-items: center;
+  row-gap: 2px;
+  column-gap: 0;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.product-main-price {
+  container-type: inline-size;
+  text-align: right;
+}
+
+.product-price--deposit {
+  font-size: var(--list-sub-font);
+  color: var(--text-subtle);
+}
+
+.price-short { display: none; }
+.price-full  { display: inline; }
+
+@container (max-width: 80px) {
+  .price-short { display: inline; }
+  .price-full  { display: none; }
+}
+
+/* ===== CHAT LIST TOKENS ===== */
+#room-list .chat-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: var(--list-chat-badge-h);
+  padding: 0 var(--list-badge-px);
+  border-radius: var(--list-badge-radius);
+  border: 1px solid var(--border-main);
+  font-size: var(--font-size-sub);
+  line-height: 1;
+  color: var(--text-subtle);
+  background: var(--surface-subtle);
+  white-space: nowrap;
+}
+
+#room-list .chat-badge.is-unread {
+  color: var(--badge-chat-unread-text);
+  background: var(--badge-chat-unread-bg);
+  border-color: var(--badge-chat-unread-border);
+}
+
+#room-list .chat-badge.is-pending {
+  color: var(--badge-chat-pending-text);
+  background: var(--badge-chat-pending-bg);
+  border-color: var(--badge-chat-pending-border);
+}
+
+#room-list .chat-badge.is-done {
+  color: var(--badge-chat-done-text);
+  background: var(--badge-chat-done-bg);
+  border-color: var(--badge-chat-done-border);
+}
+
+#room-list .room-vehicle,
+#room-list .room-maker,
+#room-list .room-submodel,
+#room-list .room-chatcode,
+#room-list .room-last,
+#room-list .room-date,
+#room-list .room-time {
+  min-width: 0;
+  font-size: var(--list-main-font);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+#room-list .room-vehicle {
+  font-weight: var(--font-weight-base);
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 10px;
+}
+
+#room-list .room-maker,
+#room-list .room-chatcode,
+#room-list .room-date,
+#room-list .room-time {
+  color: var(--text-subtle);
+}
+
+#room-list .room-submodel,
+#room-list .room-last {
+  color: var(--text-main);
+}
+
+#room-list .room-last {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#room-list .room-maker::before,
+#room-list .room-submodel::before,
+#room-list .room-chatcode::before,
+#room-list .room-last::before {
+  content: "·";
+  display: inline-block;
+  margin: 0 var(--list-dot-gap);
+  color: var(--text-muted);
+  font-weight: var(--font-weight-base);
+}
+
+#room-list .room-vehicle,
+#room-list .room-maker,
+#room-list .room-submodel,
+#room-list .room-chatcode {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.room-list .empty-block {
+  padding: 16px 12px;
+}
+
+@media (max-width: 900px) {
+  .product-row-line {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .product-right-grid {
+    justify-content: start;
+    text-align: left;
+    gap: 8px;
+  }
+}
+
+
+.fp-badge--kind-category-product-rent-new {
+  --badge-bg:     var(--badge-category-rent-new-bg);
+  --badge-border: var(--badge-category-rent-new-border);
+  --badge-text:   var(--badge-category-rent-new-text);
+}
+
+.fp-badge--kind-category-product-rent-used {
+  --badge-bg:     var(--badge-category-rent-used-bg);
+  --badge-border: var(--badge-category-rent-used-border);
+  --badge-text:   var(--badge-category-rent-used-text);
+}
+
+.fp-badge--kind-category-product-subscription-new {
+  --badge-bg:     var(--badge-category-sub-new-bg);
+  --badge-border: var(--badge-category-sub-new-border);
+  --badge-text:   var(--badge-category-sub-new-text);
+}
+
+.fp-badge--kind-category-product-subscription-used {
+  --badge-bg:     var(--badge-category-sub-used-bg);
+  --badge-border: var(--badge-category-sub-used-border);
+  --badge-text:   var(--badge-category-sub-used-text);
+}

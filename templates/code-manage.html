@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/code-manage.css') }}">{% endblock %}
+{% block body %}
+<div class="dashboard-shell">
+  <aside class="sidebar">
+    <div class="sidebar-head">FREEPASS ERP</div>
+    <nav id="sidebar-menu" class="sidebar-menu"></nav>
+  </aside>
+  <main class="main-shell">
+    <div class="page-header">
+      <div class="page-title">09 코드관리</div>
+      <div class="page-header-actions"><button type="button" class="btn-filter" id="openCodeFilterBtn">필터</button></div>
+    </div>
+    <div class="work-page grid-12 min-h-work">
+      <section class="panel panel--list col-6">
+        <div class="panel-head panel-head-default">
+          <div class="panel-head-title-wrap">
+            <div class="panel-head-title">코드목록</div>
+          </div>
+          <div class="panel-head-actions"><button type="button" class="inline-button" id="code-form-reset">신규</button></div>
+        </div>
+        <div class="panel-body no-pad"><div id="code-item-list" class="summary-list admin-summary-list"></div></div>
+      </section>
+      <div class="panel-slot col-6">
+      <section class="panel panel--form">
+        <div class="panel-head panel-head-default">
+          <div class="panel-head-title-wrap">
+            <div class="panel-head-title">코드 정보</div>
+          </div>
+          <div class="panel-head-actions">
+            <button type="button" id="code-submit-head" class="inline-button">저장</button>
+            <button type="button" id="code-delete-head" class="inline-button btn-danger">삭제</button>
+          </div>
+        </div>
+        <div class="panel-body manage-form-body">
+          <form id="code-form" class="form-grid manage-form-shell">
+            <input id="editing_code_key" type="hidden">
+            <div class="field"><label for="group_code">그룹코드</label><input id="group_code" required></div>
+            <div class="field"><label for="item_code">항목코드</label><input id="item_code" required></div>
+            <div class="field"><label for="item_name">항목명</label><input id="item_name" required></div>
+            <div class="field"><label for="code_note">메모</label><input id="code_note"></div>
+            <div class="field"><label for="sort_order">정렬순서</label><input id="sort_order" type="number" value="0"></div>
+            <div class="field"><label for="is_active">사용여부</label>
+              <select id="is_active"><option value="true">사용</option><option value="false">미사용</option></select>
+            </div>
+            <div class="field full helper-row">입력값 코드는 Firebase input_codes 에 저장되며, 재고관리에서는 PRODUCT_VEHICLE_STATUS / PRODUCT_TYPE / PRODUCT_MAKER / PRODUCT_MODEL_NAME / PRODUCT_SUB_MODEL / PRODUCT_FUEL_TYPE / PRODUCT_VEHICLE_SUB_STATUS / PRODUCT_ACCIDENT_YN / PRODUCT_MAINTENANCE_SERVICE / PRODUCT_CREDIT_GRADE / PRODUCT_REVIEW_STATUS 그룹을 우선 사용합니다.</div>
+          </form>
+          <p id="code-message" class="message"></p>
+        </div>
+      </section>
+
+      <aside class="filter-overlay panel panel--filter" id="codeFilterOverlay" aria-hidden="true">
+        <div class="panel-head panel-head-default">
+          <div class="panel-head-title-wrap"><div class="panel-head-title">필터</div></div>
+          <div class="panel-head-actions"><button type="button" class="inline-button" data-filter-reset>초기화</button><button type="button" class="inline-button btn-tone-hide" data-filter-close>닫기</button></div>
+        </div>
+        <div class="panel-body panel-body--filter">
+          <div class="empty-block">필터 영역</div>
+        </div>
+      </aside>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+{% block page_js %}<script type="module" src="{{ url_for('static', filename='js/pages/code-manage.js') }}"></script>{% endblock %}

@@ -1,0 +1,94 @@
+/* ===== ERP UI TOKENS: component alias layer =====
+ * base.css 의 원본 토큰을 --ui-* 이름으로 제공합니다.
+ * 값을 바꾸려면 base.css 의 원본 토큰만 수정하세요.
+ * ================================================ */
+:root {
+  --ui-font-family:  'Pretendard', Arial, Helvetica, sans-serif;
+
+  --ui-font-main:    var(--font-size-main);
+  --ui-font-sub:     var(--font-size-sub);
+  --ui-font-title:   var(--font-size-title);
+  --ui-font-label:   var(--form-label-size);
+
+  --ui-text-primary:   var(--text-main);
+  --ui-text-secondary: var(--text-subtle);
+  --ui-text-muted:     var(--text-muted);
+
+  --ui-surface-base:   var(--surface-base);
+  --ui-surface-subtle: var(--surface-subtle);
+  --ui-surface-muted:  var(--surface-muted);
+  --ui-surface-hover:  var(--interactive-hover-bg);
+  --ui-surface-active: var(--interactive-selected-bg);
+
+  --ui-border-main:   var(--border-main);
+  --ui-border-soft:   var(--border-soft);
+  --ui-border-strong: var(--border-strong);
+  --ui-radius:        var(--radius-ui);
+
+  --ui-panel-head-height: var(--panel-head-height);
+  --ui-panel-body-pad:    var(--panel-body-pad);
+  --ui-panel-gap:         var(--panel-gap);
+
+  --ui-control-height:       var(--form-control-height);
+  --ui-control-px:           var(--form-control-px);
+  --ui-control-border:       var(--form-control-border);
+  --ui-control-bg:           var(--form-control-bg);
+  --ui-control-focus-border: var(--form-focus-border);
+  --ui-control-focus-shadow: var(--form-focus-shadow);
+
+  --ui-list-row-min-h: var(--list-row-min-h);
+  --ui-list-row-px:    var(--list-row-px);
+  --ui-list-row-border:var(--list-border);
+
+  --ui-btn-height:     var(--btn-height);
+  --ui-btn-panel-h:   var(--btn-panel-height);
+  --ui-btn-font:       var(--btn-font-size);
+  --ui-btn-px:         var(--btn-padding-x);
+
+  /* ── skeleton ── */
+  --skeleton-base: #e2e8f0;
+  --skeleton-shine: #f1f5f9;
+}
+
+/* ─── Skeleton Shimmer ──────────────────────────────────────────────────── */
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  height: 36px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.skeleton-cell {
+  height: 14px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+.skeleton-cell--sm { flex: 0 0 60px; }
+.skeleton-cell--md { flex: 1 1 80px; }
+.skeleton-cell--lg { flex: 2 1 120px; }
+
+.skeleton-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.skeleton-form-field {
+  height: 36px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+}

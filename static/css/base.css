@@ -1,0 +1,143 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+
+:root {
+  /* ═════ FREEPASS ERP — Industrial-Plus Design Tokens ═════ */
+
+  /* ── 간격 (4pt 기반 고밀도) ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ── 곡률: Subtly Rounded (2px) ── */
+  --radius-ui: 2px;
+
+  /* ── 타이포그래피: 12px 고밀도 ── */
+  --font-weight-base: 400;
+  --font-weight-strong: 500;
+  --font-size-main: 12px;
+  --font-size-sub: 10px;
+  --font-size-title: 12px;
+  --font-weight-heavy: 700;
+  --letter-spacing-base: -0.03em;
+
+  /* ── 텍스트 컬러: Slate 계열 ── */
+  --text-main: #1e293b;       /* Slate-800 */
+  --text-subtle: #64748b;     /* Slate-500 */
+  --text-muted: #94a3b8;      /* Slate-400 */
+
+  /* ── 보더 / 표면 ── */
+  --border-main: #cbd5e1;
+  --border-soft: #e2e8f0;
+  --surface-base: #ffffff;
+  --surface-subtle: #f8fafc;
+  --surface-hover: #f1f5f9;
+  --surface-selected: #eff6ff;
+  --surface-sidebar: #f6f7f9;
+  --surface-muted: #f1f5f9;
+  --border-strong: #94a3b8;
+
+  /* ── 인터랙션 ── */
+  --interactive-hover-bg: #f1f5f9;
+  --interactive-hover-border: #cbd5e1;
+  --interactive-active-bg: #e2e8f0;
+  --interactive-active-border: #94a3b8;
+  --interactive-selected-bg: #eff6ff;
+  --interactive-selected-border: #93c5fd;
+  --interactive-shadow-hover: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --interactive-shadow-focus: 0 0 0 2px rgba(59, 130, 246, 0.15);
+
+  /* ── 버튼 (컴팩트) ── */
+  --btn-height: 28px;
+  --btn-padding-x: 10px;
+  --btn-font-size: var(--font-size-main);
+  --btn-border-width: 1px;
+  --btn-panel-height: 24px;
+
+  /* ── 패널 헤더: 슬림 고밀도 ── */
+  --panel-gap: 8px;
+  --panel-head-height: 36px;
+  --panel-head-py: 8px;
+  --panel-head-px: 12px;
+  --panel-body-pad: 12px;
+  --panel-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+  --right-panel-width: 360px;
+  --sidebar-width: 132px;
+
+  /* ── 상세(Detail) ── */
+  --detail-section-py: 12px;
+  --detail-section-gap: 24px;
+  --detail-row-gap: 6px;
+  --detail-item-gap: 16px;
+  --detail-photo-gap: 6px;
+  --detail-thumb-w: 56px;
+  --detail-thumb-h: 42px;
+
+  /* ── 테이블 ── */
+  --table-cell-py: 6px;
+  --table-cell-px: 8px;
+  --table-head-bg: var(--surface-subtle);
+  --table-head-color: var(--text-muted);
+
+  /* ── 리스트 / 데이터 행 ── */
+  --list-row-min-h: 40px;
+  --list-row-px: 12px;
+  --list-line-gap: 0;
+
+  /* ── 폼 ── */
+  --form-label-line-height: 1.35;
+  --form-control-py: 6px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #f5f6f8;
+  color: var(--text-main);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: var(--font-size-main);
+  font-weight: var(--font-weight-base);
+  letter-spacing: var(--letter-spacing-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+
+.empty-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 24px;
+  font-size: var(--font-size-main, 12px);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-muted, #9ca3af);
+  text-align: center;
+}
+
+.empty-block strong {
+  color: var(--text-main);
+  font-weight: var(--font-weight-strong);
+}

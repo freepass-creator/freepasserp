@@ -1,0 +1,148 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   통합 모달 알림 시스템 (토스트 + 컨펌)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 오버레이 ── */
+.fp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.15s ease;
+}
+
+.fp-modal-overlay.is-visible {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 알림(토스트)은 배경 투과 — 다른 요소 클릭 가능 */
+.fp-modal-overlay--no-bg {
+  pointer-events: none;
+}
+.fp-modal-overlay--no-bg .fp-modal-box {
+  pointer-events: auto;
+}
+.fp-modal-overlay--no-bg.is-visible {
+  background: none;
+}
+
+/* ── 카드 박스 (공통) ── */
+.fp-modal-box {
+  width: min(320px, calc(100vw - 40px));
+  padding: 28px 24px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transform: scale(0.92);
+  opacity: 0;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+  pointer-events: auto;
+}
+
+.fp-modal-overlay.is-visible .fp-modal-box {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* ── 아이콘 ── */
+.fp-modal-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.fp-modal-icon--success { color: #16a34a; }
+.fp-modal-icon--error { color: #dc2626; }
+.fp-modal-icon--info { color: #1b2a4a; }
+
+.fp-modal-box[data-tone="success"] .fp-modal-icon-wrap { background: #f0fdf4; }
+.fp-modal-box[data-tone="error"] .fp-modal-icon-wrap { background: #fef2f2; }
+.fp-modal-box[data-tone="info"] .fp-modal-icon-wrap { background: #f0f4f9; }
+.fp-modal-box[data-tone="progress"] .fp-modal-icon-wrap { background: #f0f4f9; }
+
+/* ── 스피너 (progress) ── */
+.fp-modal-spinner {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid #e5e7eb;
+  border-top-color: #1b2a4a;
+  border-radius: 50%;
+  animation: fp-modal-spin 0.7s linear infinite;
+}
+
+@keyframes fp-modal-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── 텍스트 ── */
+.fp-modal-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1f1f1f;
+  text-align: center;
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+/* ── 버튼 (confirm용) ── */
+.fp-modal-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.fp-modal-btn {
+  flex: 1;
+  height: 38px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.fp-modal-btn--cancel {
+  background: #fff;
+  color: #5f6368;
+}
+
+.fp-modal-btn--cancel:hover {
+  background: #f1f3f4;
+}
+
+.fp-modal-btn--ok {
+  background: #1b2a4a;
+  border-color: #1b2a4a;
+  color: #fff;
+}
+
+.fp-modal-btn--ok:hover {
+  background: #142038;
+}
+
+/* ── confirm 박스 ── */
+.fp-modal-box--confirm {
+  padding: 24px;
+  gap: 16px;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 480px) {
+  .fp-modal-box {
+    width: calc(100vw - 32px);
+    padding: 24px 20px;
+  }
+}

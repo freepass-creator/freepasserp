@@ -1,0 +1,37 @@
+/* ===== CHAT PAGE ONLY: list column tuning ===== */
+
+#room-list .room-item.management-summary-row {
+  min-height: var(--list-row-min-h);
+}
+
+#room-list .room-item .management-summary-row__item--strong.room-code {
+  padding-right: 2px;
+}
+
+#room-list .room-item :is(.room-code, .room-vehicle, .room-submodel, .room-last) {
+  min-width: 0;
+}
+
+#room-list .room-item :is(.room-code, .room-vehicle, .room-submodel, .room-last)::before {
+  content: none;
+}
+
+#room-list .room-item .room-vehicle,
+#room-list .room-item .room-submodel,
+#room-list .room-item .room-last {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#room-list .room-item .room-vehicle {
+  padding-left: 0;
+}
+
+#room-list .room-item .room-last {
+  max-width: 260px;
+}
+
+#room-list .room-item .management-summary-row__item--date {
+  font-variant-numeric: tabular-nums;
+}
+
