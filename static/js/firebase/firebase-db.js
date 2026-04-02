@@ -683,11 +683,11 @@ export function watchGeneratedCodes(callback) {
 // ─── 계약 / 정산 ──────────────────────────────────────────────────────────────
 
 function buildContractCode({ dateKey = '', sequence = 1 } = {}) {
-  return `CT${normalizeCompactDate(dateKey)}${String(sequence).padStart(4, '0')}`;
+  return `CT${normalizeCompactDate(dateKey)}${String(sequence).padStart(2, '0')}`;
 }
 
 function buildSettlementCode({ dateKey = '', sequence = 1 } = {}) {
-  return `ST${normalizeCompactDate(dateKey)}${String(sequence).padStart(4, '0')}`;
+  return `ST${normalizeCompactDate(dateKey)}${String(sequence).padStart(2, '0')}`;
 }
 
 function buildContractSnapshots(contract = {}) {
