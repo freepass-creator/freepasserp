@@ -141,34 +141,10 @@ const BADGE_PAGES = [
 function bindAppSettings(profile) {
   const landingSelect = document.getElementById('settings-landing-page');
   const badgeList = document.getElementById('settings-badge-list');
-  const saveBtn = document.getElementById('settings-app-save');
   const msg = document.getElementById('settings-app-message');
   if (!landingSelect) return;
 
-  // 초기 페이지
-  const options = LANDING_OPTIONS.filter(o => o.roles.includes(profile.role));
-  const savedLanding = profile.settings?.landing_page || '';
-  landingSelect.innerHTML = options.map(o =>
-    `<option value="${o.href}"${o.href === savedLanding ? ' selected' : ''}>${o.label}</option>`
-  ).join('');
-
-  // 알림 뱃지 — 페이지별 토글
-  const badgeSettings = profile.settings?.badge || {};
-  const visiblePages = BADGE_PAGES.filter(p => !p.roles || p.roles.includes(profile.role));
-  if (badgeList) {
-    badgeList.innerHTML = visiblePages.map(p => {
-      const enabled = badgeSettings[p.href] !== false;
-      return `<div class="settings-badge-row">
-        <span class="settings-badge-label">${p.label}</span>
-        <label class="toggle-switch">
-          <input type="checkbox" data-badge-href="${p.href}" ${enabled ? 'checked' : ''}>
-          <span class="toggle-switch-track"></span>
-        </label>
-      </div>`;
-    }).join('');
-  }
-
-  saveBtn?.addEventListener('click', async () => {
+  async function saveAppSettings() {
     try {
       const badge = {};
       badgeList?.querySelectorAll('input[data-badge-href]').forEach(input => {
@@ -187,7 +163,32 @@ function bindAppSettings(profile) {
     } catch (err) {
       if (msg) msg.textContent = `저장 실패: ${err.message}`;
     }
-  });
+  }
+
+  // 초기 페이지
+  const options = LANDING_OPTIONS.filter(o => o.roles.includes(profile.role));
+  const savedLanding = profile.settings?.landing_page || '';
+  landingSelect.innerHTML = options.map(o =>
+    `<option value="${o.href}"${o.href === savedLanding ? ' selected' : ''}>${o.label}</option>`
+  ).join('');
+  landingSelect.addEventListener('change', saveAppSettings);
+
+  // 알림 뱃지 — 페이지별 토글
+  const badgeSettings = profile.settings?.badge || {};
+  const visiblePages = BADGE_PAGES.filter(p => !p.roles || p.roles.includes(profile.role));
+  if (badgeList) {
+    badgeList.innerHTML = visiblePages.map(p => {
+      const enabled = badgeSettings[p.href] !== false;
+      return `<div class="settings-badge-row">
+        <span class="settings-badge-label">${p.label}</span>
+        <label class="toggle-switch">
+          <input type="checkbox" data-badge-href="${p.href}" ${enabled ? 'checked' : ''}>
+          <span class="toggle-switch-track"></span>
+        </label>
+      </div>`;
+    }).join('');
+    badgeList.addEventListener('change', saveAppSettings);
+  }
 }
 
 function applyBadgeVisibility(badgeMap = {}) {

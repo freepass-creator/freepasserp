@@ -87,7 +87,7 @@
   transition: transform 0.15s;
 }
 .toggle-switch input:checked + .toggle-switch-track {
-  background: #3b82f6;
+  background: #1b2a4a;
 }
 .toggle-switch input:checked + .toggle-switch-track::after {
   transform: translateX(14px);
