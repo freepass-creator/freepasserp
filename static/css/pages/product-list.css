@@ -13,14 +13,12 @@
 }
 
 .pls-grid-head {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 52px;
-  padding: 0 16px;
-  z-index: 50;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  height: 34px;
+  padding: 0 8px;
+  flex-shrink: 0;
 }
 
 
