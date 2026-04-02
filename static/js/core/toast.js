@@ -47,9 +47,17 @@ const ICONS = {
 
 // ─── showToast (알림 모달) ──────────────────────────────────────────────────
 
+function sanitizeErrorText(text) {
+  // 한글 접두사(저장 실패: 등)는 유지하고, 뒤에 붙는 Firebase/영문 코드 제거
+  const prefix = text.match(/^[가-힣\s·,.:!?]+/)?.[0]?.trim() || '';
+  if (prefix) return prefix;
+  return '처리 중 오류가 발생했습니다.';
+}
+
 export function showToast(text, tone = 'info', options = {}) {
-  const normalizedText = String(text || '').trim();
+  let normalizedText = String(text || '').trim();
   if (!normalizedText) return { dismiss() {}, update() {} };
+  if (tone === 'error') normalizedText = sanitizeErrorText(normalizedText);
 
   const validTone = ['success', 'error', 'info', 'progress'].includes(tone) ? tone : 'info';
   const duration = options.duration !== undefined ? Number(options.duration) : (DURATIONS[validTone] || 1500);

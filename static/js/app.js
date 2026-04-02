@@ -404,7 +404,10 @@ if (_landingTarget) {
 
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
-  const message = error?.message || String(error || '알 수 없는 오류');
-  if (message.includes('auth/') || message.includes('로그인')) return;
-  showToast(message, 'error');
+  const raw = error?.message || String(error || '');
+  // 인증/로그인/Firebase 내부 코드는 무시
+  if (!raw || raw.includes('auth/') || raw.includes('로그인')) return;
+  // 사용자에게 보여줄 메시지: 한글만 추출, 없으면 기본 메시지
+  const korean = raw.match(/[가-힣\s·,.:!?]+/g)?.join('').trim();
+  showToast(korean || '처리 중 오류가 발생했습니다.', 'error');
 });
