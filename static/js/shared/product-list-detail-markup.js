@@ -229,15 +229,10 @@ function formatRentalGuideText(policy) {
 
 function renderPriceSummarySection(policy) {
   const guideText = formatRentalGuideText(policy);
-  const clawbackText = safeText(policy.commissionClawbackCondition);
   const notes = [];
   if (guideText !== '-') {
     notes.push(`<div class="plist-detail__price-note">* ${escapeHtml(guideText)}</div>`);
   }
-  // 수수료환수조건: 준비중 — 추후 오픈 시 복원
-  // if (clawbackText !== '-') {
-  //   notes.push(`<div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div>`);
-  // }
   if (!notes.length) return '';
   return `<div class="plist-detail__price-summary">${notes.join('')}</div>`;
 }
@@ -253,7 +248,6 @@ function renderPriceSection(product, termFields = {}) {
         <td>${month}개월</td>
         <td class="price-cell"><span class="price-full">${escapeHtml(formatMoney(item.rent, { zeroAsDash: false }))}</span><span class="price-short">${escapeHtml(formatMoneyShort(item.rent))}</span></td>
         <td class="price-cell"><span class="price-full">${escapeHtml(formatMoney(item.deposit))}</span><span class="price-short">${escapeHtml(formatMoneyShort(item.deposit))}</span></td>
-        <td class="price-cell price-cell--disabled">준비중</td>
       </tr>
     `;
     }).join('');
@@ -265,7 +259,7 @@ function renderPriceSection(product, termFields = {}) {
     <div class="plist-detail__table-wrap">
       <table class="price-table plist-detail__table">
         <thead>
-          <tr><th>기간</th><th>대여료</th><th>보증금</th><th>수수료</th></tr>
+          <tr><th>기간</th><th>대여료</th><th>보증금</th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
@@ -412,6 +406,31 @@ function renderInsuranceSection(product, termFields = {}) {
   `, { card: false });
 }
 
+function renderFeeSection(product, termFields = {}) {
+  const periods = ['1', '6', '12', '24', '36', '48', '60'];
+  const rows = periods
+    .filter((month) => Number(product.price?.[month]?.rent || 0) > 0)
+    .map((month) => `<tr><td>${month}개월</td><td class="price-cell price-cell--disabled">준비중</td></tr>`)
+    .join('');
+  if (!rows) return '';
+
+  const policy = buildPolicyValues(product, termFields);
+  const clawbackText = safeText(policy.commissionClawbackCondition);
+  const clawbackNote = clawbackText !== '-'
+    ? `<div class="plist-detail__price-summary"><div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div></div>`
+    : '';
+
+  return renderSection('기간별 수수료', `
+    <div class="plist-detail__table-wrap">
+      <table class="price-table plist-detail__table">
+        <thead><tr><th>기간</th><th>수수료</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${clawbackNote}
+  `, { card: false });
+}
+
 export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termFields = {} } = {}) {
   if (!product) return '<div class="detail-empty">좌측 목록에서 차량을 선택하세요.</div>';
   return `
@@ -422,6 +441,7 @@ export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termF
       ${renderInsuranceSection(product, termFields)}
       ${renderRentalSection(product, termFields)}
       ${renderVehicleInfoSection(product)}
+      ${renderFeeSection(product, termFields)}
     </div>
   `;
 }

@@ -774,7 +774,7 @@ function renderPhotoSection(product){
   const linkRow = `<div class="detail-grid">${detailLink('사진링크', product.photoLink)}</div>`;
   return detailSection(`${photoMain}${thumbs}${linkRow}`, 'detail-section--photos');
 }
-function renderPriceTable(product){ const months=['1','6','12','24','36','48','60']; return `<table class="price-table"><thead><tr><th>기간</th><th>대여료</th><th>보증금</th><th>수수료</th></tr></thead><tbody>${months.map(m=>`<tr><td>${m}개월</td><td>${Number(product.price[m]?.rent||0).toLocaleString('ko-KR')}</td><td>${Number(product.price[m]?.deposit||0).toLocaleString('ko-KR')}</td><td class="price-cell--disabled">준비중</td></tr>`).join('')}</tbody></table>`; }
+function renderPriceTable(product){ const months=['1','6','12','24','36','48','60']; return `<table class="price-table"><thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead><tbody>${months.map(m=>`<tr><td>${m}개월</td><td>${Number(product.price[m]?.rent||0).toLocaleString('ko-KR')}</td><td>${Number(product.price[m]?.deposit||0).toLocaleString('ko-KR')}</td></tr>`).join('')}</tbody></table>`; }
 function renderInsuranceTable(product){
   const merged = getMergedPolicy(product);
   const rows = [
