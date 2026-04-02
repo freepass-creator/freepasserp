@@ -139,7 +139,8 @@
 .product-list-page-shell .detail-card { min-width: 0; }
 .product-list-page-shell .detail-empty { display: flex; align-items: center; justify-content: center; min-height: 0; flex: 1 1 0; height: 100%; border: none; background: transparent; font-size: var(--font-size-main, 12px); color: var(--text-muted, #9ca3af); }
 
-.product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 8px; padding-bottom: var(--panel-body-pad, 16px); }
+.product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 8px; }
+.product-list-page-shell .plist-detail::after { content: ''; display: block; height: var(--panel-body-pad, 16px); flex-shrink: 0; }
 .product-list-page-shell .plist-detail__summary-top { display: flex; flex-direction: column; gap: 4px; }
 .product-list-page-shell .plist-detail__summary-line { min-width: 0; font-size: 12px; line-height: 1.5; color: var(--text-main); word-break: break-word; }
 .product-list-page-shell .plist-detail__summary-line--top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
