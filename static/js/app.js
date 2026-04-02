@@ -375,7 +375,19 @@ initKeyboardListNavigation();
 initShellNavigation();
 initSidebarCollapse();
 registerInitialPage();
-if (window.location.pathname !== '/') history.replaceState(null, '', '/');
+// SPA: URL을 /로 정리하되, 사이드바 메뉴는 실제 페이지 기준으로 활성화
+const _initialPath = window.location.pathname;
+if (_initialPath !== '/') history.replaceState(null, '', '/');
+// 메뉴 활성화: renderRoleMenu가 아직 실행 전이므로 DOM 로드 후 재적용
+requestAnimationFrame(() => {
+  const sidebar = document.querySelector('.sidebar') || document.getElementById('sidebar-menu');
+  if (sidebar && _initialPath !== '/') {
+    sidebar.querySelectorAll('.sidebar-link').forEach(link => {
+      const href = link.getAttribute('href') || '';
+      link.classList.toggle('active', _initialPath === href || _initialPath.startsWith(href + '/'));
+    });
+  }
+});
 
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
