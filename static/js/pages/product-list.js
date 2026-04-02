@@ -1150,8 +1150,9 @@ const PERIOD_SELECTOR_HTML = `<div class="period-selector" id="periodSelector">
 </div>`;
 
 export function onShow() {
+  console.log('[product-list] onShow called');
   const actions = document.querySelector('.top-bar-actions');
-  if (actions && !document.getElementById('periodSelector')) {
+  if (actions) {
     actions.innerHTML = PERIOD_SELECTOR_HTML;
   }
   bindPeriodSelector();
