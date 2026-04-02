@@ -842,7 +842,7 @@ function currentProduct(){
 
 function buildShareUrl(product){
   const url = new URL(window.location.origin + '/catalog');
-  url.searchParams.set('id', product.id);
+  url.searchParams.set('id', product.productUid || product.id);
   return url.toString();
 }
 
