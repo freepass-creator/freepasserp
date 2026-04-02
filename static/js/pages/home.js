@@ -429,7 +429,8 @@ function renderDashboard() {
 
 function renderNotices(items = []) {
   const notices = [...items].sort((a, b) => Number(b.created_at || 0) - Number(a.created_at || 0));
-  noticeMeta.textContent = `${notices.length}건`;
+  if (noticeMeta) noticeMeta.textContent = `${notices.length}건`;
+  if (!noticeList) return;
   if (!notices.length) { noticeList.innerHTML = '<div class="home-notice-empty">등록된 공지가 없습니다.</div>'; return; }
   noticeList.replaceChildren(...notices.map(notice => {
     const wrap = document.createElement('article');

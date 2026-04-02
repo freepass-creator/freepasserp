@@ -456,7 +456,9 @@ function bindNoticeEvents() {
         if (image_url !== undefined) updates.image_url = image_url;
         else if (noticeImgCleared) updates.image_url = null;
         const existing = noticeItems.find(n => n.id === selectedNoticeId) || {};
-        await set(ref(db, `home_notices/${selectedNoticeId}`), { ...existing, ...updates, id: undefined });
+        const payload = { ...existing, ...updates };
+        delete payload.id;
+        await set(ref(db, `home_notices/${selectedNoticeId}`), payload);
         selectNotice({ ...existing, ...updates, id: selectedNoticeId });
       } else {
         const data = {
