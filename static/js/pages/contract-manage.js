@@ -385,7 +385,7 @@ function renderList() {
     selectedKey: contractCodeHidden.value,
     getKey: (item) => item.contract_code,
     onSelect: async (item) => {
-      if ((mode === 'edit' || mode === 'create') && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
+      if (mode === 'edit' && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
       fillForm(item);
     },
     getCellValue: (col, c) => {

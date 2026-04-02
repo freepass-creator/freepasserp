@@ -513,7 +513,7 @@ function renderList(products) {
     selectedKey: editingCodeInput?.value || '',
     getKey: (item) => item?.product_uid || item?.product_code || '',
     onSelect: async (product) => {
-      if ((mode === 'edit' || mode === 'create') && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
+      if (mode === 'edit' && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
       if (product) fillProductForm(product, { ...adapterContext, currentProfile });
     },
     getCellValue: (col, p) => {
