@@ -237,7 +237,7 @@ function registerInitialPage() {
   pageCache.set(pathname, {
     container,
     styles: collectStyleHrefs(document),
-    doc: null,
+    doc: document,
     title: document.title,
     bodyPage: document.body.dataset.page || '',
     module: null,
