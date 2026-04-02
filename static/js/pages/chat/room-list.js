@@ -62,8 +62,8 @@ export function isReplyPending(room, myRole) {
 }
 
 const ROOM_COLS = [
-  { key: 'status',   label: '대화상태',     align: 'c', filterable: true, w: 64 },
-  { key: 'reply',    label: '처리상태',     align: 'c', filterable: true, w: 72 },
+  { key: 'status',   label: '대화상태',     align: 'c', filterable: true, w: 80 },
+  { key: 'reply',    label: '처리상태',     align: 'c', filterable: true, w: 80 },
   { key: 'carNo',    label: '차량번호',     align: 'c', searchable: true },
   { key: 'model',    label: '세부모델',     searchable: true },
   { key: 'partner',  label: '공급사코드',   align: 'c', filterable: true },
