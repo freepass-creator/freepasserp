@@ -16,8 +16,7 @@
     },
 
     "partners": {
-      // 인증된 사용자는 읽기 가능
-      ".read": "auth != null",
+      ".read": true,
       "$partner_code": {
         // 생성 및 수정은 admin만 가능
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
