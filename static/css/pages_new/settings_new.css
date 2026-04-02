@@ -259,6 +259,29 @@
   margin: 0;
 }
 
+.settings-period-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.settings-period-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--border-soft, #e1e5ea);
+  border-radius: var(--radius-ui, 6px);
+  background: var(--surface-base, #fff);
+  font-size: 11px;
+  color: var(--text-subtle);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.settings-period-chip input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.settings-period-chip.is-checked {
+  background: rgba(27, 42, 74, 0.1);
+  border-color: rgba(27, 42, 74, 0.2);
+  color: #1b2a4a;
+  font-weight: 600;
+}
+
 .settings-badge-list { display: flex; flex-direction: column; }
 .settings-badge-row {
   display: flex;

@@ -188,17 +188,17 @@ function bindAppSettings(profile) {
   // 상품목록 기간
   const savedPeriods = currentProfile.settings?.periods || null;
   if (periodList) {
-    periodList.innerHTML = ALL_PERIODS.map(p => {
+    periodList.innerHTML = `<div class="settings-period-chips">${ALL_PERIODS.map(p => {
       const checked = !savedPeriods || savedPeriods.includes(p);
-      return `<div class="settings-badge-row">
-        <span class="settings-badge-label">${p}개월</span>
-        <label class="toggle-switch">
-          <input type="checkbox" data-period="${p}" ${checked ? 'checked' : ''}>
-          <span class="toggle-switch-track"></span>
-        </label>
-      </div>`;
-    }).join('');
-    periodList.addEventListener('change', saveAppSettings);
+      return `<label class="settings-period-chip${checked ? ' is-checked' : ''}">
+        <input type="checkbox" data-period="${p}" ${checked ? 'checked' : ''}>
+        ${p}개월
+      </label>`;
+    }).join('')}</div>`;
+    periodList.addEventListener('change', (e) => {
+      e.target.closest('.settings-period-chip')?.classList.toggle('is-checked', e.target.checked);
+      saveAppSettings();
+    });
   }
 
   // 알림 뱃지 — 페이지별 토글
