@@ -130,9 +130,17 @@ function bindCommonEvents() {
   });
 }
 
+const BADGE_PAGES = [
+  { href: '/chat',       label: '실시간 문의·응대' },
+  { href: '/contract',   label: '계약 관리' },
+  { href: '/settlement', label: '정산 · 수수료' },
+  { href: '/member',     label: '사용자 관리',     roles: ['admin'] },
+  { href: '/partner',    label: '파트너사 관리',   roles: ['admin'] },
+];
+
 function bindAppSettings(profile) {
   const landingSelect = document.getElementById('settings-landing-page');
-  const badgeSelect = document.getElementById('settings-badge-enabled');
+  const badgeList = document.getElementById('settings-badge-list');
   const saveBtn = document.getElementById('settings-app-save');
   const msg = document.getElementById('settings-app-message');
   if (!landingSelect) return;
@@ -144,21 +152,36 @@ function bindAppSettings(profile) {
     `<option value="${o.href}"${o.href === savedLanding ? ' selected' : ''}>${o.label}</option>`
   ).join('');
 
-  // 알림 뱃지
-  const savedBadge = profile.settings?.badge_enabled !== false;
-  if (badgeSelect) badgeSelect.value = savedBadge ? 'true' : 'false';
+  // 알림 뱃지 — 페이지별 토글
+  const badgeSettings = profile.settings?.badge || {};
+  const visiblePages = BADGE_PAGES.filter(p => !p.roles || p.roles.includes(profile.role));
+  if (badgeList) {
+    badgeList.innerHTML = visiblePages.map(p => {
+      const enabled = badgeSettings[p.href] !== false;
+      return `<div class="settings-badge-row">
+        <span class="settings-badge-label">${p.label}</span>
+        <label class="toggle-switch">
+          <input type="checkbox" data-badge-href="${p.href}" ${enabled ? 'checked' : ''}>
+          <span class="toggle-switch-track"></span>
+        </label>
+      </div>`;
+    }).join('');
+  }
 
   saveBtn?.addEventListener('click', async () => {
     try {
+      const badge = {};
+      badgeList?.querySelectorAll('input[data-badge-href]').forEach(input => {
+        badge[input.dataset.badgeHref] = input.checked;
+      });
       const newSettings = {
         ...(currentProfile.settings || {}),
         landing_page: landingSelect.value,
-        badge_enabled: badgeSelect ? badgeSelect.value === 'true' : true,
+        badge,
       };
       await updateUserProfile(currentProfile.uid, { settings: newSettings });
       currentProfile.settings = newSettings;
-      // 뱃지 즉시 반영
-      applyBadgeVisibility(newSettings.badge_enabled);
+      applyBadgeVisibility(badge);
       if (msg) msg.textContent = '저장 완료';
       setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
     } catch (err) {
@@ -167,13 +190,15 @@ function bindAppSettings(profile) {
   });
 }
 
-function applyBadgeVisibility(enabled) {
-  document.querySelectorAll('.sidebar-nav-badge').forEach(badge => {
-    badge.style.display = enabled ? '' : 'none';
+function applyBadgeVisibility(badgeMap = {}) {
+  Object.entries(badgeMap).forEach(([href, enabled]) => {
+    const links = document.querySelectorAll(`.sidebar-link[href="${href}"]`);
+    links.forEach(link => {
+      const badge = link.querySelector('.sidebar-nav-badge');
+      if (badge) badge.style.display = enabled ? '' : 'none';
+      if (!enabled) link.classList.remove('has-new-event');
+    });
   });
-  if (!enabled) {
-    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('has-new-event'));
-  }
 }
 
 async function bootstrap() {

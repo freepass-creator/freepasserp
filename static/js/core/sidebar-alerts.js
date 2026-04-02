@@ -34,20 +34,18 @@ function setBadge(href, count) {
   });
 }
 
-function isBadgeEnabled() {
-  return profile?.settings?.badge_enabled !== false;
+function isBadgeEnabled(href) {
+  const badgeMap = profile?.settings?.badge;
+  if (!badgeMap) return true;
+  return badgeMap[href] !== false;
 }
 
 function syncAllBadges() {
-  if (!isBadgeEnabled()) {
-    ['/chat', '/member', '/partner', '/contract', '/settlement'].forEach(href => setBadge(href, 0));
-    return;
-  }
-  setBadge('/chat', counts.chat);
-  setBadge('/member', counts.member);
-  setBadge('/partner', counts.partner);
-  setBadge('/contract', counts.contract);
-  setBadge('/settlement', counts.settlement);
+  setBadge('/chat', isBadgeEnabled('/chat') ? counts.chat : 0);
+  setBadge('/member', isBadgeEnabled('/member') ? counts.member : 0);
+  setBadge('/partner', isBadgeEnabled('/partner') ? counts.partner : 0);
+  setBadge('/contract', isBadgeEnabled('/contract') ? counts.contract : 0);
+  setBadge('/settlement', isBadgeEnabled('/settlement') ? counts.settlement : 0);
 }
 
 // ─── 카운트 로직 ─────────────────────────────────────────────────────────────
