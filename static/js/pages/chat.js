@@ -327,7 +327,17 @@ async function bootstrap() {
       roomList.innerHTML = '';
 
       if (!visibleRooms.length) {
-        roomList.innerHTML = '<tr><td class="list-empty" colspan="99">등록된 대화가 없습니다.</td></tr>';
+        renderChatRoomList({
+          thead: document.getElementById('room-list-head'),
+          container: roomList,
+          rooms: [],
+          selectedRoomId: '',
+          productsMap,
+          getRoomProductLookupKeys,
+          onSelect: () => {},
+          myRole: currentProfile?.role || '',
+          myUid: currentUser?.uid || '',
+        });
         roomSelectionController.clearRoomSelection('등록된 대화가 없습니다.', '등록된 대화가 없습니다.');
         return;
       }
