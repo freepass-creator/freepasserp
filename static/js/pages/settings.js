@@ -131,29 +131,49 @@ function bindCommonEvents() {
 }
 
 function bindAppSettings(profile) {
-  const select = document.getElementById('settings-landing-page');
+  const landingSelect = document.getElementById('settings-landing-page');
+  const badgeSelect = document.getElementById('settings-badge-enabled');
   const saveBtn = document.getElementById('settings-app-save');
   const msg = document.getElementById('settings-app-message');
-  if (!select) return;
+  if (!landingSelect) return;
 
+  // 초기 페이지
   const options = LANDING_OPTIONS.filter(o => o.roles.includes(profile.role));
-  const saved = profile.settings?.landing_page || '';
-  select.innerHTML = options.map(o =>
-    `<option value="${o.href}"${o.href === saved ? ' selected' : ''}>${o.label}</option>`
+  const savedLanding = profile.settings?.landing_page || '';
+  landingSelect.innerHTML = options.map(o =>
+    `<option value="${o.href}"${o.href === savedLanding ? ' selected' : ''}>${o.label}</option>`
   ).join('');
 
+  // 알림 뱃지
+  const savedBadge = profile.settings?.badge_enabled !== false;
+  if (badgeSelect) badgeSelect.value = savedBadge ? 'true' : 'false';
+
   saveBtn?.addEventListener('click', async () => {
-    const landing = select.value;
     try {
-      const newSettings = { ...(currentProfile.settings || {}), landing_page: landing };
+      const newSettings = {
+        ...(currentProfile.settings || {}),
+        landing_page: landingSelect.value,
+        badge_enabled: badgeSelect ? badgeSelect.value === 'true' : true,
+      };
       await updateUserProfile(currentProfile.uid, { settings: newSettings });
       currentProfile.settings = newSettings;
+      // 뱃지 즉시 반영
+      applyBadgeVisibility(newSettings.badge_enabled);
       if (msg) msg.textContent = '저장 완료';
       setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
     } catch (err) {
       if (msg) msg.textContent = `저장 실패: ${err.message}`;
     }
   });
+}
+
+function applyBadgeVisibility(enabled) {
+  document.querySelectorAll('.sidebar-nav-badge').forEach(badge => {
+    badge.style.display = enabled ? '' : 'none';
+  });
+  if (!enabled) {
+    document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('has-new-event'));
+  }
 }
 
 async function bootstrap() {

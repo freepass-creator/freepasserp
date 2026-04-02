@@ -34,7 +34,15 @@ function setBadge(href, count) {
   });
 }
 
+function isBadgeEnabled() {
+  return profile?.settings?.badge_enabled !== false;
+}
+
 function syncAllBadges() {
+  if (!isBadgeEnabled()) {
+    ['/chat', '/member', '/partner', '/contract', '/settlement'].forEach(href => setBadge(href, 0));
+    return;
+  }
   setBadge('/chat', counts.chat);
   setBadge('/member', counts.member);
   setBadge('/partner', counts.partner);
