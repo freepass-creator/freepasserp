@@ -10,7 +10,7 @@ import { ensureRoom, watchProducts, resolveTermForProduct } from "../firebase/fi
 import { bindProductDetailPhotoEvents, extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
 import { renderBadgeRow } from "../shared/badge.js";
 
-const DEFAULT_PERIODS = ["48"];
+const DEFAULT_PERIODS = ["1", "12", "24", "36", "48", "60"];
 const RANGE_BUCKETS = {
   rent: [
     { value: "under50", label: "50만원 이하", match: v => v > 0 && v < 500000 },
@@ -1137,9 +1137,6 @@ export function unmount() {
   runPageCleanup();
   _mounted = false;
 }
-export function onShow() {
-  bindPeriodSelector();
-  syncPeriodChips();
-}
+export function onShow() {}
 // Auto-mount on first script load (server-rendered page)
 if (!import.meta.url.includes('?')) mount();

@@ -8,16 +8,8 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   min-width: 0;
-}
-
-.pls-grid-head {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 32px;
-  padding: 0 4px;
 }
 
 
