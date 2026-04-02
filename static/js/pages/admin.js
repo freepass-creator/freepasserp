@@ -432,13 +432,15 @@ function bindNoticeEvents() {
   registerPageCleanup(() => editSaveBtn?.removeEventListener('click', onEditSave));
 
   // 저장 (신규/수정)
+  let noticeSaving = false;
   const onNoticeSubmit = async (e) => {
     e.preventDefault();
+    if (noticeSaving) return;
+    noticeSaving = true;
     const title = document.getElementById('admin_notice_title')?.value.trim();
     const body  = document.getElementById('admin_notice_body')?.value.trim();
-    if (!title || !body) { if (noticeMsg) noticeMsg.textContent = '제목과 내용을 모두 입력하세요.'; return; }
+    if (!title || !body) { noticeSaving = false; if (noticeMsg) noticeMsg.textContent = '제목과 내용을 모두 입력하세요.'; return; }
     if (noticeMsg) noticeMsg.textContent = '';
-    // 비동기 저장 중 중복 클릭 방지
     if (editSaveBtn) editSaveBtn.disabled = true;
     try {
       let image_url;
@@ -471,8 +473,9 @@ function bindNoticeEvents() {
     } catch (err) {
       if (noticeMsg) noticeMsg.textContent = err.message;
       showToast(`저장 실패: ${err.message}`, 'error');
-      // 실패 시 버튼 재활성화 (성공 시엔 setNoticeMode가 처리)
       if (editSaveBtn) editSaveBtn.disabled = false;
+    } finally {
+      noticeSaving = false;
     }
   };
   noticeForm?.addEventListener('submit', onNoticeSubmit);
