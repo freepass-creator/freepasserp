@@ -58,6 +58,14 @@
   color: var(--text-muted, #94a3b8);
 }
 
+.settings-save-msg {
+  font-size: 10px;
+  color: var(--text-subtle, #64748b);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.settings-save-msg.is-show { opacity: 1; }
+
 /* 토글 스위치 */
 .toggle-switch {
   position: relative;

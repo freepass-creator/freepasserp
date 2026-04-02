@@ -164,10 +164,9 @@ function bindAppSettings(profile) {
       const badgeByHref = {};
       Object.entries(badge).forEach(([k, v]) => { badgeByHref[keyToHref(k)] = v; });
       applyBadgeVisibility(badgeByHref);
-      if (msg) msg.textContent = '저장 완료';
-      setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
+      if (msg) { msg.textContent = '저장 완료'; msg.classList.add('is-show'); setTimeout(() => msg.classList.remove('is-show'), 1500); }
     } catch (err) {
-      if (msg) msg.textContent = `저장 실패: ${err.message}`;
+      if (msg) { msg.textContent = `저장 실패: ${err.message}`; msg.classList.add('is-show'); setTimeout(() => msg.classList.remove('is-show'), 3000); }
     }
   }
 
