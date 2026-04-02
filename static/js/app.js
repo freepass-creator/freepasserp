@@ -117,28 +117,8 @@ function ensureStyles(hrefs) {
 
 // ─── 상단바 ─────────────────────────────────────────────────────────────────
 
-function syncTopBar(nextDoc) {
-  const curPageName = document.querySelector('.top-bar-page-name');
-  const nextPageName = nextDoc?.querySelector('.top-bar-page-name');
-  if (curPageName && nextPageName) curPageName.textContent = nextPageName.textContent;
-
-  // top-bar-actions: 항상 비우고, onShow에서 각 페이지가 필요하면 다시 채움
-  const curActions = document.querySelector('.top-bar-actions');
-  if (curActions) {
-    const nextActions = nextDoc?.querySelector('.top-bar-actions');
-    if (nextActions && nextActions.childNodes.length) {
-      curActions.replaceChildren(...Array.from(nextActions.childNodes).map((n) => n.cloneNode(true)));
-    } else {
-      curActions.replaceChildren();
-    }
-  }
-
-  const sep = document.getElementById('topBarStateSep');
-  const identEl = document.getElementById('topBarIdentity');
-  const badge = document.getElementById('topBarWorkBadge');
-  if (sep) sep.hidden = true;
-  if (identEl) { identEl.textContent = ''; identEl.hidden = true; }
-  if (badge) badge.textContent = '';
+function syncTopBar() {
+  // 탑바 제거됨 — 빈 함수 유지 (호출부 호환)
 }
 
 // ─── 페이지 전환 ────────────────────────────────────────────────────────────

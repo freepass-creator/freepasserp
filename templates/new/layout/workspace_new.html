@@ -19,21 +19,7 @@
     </div>
     <nav id="sidebar-menu" class="sidebar-menu"></nav>
   </aside>
-  <div class="main-area">
-    <div class="top-bar">
-      <div class="top-bar-user">
-        <span class="top-bar-user-item" id="topBarOrg">-</span>
-        <span class="top-bar-user-item" id="topBarName">-</span>
-        <span class="top-bar-user-item" id="topBarRank">-</span>
-      </div>
-      <div class="top-bar-state">
-        <span class="top-bar-page-name">{% block page_title_text %}페이지{% endblock %}</span>
-        <span class="top-bar-state-sep" id="topBarStateSep" hidden>|</span>
-        <span class="top-bar-identity" id="topBarIdentity" hidden></span>
-        <span class="top-bar-work-badge" id="topBarWorkBadge"></span>
-      </div>
-      <div class="top-bar-actions">{% block top_bar_actions %}{% endblock %}</div>
-    </div>
+  <div class="main-area main-area--no-topbar">
     <main class="main-shell main-shell--new">
       {% block workspace_body %}{% endblock %}
       {% block workspace_overlays %}{% endblock %}
@@ -42,7 +28,6 @@
 </div>
 {% endblock %}
 {% block page_js %}
-<script type="module" src="{{ url_for('static', filename='js/core/top-bar.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/core/sidebar-alerts.js') }}?v=2"></script>
 {% block workspace_page_js %}{% endblock %}
 {% endblock %}

@@ -12,6 +12,15 @@
   min-width: 0;
 }
 
+.pls-grid-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
 
 /* ─── 기간선택 슬라이드 ──────────────────────────────────────────────────── */
 
