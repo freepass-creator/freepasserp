@@ -593,6 +593,10 @@ export async function sendMessage(roomId, payload) {
   if (senderRole === 'agent' || senderRole === 'provider') {
     updatePayload.last_effective_sender_role = senderRole;
     updatePayload.last_effective_sender_code = payload.sender_code || '';
+  } else if (senderRole === 'admin') {
+    // 관리자 = 공급사 시점: 관리자가 답하면 공급사가 회신한 것과 동일하게 처리
+    updatePayload.last_effective_sender_role = 'provider';
+    updatePayload.last_effective_sender_code = payload.sender_code || '';
   }
   await update(roomRef, updatePayload);
 }
