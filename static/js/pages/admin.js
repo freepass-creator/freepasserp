@@ -564,6 +564,6 @@ async function bootstrap() {
   }
 }
 
-export async function mount() { bindDOM(); await bootstrap(); }
+export async function mount() { runPageCleanup(); bindDOM(); await bootstrap(); }
 export function unmount() { runPageCleanup(); }
 if (!import.meta.url.includes('?')) mount();
