@@ -178,9 +178,7 @@
 .product-list-page-shell .plist-detail__chip { display: inline-flex; align-items: center; min-height: 20px; padding: 0 6px; border: 1px solid var(--border-soft); background: var(--surface-subtle); font-size: 12px; line-height: 1.4; color: var(--text-main); border-radius: var(--radius-ui); }
 .product-list-page-shell .plist-detail__table-wrap { border: 1px solid var(--border-soft); overflow: hidden; border-radius: var(--radius-ui); container-type: inline-size; }
 .product-list-page-shell .plist-detail__table th,
-.product-list-page-shell .plist-detail__table td,
-.product-list-page-shell .plist-detail__table th:first-child,
-.product-list-page-shell .plist-detail__table td:first-child { font-size: 12px; line-height: 1.5; text-align: center; }
+.product-list-page-shell .plist-detail__table td { font-size: 12px; line-height: 1.5; text-align: center !important; }
 
 @container (max-width: 300px) {
   .product-list-page-shell .plist-detail__table .price-cell .price-short { display: inline; }
@@ -211,7 +209,7 @@
 .product-list-page-shell .plist-detail__price-summary { margin-top: 2px; padding: 6px 8px; border: 1px solid var(--border-soft); background: var(--surface-subtle); border-radius: var(--radius-ui); }
 .product-list-page-shell .plist-detail__price-note { font-size: 12px; line-height: 1.6; color: var(--text-main); word-break: keep-all; }
 .product-list-page-shell .plist-detail__table--insurance-summary td,
-.product-list-page-shell .plist-detail__table--insurance-summary th { text-align: center; vertical-align: top; }
+.product-list-page-shell .plist-detail__table--insurance-summary th { text-align: center !important; vertical-align: top; }
 
 .product-list-page-shell .plist-detail__photo-layout { display: flex; flex-direction: column; gap: 6px; }
 .product-list-page-shell .plist-detail__photo-main { display: block; width: 100%; padding: 0; border: 1px solid var(--border-soft); background: var(--surface-subtle); cursor: pointer; overflow: hidden; border-radius: var(--radius-ui); }
