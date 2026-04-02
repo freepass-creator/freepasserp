@@ -416,9 +416,11 @@ function renderFeeSection(product, termFields = {}) {
 
   const policy = buildPolicyValues(product, termFields);
   const clawbackText = safeText(policy.commissionClawbackCondition);
-  const clawbackNote = clawbackText !== '-'
-    ? `<div class="plist-detail__price-summary"><div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div></div>`
-    : '';
+  const insuranceText = safeText(policy.insuranceIncluded);
+  const notes = [];
+  if (clawbackText !== '-') notes.push(`<div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div>`);
+  if (insuranceText !== '-') notes.push(`<div class="plist-detail__price-note">* 보험료: ${escapeHtml(insuranceText)}</div>`);
+  const notesHtml = notes.length ? `<div class="plist-detail__price-summary">${notes.join('')}</div>` : '';
 
   return renderSection('기간별 수수료', `
     <div class="plist-detail__table-wrap">
@@ -427,7 +429,7 @@ function renderFeeSection(product, termFields = {}) {
         <tbody>${rows}</tbody>
       </table>
     </div>
-    ${clawbackNote}
+    ${notesHtml}
   `, { card: false });
 }
 
