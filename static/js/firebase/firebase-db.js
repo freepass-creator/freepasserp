@@ -352,6 +352,8 @@ export async function resolveTermForProduct({ termCode = '', termName = '', prov
     (normalizedTermName && normalizedProviderCode && items.find((i) => matchesProvider(i) && matchesName(i))) ||
     (normalizedTermCode && items.find(matchesCode)) ||
     (normalizedTermName && items.find(matchesName)) ||
+    // 공급사코드만으로 해당 공급사의 첫 번째 활성 정책 자동 매칭
+    (normalizedProviderCode && items.find(matchesProvider)) ||
     null
   );
 }
