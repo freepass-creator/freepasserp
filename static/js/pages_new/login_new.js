@@ -35,7 +35,12 @@ watchAuth(async (user) => {
     return;
   }
 
-  window.location.href = '/home';
+  const landingPage = profile.settings?.landing_page;
+  if (landingPage) { window.location.href = landingPage; return; }
+
+  if (profile.role === 'admin') { window.location.href = '/home'; return; }
+  if (profile.role === 'provider') { window.location.href = '/product-new'; return; }
+  window.location.href = '/product-list';
 });
 
 form?.addEventListener('submit', async (event) => {
