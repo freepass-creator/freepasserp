@@ -144,11 +144,14 @@ function bindAppSettings(profile) {
   const msg = document.getElementById('settings-app-message');
   if (!landingSelect) return;
 
+  function hrefToKey(href) { return href.replace(/\//g, '_'); }
+  function keyToHref(key) { return key.replace(/^_/, '/'); }
+
   async function saveAppSettings() {
     try {
       const badge = {};
       badgeList?.querySelectorAll('input[data-badge-href]').forEach(input => {
-        badge[input.dataset.badgeHref] = input.checked;
+        badge[hrefToKey(input.dataset.badgeHref)] = input.checked;
       });
       const newSettings = {
         ...(currentProfile.settings || {}),
@@ -157,7 +160,10 @@ function bindAppSettings(profile) {
       };
       await updateUserProfile(currentProfile.uid, { settings: newSettings });
       currentProfile.settings = newSettings;
-      applyBadgeVisibility(badge);
+      // href 기반으로 변환해서 반영
+      const badgeByHref = {};
+      Object.entries(badge).forEach(([k, v]) => { badgeByHref[keyToHref(k)] = v; });
+      applyBadgeVisibility(badgeByHref);
       if (msg) msg.textContent = '저장 완료';
       setTimeout(() => { if (msg) msg.textContent = ''; }, 2000);
     } catch (err) {
@@ -178,7 +184,7 @@ function bindAppSettings(profile) {
   const visiblePages = BADGE_PAGES.filter(p => !p.roles || p.roles.includes(profile.role));
   if (badgeList) {
     badgeList.innerHTML = visiblePages.map(p => {
-      const enabled = badgeSettings[p.href] !== false;
+      const enabled = badgeSettings[hrefToKey(p.href)] !== false;
       return `<div class="settings-badge-row">
         <span class="settings-badge-label">${p.label}</span>
         <label class="toggle-switch">

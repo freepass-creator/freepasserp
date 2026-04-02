@@ -37,7 +37,8 @@ function setBadge(href, count) {
 function isBadgeEnabled(href) {
   const badgeMap = profile?.settings?.badge;
   if (!badgeMap) return true;
-  return badgeMap[href] !== false;
+  const key = href.replace(/\//g, '_');
+  return badgeMap[key] !== false;
 }
 
 function syncAllBadges() {
