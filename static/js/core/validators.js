@@ -90,6 +90,7 @@ export function validateProduct(payload = {}) {
     errors.push('공급사(파트너) 코드는 필수입니다.');
   }
 
+  if (isBlank(payload.policy_code) && isBlank(payload.term_code)) errors.push('정책코드는 필수입니다.');
   if (isBlank(payload.maker)) errors.push('제조사는 필수입니다.');
   if (isBlank(payload.model_name)) errors.push('모델명은 필수입니다.');
 
