@@ -361,7 +361,7 @@ function formatOwnDamageDeductible(policy) {
   if (hasMin && hasMax) parts.push(`최소 ${formatDeductibleAmount(min)} ~ 최대 ${formatDeductibleAmount(max)}`);
   else if (hasMin) parts.push(`최소 ${formatDeductibleAmount(min)}`);
   else if (hasMax) parts.push(`최대 ${formatDeductibleAmount(max)}`);
-  return parts.join(', ') || '-';
+  return parts.join('\n') || '-';
 }
 
 function renderInsuranceSection(product, termFields = {}) {
@@ -375,8 +375,8 @@ function renderInsuranceSection(product, termFields = {}) {
   ].map(([label, limit, deductible]) => `
       <tr>
         <td>${escapeHtml(label)}</td>
-        <td>${escapeHtml(safeText(limit))}</td>
-        <td>${escapeHtml(safeText(deductible))}</td>
+        <td>${escapeHtml(safeText(limit)).replace(/\n/g, '<br>')}</td>
+        <td class="insurance-cell-wrap">${escapeHtml(safeText(deductible)).replace(/\n/g, '<br>')}</td>
       </tr>
     `).join('');
 
