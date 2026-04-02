@@ -147,20 +147,27 @@ function bindAppSettings(profile) {
   function hrefToKey(href) { return href.replace(/\//g, '_'); }
   function keyToHref(key) { return key.replace(/^_/, '/'); }
 
+  const ALL_PERIODS = ['1', '12', '24', '36', '48', '60'];
+  const periodList = document.getElementById('settings-period-list');
+
   async function saveAppSettings() {
     try {
       const badge = {};
       badgeList?.querySelectorAll('input[data-badge-href]').forEach(input => {
         badge[hrefToKey(input.dataset.badgeHref)] = input.checked;
       });
+      const periods = [];
+      periodList?.querySelectorAll('input[data-period]').forEach(input => {
+        if (input.checked) periods.push(input.dataset.period);
+      });
       const newSettings = {
         ...(currentProfile.settings || {}),
         landing_page: landingSelect.value,
         badge,
+        periods: periods.length ? periods : null,
       };
       await updateUserProfile(currentProfile.uid, { settings: newSettings });
       currentProfile.settings = newSettings;
-      // href 기반으로 변환해서 반영
       const badgeByHref = {};
       Object.entries(badge).forEach(([k, v]) => { badgeByHref[keyToHref(k)] = v; });
       applyBadgeVisibility(badgeByHref);
@@ -177,6 +184,22 @@ function bindAppSettings(profile) {
     `<option value="${o.href}"${o.href === savedLanding ? ' selected' : ''}>${o.label}</option>`
   ).join('');
   landingSelect.addEventListener('change', saveAppSettings);
+
+  // 상품목록 기간
+  const savedPeriods = currentProfile.settings?.periods || null;
+  if (periodList) {
+    periodList.innerHTML = ALL_PERIODS.map(p => {
+      const checked = !savedPeriods || savedPeriods.includes(p);
+      return `<div class="settings-badge-row">
+        <span class="settings-badge-label">${p}개월</span>
+        <label class="toggle-switch">
+          <input type="checkbox" data-period="${p}" ${checked ? 'checked' : ''}>
+          <span class="toggle-switch-track"></span>
+        </label>
+      </div>`;
+    }).join('');
+    periodList.addEventListener('change', saveAppSettings);
+  }
 
   // 알림 뱃지 — 페이지별 토글
   const badgeSettings = profile.settings?.badge || {};

@@ -1096,6 +1096,8 @@ async function init(){
   state.profile = profile;
   state.role = profile.role;
   state.companyCode = profile.company_code || '';
+  const savedPeriods = profile.settings?.periods;
+  if (savedPeriods?.length) state.filters.periods = savedPeriods.slice();
   renderRoleMenu(menu, profile.role);
   applyRoleActions();
   syncFilterOverlayWidth();
