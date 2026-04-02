@@ -182,7 +182,16 @@ function fillForm(term) {
   const resolved = resolveFormValues(term, CONTENT_LABEL_TO_KEY);
   CONTENT_KEYS.forEach((key) => {
     if (!detailFields[key]) return;
-    detailFields[key].value = resolved[key] || (key === 'injury_compensation_limit' ? '무한' : '');
+    const val = resolved[key] || (key === 'injury_compensation_limit' ? '무한' : '');
+    detailFields[key].value = val;
+    // select에 매칭 옵션이 없으면 동적 추가
+    if (val && detailFields[key].tagName === 'SELECT' && detailFields[key].value !== val) {
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = val;
+      detailFields[key].appendChild(opt);
+      detailFields[key].value = val;
+    }
   });
 
   applyMoneyFieldFormatting(MONEY_FIELD_IDS);
