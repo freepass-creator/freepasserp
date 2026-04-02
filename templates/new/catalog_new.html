@@ -6,6 +6,9 @@
 <title>FREEPASS - 차량 카탈로그</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/product-list.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}" data-page-style="true">
 </head>
 <body class="catalog-body" data-page="카탈로그">
@@ -16,13 +19,14 @@
 </header>
 
 <main class="catalog-main">
-  <div class="catalog-toolbar">
+  <div class="catalog-toolbar" id="catalog-toolbar">
     <input class="catalog-search" id="catalog-search" type="search" placeholder="차량번호, 모델명, 제조사 검색...">
     <div class="catalog-filter-chips" id="catalog-filter-chips"></div>
   </div>
   <div class="catalog-grid" id="catalog-grid">
     <div class="catalog-empty">상품을 불러오는 중...</div>
   </div>
+  <div class="catalog-share-detail" id="catalog-share-detail" hidden></div>
 </main>
 
 <!-- 상세 모달 -->

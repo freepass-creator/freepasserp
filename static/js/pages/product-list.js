@@ -841,28 +841,22 @@ function currentProduct(){
 }
 
 function buildShareUrl(product){
-  const url = new URL(window.location.href);
-  url.pathname = '/product-list';
-  url.searchParams.set('product_code', product.id);
+  const url = new URL(window.location.origin + '/catalog');
+  url.searchParams.set('id', product.id);
   return url.toString();
 }
 
 async function handleShare(){
   const product = currentProduct();
   if (!product) {
-    window.alert('공유할 상품을 먼저 선택하세요.');
+    showToast('공유할 상품을 먼저 선택하세요.', 'info');
     return;
   }
   const shareUrl = buildShareUrl(product);
-  const shareText = `[FREEPASS] ${safe(product.carNo)} ${[product.maker, product.model, product.subModel, product.trim].filter(Boolean).join(' ')}`.trim();
   try {
-    if (navigator.share) {
-      await navigator.share({ title: 'FREEPASS 상품공유', text: shareText, url: shareUrl });
-      return;
-    }
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(shareUrl);
-      window.alert('상품 링크를 복사했습니다.');
+      showToast('공유 링크가 복사되었습니다.', 'success');
       return;
     }
   } catch (error) {
