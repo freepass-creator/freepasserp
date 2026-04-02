@@ -217,7 +217,7 @@ async function loadPage(url, options = {}) {
     }
 
     normalizeRequiredFields(cached.container);
-    document.title = 'FREEPASS ERP';
+    document.title = 'FREEPASS ERP 2026';
     document.body.dataset.page = cached.bodyPage || '';
     setActiveSidebar(nextPathname);
     currentPageKey = nextPathname;
