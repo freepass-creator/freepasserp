@@ -229,16 +229,8 @@ function formatRentalGuideText(policy) {
 
 function renderPriceSummarySection(policy) {
   const guideText = formatRentalGuideText(policy);
-  const insuranceText = safeText(policy.insuranceIncluded);
-  const notes = [];
-  if (guideText !== '-') {
-    notes.push(`<div class="plist-detail__price-note">* ${escapeHtml(guideText)}</div>`);
-  }
-  if (insuranceText !== '-') {
-    notes.push(`<div class="plist-detail__price-note">* 보험료: ${escapeHtml(insuranceText)}</div>`);
-  }
-  if (!notes.length) return '';
-  return `<div class="plist-detail__price-summary">${notes.join('')}</div>`;
+  if (guideText === '-') return '';
+  return `<div class="plist-detail__price-summary"><div class="plist-detail__price-note">* ${escapeHtml(guideText)}</div></div>`;
 }
 
 function renderPriceSection(product, termFields = {}) {
