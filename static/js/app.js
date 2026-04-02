@@ -117,8 +117,10 @@ function ensureStyles(hrefs) {
 
 // ─── 상단바 ─────────────────────────────────────────────────────────────────
 
-function syncTopBar() {
-  // 탑바 제거됨 — 빈 함수 유지 (호출부 호환)
+function syncTopBar(nextDoc) {
+  const curPageName = document.querySelector('.top-bar-page-name');
+  const nextPageName = nextDoc?.querySelector('.top-bar-page-name');
+  if (curPageName && nextPageName) curPageName.textContent = nextPageName.textContent;
 }
 
 // ─── 페이지 전환 ────────────────────────────────────────────────────────────
