@@ -257,7 +257,7 @@ const PRODUCT_CSV_COLS = [
 const PERIOD_KEYS = ['1', '12', '24', '36', '48', '60'];
 
 async function downloadProducts() {
-  showToast('상품 데이터 준비 중...', 'progress', { duration: 0 });
+  const progress = showToast('상품 데이터 준비 중...', 'progress', { duration: 0 });
   try {
     const products = await fetchProductsOnce();
     const headers = [
@@ -277,8 +277,10 @@ async function downloadProducts() {
     const csv = toCsvString(headers, rows);
     const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     downloadCsv(`상품목록_${today}.csv`, csv);
+    progress.dismiss();
     showToast(`${products.length}건 다운로드 완료`, 'success');
   } catch (err) {
+    progress.dismiss();
     showToast('다운로드 실패', 'error');
   }
 }
