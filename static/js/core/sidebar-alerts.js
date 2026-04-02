@@ -134,7 +134,11 @@ async function init() {
     uid = auth.user.uid;
     companyCode = profile.company_code || '';
 
-    watchRooms((rooms) => { counts.chat = countUnreadRooms(rooms); syncAllBadges(); });
+    watchRooms((rooms) => {
+      counts.chat = countUnreadRooms(rooms);
+      console.log('[sidebar-alerts] chat count:', counts.chat, 'rooms:', rooms.length);
+      syncAllBadges();
+    });
     watchContracts((items) => { counts.contract = countActionContracts(items); syncAllBadges(); });
     watchSettlements((items) => { counts.settlement = countActionSettlements(items); syncAllBadges(); });
 
