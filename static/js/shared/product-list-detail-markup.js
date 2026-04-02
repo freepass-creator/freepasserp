@@ -371,25 +371,19 @@ function formatOwnDamageDeductible(policy) {
 function renderInsuranceSection(product, termFields = {}) {
   const policy = buildPolicyValues(product, termFields);
   const rows = [
-    ['대인 I, II 배상', policy.injuryCompensationLimit, policy.injuryDeductible],
-    ['대물배상', policy.propertyCompensationLimit, policy.propertyDeductible],
-    ['자기신체사고', policy.selfBodyAccident, policy.selfBodyDeductible],
+    ['대인', policy.injuryCompensationLimit, policy.injuryDeductible],
+    ['대물', policy.propertyCompensationLimit, policy.propertyDeductible],
     ['무보험차상해', policy.uninsuredDamage, policy.uninsuredDeductible],
     ['자기차량손해', policy.ownDamageCompensation, formatOwnDamageDeductible(policy)],
     ['긴급출동', policy.annualRoadsideAssistance, '-']
-  ].filter(([, limit, deductible]) => {
-    const l = String(limit ?? '').trim();
-    const d = String(deductible ?? '').trim();
-    return (l && l !== '-') || (d && d !== '-');
-  }).map(([label, limit, deductible]) => `
+  ].map(([label, limit, deductible]) => `
       <tr>
         <td>${escapeHtml(label)}</td>
-        <td>${escapeHtml(safeText(limit)).replace(/\n/g, '<br>')}</td>
-        <td>${escapeHtml(safeText(deductible)).replace(/\n/g, '<br>')}</td>
+        <td>${escapeHtml(safeText(limit))}</td>
+        <td>${escapeHtml(safeText(deductible))}</td>
       </tr>
     `).join('');
 
-  if (!rows) return '';
   return renderSection('차량보험정보', `
     <div class="plist-detail__table-wrap">
       <table class="price-table plist-detail__table plist-detail__table--insurance-summary">
