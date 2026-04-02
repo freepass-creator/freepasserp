@@ -35,12 +35,14 @@ watchAuth(async (user) => {
     return;
   }
 
+  // 랜딩 페이지를 localStorage에 저장 → 워크스페이스 진입 후 사이드바 버튼 클릭
   const landingPage = profile.settings?.landing_page;
-  if (landingPage) { window.location.href = landingPage; return; }
-
-  if (profile.role === 'admin') { window.location.href = '/home'; return; }
-  if (profile.role === 'provider') { window.location.href = '/product-new'; return; }
-  window.location.href = '/product-list';
+  let target = '/home';
+  if (landingPage) target = landingPage;
+  else if (profile.role === 'provider') target = '/product-new';
+  else if (profile.role === 'agent') target = '/product-list';
+  localStorage.setItem('fp.landing_target', target);
+  window.location.href = target;
 });
 
 form?.addEventListener('submit', async (event) => {

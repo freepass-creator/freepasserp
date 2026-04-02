@@ -375,19 +375,28 @@ initKeyboardListNavigation();
 initShellNavigation();
 initSidebarCollapse();
 registerInitialPage();
-// SPA: URL을 /로 정리하되, 사이드바 메뉴는 실제 페이지 기준으로 활성화
 const _initialPath = window.location.pathname;
 if (_initialPath !== '/') history.replaceState(null, '', '/');
-// 메뉴 활성화: renderRoleMenu가 아직 실행 전이므로 DOM 로드 후 재적용
-requestAnimationFrame(() => {
-  const sidebar = document.querySelector('.sidebar') || document.getElementById('sidebar-menu');
-  if (sidebar && _initialPath !== '/') {
-    sidebar.querySelectorAll('.sidebar-link').forEach(link => {
-      const href = link.getAttribute('href') || '';
-      link.classList.toggle('active', _initialPath === href || _initialPath.startsWith(href + '/'));
+
+// 로그인 후 랜딩: 사이드바 버튼 클릭으로 SPA 네비게이션
+const _landingTarget = localStorage.getItem('fp.landing_target');
+if (_landingTarget) {
+  localStorage.removeItem('fp.landing_target');
+  // renderRoleMenu가 비동기로 실행되므로 메뉴 생성 감시
+  const _menuEl = document.getElementById('sidebar-menu');
+  if (_menuEl) {
+    const _observer = new MutationObserver(() => {
+      const link = _menuEl.querySelector(`.sidebar-link[href="${_landingTarget}"]`);
+      if (link) { _observer.disconnect(); link.click(); }
     });
+    _observer.observe(_menuEl, { childList: true, subtree: true });
+    // 이미 있으면 바로 클릭
+    const _existing = _menuEl.querySelector(`.sidebar-link[href="${_landingTarget}"]`);
+    if (_existing) { _observer.disconnect(); _existing.click(); }
+    // 3초 후 정리
+    setTimeout(() => _observer.disconnect(), 3000);
   }
-});
+}
 
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
