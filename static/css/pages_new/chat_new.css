@@ -32,7 +32,7 @@
   border: 1px solid var(--border-soft, #e1e5ea);
   border-radius: var(--radius-ui, 8px);
   background: var(--surface-base, #fff);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-main);
   cursor: pointer;
@@ -76,7 +76,7 @@
   border: 1px solid var(--border-soft, #e1e5ea);
   border-radius: var(--radius-ui, 8px);
   background: var(--surface-base, #fff);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--text-subtle, #5f6368);
   cursor: pointer;
@@ -108,7 +108,7 @@
 /* ─── 기간별 대여료 2줄 셀 ────────────────────────────────────────────────── */
 
 .pls-cell--price { padding: 0 4px; text-align: right; vertical-align: middle; line-height: 1; }
-.pls-price-rent { display: block; font-size: 11px; font-weight: 600; color: #1e293b; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; text-align: right; }
+.pls-price-rent { display: block; font-size: 10px; font-weight: 600; color: #1e293b; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; text-align: right; }
 .pls-price-dep { display: block; font-size: 10px; font-weight: 400; color: #94a3b8; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; text-align: right; }
 
 /* ─── 상세 슬라이드 패널 (오버레이) ───────────────────────────────────────── */
@@ -148,7 +148,7 @@
 .product-list-page-shell .plist-detail__meta-text { font-size: 12px; color: var(--text-main); }
 .product-list-page-shell .plist-detail__color-badges { display: inline-flex; gap: 4px; }
 .product-list-page-shell .plist-detail__summary-main { min-width: 0; font-size: 12px; line-height: 1.5; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
-.product-list-page-shell .plist-detail__summary-maker-model { font-weight: 400; color: var(--text-subtle); font-size: 11px; }
+.product-list-page-shell .plist-detail__summary-maker-model { font-weight: 400; color: var(--text-subtle); font-size: 10px; }
 .product-list-page-shell .plist-detail__summary-badges { flex: 0 0 auto; display: flex; justify-content: flex-end; }
 .product-list-page-shell .plist-detail__summary-badges .badge-row { justify-content: flex-end; }
 
@@ -157,7 +157,7 @@
 .product-list-page-shell .plist-detail__section-title { font-size: 12px; line-height: 1.4; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
 .product-list-page-shell .plist-detail__section-title::before { content: ''; flex: 0 0 3px; height: 12px; background: currentColor; border-radius: 1px; opacity: 0.3; }
 
-.product-list-page-shell .plist-detail__photo-download-link { padding: 0; border: none; background: transparent; font-size: 11px; color: var(--text-subtle); text-decoration: underline; cursor: pointer; }
+.product-list-page-shell .plist-detail__photo-download-link { padding: 0; border: none; background: transparent; font-size: 10px; color: var(--text-subtle); text-decoration: underline; cursor: pointer; }
 .product-list-page-shell .plist-detail__photo-download-link:hover { color: var(--text-main); }
 .product-list-page-shell .plist-detail__photo-download-link:disabled { opacity: 0.4; cursor: default; }
 

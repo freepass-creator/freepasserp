@@ -20,13 +20,13 @@
 .settings-right-panel-body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--form-section-gap, 24px);
 }
 
 .settings-section-block {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--form-section-inner-gap, 8px);
 }
 
 .settings-subsection-title {
@@ -40,7 +40,7 @@
 }
 
 .settings-helper {
-  font-size: 11px;
+  font-size: var(--font-size-sub, 10px);
   line-height: 1.5;
   color: var(--text-subtle);
 }
@@ -203,6 +203,20 @@
 .settings-account-action-expand .field {
   margin: 0;
 }
+
+.settings-badge-list { display: flex; flex-direction: column; }
+.settings-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 32px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+.settings-badge-row:last-child { border-bottom: none; }
+.settings-badge-label { font-size: 12px; color: var(--text-main); }
+.settings-badge-toggle { font-size: 12px; }
 
 @media (max-width: 900px) {
   .settings-page-shell {

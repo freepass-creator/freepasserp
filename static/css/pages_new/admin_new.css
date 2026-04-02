@@ -179,7 +179,7 @@
 
 .admin-code-item-row.is-header {
   background: var(--surface-subtle, #f8f8f7);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-subtle);
 }
@@ -248,7 +248,7 @@
 }
 .admin-stl-mpick-btn:hover { background: rgba(0,0,0,0.06); color: var(--text-main); }
 .admin-stl-mpick-label {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-main);
   white-space: nowrap;
   min-width: 48px;
@@ -257,7 +257,7 @@
   letter-spacing: -0.02em;
 }
 .admin-stl-count {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   white-space: nowrap;
 }
