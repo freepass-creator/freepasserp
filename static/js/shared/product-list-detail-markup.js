@@ -252,7 +252,7 @@ function renderPriceSection(product, termFields = {}) {
         <td>${month}개월</td>
         <td class="price-cell"><span class="price-full">${escapeHtml(formatMoney(item.rent, { zeroAsDash: false }))}</span><span class="price-short">${escapeHtml(formatMoneyShort(item.rent))}</span></td>
         <td class="price-cell"><span class="price-full">${escapeHtml(formatMoney(item.deposit))}</span><span class="price-short">${escapeHtml(formatMoneyShort(item.deposit))}</span></td>
-        <td class="price-cell"><span class="price-full">${escapeHtml(formatMoney(item.fee))}</span><span class="price-short">${escapeHtml(formatMoneyShort(item.fee))}</span></td>
+        <td class="price-cell price-cell--disabled">준비중</td>
       </tr>
     `;
     }).join('');
