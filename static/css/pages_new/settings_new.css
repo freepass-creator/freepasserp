@@ -48,11 +48,10 @@
 /* 섹션 타이틀 + 설명 한 줄 */
 .section-title-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
 }
 .section-title-row .section-title { margin: 0; }
-.section-title-row .section-title::before { display: none; }
 .section-desc {
   font-size: 10px;
   color: var(--text-muted, #94a3b8);
