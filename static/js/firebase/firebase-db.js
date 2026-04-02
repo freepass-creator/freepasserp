@@ -71,7 +71,15 @@ export async function fetchUsersOnce() {
 }
 
 export function watchUsers(callback) {
-  return watchCollection('users', callback, { mode: 'entries', entryKey: 'uid', filter: isNotDeleted });
+  return watchCollection('users', callback, {
+    mode: 'entries', entryKey: 'uid', filter: isNotDeleted,
+    sort: (a, b) => {
+      const ap = a.status === 'pending' ? 0 : 1;
+      const bp = b.status === 'pending' ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+      return (b.updated_at || b.created_at || 0) - (a.updated_at || a.created_at || 0);
+    }
+  });
 }
 
 export async function updateUserStatus(uid, status) { return setStatus(`users/${uid}`, status); }
@@ -139,7 +147,15 @@ export async function fetchPartnersOnce() {
 }
 
 export function watchPartners(callback) {
-  return watchCollection('partners', callback, { filter: isNotDeleted, sort: sortByCode('partner_code') });
+  return watchCollection('partners', callback, {
+    filter: isNotDeleted,
+    sort: (a, b) => {
+      const ap = a.status === 'pending' ? 0 : 1;
+      const bp = b.status === 'pending' ? 0 : 1;
+      if (ap !== bp) return ap - bp;
+      return String(a.partner_code || '').localeCompare(String(b.partner_code || ''));
+    }
+  });
 }
 
 export async function getPartnerByCode(partnerCode) { return fetchOne(`partners/${sanitizeCodeValue(partnerCode)}`); }
@@ -908,11 +924,24 @@ export async function fetchContractsOnce() {
 }
 
 export function watchContracts(callback) {
-  return watchCollection('contracts', callback, { sort: sortByCreatedDesc });
+  return watchCollection('contracts', callback, {
+    sort: (a, b) => {
+      const ad = a.contract_status === '계약완료' ? 1 : 0;
+      const bd = b.contract_status === '계약완료' ? 1 : 0;
+      if (ad !== bd) return ad - bd;
+      return (b.updated_at || b.created_at || 0) - (a.updated_at || a.created_at || 0);
+    }
+  });
 }
 
 export function watchSettlements(callback) {
+  const DONE = ['정산완료', '환수결정'];
   return watchCollection('settlements', callback, {
-    sort: (a, b) => (b.completed_at || b.created_at || 0) - (a.completed_at || a.created_at || 0)
+    sort: (a, b) => {
+      const ad = DONE.includes(a.settlement_status || a.status) ? 1 : 0;
+      const bd = DONE.includes(b.settlement_status || b.status) ? 1 : 0;
+      if (ad !== bd) return ad - bd;
+      return (b.completed_at || b.created_at || 0) - (a.completed_at || a.created_at || 0);
+    }
   });
 }
