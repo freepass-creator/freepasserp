@@ -292,18 +292,23 @@ body[data-page] [contenteditable="true"] {
 
 .sidebar-nav-badge {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
   border-radius: 999px;
-  background: #ef4444;
+  background: #dc2626;
   color: #fff;
   font-size: 10px;
   font-weight: 600;
-  line-height: 18px;
-  text-align: center;
   flex: 0 0 auto;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3);
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.12s ease;
 }
+.sidebar-nav-badge:hover { transform: scale(1.08); }
 
 /* ───── MAIN CONTENT ───── */
 
@@ -446,12 +451,14 @@ body[data-page] [contenteditable="true"] {
 .dashboard-shell--new .sidebar.sidebar-collapsed .sidebar-link.has-new-event .sidebar-link-icon::after {
   content: '';
   position: absolute;
-  top: 0;
-  right: -2px;
-  width: 6px;
-  height: 6px;
-  background: #ef4444;
+  top: -1px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  background: #dc2626;
   border-radius: 50%;
+  border: 1.5px solid var(--new-bg-sidebar, #fff);
+  box-shadow: 0 1px 2px rgba(220, 38, 38, 0.3);
 }
 
 .dashboard-shell--new .sidebar-link-icon {
