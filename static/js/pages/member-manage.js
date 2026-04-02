@@ -262,32 +262,6 @@ async function handleDelete() {
   clearForm();
 }
 
-roleSelect?.addEventListener('change', () => {
-  buildCompanyCodeOptions(roleSelect.value, roleSelect.value === 'admin' ? 'MASTER' : '');
-  syncCompanyName(companyCodeSelect.value);
-});
-companyCodeSelect?.addEventListener('change', () => syncCompanyName(companyCodeSelect.value));
-refreshButton?.addEventListener('click', async () => {
-  try { await refreshMembers(); } catch (error) { showToast(`새로고침 실패: ${error.message}`, 'error'); }
-});
-submitButton?.addEventListener('click', async () => {
-  try {
-    if (!selectedUid) return;
-    if (formMode === 'view') {
-      if (!await showConfirm('수정하시겠습니까?')) return;
-      applyMode('edit');
-      return;
-    }
-    if (!await showConfirm('저장하시겠습니까?')) return;
-    await handleSave();
-  } catch (error) {
-    showToast(`저장 실패: ${error.message}`, 'error');
-  }
-});
-deleteButton?.addEventListener('click', async () => {
-  try { await handleDelete(); } catch (error) { showToast(`삭제 실패: ${error.message}`, 'error'); }
-});
-
 async function bootstrap() {
   try {
     const { profile } = await requireAuth({ roles: ['admin'] });
@@ -296,6 +270,32 @@ async function bootstrap() {
     currentPartners = await fetchPartnersOnce();
     setDirtyCheck(() => formMode === 'edit');
     registerPageCleanup(() => clearDirtyCheck());
+
+    roleSelect?.addEventListener('change', () => {
+      buildCompanyCodeOptions(roleSelect.value, roleSelect.value === 'admin' ? 'MASTER' : '');
+      syncCompanyName(companyCodeSelect.value);
+    });
+    companyCodeSelect?.addEventListener('change', () => syncCompanyName(companyCodeSelect.value));
+    refreshButton?.addEventListener('click', async () => {
+      try { await refreshMembers(); } catch (error) { showToast(`새로고침 실패: ${error.message}`, 'error'); }
+    });
+    submitButton?.addEventListener('click', async () => {
+      try {
+        if (!selectedUid) return;
+        if (formMode === 'view') {
+          if (!await showConfirm('수정하시겠습니까?')) return;
+          applyMode('edit');
+          return;
+        }
+        if (!await showConfirm('저장하시겠습니까?')) return;
+        await handleSave();
+      } catch (error) {
+        showToast(`저장 실패: ${error.message}`, 'error');
+      }
+    });
+    deleteButton?.addEventListener('click', async () => {
+      try { await handleDelete(); } catch (error) { showToast(`삭제 실패: ${error.message}`, 'error'); }
+    });
 
     renderSkeletonRows(list, MEMBER_COLS, 8);
     registerPageCleanup(watchUsers((users) => {

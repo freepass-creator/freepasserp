@@ -43,7 +43,6 @@ function bindDOM() {
 applyManagementButtonTones({ resetButtons, submitButtons, deleteButtons });
 
 let currentPartners = [];
-let mode = 'create';
 let currentUid = '';
 let formMode = 'create';
 
@@ -51,7 +50,7 @@ const applyPartnerFormMode = createManagedFormModeApplier({
   form,
   panelLabel: '파트너',
   getIdentity: () => editingCodeInput.value,
-  isSelected: () => mode === 'edit',
+  isSelected: () => Boolean(editingCodeInput.value),
   submitButtons,
   deleteButtons,
   defaultOptions: {
@@ -62,11 +61,11 @@ const applyPartnerFormMode = createManagedFormModeApplier({
 
 function applyFormMode(nextMode) {
   formMode = nextMode;
-  applyPartnerFormMode(nextMode, { deleteEnabled: mode === 'edit' });
+  applyPartnerFormMode(nextMode, { deleteEnabled: Boolean(editingCodeInput.value) });
 }
 
 function updatePreview() {
-  if (mode === 'edit' && editingCodeInput.value) {
+  if (editingCodeInput.value) {
     preview.value = editingCodeInput.value;
     return;
   }
@@ -74,7 +73,6 @@ function updatePreview() {
 }
 
 function setIdleMode() {
-  mode = 'idle';
   editingCodeInput.value = '';
   form.reset();
   applyFormMode('idle');
@@ -82,7 +80,6 @@ function setIdleMode() {
 }
 
 function setCreateMode() {
-  mode = 'create';
   editingCodeInput.value = '';
   form.reset();
   statusInput.value = 'active';
@@ -92,7 +89,6 @@ function setCreateMode() {
 }
 
 function fillForm(partner) {
-  mode = 'edit';
   editingCodeInput.value = partner.partner_code;
   statusInput.value = partner.status || 'active';
   typeInput.value = partner.partner_type || 'provider';
@@ -220,7 +216,7 @@ async function bootstrap() {
     typeInput.addEventListener('change', updatePreview);
     resetButtons.forEach((button) => button?.addEventListener('click', () => { setCreateMode(); showToast('신규 등록 상태입니다.', 'info'); }));
     submitButtons.forEach((button) => button?.addEventListener('click', async () => {
-      if (mode === 'edit' && formMode === 'view') {
+      if (formMode === 'view' && editingCodeInput.value) {
         if (!await showConfirm('수정하시겠습니까?')) return;
         applyFormMode('edit');
         message.textContent = '';
