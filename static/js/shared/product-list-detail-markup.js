@@ -356,16 +356,12 @@ function formatOwnDamageDeductible(policy) {
 
   if (!hasRatio && !hasMin && !hasMax) return '-';
 
-  const lines = [];
-  if (hasRatio) lines.push(`차량수리비의 ${ensurePercentSuffix(ratio)}`);
-  if (hasMin || hasMax) {
-    const minText = hasMin ? formatDeductibleAmount(min) : '-';
-    const maxText = hasMax ? formatDeductibleAmount(max) : '-';
-    if (hasMin && hasMax) lines.push(`최소 ${minText}~ 최대 ${maxText}`);
-    else if (hasMin) lines.push(`최소 ${minText}`);
-    else lines.push(`최대 ${maxText}`);
-  }
-  return lines.join('\n') || '-';
+  const parts = [];
+  if (hasRatio) parts.push(`차량수리비의 ${ensurePercentSuffix(ratio)}`);
+  if (hasMin && hasMax) parts.push(`최소 ${formatDeductibleAmount(min)} ~ 최대 ${formatDeductibleAmount(max)}`);
+  else if (hasMin) parts.push(`최소 ${formatDeductibleAmount(min)}`);
+  else if (hasMax) parts.push(`최대 ${formatDeductibleAmount(max)}`);
+  return parts.join(', ') || '-';
 }
 
 function renderInsuranceSection(product, termFields = {}) {
