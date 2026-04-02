@@ -2,6 +2,7 @@ import { requireAuth } from './auth-guard.js';
 import { qs } from './utils.js';
 import { renderRoleMenu } from './role-menu.js';
 import { bindManagedFieldState, syncManagedFieldState } from './management-fields.js';
+import { showConfirm, showToast } from './toast.js';
 import {
   UI_FORM_MODE,
   composePanelHeadTitle as composePanelHeadTitleBase,
@@ -456,4 +457,31 @@ export async function bootstrapManagementSkeleton(options = {}) {
       if (message) message.textContent = `${itemLabel} 보기 상태입니다.`;
     });
   });
+}
+
+/**
+ * View→Edit→Save 2단계 버튼 핸들러 공통 팩토리
+ * @param {object} options
+ * @param {() => string}   options.getFormMode  - 현재 formMode 반환
+ * @param {() => void}     options.setEditMode  - edit 모드로 전환
+ * @param {() => boolean}  options.isSelected   - 항목 선택 여부 (선택 안 된 경우 저장 차단)
+ * @param {() => Promise}  options.onSave       - 저장 로직 (async)
+ * @param {() => void}    [options.clearMessage] - 메시지 초기화 (선택)
+ */
+export function createSubmitHandler({ getFormMode, setEditMode, isSelected, onSave, clearMessage }) {
+  return async () => {
+    try {
+      if (getFormMode() === 'view' && isSelected()) {
+        if (!await showConfirm('수정하시겠습니까?')) return;
+        setEditMode();
+        clearMessage?.();
+        return;
+      }
+      if (!isSelected()) return;
+      if (!await showConfirm('저장하시겠습니까?')) return;
+      await onSave();
+    } catch (error) {
+      showToast(`저장 실패: ${error.message}`, 'error');
+    }
+  };
 }

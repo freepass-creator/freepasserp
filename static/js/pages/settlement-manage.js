@@ -1,7 +1,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
-import { applyManagementButtonTones, createManagedFormModeApplier, syncTopBarPageCount } from '../core/management-skeleton.js';
+import { applyManagementButtonTones, createManagedFormModeApplier, createSubmitHandler, syncTopBarPageCount } from '../core/management-skeleton.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { renderBadgeRow } from '../shared/badge.js';
 import { showToast, showConfirm } from '../core/toast.js';
@@ -414,42 +414,37 @@ async function bootstrap() {
       }
     });
 
-    submitButton?.addEventListener('click', async () => {
-      if (formMode === 'view' && selectedCode) {
-        if (!await showConfirm('수정하시겠습니까?')) return;
-        applyFormMode('edit');
-        if (message) message.textContent = '';
-        return;
-      }
-      if (!selectedCode) return;
-      if (!await showConfirm('저장하시겠습니까?')) return;
-      try {
-        // 선택된 정산의 contract_code 찾기 (Firebase 경로 키)
-        const currentItem = currentSettlements.find(s => s.settlement_code === selectedCode);
-        const contractCode = currentItem?.contract_code || selectedCode;
-        const feeRaw = String(fields.fee_amount?.value || '').replace(/[^\d]/g, '');
-        const status = fields.settlement_status?.value || '정산대기';
-        const payload = {
-          settlement_status: status,
-          status: status,
-          fee_amount: status.includes('환수') ? -Math.abs(Number(feeRaw || 0)) : Number(feeRaw || 0),
-          settled_date: fields.settled_date?.value || '',
-          provider_memo: fields.provider_memo?.value || '',
-          agent_memo: fields.agent_memo?.value || '',
-          admin_memo: fields.admin_memo?.value || '',
-          confirms: {
-            provider: fields.provider_confirmed?.value === 'confirmed',
-            agent: fields.agent_confirmed?.value === 'confirmed',
-            admin: fields.admin_confirmed?.value === 'confirmed'
-          }
-        };
-        await updateSettlement(contractCode, payload);
-        showToast(`저장 완료: ${formatSettlementCodeDisplay(selectedCode)}`, 'success');
-        if (currentItem) fillForm({ ...currentItem, ...payload });
-      } catch (error) {
-        showToast(`저장 실패: ${error.message}`, 'error');
-      }
+    async function handleSave() {
+      const currentItem = currentSettlements.find(s => s.settlement_code === selectedCode);
+      const contractCode = currentItem?.contract_code || selectedCode;
+      const feeRaw = String(fields.fee_amount?.value || '').replace(/[^\d]/g, '');
+      const status = fields.settlement_status?.value || '정산대기';
+      const payload = {
+        settlement_status: status,
+        status: status,
+        fee_amount: status.includes('환수') ? -Math.abs(Number(feeRaw || 0)) : Number(feeRaw || 0),
+        settled_date: fields.settled_date?.value || '',
+        provider_memo: fields.provider_memo?.value || '',
+        agent_memo: fields.agent_memo?.value || '',
+        admin_memo: fields.admin_memo?.value || '',
+        confirms: {
+          provider: fields.provider_confirmed?.value === 'confirmed',
+          agent: fields.agent_confirmed?.value === 'confirmed',
+          admin: fields.admin_confirmed?.value === 'confirmed'
+        }
+      };
+      await updateSettlement(contractCode, payload);
+      showToast(`저장 완료: ${formatSettlementCodeDisplay(selectedCode)}`, 'success');
+      if (currentItem) fillForm({ ...currentItem, ...payload });
+    }
+    const onSubmit = createSubmitHandler({
+      getFormMode: () => formMode,
+      setEditMode: () => applyFormMode('edit'),
+      isSelected: () => Boolean(selectedCode),
+      onSave: handleSave,
+      clearMessage: () => { if (message) message.textContent = ''; },
     });
+    submitButton?.addEventListener('click', onSubmit);
     deleteButton?.addEventListener('click', async () => {
       if (!selectedCode) return;
       const currentItem = currentSettlements.find(s => s.settlement_code === selectedCode);

@@ -1,5 +1,5 @@
 import { requireAuth } from '../core/auth-guard.js';
-import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier , syncTopBarPageCount } from '../core/management-skeleton.js';
+import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier, createSubmitHandler, syncTopBarPageCount } from '../core/management-skeleton.js';
 import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
@@ -215,16 +215,14 @@ async function bootstrap() {
     updatePreview();
     typeInput.addEventListener('change', updatePreview);
     resetButtons.forEach((button) => button?.addEventListener('click', () => { setCreateMode(); showToast('신규 등록 상태입니다.', 'info'); }));
-    submitButtons.forEach((button) => button?.addEventListener('click', async () => {
-      if (formMode === 'view' && editingCodeInput.value) {
-        if (!await showConfirm('수정하시겠습니까?')) return;
-        applyFormMode('edit');
-        message.textContent = '';
-        return;
-      }
-      if (!await showConfirm('저장하시겠습니까?')) return;
-      form.requestSubmit();
-    }));
+    const onSubmit = createSubmitHandler({
+      getFormMode: () => formMode,
+      setEditMode: () => applyFormMode('edit'),
+      isSelected: () => Boolean(editingCodeInput.value),
+      onSave: () => form.requestSubmit(),
+      clearMessage: () => { message.textContent = ''; },
+    });
+    submitButtons.forEach((button) => button?.addEventListener('click', onSubmit));
     deleteButtons.forEach((button) => button?.addEventListener('click', async () => {
       try { await handleDelete(); } catch (error) { showToast(`삭제 실패: ${error.message}`, 'error'); }
     }));

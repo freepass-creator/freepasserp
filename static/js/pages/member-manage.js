@@ -1,5 +1,5 @@
 import { requireAuth } from '../core/auth-guard.js';
-import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier, syncEditSaveButtonTone , syncTopBarPageCount } from '../core/management-skeleton.js';
+import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier, createSubmitHandler, syncTopBarPageCount } from '../core/management-skeleton.js';
 import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
@@ -279,20 +279,13 @@ async function bootstrap() {
     refreshButton?.addEventListener('click', async () => {
       try { await refreshMembers(); } catch (error) { showToast(`새로고침 실패: ${error.message}`, 'error'); }
     });
-    submitButton?.addEventListener('click', async () => {
-      try {
-        if (!selectedUid) return;
-        if (formMode === 'view') {
-          if (!await showConfirm('수정하시겠습니까?')) return;
-          applyMode('edit');
-          return;
-        }
-        if (!await showConfirm('저장하시겠습니까?')) return;
-        await handleSave();
-      } catch (error) {
-        showToast(`저장 실패: ${error.message}`, 'error');
-      }
+    const onSubmit = createSubmitHandler({
+      getFormMode: () => formMode,
+      setEditMode: () => applyMode('edit'),
+      isSelected: () => Boolean(selectedUid),
+      onSave: handleSave,
     });
+    submitButton?.addEventListener('click', onSubmit);
     deleteButton?.addEventListener('click', async () => {
       try { await handleDelete(); } catch (error) { showToast(`삭제 실패: ${error.message}`, 'error'); }
     });

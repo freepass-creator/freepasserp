@@ -1,5 +1,5 @@
 import { requireAuth } from '../core/auth-guard.js';
-import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier , syncTopBarPageCount } from '../core/management-skeleton.js';
+import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier, createSubmitHandler, syncTopBarPageCount } from '../core/management-skeleton.js';
 import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
@@ -61,7 +61,6 @@ let { detailFields, CONTENT_LABELS, CONTENT_KEYS, CONTENT_LABEL_TO_KEY } = creat
 let currentTerms = [];
 let currentProfile = null;
 let currentUid = '';
-let mode = 'create';
 let availableProviders = [];
 let lastSelectedCode = '';
 let formMode = 'create';
@@ -73,7 +72,7 @@ function initPolicyFormMode() {
     form,
     panelLabel: '정책',
     getIdentity: () => editingCodeInput.value,
-    isSelected: () => mode === 'edit',
+    isSelected: () => Boolean(editingCodeInput.value),
     submitButtons: [submitButton],
     deleteButtons: [deleteButton],
     defaultOptions: {
@@ -93,8 +92,7 @@ function initPolicyFormMode() {
 function applyFormMode(nextMode) {
   formMode = nextMode;
   if (!applyPolicyFormMode) return;
-  const isEditRecord = mode === 'edit';
-  applyPolicyFormMode(nextMode, { deleteEnabled: isEditRecord });
+  applyPolicyFormMode(nextMode, { deleteEnabled: Boolean(editingCodeInput.value) });
 }
 
 
@@ -126,7 +124,6 @@ function updatePreviewCode() {
 }
 
 function setIdleMode() {
-  mode = 'idle';
   editingCodeInput.value = '';
   lastSelectedCode = '';
   applyFormMode('idle');
@@ -134,7 +131,6 @@ function setIdleMode() {
 }
 
 function setCreateMode(selectedProviderCode = '') {
-  mode = 'create';
   editingCodeInput.value = '';
   lastSelectedCode = '';
   form.reset();
@@ -176,7 +172,6 @@ function setCreateMode(selectedProviderCode = '') {
 }
 
 function fillForm(term) {
-  mode = 'edit';
   editingCodeInput.value = term.term_code || '';
   lastSelectedCode = term.term_code || '';
   renderProviderOptions(term.provider_company_code || '');
@@ -340,28 +335,18 @@ async function bootstrap() {
     registerPageCleanup(watchPartners((partners) => {
       availableProviders = partners;
       renderProviderOptions(providerCodeInput.value || profile.company_code || '');
-      if (mode === 'create') updatePreviewCode();
+      if (!editingCodeInput.value) updatePreviewCode();
     }));
 
     resetButton?.addEventListener('click', () => { setCreateMode(); showToast('신규 등록 상태입니다.', 'info'); });
-    submitButton?.addEventListener('click', async () => {
-      console.log('[policy] submit click', { mode, formMode, submitButton, submitButtonDisabled: submitButton?.disabled });
-      if (mode === 'edit' && formMode === 'view') {
-        if (!await showConfirm('수정하시겠습니까?')) return;
-        applyFormMode('edit');
-        if (message) message.textContent = '';
-        return;
-      }
-      if (!await showConfirm('저장하시겠습니까?')) return;
-      try {
-        console.log('[policy] calling handleSubmit');
-        await handleSubmit();
-        console.log('[policy] handleSubmit done');
-      } catch (error) {
-        console.error('[policy] handleSubmit error', error);
-        showToast(`저장 실패: ${error.message}`, 'error');
-      }
+    const onSubmit = createSubmitHandler({
+      getFormMode: () => formMode,
+      setEditMode: () => applyFormMode('edit'),
+      isSelected: () => Boolean(editingCodeInput.value),
+      onSave: handleSubmit,
+      clearMessage: () => { if (message) message.textContent = ''; },
     });
+    submitButton?.addEventListener('click', onSubmit);
     deleteButton?.addEventListener('click', async () => {
       try {
         await handleDelete();
