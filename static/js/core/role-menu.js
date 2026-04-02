@@ -27,7 +27,7 @@ const ROUTE_REGISTRY = [
   // 관리자
   { href: '/admin',        label: '관리자 페이지',   pageTitle: '관리자',     icon: 'lock-keyhole', roles: ['admin'],                      group: 'g5' },
   // 환경설정 (맨 하단)
-  { href: '/settings',     label: '환경 설정',      pageTitle: '설정',       icon: 'settings',  roles: ['provider', 'agent', 'admin'], group: 'bottom' },
+  { href: '/settings',     label: '설정',           pageTitle: '설정',       icon: 'settings',  roles: ['provider', 'agent', 'admin'], group: 'bottom' },
 ];
 
 const ICON_STROKE_WIDTH = 1.2;
