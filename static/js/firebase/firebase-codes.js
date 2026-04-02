@@ -59,7 +59,7 @@ export function buildChatCode(productCode = '', agentCode = '', agentUid = '') {
 
 export async function createPartnerCode(partnerType) {
   if (partnerType === 'provider') {
-    return reserveCode('provider_company', 'RP', 4);
+    return reserveCode('provider_company', 'RP', 3);
   }
   if (partnerType === 'sales_channel') {
     return reserveCode('agent_company', 'SP', 3);
