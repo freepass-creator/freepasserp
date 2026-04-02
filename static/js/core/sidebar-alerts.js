@@ -137,13 +137,15 @@ async function init() {
     uid = auth.user.uid;
     companyCode = profile.company_code || '';
 
-    watchRooms((rooms) => { counts.chat = countUnreadRooms(rooms); syncAllBadges(); });
-    watchContracts((items) => { counts.contract = countActionContracts(items); syncAllBadges(); });
-    watchSettlements((items) => { counts.settlement = countActionSettlements(items); syncAllBadges(); });
+    let _rafId = 0;
+    function scheduleBadges() { if (_rafId) return; _rafId = requestAnimationFrame(() => { _rafId = 0; syncAllBadges(); }); }
+    watchRooms((rooms) => { counts.chat = countUnreadRooms(rooms); scheduleBadges(); });
+    watchContracts((items) => { counts.contract = countActionContracts(items); scheduleBadges(); });
+    watchSettlements((items) => { counts.settlement = countActionSettlements(items); scheduleBadges(); });
 
     if (profile.role === 'admin') {
-      watchUsers((items) => { counts.member = countPendingUsers(items); syncAllBadges(); });
-      watchPartners((items) => { counts.partner = countPendingPartners(items); syncAllBadges(); });
+      watchUsers((items) => { counts.member = countPendingUsers(items); scheduleBadges(); });
+      watchPartners((items) => { counts.partner = countPendingPartners(items); scheduleBadges(); });
     }
   } catch (_) {}
 }

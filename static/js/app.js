@@ -87,10 +87,15 @@ function normalizeRequiredFields(root = document) {
 }
 
 function setActiveSidebar(pathname) {
+  let activeLink = null;
   document.querySelectorAll('.sidebar-link').forEach((link) => {
     const isActive = link.getAttribute('href') === pathname;
     link.classList.toggle('active', isActive);
+    if (isActive) activeLink = link;
   });
+  const labelEl = activeLink?.querySelector('.sidebar-link-label');
+  const pageName = document.querySelector('.top-bar-page-name');
+  if (labelEl && pageName) pageName.textContent = labelEl.textContent;
 }
 
 // ─── CSS 관리 ───────────────────────────────────────────────────────────────
@@ -173,6 +178,8 @@ async function loadPage(url, options = {}) {
       const nextMainShell = nextDoc.querySelector(MAIN_SHELL_SELECTOR);
       if (!nextMainShell) { window.location.href = url; return; }
 
+      syncTopBar(nextDoc);
+
       const styleHrefs = collectStyleHrefs(nextDoc);
       await ensureStyles(styleHrefs);
 
@@ -192,7 +199,6 @@ async function loadPage(url, options = {}) {
         mounted: false
       };
       pageCache.set(nextPathname, cached);
-      syncTopBar(nextDoc);
 
       // 기존 script 태그 제거
       document.querySelectorAll('script[data-page-script]').forEach((n) => n.remove());
@@ -200,7 +206,7 @@ async function loadPage(url, options = {}) {
       const modulePath = PAGE_MODULE_PATHS[nextPathname];
       if (modulePath) {
         try {
-          if (!cached.module) cached.module = await import(modulePath + '?t=' + Date.now());
+          if (!cached.module) cached.module = await import(modulePath + '?v=' + (window.APP_VER || '1'));
           if (typeof cached.module.mount === 'function') await cached.module.mount();
         } catch (e) {
           console.error('[app] module error', e);

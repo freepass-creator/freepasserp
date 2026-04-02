@@ -168,6 +168,7 @@ function bindAppSettings(profile) {
       };
       await updateUserProfile(currentProfile.uid, { settings: newSettings });
       currentProfile.settings = newSettings;
+      window.dispatchEvent(new CustomEvent('fp:settings-saved', { detail: { periods: periods.length ? periods : null } }));
       const badgeByHref = {};
       Object.entries(badge).forEach(([k, v]) => { badgeByHref[keyToHref(k)] = v; });
       applyBadgeVisibility(badgeByHref);
@@ -188,17 +189,14 @@ function bindAppSettings(profile) {
   // 상품목록 기간
   const savedPeriods = currentProfile.settings?.periods || null;
   if (periodList) {
-    periodList.innerHTML = `<div class="settings-period-chips">${ALL_PERIODS.map(p => {
+    periodList.innerHTML = `<div class="settings-period-checks">${ALL_PERIODS.map(p => {
       const checked = !savedPeriods || savedPeriods.includes(p);
-      return `<label class="settings-period-chip${checked ? ' is-checked' : ''}">
+      return `<label class="settings-period-check">
         <input type="checkbox" data-period="${p}" ${checked ? 'checked' : ''}>
-        ${p}개월
+        <span>${p}개월</span>
       </label>`;
     }).join('')}</div>`;
-    periodList.addEventListener('change', (e) => {
-      e.target.closest('.settings-period-chip')?.classList.toggle('is-checked', e.target.checked);
-      saveAppSettings();
-    });
+    periodList.addEventListener('change', saveAppSettings);
   }
 
   // 알림 뱃지 — 페이지별 토글

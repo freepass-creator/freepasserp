@@ -26,6 +26,7 @@
 </head>
 <body data-page="{{ page_title }}">
   {% block body %}{% endblock %}
+  <script>window.APP_VER='{{ app_version }}';</script>
   <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
   {% block page_js %}{% endblock %}
 </body>

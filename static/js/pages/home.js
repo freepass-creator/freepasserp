@@ -457,16 +457,18 @@ function renderNotices(items = []) {
 // ─── 초기화 ─────────────────────────────────────────────────────────────────
 
 function mountWatchers() {
-  registerPageCleanup(watchProducts(items => { ds.products = items || []; renderDashboard(); }));
-  registerPageCleanup(watchRooms(items => { ds.rooms = items || []; renderDashboard(); }));
-  registerPageCleanup(watchContracts(items => { ds.contracts = items || []; renderDashboard(); }));
-  registerPageCleanup(watchSettlements(items => { ds.settlements = items || []; renderDashboard(); }));
+  let _rafId = 0;
+  function scheduleRender() { if (_rafId) return; _rafId = requestAnimationFrame(() => { _rafId = 0; renderDashboard(); }); }
+  registerPageCleanup(watchProducts(items => { ds.products = items || []; scheduleRender(); }));
+  registerPageCleanup(watchRooms(items => { ds.rooms = items || []; scheduleRender(); }));
+  registerPageCleanup(watchContracts(items => { ds.contracts = items || []; scheduleRender(); }));
+  registerPageCleanup(watchSettlements(items => { ds.settlements = items || []; scheduleRender(); }));
   if (currentProfile?.role === 'provider' || currentProfile?.role === 'admin') {
-    registerPageCleanup(watchTerms(items => { ds.terms = items || []; renderDashboard(); }));
+    registerPageCleanup(watchTerms(items => { ds.terms = items || []; scheduleRender(); }));
   }
   if (currentProfile?.role === 'admin') {
-    registerPageCleanup(watchPartners(items => { ds.partners = items || []; renderDashboard(); }));
-    registerPageCleanup(watchUsers(items => { ds.users = items || []; renderDashboard(); }));
+    registerPageCleanup(watchPartners(items => { ds.partners = items || []; scheduleRender(); }));
+    registerPageCleanup(watchUsers(items => { ds.users = items || []; scheduleRender(); }));
   } else { ds.partners = []; ds.users = []; }
 }
 

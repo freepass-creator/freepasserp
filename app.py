@@ -18,6 +18,12 @@ import io, re, zipfile
 
 app = Flask(__name__)
 
+APP_VERSION = '20260403'
+
+@app.context_processor
+def inject_app_version():
+    return {'app_version': APP_VERSION}
+
 
 # ─── 구글시트 유틸 ────────────────────────────────────────────────────────────
 

@@ -170,3 +170,7 @@
 #product-form.ui-mode-view #product-photo-section {
   display: grid;
 }
+
+#product-form {
+  padding-bottom: var(--panel-body-pad, 16px);
+}

@@ -703,29 +703,28 @@ function renderList(){
     return `<tr class="pls-row${active}" data-id="${item.id}">${infoCells}${priceCells}</tr>`;
   }).join('');
 
-  $list.querySelectorAll('.pls-row').forEach(row => row.addEventListener('click', () => {
-    const clickedId = row.dataset.id;
+}
 
-    // 같은 행 클릭 → 닫기
-    if (state.selectedId === clickedId && $detailPanel && !$detailPanel.hidden) {
-      hideDetailPanel();
-      return;
-    }
-
-    state.selectedId = clickedId;
-    state.activePhotoIndex = 0;
-    renderList();
-    renderDetail();
-
-    if ($detailPanel && !$detailPanel.hidden) {
-      // 열려있으면 즉시 숨기고 다음 틱에 새로 슬라이드
-      $detailPanel.classList.remove('is-open');
-      $detailPanel.hidden = true;
-      setTimeout(() => showDetailPanel(), 0);
-    } else {
-      showDetailPanel();
-    }
-  }));
+// 행 클릭 — 이벤트 위임 (renderList 호출마다 리스너 누적 방지)
+function _handleRowClick(e) {
+  const row = e.target.closest('.pls-row');
+  if (!row) return;
+  const clickedId = row.dataset.id;
+  if (state.selectedId === clickedId && $detailPanel && !$detailPanel.hidden) {
+    hideDetailPanel();
+    return;
+  }
+  state.selectedId = clickedId;
+  state.activePhotoIndex = 0;
+  renderList();
+  renderDetail();
+  if ($detailPanel && !$detailPanel.hidden) {
+    $detailPanel.classList.remove('is-open');
+    $detailPanel.hidden = true;
+    setTimeout(() => showDetailPanel(), 0);
+  } else {
+    showDetailPanel();
+  }
 }
 function hasContent(value){ return String(value ?? '').trim() !== '' && String(value ?? '').trim() !== '-'; }
 function escapeHtml(value){ return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -1039,7 +1038,8 @@ $openFilterBtn?.addEventListener('click',()=>{
 $closeFilterBtn?.addEventListener('click',()=>{
   setFilterOverlay(false);
 });
-$filterSearch?.addEventListener('input', () => { state.searchQuery = $filterSearch.value.trim(); applyFilters(); });
+let _searchTimer = 0;
+$filterSearch?.addEventListener('input', () => { state.searchQuery = $filterSearch.value.trim(); clearTimeout(_searchTimer); _searchTimer = setTimeout(applyFilters, 150); });
 $resetFilterBtn?.addEventListener('click',()=>{ FILTER_SCHEMA.forEach(g=>{state.filters[g.key]=g.key==='periods'?DEFAULT_PERIODS.slice():[]; state.openGroups[g.key]=!!g.open;}); state.searchQuery=''; if($filterSearch) $filterSearch.value=''; applyFilters(); });
 $toggleAllGroupsBtn?.addEventListener('click',()=>{ const anyOpen=FILTER_SCHEMA.some(g=>state.openGroups[g.key]); FILTER_SCHEMA.forEach(g=>{state.openGroups[g.key]=!anyOpen;}); persistFilterState(); renderFilterAccordion(); const icon=$toggleAllGroupsBtn.querySelector('svg'); if(icon) icon.style.transform=anyOpen?'':'rotate(180deg)'; });
 qs('#shareProductBtn')?.addEventListener('click', handleShare);
@@ -1124,10 +1124,19 @@ async function init(){
     applyFilters();
   });
   registerPageCleanup(unsubscribe);
+
+  const onSettingsSaved = (e) => {
+    const periods = e.detail?.periods;
+    state.filters.periods = periods?.length ? periods.slice() : DEFAULT_PERIODS.slice();
+    applyFilters();
+  };
+  window.addEventListener('fp:settings-saved', onSettingsSaved);
+  registerPageCleanup(() => window.removeEventListener('fp:settings-saved', onSettingsSaved));
 }
 let _mounted = false;
 export async function mount() {
   bindDOM();
+  $list?.addEventListener('click', _handleRowClick);
   _mounted = false;
   await init().catch((error) => {
     console.error('[product-list] init failed', error);
@@ -1139,6 +1148,8 @@ export function unmount() {
   runPageCleanup();
   _mounted = false;
 }
-export function onShow() {}
+export function onShow() {
+  scheduleRenderList();
+}
 // Auto-mount on first script load (server-rendered page)
 if (!import.meta.url.includes('?')) mount();
