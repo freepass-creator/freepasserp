@@ -47,7 +47,7 @@ export function buildLegacyTermCode(providerCompanyCode = '', termType = '') {
 export async function createManagedTermCode(providerCompanyCode = '') {
   const normalizedProviderCode = sanitizeValue(providerCompanyCode);
   if (!normalizedProviderCode) throw new Error('공급사코드가 없습니다.');
-  const sequence = await nextSequence(`term_${normalizedProviderCode}`);
+  const sequence = await nextSequence(`policy_${normalizedProviderCode}`);
   return `${normalizedProviderCode}_P${padNumber(sequence, 2)}`;
 }
 

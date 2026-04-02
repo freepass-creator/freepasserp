@@ -34,10 +34,16 @@
       }
     },
 
+    "policies": {
+      ".read": true,
+      "$policy_code": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider')"
+      }
+    },
     "terms": {
       ".read": true,
       "$term_code": {
-        // admin 또는 해당 공급사 소속 provider가 쓰기 가능
+        // 하위호환: 기존 terms 경로 유지 (읽기만)
         ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'provider' && root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val()))",
         ".validate": "newData.hasChildren(['term_code', 'provider_company_code', 'term_name', 'status', 'created_at'])",
         "status": {

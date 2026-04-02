@@ -275,7 +275,7 @@ export function watchVehicleMaster(callback) {
 // ─── 정책(Term) ───────────────────────────────────────────────────────────────
 
 async function checkDuplicateTermName(providerCode, termName, excludeCode = null) {
-  const snapshot = await get(ref(db, 'terms'));
+  const snapshot = await get(ref(db, 'policies'));
   return Object.entries(snapshot.val() || {}).find(([code, item]) =>
     (excludeCode === null || code !== excludeCode) &&
     item.status !== 'deleted' &&
@@ -294,7 +294,7 @@ export async function saveTerm(termData = {}) {
     throw new Error('같은 공급사에서 같은 정책명은 등록할 수 없습니다.');
   }
   const termCode = await createManagedTermCode(providerCode);
-  await set(ref(db, `terms/${termCode}`), {
+  await set(ref(db, `policies/${termCode}`), {
     term_code: termCode, provider_company_code: providerCode,
     term_name: normalizedTermName, ...rest, status, created_by, created_at: Date.now()
   });
@@ -303,7 +303,7 @@ export async function saveTerm(termData = {}) {
 
 export async function updateTerm(termCode, updates) {
   const normalizedCode = sanitizeCodeValue(termCode);
-  const termRef = ref(db, `terms/${normalizedCode}`);
+  const termRef = ref(db, `policies/${normalizedCode}`);
   const snapshot = await get(termRef);
   if (!snapshot.exists()) throw new Error('수정할 정책이 없습니다.');
   const current = snapshot.val();
@@ -317,21 +317,21 @@ export async function updateTerm(termCode, updates) {
   return normalizedCode;
 }
 
-export async function deleteTerm(termCode) { return softDelete(`terms/${sanitizeCodeValue(termCode)}`); }
+export async function deleteTerm(termCode) { return softDelete(`policies/${sanitizeCodeValue(termCode)}`); }
 
 export function watchTerms(callback) {
-  return watchCollection('terms', callback, { filter: isNotDeleted, sort: sortByCreatedDesc });
+  return watchCollection('policies', callback, { filter: isNotDeleted, sort: sortByCreatedDesc });
 }
 
 export function watchTermsByProvider(providerCompanyCode, callback) {
   const normalizedProvider = sanitizeCodeValue(providerCompanyCode);
-  return watchCollection('terms', callback, {
+  return watchCollection('policies', callback, {
     filter: (item) => item.provider_company_code === normalizedProvider && isActive(item),
     sort: sortByCreatedDesc
   });
 }
 
-export async function getTerm(termCode) { return fetchOne(`terms/${sanitizeCodeValue(termCode)}`); }
+export async function getTerm(termCode) { return fetchOne(`policies/${sanitizeCodeValue(termCode)}`); }
 
 export async function resolveTermForProduct({ termCode = '', termName = '', providerCompanyCode = '' } = {}) {
   const normalizedTermCode = sanitizeCodeValue(termCode);
@@ -341,7 +341,7 @@ export async function resolveTermForProduct({ termCode = '', termName = '', prov
     const direct = await getTerm(normalizedTermCode);
     if (direct) return direct;
   }
-  const items = await fetchCollection('terms', { filter: isActive });
+  const items = await fetchCollection('policies', { filter: isActive });
   if (!items.length) return null;
   const safe = (predicate) => (item) => { try { return predicate(item || {}); } catch { return false; } };
   const matchesCode = safe((item) => sanitizeCodeValue(item.term_code || '') === normalizedTermCode);
@@ -627,7 +627,7 @@ export async function deleteRoomEverywhere(roomId) {
  * 개선: 5개 컬렉션을 각각 개별 watch하고, 어느 하나가 변경될 때만 병합 후 callback.
  */
 export function watchGeneratedCodes(callback) {
-  const cache = { partners: {}, users: {}, terms: {}, products: {}, rooms: {} };
+  const cache = { partners: {}, users: {}, policies: {}, products: {}, rooms: {} };
   let debounceTimer = null;
 
   function buildAndEmit() {
@@ -643,7 +643,7 @@ export function watchGeneratedCodes(callback) {
         rule_text: u.role === 'provider' ? 'R + 4자리 시퀀스' : u.role === 'agent' ? 'S + 3자리 시퀀스' : u.role === 'admin' ? 'A0001 고정' : '사용자 역할 기반 자동 시퀀스',
         source_values: { role: u.role || '', partner_code: u.company_code || '', email: u.email || '' }, created_at: u.created_at || 0
       })),
-      ...Object.values(cache.terms).map((t) => ({
+      ...Object.values(cache.policies).map((t) => ({
         code_type: 'policy', code: t.term_code || '', title: t.term_name || '-', subtitle: '정책 코드',
         rule_text: '공급사코드 + T + 3자리 시퀀스',
         source_values: { provider_company_code: t.provider_company_code || '', term_name: t.term_name || '' }, created_at: t.created_at || 0
@@ -674,7 +674,7 @@ export function watchGeneratedCodes(callback) {
     });
   }
 
-  const unsubs = ['partners', 'users', 'terms', 'products', 'rooms'].map(makeListener);
+  const unsubs = ['partners', 'users', 'policies', 'products', 'rooms'].map(makeListener);
   return () => { clearTimeout(debounceTimer); unsubs.forEach((fn) => fn()); };
 }
 
