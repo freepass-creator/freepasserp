@@ -452,6 +452,7 @@ function renderNotices(items = []) {
 }
 
 function bindNoticeEvents() {
+  if (!noticeList) return;
   noticeList.addEventListener('click', (e) => {
     const trigger = e.target.closest('.home-notice-trigger');
     if (trigger) { trigger.closest('.home-notice-item')?.classList.toggle('is-open'); }
