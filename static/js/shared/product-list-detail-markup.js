@@ -234,9 +234,10 @@ function renderPriceSummarySection(policy) {
   if (guideText !== '-') {
     notes.push(`<div class="plist-detail__price-note">* ${escapeHtml(guideText)}</div>`);
   }
-  if (clawbackText !== '-') {
-    notes.push(`<div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div>`);
-  }
+  // 수수료환수조건: 준비중 — 추후 오픈 시 복원
+  // if (clawbackText !== '-') {
+  //   notes.push(`<div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div>`);
+  // }
   if (!notes.length) return '';
   return `<div class="plist-detail__price-summary">${notes.join('')}</div>`;
 }

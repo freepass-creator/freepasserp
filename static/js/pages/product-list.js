@@ -191,6 +191,7 @@ const INFO_COLS = [
   // maxW 없음 = 텍스트에 맞게 자동. ellipsis = 상한만 제한
   { key: 'vehicleStatus', label: '차량상태', align: 'c', filterKey: 'vehicleStatus', w: 80 },
   { key: 'productType',   label: '상품구분', align: 'c', filterKey: 'productType', w: 80 },
+  { key: 'partnerCode',   label: '공급코드', align: 'c', filterKey: 'partnerCode' },
   { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, filterKey: null, filterType: 'search' },
   { key: 'maker',         label: '제조사',   align: 'c', filterKey: 'maker' },
   { key: 'model',         label: '모델명',   align: 'c', filterKey: 'model' },
@@ -638,6 +639,7 @@ function cellValue(col, item) {
   switch (col.key) {
     case 'vehicleStatus': return { html: renderBadgeRow([{ field: 'vehicle_status', value: item.vehicleStatus }]) };
     case 'productType': return { html: renderBadgeRow([{ field: 'product_type', value: item.productType }]) };
+    case 'partnerCode': return { text: safe(item.partnerCode) };
     case 'carNo': return { text: safe(item.carNo) };
     case 'maker': return { text: safe(item.maker) };
     case 'model': return { text: safe(item.model) };
