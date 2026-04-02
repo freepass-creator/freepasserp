@@ -70,7 +70,7 @@ function updatePreview() {
     preview.value = editingCodeInput.value;
     return;
   }
-  preview.value = typeInput.value === 'provider' ? 'RP001' : 'SP001';
+  preview.value = typeInput.value === 'provider' ? 'RP001' : typeInput.value === 'operator' ? 'OP001' : 'SP001';
 }
 
 function setIdleMode() {
@@ -140,7 +140,7 @@ function renderList(partners) {
     getCellValue: (col, p) => {
       switch (col.key) {
         case 'status': return renderBadgeRow([{ field: 'partner_status', value: p.status === 'active' ? '활성' : p.status === 'inactive' ? '비활성' : p.status || '-' }]);
-        case 'type': return renderBadgeRow([{ field: 'partner_type', value: p.partner_type === 'provider' ? '공급사' : '영업채널' }]);
+        case 'type': return renderBadgeRow([{ field: 'partner_type', value: p.partner_type === 'provider' ? '공급사' : p.partner_type === 'operator' ? '운영사' : '영업채널' }]);
         case 'code': return escapeHtml(p.partner_code || '-');
         case 'name': return escapeHtml(p.partner_name || '');
         case 'bizNo': return escapeHtml(p.business_number || '');
@@ -152,7 +152,7 @@ function renderList(partners) {
     getCellText: (col, p) => {
       switch (col.key) {
         case 'status': return p.status === 'active' ? '활성' : p.status === 'inactive' ? '비활성' : p.status || '-';
-        case 'type': return p.partner_type === 'provider' ? '공급사' : '영업채널';
+        case 'type': return p.partner_type === 'provider' ? '공급사' : p.partner_type === 'operator' ? '운영사' : '영업채널';
         case 'code': return p.partner_code || '';
         case 'name': return p.partner_name || '';
         case 'bizNo': return p.business_number || '';

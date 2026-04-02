@@ -122,6 +122,7 @@ function getBadgeKind(field, value) {
     if (includesAny(label, ['영업'])) return 'category-sales';
     if (token === 'provider') return 'category-supply';
     if (token === 'saleschannel') return 'category-sales';
+    if (token === 'operator' || includesAny(label, ['운영'])) return 'category-member';
     if (token === 'admin') return 'category-member';
     if (token === 'agent') return 'category-sales';
   }

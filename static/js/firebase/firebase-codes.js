@@ -64,6 +64,9 @@ export async function createPartnerCode(partnerType) {
   if (partnerType === 'sales_channel') {
     return reserveCode('agent_company', 'SP', 3);
   }
+  if (partnerType === 'operator') {
+    return reserveCode('operator_company', 'OP', 3);
+  }
   throw new Error('지원하지 않는 파트너 유형입니다.');
 }
 
