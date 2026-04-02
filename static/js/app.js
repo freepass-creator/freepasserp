@@ -165,6 +165,10 @@ async function loadPage(url, options = {}) {
       // ── 재방문: 컨테이너 즉시 표시 (구독 살아있음, DOM 최신) ──
       cached.container.style.display = '';
       if (cached.doc) syncTopBar(cached.doc);
+      // top-bar-actions 교체 후 이벤트 재바인딩
+      if (cached.module && typeof cached.module.onShow === 'function') {
+        try { cached.module.onShow(); } catch (_) {}
+      }
     } else {
       // ── 처음 방문: HTML fetch + mount (1회) ──
       prefetchModule(nextPathname);

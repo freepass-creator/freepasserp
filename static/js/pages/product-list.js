@@ -1141,5 +1141,8 @@ export function unmount() {
   runPageCleanup();
   _mounted = false;
 }
+export function onShow() {
+  bindPeriodSelector();
+}
 // Auto-mount on first script load (server-rendered page)
 if (!import.meta.url.includes('?')) mount();
