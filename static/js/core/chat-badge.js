@@ -69,6 +69,15 @@ async function initChatBadge() {
 
     watchRooms((rooms) => {
       lastCount = countPendingRooms(rooms, profile.role, user.uid, profile.company_code || '');
+      console.log('[chat-badge] rooms:', rooms.length, 'pending:', lastCount, 'role:', profile.role);
+      if (lastCount > 0) {
+        rooms.filter(r => {
+          const eff = r.last_effective_sender_role || '';
+          const last = r.last_sender_role || '';
+          const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
+          return sender === 'agent';
+        }).forEach(r => console.log('[chat-badge] pending room:', r.room_id, 'eff:', r.last_effective_sender_role, 'last:', r.last_sender_role));
+      }
       updateBadge(lastCount);
     });
   } catch (_) {
