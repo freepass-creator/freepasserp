@@ -229,9 +229,13 @@ function formatRentalGuideText(policy) {
 
 function renderPriceSummarySection(policy) {
   const guideText = formatRentalGuideText(policy);
+  const insuranceText = safeText(policy.insuranceIncluded);
   const notes = [];
   if (guideText !== '-') {
     notes.push(`<div class="plist-detail__price-note">* ${escapeHtml(guideText)}</div>`);
+  }
+  if (insuranceText !== '-') {
+    notes.push(`<div class="plist-detail__price-note">* 보험료: ${escapeHtml(insuranceText)}</div>`);
   }
   if (!notes.length) return '';
   return `<div class="plist-detail__price-summary">${notes.join('')}</div>`;
@@ -416,11 +420,9 @@ function renderFeeSection(product, termFields = {}) {
 
   const policy = buildPolicyValues(product, termFields);
   const clawbackText = safeText(policy.commissionClawbackCondition);
-  const insuranceText = safeText(policy.insuranceIncluded);
-  const notes = [];
-  if (clawbackText !== '-') notes.push(`<div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div>`);
-  if (insuranceText !== '-') notes.push(`<div class="plist-detail__price-note">* 보험료: ${escapeHtml(insuranceText)}</div>`);
-  const notesHtml = notes.length ? `<div class="plist-detail__price-summary">${notes.join('')}</div>` : '';
+  const notesHtml = clawbackText !== '-'
+    ? `<div class="plist-detail__price-summary"><div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div></div>`
+    : '';
 
   return renderSection('기간별 수수료', `
     <div class="plist-detail__table-wrap">
