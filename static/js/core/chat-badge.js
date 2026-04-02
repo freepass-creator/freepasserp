@@ -16,11 +16,15 @@ function getBadge() {
 function updateBadge(count) {
   const badge = getBadge();
   if (!badge) return;
+  const link = badge.closest('.sidebar-link');
   if (count > 0) {
     badge.textContent = count > 99 ? '99+' : String(count);
     badge.hidden = false;
+    link?.classList.add('has-new-event');
   } else {
     badge.hidden = true;
+    badge.textContent = '';
+    link?.classList.remove('has-new-event');
   }
 }
 
