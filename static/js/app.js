@@ -126,16 +126,16 @@ function syncTopBar(nextDoc, pathname = '') {
 
   const curActions = document.querySelector('.top-bar-actions');
   if (curActions) {
-    // 현재 페이지의 actions DOM을 캐시에 저장 (이벤트 포함)
+    // 현재 페이지의 actions 자식 노드를 캐시 div로 이동 (이벤트 보존)
     if (currentPageKey && curActions.childNodes.length) {
-      const frag = document.createDocumentFragment();
-      while (curActions.firstChild) frag.appendChild(curActions.firstChild);
-      _topBarActionsCache.set(currentPageKey, frag);
+      let cacheDiv = _topBarActionsCache.get(currentPageKey);
+      if (!cacheDiv) { cacheDiv = document.createElement('div'); _topBarActionsCache.set(currentPageKey, cacheDiv); }
+      while (curActions.firstChild) cacheDiv.appendChild(curActions.firstChild);
     }
-    // 다음 페이지의 캐시된 actions가 있으면 복원, 없으면 cloneNode
-    const cached = _topBarActionsCache.get(pathname);
-    if (cached) {
-      curActions.replaceChildren(cached);
+    // 다음 페이지의 캐시가 있으면 복원, 없으면 cloneNode
+    const cacheDiv = _topBarActionsCache.get(pathname);
+    if (cacheDiv && cacheDiv.childNodes.length) {
+      while (cacheDiv.firstChild) curActions.appendChild(cacheDiv.firstChild);
     } else {
       const nextActions = nextDoc?.querySelector('.top-bar-actions');
       if (nextActions) curActions.replaceChildren(...Array.from(nextActions.childNodes).map((n) => n.cloneNode(true)));
