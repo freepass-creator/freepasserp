@@ -70,7 +70,7 @@ function updatePreview() {
     preview.value = editingCodeInput.value;
     return;
   }
-  preview.value = typeInput.value === 'provider' ? 'RP001' : typeInput.value === 'operator' ? 'OP001' : 'SP001';
+  preview.value = typeInput.value === 'provider' ? 'RP***' : typeInput.value === 'operator' ? 'OP***' : 'SP***';
 }
 
 function setIdleMode() {
