@@ -117,29 +117,19 @@ function ensureStyles(hrefs) {
 
 // ─── 상단바 ─────────────────────────────────────────────────────────────────
 
-const _topBarActionsCache = new Map();
-
-function syncTopBar(nextDoc, pathname = '') {
+function syncTopBar(nextDoc) {
   const curPageName = document.querySelector('.top-bar-page-name');
   const nextPageName = nextDoc?.querySelector('.top-bar-page-name');
   if (curPageName && nextPageName) curPageName.textContent = nextPageName.textContent;
 
+  // top-bar-actions: 항상 비우고, onShow에서 각 페이지가 필요하면 다시 채움
   const curActions = document.querySelector('.top-bar-actions');
   if (curActions) {
-    // 현재 페이지의 actions 자식 노드를 캐시 div로 이동 (이벤트 보존)
-    if (currentPageKey && curActions.childNodes.length) {
-      let cacheDiv = _topBarActionsCache.get(currentPageKey);
-      if (!cacheDiv) { cacheDiv = document.createElement('div'); _topBarActionsCache.set(currentPageKey, cacheDiv); }
-      while (curActions.firstChild) cacheDiv.appendChild(curActions.firstChild);
-    }
-    // 다음 페이지의 캐시가 있으면 복원, 없으면 cloneNode
-    const cacheDiv = _topBarActionsCache.get(pathname);
-    if (cacheDiv && cacheDiv.childNodes.length) {
-      while (cacheDiv.firstChild) curActions.appendChild(cacheDiv.firstChild);
+    const nextActions = nextDoc?.querySelector('.top-bar-actions');
+    if (nextActions && nextActions.childNodes.length) {
+      curActions.replaceChildren(...Array.from(nextActions.childNodes).map((n) => n.cloneNode(true)));
     } else {
-      const nextActions = nextDoc?.querySelector('.top-bar-actions');
-      if (nextActions) curActions.replaceChildren(...Array.from(nextActions.childNodes).map((n) => n.cloneNode(true)));
-      else curActions.replaceChildren();
+      curActions.replaceChildren();
     }
   }
 
@@ -181,7 +171,7 @@ async function loadPage(url, options = {}) {
     if (cached?.mounted) {
       // ── 재방문: 컨테이너 즉시 표시 (구독 살아있음, DOM 최신) ──
       cached.container.style.display = '';
-      if (cached.doc) syncTopBar(cached.doc, nextPathname);
+      if (cached.doc) syncTopBar(cached.doc);
       // top-bar-actions 교체 후 이벤트 재바인딩
       if (cached.module && typeof cached.module.onShow === 'function') {
         try { cached.module.onShow(); } catch (_) {}
@@ -220,7 +210,7 @@ async function loadPage(url, options = {}) {
         mounted: false
       };
       pageCache.set(nextPathname, cached);
-      syncTopBar(nextDoc, nextPathname);
+      syncTopBar(nextDoc);
 
       // 기존 script 태그 제거
       document.querySelectorAll('script[data-page-script]').forEach((n) => n.remove());
