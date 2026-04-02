@@ -9,6 +9,7 @@
 
 import { db } from '../firebase/firebase-config.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
+import { normalizeProduct, renderProductDetailMarkup, bindProductDetailPhotoEvents } from '../shared/product-list-detail-view.js';
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -219,9 +220,9 @@ async function loadShareDetail() {
   const detailEl = document.getElementById('catalog-share-detail');
   if (!shareProductId || !detailEl) return false;
 
-  // 그리드/툴바/CTA/모달 숨기기
-  document.getElementById('catalog-toolbar')?.setAttribute('hidden', '');
-  grid.setAttribute('hidden', '');
+  // 카탈로그 UI 전부 숨기기
+  document.getElementById('catalog-toolbar')?.remove();
+  grid.remove();
   document.getElementById('catalog-cta')?.remove();
   document.getElementById('catalog-modal')?.remove();
 
@@ -232,62 +233,15 @@ async function loadShareDetail() {
       detailEl.hidden = false;
       return true;
     }
-    const p = snapshot.val();
-
-    // 상품 정보 구성
-    const model = [p.maker, p.model_name].filter(Boolean).join(' ');
-    const sub = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
-    const imageUrl = (p.image_urls?.[0] || p.image_url || p.photo_link || '').trim();
-
-    const infoRows = [
-      ['차량번호', p.car_number],
-      ['제조사', p.maker],
-      ['모델명', p.model_name],
-      ['세부모델', p.sub_model],
-      ['트림', p.trim_name],
-      ['연식', p.year ? `${p.year}년` : ''],
-      ['연료', p.fuel_type],
-      ['주행거리', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''],
-      ['차종구분', p.vehicle_class],
-      ['외부색상', p.ext_color],
-      ['내부색상', p.int_color],
-      ['옵션', p.options],
-      ['특이사항', p.partner_memo],
-    ].filter(([, v]) => v && v !== '-');
-
-    // 기간별 가격
-    const periods = ['1', '12', '24', '36', '48', '60'];
-    const priceRows = periods
-      .filter(m => Number(p[`rent_${m}`] || p.price?.[m]?.rent || 0) > 0)
-      .map(m => {
-        const rent = Number(p[`rent_${m}`] || p.price?.[m]?.rent || 0).toLocaleString('ko-KR');
-        const deposit = Number(p[`deposit_${m}`] || p.price?.[m]?.deposit || 0).toLocaleString('ko-KR');
-        return `<tr><td>${m}개월</td><td>${rent}</td><td>${deposit}</td></tr>`;
-      }).join('');
-
-    detailEl.innerHTML = `
-      <div class="catalog-share-card">
-        ${imageUrl ? `<div class="catalog-share-photo"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(model)}"></div>` : ''}
-        <div class="catalog-share-title">${escapeHtml(model)}</div>
-        ${sub ? `<div class="catalog-share-subtitle">${escapeHtml(sub)}</div>` : ''}
-        <div class="catalog-share-info">
-          ${infoRows.map(([label, value]) => `
-            <div class="catalog-share-row">
-              <span class="catalog-share-label">${escapeHtml(label)}</span>
-              <span class="catalog-share-value">${escapeHtml(String(value))}</span>
-            </div>
-          `).join('')}
-        </div>
-        ${priceRows ? `
-          <div class="catalog-share-section-title">기간별 대여료 및 보증금</div>
-          <table class="price-table catalog-share-price">
-            <thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead>
-            <tbody>${priceRows}</tbody>
-          </table>
-        ` : ''}
-      </div>
-    `;
+    const raw = snapshot.val();
+    const product = normalizeProduct(raw);
+    detailEl.className = 'catalog-share-detail product-list-page-shell';
+    detailEl.innerHTML = `<div class="detail-card">${renderProductDetailMarkup(product)}</div>`;
     detailEl.hidden = false;
+    bindProductDetailPhotoEvents(detailEl, (index) => {
+      detailEl.innerHTML = `<div class="detail-card">${renderProductDetailMarkup(product, { activePhotoIndex: index })}</div>`;
+      bindProductDetailPhotoEvents(detailEl, () => {});
+    });
   } catch (err) {
     detailEl.innerHTML = '<div class="catalog-empty">상품 정보를 불러올 수 없습니다.</div>';
     detailEl.hidden = false;
