@@ -13,10 +13,10 @@
 }
 
 .pls-grid-head {
-  position: absolute;
-  top: -34px;
-  right: 0;
-  z-index: 5;
+  position: fixed;
+  top: 14px;
+  right: 24px;
+  z-index: 50;
   display: flex;
   align-items: center;
 }
