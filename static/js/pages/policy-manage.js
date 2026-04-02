@@ -49,9 +49,14 @@ function bindDOM() {
   resetButton = qs('#term-form-reset');
   submitButton = qs('#term-submit-head');
   deleteButton = qs('#term-delete-head');
+  const rebound = createPolicyFieldBindings();
+  detailFields = rebound.detailFields;
+  CONTENT_LABELS = rebound.CONTENT_LABELS;
+  CONTENT_KEYS = rebound.CONTENT_KEYS;
+  CONTENT_LABEL_TO_KEY = rebound.CONTENT_LABEL_TO_KEY;
 }
 
-const { detailFields, CONTENT_LABELS, CONTENT_KEYS, CONTENT_LABEL_TO_KEY } = createPolicyFieldBindings();
+let { detailFields, CONTENT_LABELS, CONTENT_KEYS, CONTENT_LABEL_TO_KEY } = createPolicyFieldBindings();
 
 let currentTerms = [];
 let currentProfile = null;
