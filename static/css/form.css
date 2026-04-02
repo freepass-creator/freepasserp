@@ -254,6 +254,10 @@ textarea:focus {
   color: var(--text-main);
 }
 
+.message:empty {
+  margin-top: 0;
+}
+
 .form-feedback {
   position: sticky;
   top: 0;

@@ -1,4 +1,4 @@
-/* ===== GUEST CATALOG MODE ===== */
+/* ===== B2C CATALOG STORE ===== */
 
 .catalog-body {
   background: #f8fafc;
@@ -18,24 +18,95 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 56px;
-  padding: 0 24px;
-  background: rgba(255, 255, 255, 0.92);
+  height: 60px;
+  padding: 0 20px;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
 }
 
-.catalog-header__brand {
+.catalog-header-right {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* 영업자 명함 */
+
+.catalog-agent-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.catalog-agent-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #1b2a4a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.catalog-agent-avatar__initial {
   font-size: 16px;
   font-weight: 700;
-  color: #3b82f6;
-  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
-.catalog-header__title {
+.catalog-agent-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.catalog-agent-name {
   font-size: 14px;
-  font-weight: 500;
-  color: var(--text-subtle, #64748b);
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.catalog-agent-company {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 헤더 전화 버튼 */
+
+.catalog-header-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+
+.catalog-header-call:hover { background: #dcfce7; }
+
+/* ─── Main ────────────────────────────────────────────────────────────────── */
+
+.catalog-main {
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 /* ─── Toolbar ─────────────────────────────────────────────────────────────── */
@@ -43,21 +114,36 @@
 .catalog-toolbar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 24px;
+  gap: 10px;
+  padding: 14px 20px 10px;
+}
+
+.catalog-search-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+}
+
+.catalog-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
 }
 
 .catalog-search {
   width: 100%;
-  max-width: 480px;
-  height: 44px;
-  padding: 0 16px;
+  height: 42px;
+  padding: 0 14px 0 38px;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   background: #fff;
   font-size: 14px;
   color: #0f172a;
   outline: none;
+  box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
@@ -68,14 +154,14 @@
 
 .catalog-filter-chips {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .catalog-chip {
   display: inline-flex;
   align-items: center;
-  height: 30px;
+  height: 28px;
   padding: 0 12px;
   border: 1px solid #e2e8f0;
   border-radius: 999px;
@@ -93,18 +179,21 @@
   font-weight: 600;
 }
 
-/* ─── Product Grid ────────────────────────────────────────────────────────── */
+/* ─── Count bar ───────────────────────────────────────────────────────────── */
 
-.catalog-main {
-  max-width: 1280px;
-  margin: 0 auto;
+.catalog-count-bar {
+  padding: 4px 20px 8px;
+  font-size: 12px;
+  color: #94a3b8;
 }
+
+/* ─── Product Grid ────────────────────────────────────────────────────────── */
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  padding: 0 24px 32px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  padding: 0 20px 32px;
 }
 
 .catalog-card {
@@ -118,33 +207,68 @@
 
 .catalog-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+.catalog-card__image-wrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: #f1f5f9;
 }
 
 .catalog-card__image {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
-  background: #f1f5f9;
   display: block;
 }
 
-.catalog-card__image-placeholder {
+.catalog-card__no-image {
   width: 100%;
-  height: 180px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
-  color: #94a3b8;
-  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.catalog-card__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.65);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.catalog-card__photo-count {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  font-size: 11px;
 }
 
 .catalog-card__body {
-  padding: 14px 16px 16px;
+  padding: 12px 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .catalog-card__model {
@@ -159,23 +283,34 @@
   color: #64748b;
 }
 
-.catalog-card__price {
+.catalog-card__price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
   margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.catalog-card__price {
   font-size: 16px;
   font-weight: 700;
   color: #1b2a4a;
 }
 
-.catalog-card__price-sub {
+.catalog-card__dep {
   font-size: 11px;
-  font-weight: 400;
   color: #94a3b8;
-  margin-left: 4px;
+}
+
+.catalog-card__price-inquiry {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b82f6;
 }
 
 .catalog-card__tags {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   margin-top: 4px;
   flex-wrap: wrap;
 }
@@ -183,8 +318,8 @@
 .catalog-card__tag {
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding: 0 8px;
+  height: 20px;
+  padding: 0 7px;
   border-radius: 4px;
   background: #f1f5f9;
   font-size: 11px;
@@ -193,10 +328,32 @@
 
 .catalog-empty {
   grid-column: 1 / -1;
-  padding: 48px 16px;
+  padding: 60px 16px;
   text-align: center;
   font-size: 14px;
   color: #94a3b8;
+}
+
+/* ─── Skeleton ────────────────────────────────────────────────────────────── */
+
+.catalog-skeleton-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.catalog-skeleton-card {
+  height: 280px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e9eef5 50%, #f1f5f9 75%);
+  background-size: 400% 100%;
+  animation: catalog-shimmer 1.4s ease infinite;
+}
+
+@keyframes catalog-shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
 }
 
 /* ─── Detail Modal ────────────────────────────────────────────────────────── */
@@ -205,92 +362,244 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 24px;
+  padding: 0;
+}
+
+@media (min-width: 600px) {
+  .catalog-modal-overlay {
+    align-items: center;
+    padding: 24px;
+  }
 }
 
 .catalog-modal {
   position: relative;
   width: min(560px, 100%);
-  max-height: calc(100vh - 48px);
-  border-radius: 16px;
+  max-height: 92dvh;
+  border-radius: 20px 20px 0 0;
   background: #fff;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 -4px 40px rgba(15, 23, 42, 0.15);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 600px) {
+  .catalog-modal {
+    border-radius: 16px;
+    max-height: calc(100vh - 48px);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  }
 }
 
 .catalog-modal__close {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border: none;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.06);
+  background: rgba(15, 23, 42, 0.07);
   color: #64748b;
   cursor: pointer;
-  z-index: 1;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  transition: background 0.12s;
 }
+
+.catalog-modal__close:hover { background: rgba(15, 23, 42, 0.12); }
+
+/* ─── Gallery ─────────────────────────────────────────────────────────────── */
+
+.catalog-modal__gallery {
+  flex-shrink: 0;
+}
+
+.catalog-gallery__track {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  background: #0f172a;
+  overflow: hidden;
+}
+
+.catalog-gallery__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.catalog-gallery__empty {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #cbd5e1;
+}
+
+.catalog-gallery__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.12s;
+  z-index: 1;
+}
+
+.catalog-gallery__nav:hover { background: #fff; }
+.catalog-gallery__nav--prev { left: 10px; }
+.catalog-gallery__nav--next { right: 10px; }
+
+.catalog-gallery__counter {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ─── Modal body ──────────────────────────────────────────────────────────── */
 
 .catalog-modal__body {
-  padding: 24px;
+  padding: 20px 20px 8px;
+  flex: 1;
 }
 
-.catalog-detail__image {
-  width: 100%;
-  max-height: 320px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.catalog-detail__title {
+.catalog-modal__title {
   font-size: 20px;
   font-weight: 700;
   color: #0f172a;
-  margin-bottom: 4px;
+  line-height: 1.25;
+  padding-right: 40px; /* close button */
 }
 
-.catalog-detail__subtitle {
+.catalog-modal__subtitle {
   font-size: 13px;
   color: #64748b;
-  margin-bottom: 16px;
+  margin-top: 3px;
 }
+
+.catalog-modal__section {
+  margin-top: 18px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 14px;
+}
+
+.catalog-modal__section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+/* 스펙 rows */
 
 .catalog-detail__row {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f1f5f9;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f8fafc;
   font-size: 13px;
 }
 
-.catalog-detail__label { color: #64748b; }
-.catalog-detail__value { color: #0f172a; font-weight: 500; }
+.catalog-detail__label { color: #64748b; flex-shrink: 0; }
+.catalog-detail__value { color: #0f172a; font-weight: 500; text-align: right; }
 
-/* ─── Bottom CTA ──────────────────────────────────────────────────────────── */
+/* 가격표 */
 
-.catalog-cta {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 200;
-  padding: 12px 24px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(15, 23, 42, 0.06);
+.catalog-price-table { width: 100%; }
+
+.catalog-price-table__head {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 2px;
 }
+
+.catalog-price-table__row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 8px;
+  padding: 10px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  align-items: center;
+}
+
+.catalog-price-table__period {
+  font-weight: 600;
+  color: #475569;
+}
+
+.catalog-price-table__rent {
+  font-weight: 700;
+  color: #1b2a4a;
+}
+
+.catalog-price-table__dep {
+  color: #64748b;
+}
+
+/* 가격 문의 */
+
+.catalog-modal__inquiry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+/* ─── Modal footer CTA ────────────────────────────────────────────────────── */
+
+.catalog-modal__footer {
+  padding: 14px 20px;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  flex-shrink: 0;
+}
+
+/* ─── Bottom CTA button (shared) ─────────────────────────────────────────── */
 
 .catalog-cta__button {
   display: flex;
@@ -298,9 +607,7 @@
   justify-content: center;
   gap: 8px;
   width: 100%;
-  max-width: 480px;
   height: 48px;
-  margin: 0 auto;
   border-radius: 12px;
   background: #1b2a4a;
   color: #fff;
@@ -310,27 +617,43 @@
   transition: background 0.15s;
 }
 
-.catalog-cta__button:hover {
-  background: #142038;
+.catalog-cta__button:hover { background: #142038; }
+
+.catalog-cta__button--footer {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ─── Fixed footer ────────────────────────────────────────────────────────── */
+
+.catalog-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  padding: 12px 20px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 600px) {
-  .catalog-header { padding: 0 16px; }
-  .catalog-toolbar { padding: 12px 16px; }
+  .catalog-header { padding: 0 14px; }
+  .catalog-toolbar { padding: 12px 14px 8px; }
   .catalog-grid {
-    grid-template-columns: 1fr;
-    padding: 0 16px 24px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 14px 24px;
   }
-  .catalog-cta { padding: 10px 16px; }
+  .catalog-card__image-wrap { height: 140px; }
+  .catalog-count-bar { padding: 4px 14px 6px; }
+  .catalog-footer { padding: 10px 14px; }
 }
 
-/* ─── 공유 상세 ──────────────────────────────────────────────────────────── */
-
-.catalog-share-detail {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 12px;
+@media (max-width: 360px) {
+  .catalog-grid { grid-template-columns: 1fr; }
 }
-.catalog-share-detail .detail-card { background: #fff; border-radius: 8px; padding: 12px; }

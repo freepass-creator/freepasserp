@@ -369,7 +369,7 @@ async function bootstrap() {
           return;
         }
       }
-      if (!editingCodeInput.value && mode !== 'idle') setCreateMode(providerCodeInput.value || profile.company_code || '');
+      if (!editingCodeInput.value && formMode !== 'idle') setCreateMode(providerCodeInput.value || profile.company_code || '');
     }));
 
     providerCodeInput.addEventListener('change', updatePreviewCode);

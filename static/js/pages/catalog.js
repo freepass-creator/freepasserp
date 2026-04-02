@@ -1,92 +1,185 @@
 /**
- * catalog.js
+ * catalog.js — B2C 영업자 카탈로그 스토어
  *
- * 게스트/카탈로그 모드 — 인증 없이 공개 상품 목록을 카드 그리드로 표시.
  * URL 파라미터:
- *   ?agent=SP001&phone=01012345678  영업자 코드 + 연락처
- *   &maker=현대                      필터 프리셋
+ *   ?a={agentCode}        영업자 user_code (필수는 아니지만 명함 표시에 필요)
+ *   &id={productUid}      공유된 상품 uid → 자동으로 모달 오픈
+ *
+ * 레거시 호환:
+ *   ?agent={agentCode}    구형 agent 파라미터
+ *   ?car={carNumber}      구형 차량번호 기반 공유
  */
 
-import { db } from '../firebase/firebase-config.js';
+import { auth, db } from '../firebase/firebase-config.js';
+import { signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
-import { normalizeProduct, renderProductDetailMarkup, bindProductDetailPhotoEvents } from '../shared/product-list-detail-view.js';
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-const grid = document.getElementById('catalog-grid');
-const searchInput = document.getElementById('catalog-search');
-const chipsContainer = document.getElementById('catalog-filter-chips');
-const modal = document.getElementById('catalog-modal');
-const modalBody = document.getElementById('catalog-modal-body');
-const modalClose = document.getElementById('catalog-modal-close');
-const ctaLink = document.getElementById('catalog-cta-link');
+// ─── DOM refs ──────────────────────────────────────────────────────────────
 
-const params = new URLSearchParams(window.location.search);
-const agentCode = params.get('agent') || '';
-const agentPhone = params.get('phone') || '';
-const presetMaker = params.get('maker') || '';
+const qs = (id) => document.getElementById(id);
 
-let allProducts = [];
-let activeMaker = presetMaker;
+const agentAvatar    = qs('catalog-agent-avatar');
+const agentName      = qs('catalog-agent-name');
+const agentCompany   = qs('catalog-agent-company');
+const headerCall     = qs('catalog-header-call');
+const headerCallText = qs('catalog-header-call-text');
+const searchInput    = qs('catalog-search');
+const chipsEl        = qs('catalog-filter-chips');
+const countBar       = qs('catalog-count-bar');
+const countText      = qs('catalog-count-text');
+const grid           = qs('catalog-grid');
+const modal          = qs('catalog-modal');
+const modalGallery   = qs('catalog-modal-gallery');
+const modalBody      = qs('catalog-modal-body');
+const modalClose     = qs('catalog-modal-close');
+const modalCta       = qs('catalog-modal-cta');
+const modalCtaText   = qs('catalog-modal-cta-text');
+const footer         = qs('catalog-footer');
+const ctaLink        = qs('catalog-cta-link');
+const ctaText        = qs('catalog-cta-text');
 
-// ─── CTA 설정 ─────────────────────────────────────────────────────────────
+// ─── URL 파라미터 ──────────────────────────────────────────────────────────
 
-if (agentPhone) {
-  ctaLink.href = `tel:${agentPhone}`;
-} else {
-  ctaLink.removeAttribute('href');
-  ctaLink.querySelector('span').textContent = '상품 문의하기';
+const params     = new URLSearchParams(window.location.search);
+const agentCode  = params.get('a') || params.get('agent') || '';
+const shareId    = params.get('id') || '';
+const shareCar   = params.get('car') || '';
+
+// ─── 상태 ──────────────────────────────────────────────────────────────────
+
+let allProducts   = [];
+let activeMaker   = '';
+let galleryIndex  = 0;
+let galleryImages = [];
+let agentPhone    = '';
+
+// ─── 유틸 ──────────────────────────────────────────────────────────────────
+
+function esc(text) {
+  const d = document.createElement('div');
+  d.textContent = String(text ?? '');
+  return d.innerHTML;
 }
 
-// ─── 유틸 ─────────────────────────────────────────────────────────────────
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+function fmtPrice(v) {
+  const n = Number(v || 0);
+  if (!n) return null;
+  return n.toLocaleString('ko-KR') + '원';
 }
 
-function formatPrice(value) {
-  const num = Number(value || 0);
-  if (!num) return '-';
-  return num.toLocaleString('ko-KR') + '원';
+function getImages(p) {
+  if (Array.isArray(p.image_urls) && p.image_urls.length) return p.image_urls.filter(Boolean);
+  if (p.image_url) return [p.image_url];
+  return [];
 }
 
-// ─── 데이터 로드 ──────────────────────────────────────────────────────────
+function getRent(p, months) {
+  return Number(
+    p[`rent_${months}`] ||
+    p[`rental_price_${months}`] ||
+    p?.price?.[months]?.rent ||
+    p?.price?.[String(months)]?.rent ||
+    0
+  );
+}
 
-async function loadProducts() {
+function getDeposit(p, months) {
+  return Number(
+    p[`deposit_${months}`] ||
+    p?.price?.[months]?.deposit ||
+    p?.price?.[String(months)]?.deposit ||
+    0
+  );
+}
+
+// ─── 영업자 정보 로드 ──────────────────────────────────────────────────────
+
+async function loadAgent() {
+  if (!agentCode) return;
   try {
-    const snapshot = await get(ref(db, 'products'));
-    const data = snapshot.val() || {};
-    allProducts = Object.values(data)
-      .filter((p) => p && p.status !== 'deleted')
-      .sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
-    renderChips();
-    renderGrid();
-  } catch (error) {
-    grid.innerHTML = '<div class="catalog-empty">상품을 불러올 수 없습니다.</div>';
+    const snap = await get(ref(db, 'users'));
+    if (!snap.exists()) return;
+    const users = snap.val();
+    const agent = Object.values(users).find((u) => u && u.user_code === agentCode);
+    if (!agent) return;
+
+    const name    = agent.name || agent.user_name || '';
+    const company = agent.company || agent.company_name || '';
+    const phone   = agent.phone || agent.phone_number || '';
+
+    if (name) {
+      agentName.textContent = name;
+      // 아바타에 이니셜 표시
+      const initial = name.charAt(0);
+      agentAvatar.innerHTML = `<span class="catalog-agent-avatar__initial">${esc(initial)}</span>`;
+    }
+    if (company) agentCompany.textContent = company;
+
+    if (phone) {
+      agentPhone = phone;
+      headerCall.href = `tel:${phone}`;
+      headerCallText.textContent = phone;
+      headerCall.hidden = false;
+
+      ctaLink.href = `tel:${phone}`;
+      ctaText.textContent = `${name || '영업자'}에게 전화하기`;
+      footer.hidden = false;
+
+      modalCta.href = `tel:${phone}`;
+      modalCtaText.textContent = '전화 문의하기';
+    }
+  } catch (e) {
+    console.warn('[catalog] agent load failed', e);
   }
 }
 
-// ─── 필터 칩 ──────────────────────────────────────────────────────────────
+// ─── 상품 로드 ─────────────────────────────────────────────────────────────
+
+async function loadProducts() {
+  try {
+    const snap = await get(ref(db, 'products'));
+    const data = snap.val() || {};
+    allProducts = Object.values(data)
+      .filter((p) => p && p.status !== 'deleted' && p.vehicle_status !== '계약완료')
+      .sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+    renderChips();
+    renderGrid();
+
+    // 공유 상품 자동 오픈
+    if (shareId) {
+      const target = allProducts.find((p) => (p.productUid || p.id) === shareId);
+      if (target) openModal(target);
+    } else if (shareCar) {
+      const target = allProducts.find((p) => p.car_number === shareCar);
+      if (target) openModal(target);
+    }
+  } catch (err) {
+    grid.innerHTML = '<div class="catalog-empty">상품을 불러올 수 없습니다.</div>';
+    console.error('[catalog] loadProducts error', err);
+  }
+}
+
+// ─── 필터 칩 ───────────────────────────────────────────────────────────────
 
 function getMakers() {
-  const makers = new Set();
-  allProducts.forEach((p) => { if (p.maker) makers.add(p.maker); });
-  return [...makers].sort();
+  const set = new Set();
+  allProducts.forEach((p) => { if (p.maker) set.add(p.maker); });
+  return [...set].sort();
 }
 
 function renderChips() {
   const makers = getMakers();
-  if (makers.length <= 1) { chipsContainer.innerHTML = ''; return; }
-  const all = `<button class="catalog-chip${!activeMaker ? ' is-active' : ''}" data-maker="">전체</button>`;
-  const chips = makers.map((m) =>
-    `<button class="catalog-chip${activeMaker === m ? ' is-active' : ''}" data-maker="${escapeHtml(m)}">${escapeHtml(m)}</button>`
+  if (makers.length <= 1) { chipsEl.innerHTML = ''; return; }
+  const btnAll = `<button class="catalog-chip${!activeMaker ? ' is-active' : ''}" data-maker="">전체</button>`;
+  const btnMakers = makers.map((m) =>
+    `<button class="catalog-chip${activeMaker === m ? ' is-active' : ''}" data-maker="${esc(m)}">${esc(m)}</button>`
   ).join('');
-  chipsContainer.innerHTML = all + chips;
+  chipsEl.innerHTML = btnAll + btnMakers;
 }
 
-chipsContainer.addEventListener('click', (e) => {
+chipsEl.addEventListener('click', (e) => {
   const chip = e.target.closest('.catalog-chip');
   if (!chip) return;
   activeMaker = chip.dataset.maker || '';
@@ -94,165 +187,243 @@ chipsContainer.addEventListener('click', (e) => {
   renderGrid();
 });
 
-// ─── 그리드 렌더링 ────────────────────────────────────────────────────────
+// ─── 그리드 렌더링 ─────────────────────────────────────────────────────────
 
-function getFilteredProducts() {
-  const query = (searchInput.value || '').trim().toLowerCase();
+function getFiltered() {
+  const q = (searchInput.value || '').trim().toLowerCase();
   return allProducts.filter((p) => {
     if (activeMaker && p.maker !== activeMaker) return false;
-    if (query) {
+    if (q) {
       const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name].join(' ').toLowerCase();
-      if (!text.includes(query)) return false;
+      if (!text.includes(q)) return false;
     }
     return true;
   });
 }
 
 function renderGrid() {
-  const products = getFilteredProducts();
+  const products = getFiltered();
+
+  // 카운트 바
+  countText.textContent = `${products.length}대`;
+  countBar.hidden = false;
+
   if (!products.length) {
     grid.innerHTML = '<div class="catalog-empty">조건에 맞는 상품이 없습니다.</div>';
     return;
   }
 
   grid.innerHTML = products.map((p, i) => {
-    const imageUrl = (p.image_urls?.[0] || p.image_url || '').trim();
-    const imageHtml = imageUrl
-      ? `<img class="catalog-card__image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(p.model_name || '')}" loading="lazy">`
-      : `<div class="catalog-card__image-placeholder">No Image</div>`;
+    const imgs   = getImages(p);
+    const thumb  = imgs[0] || '';
+    const model  = [p.maker, p.model_name].filter(Boolean).join(' ');
+    const sub    = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
+    const rent48 = getRent(p, 48);
+    const dep48  = getDeposit(p, 48);
+    const status = p.vehicle_status || '';
 
-    const model = [p.maker, p.model_name].filter(Boolean).join(' ');
-    const sub = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
-    const price = Number(p.rent_48 || p.rental_price_48 || p.rental_price || p.price?.['48']?.rent || 0);
-    const deposit = Number(p.deposit_48 || p.deposit || p.price?.['48']?.deposit || 0);
+    const imageHtml = thumb
+      ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(model)}" loading="lazy">`
+      : `<div class="catalog-card__no-image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
-    const tags = [
-      p.fuel_type,
-      p.year ? `${p.year}년` : '',
-      p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''
-    ].filter(Boolean);
+    const badgeHtml = status && status !== '재고' && status !== '입고예정'
+      ? `<span class="catalog-card__badge">${esc(status)}</span>`
+      : '';
+
+    const tags = [p.fuel_type, p.year ? `${p.year}년` : '', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''].filter(Boolean);
 
     return `
-      <article class="catalog-card" data-index="${i}">
-        ${imageHtml}
-        <div class="catalog-card__body">
-          <div class="catalog-card__model">${escapeHtml(model || '차량')}</div>
-          ${sub ? `<div class="catalog-card__sub">${escapeHtml(sub)}</div>` : ''}
-          <div class="catalog-card__price">
-            ${price ? `월 ${formatPrice(price)}` : '가격 문의'}
-            ${deposit ? `<span class="catalog-card__price-sub">보증금 ${formatPrice(deposit)}</span>` : ''}
-          </div>
-          ${tags.length ? `<div class="catalog-card__tags">${tags.map((t) => `<span class="catalog-card__tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      <article class="catalog-card" data-index="${i}" role="button" tabindex="0">
+        <div class="catalog-card__image-wrap">
+          ${imageHtml}
+          ${badgeHtml}
+          ${imgs.length > 1 ? `<span class="catalog-card__photo-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${imgs.length}</span>` : ''}
         </div>
-      </article>
-    `;
+        <div class="catalog-card__body">
+          <div class="catalog-card__model">${esc(model || '차량')}</div>
+          ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
+          <div class="catalog-card__price-row">
+            ${rent48
+              ? `<span class="catalog-card__price">월 ${fmtPrice(rent48)}</span>${dep48 ? `<span class="catalog-card__dep">보증금 ${fmtPrice(dep48)}</span>` : ''}`
+              : `<span class="catalog-card__price-inquiry">가격 문의</span>`
+            }
+          </div>
+          ${tags.length ? `<div class="catalog-card__tags">${tags.map((t) => `<span class="catalog-card__tag">${esc(t)}</span>`).join('')}</div>` : ''}
+        </div>
+      </article>`;
   }).join('');
 }
 
-// ─── 상세 모달 ────────────────────────────────────────────────────────────
+// ─── 상세 모달 ─────────────────────────────────────────────────────────────
 
-grid.addEventListener('click', (e) => {
-  const card = e.target.closest('.catalog-card');
-  if (!card) return;
-  const index = Number(card.dataset.index);
-  const products = getFilteredProducts();
-  const p = products[index];
-  if (!p) return;
-  openDetail(p);
-});
-
-function openDetail(p) {
-  const imageUrl = (p.image_urls?.[0] || p.image_url || '').trim();
-  const model = [p.maker, p.model_name].filter(Boolean).join(' ');
-  const sub = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
-  const price48 = Number(p.rent_48 || p.rental_price_48 || p.price?.['48']?.rent || 0);
-  const dep48 = Number(p.deposit_48 || p.price?.['48']?.deposit || 0);
-
-  const rows = [
-    ['차량번호', p.car_number],
-    ['연식', p.year ? `${p.year}년` : '-'],
-    ['연료', p.fuel_type || '-'],
-    ['주행거리', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : '-'],
-    ['외부색상', p.ext_color || '-'],
-    ['내부색상', p.int_color || '-'],
-    ['48개월 대여료', price48 ? formatPrice(price48) : '-'],
-    ['48개월 보증금', dep48 ? formatPrice(dep48) : '-'],
-    ['특이사항', p.partner_memo || p.note || '-']
-  ].filter(([, v]) => v && v !== '-');
-
-  modalBody.innerHTML = `
-    ${imageUrl ? `<img class="catalog-detail__image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(model)}">` : ''}
-    <div class="catalog-detail__title">${escapeHtml(model || '차량')}</div>
-    ${sub ? `<div class="catalog-detail__subtitle">${escapeHtml(sub)}</div>` : ''}
-    ${rows.map(([label, value]) => `
-      <div class="catalog-detail__row">
-        <span class="catalog-detail__label">${escapeHtml(label)}</span>
-        <span class="catalog-detail__value">${escapeHtml(String(value))}</span>
-      </div>
-    `).join('')}
-  `;
+function openModal(p) {
+  galleryImages = getImages(p);
+  galleryIndex  = 0;
+  renderGallery();
+  renderModalBody(p);
   modal.hidden = false;
   document.body.style.overflow = 'hidden';
 }
 
-function closeDetail() {
+function closeModal() {
   modal.hidden = true;
   document.body.style.overflow = '';
 }
 
-modalClose.addEventListener('click', closeDetail);
-modal.addEventListener('click', (e) => { if (e.target === modal) closeDetail(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeDetail(); });
+// 갤러리
+
+function renderGallery() {
+  if (!galleryImages.length) {
+    modalGallery.innerHTML = '<div class="catalog-gallery__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
+    return;
+  }
+
+  const total = galleryImages.length;
+  const navBtns = total > 1 ? `
+    <button class="catalog-gallery__nav catalog-gallery__nav--prev" id="gallery-prev" aria-label="이전">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <button class="catalog-gallery__nav catalog-gallery__nav--next" id="gallery-next" aria-label="다음">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+    <div class="catalog-gallery__counter">${galleryIndex + 1} / ${total}</div>` : '';
+
+  modalGallery.innerHTML = `
+    <div class="catalog-gallery__track">
+      <img class="catalog-gallery__img" src="${esc(galleryImages[galleryIndex])}" alt="차량 사진 ${galleryIndex + 1}">
+      ${navBtns}
+    </div>`;
+
+  if (total > 1) {
+    document.getElementById('gallery-prev')?.addEventListener('click', () => {
+      galleryIndex = (galleryIndex - 1 + total) % total;
+      renderGallery();
+    });
+    document.getElementById('gallery-next')?.addEventListener('click', () => {
+      galleryIndex = (galleryIndex + 1) % total;
+      renderGallery();
+    });
+  }
+}
+
+// 상품 정보
+
+function renderModalBody(p) {
+  const model = [p.maker, p.model_name].filter(Boolean).join(' ');
+  const sub   = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
+
+  // 스펙
+  const specs = [
+    ['연식',     p.year ? `${p.year}년` : null],
+    ['연료',     p.fuel_type || null],
+    ['주행거리', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : null],
+    ['외부색상', p.ext_color || null],
+    ['내부색상', p.int_color || null],
+    ['차량번호', p.car_number || null],
+    ['특이사항', p.partner_memo || p.note || null],
+  ].filter(([, v]) => v);
+
+  // 가격표 (36/48/60개월)
+  const periods = [36, 48, 60];
+  const priceRows = periods
+    .map((m) => {
+      const rent = getRent(p, m);
+      const dep  = getDeposit(p, m);
+      if (!rent && !dep) return null;
+      return { m, rent, dep };
+    })
+    .filter(Boolean);
+
+  const specsHtml = specs.length
+    ? `<div class="catalog-modal__section">
+        <div class="catalog-modal__section-title">차량 정보</div>
+        ${specs.map(([label, value]) =>
+          `<div class="catalog-detail__row"><span class="catalog-detail__label">${esc(label)}</span><span class="catalog-detail__value">${esc(value)}</span></div>`
+        ).join('')}
+      </div>`
+    : '';
+
+  const priceHtml = priceRows.length
+    ? `<div class="catalog-modal__section">
+        <div class="catalog-modal__section-title">렌트 요금</div>
+        <div class="catalog-price-table">
+          <div class="catalog-price-table__head">
+            <span>기간</span><span>월 대여료</span><span>보증금</span>
+          </div>
+          ${priceRows.map(({ m, rent, dep }) =>
+            `<div class="catalog-price-table__row">
+              <span class="catalog-price-table__period">${m}개월</span>
+              <span class="catalog-price-table__rent">${fmtPrice(rent) || '-'}</span>
+              <span class="catalog-price-table__dep">${fmtPrice(dep) || '-'}</span>
+            </div>`
+          ).join('')}
+        </div>
+      </div>`
+    : `<div class="catalog-modal__section catalog-modal__inquiry">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        가격은 문의해 주세요.
+      </div>`;
+
+  modalBody.innerHTML = `
+    <div class="catalog-modal__title">${esc(model || '차량')}</div>
+    ${sub ? `<div class="catalog-modal__subtitle">${esc(sub)}</div>` : ''}
+    ${priceHtml}
+    ${specsHtml}
+  `;
+}
+
+// 이벤트
+
+grid.addEventListener('click', (e) => {
+  const card = e.target.closest('.catalog-card');
+  if (!card) return;
+  const idx = Number(card.dataset.index);
+  const products = getFiltered();
+  const p = products[idx];
+  if (p) openModal(p);
+});
+
+grid.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const card = e.target.closest('.catalog-card');
+  if (!card) return;
+  e.preventDefault();
+  card.click();
+});
+
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+// 갤러리 스와이프 (모바일)
+let _touchStartX = 0;
+modalGallery.addEventListener('touchstart', (e) => { _touchStartX = e.touches[0].clientX; }, { passive: true });
+modalGallery.addEventListener('touchend', (e) => {
+  const dx = e.changedTouches[0].clientX - _touchStartX;
+  if (Math.abs(dx) < 40 || !galleryImages.length) return;
+  const total = galleryImages.length;
+  galleryIndex = dx < 0
+    ? (galleryIndex + 1) % total
+    : (galleryIndex - 1 + total) % total;
+  renderGallery();
+}, { passive: true });
 
 // ─── 검색 ─────────────────────────────────────────────────────────────────
 
-let searchTimer = null;
+let _searchTimer = null;
 searchInput.addEventListener('input', () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(renderGrid, 200);
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(renderGrid, 200);
 });
 
-// ─── 공유 상세 보기 (?id=xxx) ─────────────────────────────────────────────
+// ─── 부트스트랩 ────────────────────────────────────────────────────────────
 
-const shareProductId = params.get('id') || '';
-
-async function loadShareDetail() {
-  const detailEl = document.getElementById('catalog-share-detail');
-  if (!shareProductId || !detailEl) return false;
-
-  // 카탈로그 UI 전부 숨기기
-  document.getElementById('catalog-toolbar')?.remove();
-  grid.remove();
-  document.getElementById('catalog-cta')?.remove();
-  document.getElementById('catalog-modal')?.remove();
-
+(async function bootstrap() {
   try {
-    const snapshot = await get(ref(db, `products/${shareProductId}`));
-    if (!snapshot.exists()) {
-      detailEl.innerHTML = '<div class="catalog-empty">상품 정보를 찾을 수 없습니다.</div>';
-      detailEl.hidden = false;
-      return true;
-    }
-    const raw = snapshot.val();
-    const product = normalizeProduct(raw);
-    detailEl.className = 'catalog-share-detail product-list-page-shell';
-    detailEl.innerHTML = `<div class="detail-card">${renderProductDetailMarkup(product)}</div>`;
-    detailEl.hidden = false;
-    bindProductDetailPhotoEvents(detailEl, (index) => {
-      detailEl.innerHTML = `<div class="detail-card">${renderProductDetailMarkup(product, { activePhotoIndex: index })}</div>`;
-      bindProductDetailPhotoEvents(detailEl, () => {});
-    });
-  } catch (err) {
-    detailEl.innerHTML = '<div class="catalog-empty">상품 정보를 불러올 수 없습니다.</div>';
-    detailEl.hidden = false;
+    await signInAnonymously(auth);
+  } catch (e) {
+    console.warn('[catalog] anonymous auth failed', e);
   }
-  return true;
-}
 
-// ─── 시작 ─────────────────────────────────────────────────────────────────
-
-if (shareProductId) {
-  loadShareDetail();
-} else {
-  loadProducts();
-}
+  await Promise.all([loadAgent(), loadProducts()]);
+})();

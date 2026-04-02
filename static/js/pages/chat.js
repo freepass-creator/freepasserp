@@ -48,6 +48,7 @@ let currentRoomId = preferredRoomId || null;
 let currentProfile = null;
 let currentUser = null;
 let productsMap = new Map();
+let _ensureRoomPending = false;
 let roomMap = new Map();
 let openedRoomId = null;
 let visibleRoomsCache = [];
@@ -222,12 +223,26 @@ async function bootstrap() {
     registerPageCleanup(() => roomSelectionController.cleanup());
 
     // 상세패널 버튼 이벤트
-    qs('#detailShareBtn')?.addEventListener('click', () => {
+    qs('#detailShareBtn')?.addEventListener('click', async () => {
       const room = roomSelectionController.getCurrentRoom();
       if (!room) return;
       const product = getCurrentProduct();
+      const productId = product?.productUid || product?.id || room.product_uid || '';
       const carNo = room.vehicle_number || product?.carNo || '';
-      const shareUrl = `${window.location.origin}/catalog?car=${encodeURIComponent(carNo)}`;
+      const url = new URL(window.location.origin + '/catalog');
+      if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
+      if (productId) url.searchParams.set('id', productId);
+      else if (carNo) url.searchParams.set('car', carNo);
+      const shareUrl = url.toString();
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+          showToast('공유 링크가 복사되었습니다.', 'success');
+          return;
+        }
+      } catch (e) {
+        if (e?.name === 'AbortError') return;
+      }
       window.prompt('아래 링크를 복사하세요.', shareUrl);
     });
     qs('#detailContractBtn')?.addEventListener('click', async () => {
@@ -261,9 +276,10 @@ async function bootstrap() {
         });
       });
 
-      if (profile.role === 'agent' && preferredProductCode && !currentRoomId) {
+      if (profile.role === 'agent' && preferredProductCode && !currentRoomId && !_ensureRoomPending) {
         const product = productsMap.get(preferredProductCode);
         if (product) {
+          _ensureRoomPending = true;
           ensureRoom({
             productUid: product.productUid || '',
             productCode: product.productCode || preferredProductCode,
@@ -277,6 +293,10 @@ async function bootstrap() {
             modelName: [product.maker, product.model, product.subModel, product.trim].filter(Boolean).join(' ')
           }).then((roomId) => {
             currentRoomId = roomId;
+          }).catch((e) => {
+            console.warn('[chat] ensureRoom failed', e);
+          }).finally(() => {
+            _ensureRoomPending = false;
           });
         }
       }

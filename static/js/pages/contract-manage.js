@@ -8,8 +8,7 @@ import { showToast, showConfirm } from '../core/toast.js';
 import { validateContract } from '../core/validators.js';
 import { savePageState, loadPageState } from '../core/page-state.js';
 
-const _t = new URL(import.meta.url).searchParams.get('t') || '';
-const { uploadContractFilesDetailed, deleteProductImagesByUrls } = await import(`../firebase/firebase-storage.js${_t ? `?t=${_t}` : ''}`);
+const { uploadContractFilesDetailed, deleteProductImagesByUrls } = await import(`../firebase/firebase-storage.js?v=${window.APP_VER || '1'}`);
 
 import { saveContract, updateContract, deleteContract, fetchContractsOnce, watchContracts, getProduct, ensureRoom } from '../firebase/firebase-db.js';
 import { formatShortDate, formatYearMonth } from '../core/management-format.js';
@@ -67,34 +66,36 @@ function bindDOM() {
   saveButton = qs('#contract-submit-head');
   deleteButton = qs('#contract-delete-head');
   chatButton = qs('#contract-chat-btn');
-  formMode = qs('#contract-form_mode');
-  contractCodeHidden = qs('#contract_code_hidden');
-  docInput = qs('#contract_docs');
+  const contractForm = qs('#contract-form');
+  formMode = contractForm?.querySelector('#contract-form_mode') ?? qs('#contract-form_mode');
+  contractCodeHidden = contractForm?.querySelector('#contract_code_hidden') ?? qs('#contract_code_hidden');
+  docInput = contractForm?.querySelector('#contract_docs') ?? qs('#contract_docs');
   docDropzone = qs('#contract-doc-dropzone');
   docList = qs('#contract-doc-list');
   docSummary = qs('#contract-doc-summary');
   docClearButton = qs('#contract-doc-clear');
+  const f = (id) => contractForm?.querySelector(`#${id}`) ?? null;
   fields = {
-    contract_code: qs('#contract_code'),
-    contract_status: qs('#contract_status'),
-    partner_code: qs('#partner_code'),
-    agent_code: qs('#agent_code'),
-    policy_code: qs('#policy_code'),
-    product_code: qs('#product_code'),
-    car_number: qs('#car_number'),
-    vehicle_name: qs('#vehicle_name'),
-    rent_month: qs('#rent_month'),
-    rent_amount: qs('#rent_amount'),
-    deposit_amount: qs('#deposit_amount'),
-    customer_name: qs('#customer_name'),
-    customer_birth: qs('#customer_birth'),
-    customer_phone: qs('#customer_phone'),
-    deposit_confirmed: qs('#deposit_confirmed'),
-    docs_confirmed: qs('#docs_confirmed'),
-    approval_confirmed: qs('#approval_confirmed'),
-    contract_confirmed: qs('#contract_confirmed'),
-    balance_confirmed: qs('#balance_confirmed'),
-    delivery_confirmed: qs('#delivery_confirmed')
+    contract_code: f('contract_code'),
+    contract_status: f('contract_status'),
+    partner_code: f('partner_code'),
+    agent_code: f('agent_code'),
+    policy_code: f('policy_code'),
+    product_code: f('product_code'),
+    car_number: f('car_number'),
+    vehicle_name: f('vehicle_name'),
+    rent_month: f('rent_month'),
+    rent_amount: f('rent_amount'),
+    deposit_amount: f('deposit_amount'),
+    customer_name: f('customer_name'),
+    customer_birth: f('customer_birth'),
+    customer_phone: f('customer_phone'),
+    deposit_confirmed: f('deposit_confirmed'),
+    docs_confirmed: f('docs_confirmed'),
+    approval_confirmed: f('approval_confirmed'),
+    contract_confirmed: f('contract_confirmed'),
+    balance_confirmed: f('balance_confirmed'),
+    delivery_confirmed: f('delivery_confirmed')
   };
 }
 
@@ -106,6 +107,7 @@ let currentProfile = null;
 let allContracts = [];
 let currentContract = null;
 let mode = 'create';
+let _bootDone = false;
 
 const docsController = createContractDocsController({
   input: docInput,
@@ -587,6 +589,7 @@ function handleDocSelection(files) {
 }
 
 async function bootstrap() {
+  _bootDone = false;
   try {
     const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
     currentProfile = { ...profile, uid: user.uid };
@@ -733,19 +736,29 @@ async function bootstrap() {
     registerPageCleanup(watchContracts((items) => {
       allContracts = items;
       renderList();
-      const code = contractCodeHidden.value || restoredState?.selectedCode || '';
+      if (!_bootDone) return;
+      if (mode === 'edit') return; // 수정 중 Firebase 업데이트로 폼 초기화 방지
+      const code = contractCodeHidden.value || '';
       if (code) {
         const selected = allContracts.find((item) => item.contract_code === code);
         if (selected) fillForm(selected);
-      }
-      if (restoredState?.scrollTop && listBody) {
-        requestAnimationFrame(() => { listBody.scrollTop = restoredState.scrollTop; });
-        restoredState.scrollTop = 0;
       }
     }));
 
     resetForm();
     setMode('idle');
+    _bootDone = true;
+
+    // 부트스트랩 완료 후 1회 선택 복원
+    const restoreCode = restoredState?.selectedCode || '';
+    if (restoreCode) {
+      const restoreTarget = allContracts.find((item) => item.contract_code === restoreCode);
+      if (restoreTarget) fillForm(restoreTarget);
+    }
+    if (restoredState?.scrollTop && listBody) {
+      requestAnimationFrame(() => { listBody.scrollTop = restoredState.scrollTop; });
+    }
+
     await maybeCreateFromPendingSeed();
   } catch (error) {
     console.error(error);
@@ -763,6 +776,9 @@ export async function mount() {
 export function unmount() {
   runPageCleanup();
   _mounted = false;
+}
+export function onShow() {
+  setDirtyCheck(() => mode === 'edit');
 }
 // Auto-mount on first script load (server-rendered page)
 if (!import.meta.url.includes('?')) mount();

@@ -161,6 +161,7 @@ let allProducts = [];
 let vehicleMasterEntries = [];
 let lastSelectedProductCode = '';
 let mode = 'create';
+let _bootDone = false;
 
 let _progressToast = null;
 function setStatus(text = '', tone = 'info') {
@@ -304,7 +305,7 @@ function syncProductCodePreview(fallbackCode = '') {
 }
 
 function getField(id) {
-  return qs(`#${id}`);
+  return (form || document).querySelector(`#${id}`);
 }
 
 const inputController = safeCreateProductManageController('input-controller', () => createProductInputController({
@@ -671,6 +672,7 @@ async function handleDelete() {
 }
 
 async function bootstrap() {
+  _bootDone = false;
   try {
     const { user, profile } = await requireAuth({ roles: ['provider', 'admin'] });
     if (productManageInitErrors.length) {
@@ -799,16 +801,14 @@ async function bootstrap() {
       refreshVehicleSpecSelects();
       renderFilterAccordion();
       renderFilteredList();
+      // 부트스트랩 완료 전에는 폼 복원 스킵 (셀렉트 옵션 미준비)
+      if (!_bootDone) return;
+      if (mode === 'edit') return; // 수정 중 Firebase 업데이트로 폼 초기화 방지
       // 복원된 코드가 있으면 우선 사용, 그 다음 현재 선택 코드
-      const selectedCode = editingCodeInput.value || lastSelectedProductCode || restoredState?.selectedCode || '';
+      const selectedCode = editingCodeInput.value || lastSelectedProductCode || '';
       if (selectedCode) {
         const selected = allProducts.find((item) => (item.product_uid || item.product_code) === selectedCode);
         if (selected) fillProductForm(selected, { ...adapterContext, currentProfile });
-      }
-      // 스크롤 복원 (첫 로드 시 1회만)
-      if (restoredState?.scrollTop && listBody) {
-        requestAnimationFrame(() => { listBody.scrollTop = restoredState.scrollTop; });
-        restoredState.scrollTop = 0;
       }
     }));
 
@@ -845,6 +845,17 @@ async function bootstrap() {
     setFilterOverlay(false);
     resetForm();
     applyFormMode('idle');
+    _bootDone = true;
+
+    // 부트스트랩 완료 후 1회 선택 복원 (셀렉트 옵션이 모두 준비된 시점)
+    const restoreCode = restoredState?.selectedCode || '';
+    if (restoreCode) {
+      const restoreTarget = allProducts.find((item) => (item.product_uid || item.product_code) === restoreCode);
+      if (restoreTarget) fillProductForm(restoreTarget, { ...adapterContext, currentProfile });
+    }
+    if (restoredState?.scrollTop && listBody) {
+      requestAnimationFrame(() => { listBody.scrollTop = restoredState.scrollTop; });
+    }
   } catch (error) {
     console.error(error);
     const detail = error?.message ? `재고관리 초기화 실패: ${error.message}` : '재고관리 초기화 실패';
@@ -865,6 +876,9 @@ export async function mount() {
 export function unmount() {
   runPageCleanup();
   _mounted = false;
+}
+export function onShow() {
+  setDirtyCheck(() => mode === 'edit');
 }
 // Auto-mount on first script load (server-rendered page)
 if (!import.meta.url.includes('?')) mount();

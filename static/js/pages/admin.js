@@ -5,7 +5,7 @@ import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { db, storage } from '../firebase/firebase-config.js';
-import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
+import { ref as sRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { watchSettlements, watchPartners, watchProducts } from '../firebase/firebase-db.js';
 import { renderBadge } from '../shared/badge.js';
 import { renderTableGrid, renderSkeletonRows } from '../core/management-list.js';
@@ -263,7 +263,7 @@ async function uploadNoticeImage(file) {
   const path = `notice-images/${currentProfile.uid}/${Date.now()}_${file.name}`;
   const r = sRef(storage, path);
   await uploadBytes(r, file);
-  return getDownloadURL(r);
+  return { url: await getDownloadURL(r), storageRef: r };
 }
 
 let noticeImgFile = null;   // 새로 선택한 파일
@@ -442,11 +442,14 @@ function bindNoticeEvents() {
     if (!title || !body) { noticeSaving = false; if (noticeMsg) noticeMsg.textContent = '제목과 내용을 모두 입력하세요.'; return; }
     if (noticeMsg) noticeMsg.textContent = '';
     if (editSaveBtn) editSaveBtn.disabled = true;
+    let _uploadedRef = null;
     try {
       let image_url;
       if (noticeImgFile) {
         if (noticeMsg) noticeMsg.textContent = '업로드 중…';
-        image_url = await uploadNoticeImage(noticeImgFile);
+        const { url, storageRef } = await uploadNoticeImage(noticeImgFile);
+        image_url = url;
+        _uploadedRef = storageRef;
         if (noticeMsg) noticeMsg.textContent = '';
       } else if (!noticeImgCleared && noticeImgUrl) {
         image_url = noticeImgUrl;
@@ -473,6 +476,7 @@ function bindNoticeEvents() {
       }
       showToast('저장 완료', 'success');
     } catch (err) {
+      if (_uploadedRef) deleteObject(_uploadedRef).catch(() => {});
       if (noticeMsg) noticeMsg.textContent = err.message;
       showToast(`저장 실패: ${err.message}`, 'error');
       if (editSaveBtn) editSaveBtn.disabled = false;

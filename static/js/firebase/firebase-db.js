@@ -21,7 +21,8 @@ import {
 } from './firebase-codes.js';
 import {
   softDelete, setStatus, watchCollection, fetchCollection,
-  fetchOne, isNotDeleted, isActive, queryByChild
+  fetchOne, isNotDeleted, isActive, queryByChild,
+  limitToLast, query, orderByChild
 } from './firebase-db-helpers.js';
 
 // ─── 공통 유틸 ───────────────────────────────────────────────────────────────
@@ -541,8 +542,14 @@ export async function ensureRoom({
   return roomId;
 }
 
+const ROOMS_LIMIT = 200;
+
 export function watchRooms(callback) {
-  return watchCollection('rooms', callback, { sort: (a, b) => (b.last_message_at || 0) - (a.last_message_at || 0) });
+  return watchCollection('rooms', callback, {
+    sort: (a, b) => (b.last_message_at || 0) - (a.last_message_at || 0),
+    queryFn: (dbRef) => query(dbRef, orderByChild('last_message_at'), limitToLast(ROOMS_LIMIT)),
+    queryKey: `L${ROOMS_LIMIT}`
+  });
 }
 
 export function watchMessages(roomId, callback) {

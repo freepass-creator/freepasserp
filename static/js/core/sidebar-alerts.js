@@ -129,10 +129,14 @@ function countActionSettlements(settlements) {
 
 // ─── 초기화 ──────────────────────────────────────────────────────────────────
 
+let _initialized = false;
+
 async function init() {
+  if (_initialized) return;
+  _initialized = true;
   try {
     const auth = await requireAuth();
-    if (!auth?.profile || !auth?.user) return;
+    if (!auth?.profile || !auth?.user) { _initialized = false; return; }
     profile = auth.profile;
     uid = auth.user.uid;
     companyCode = profile.company_code || '';
@@ -147,7 +151,7 @@ async function init() {
       watchUsers((items) => { counts.member = countPendingUsers(items); scheduleBadges(); });
       watchPartners((items) => { counts.partner = countPendingPartners(items); scheduleBadges(); });
     }
-  } catch (_) {}
+  } catch (_) { _initialized = false; }
 }
 
 init();

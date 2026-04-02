@@ -136,7 +136,7 @@
 
 /* ─── 상세 카드 (기존 호환) ───────────────────────────────────────────────── */
 
-.product-list-page-shell .detail-card { min-width: 0; padding-bottom: var(--panel-body-pad, 16px); }
+.product-list-page-shell .detail-card { min-width: 0; }
 .product-list-page-shell .detail-empty { display: flex; align-items: center; justify-content: center; min-height: 0; flex: 1 1 0; height: 100%; border: none; background: transparent; font-size: var(--font-size-main, 12px); color: var(--text-muted, #9ca3af); }
 
 .product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 8px; }

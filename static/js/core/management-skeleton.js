@@ -481,7 +481,7 @@ export function createSubmitHandler({ getFormMode, setEditMode, isSelected, onSa
       if (!await showConfirm('저장하시겠습니까?')) return;
       await onSave();
     } catch (error) {
-      showToast(`저장 실패: ${error.message}`, 'error');
+      showToast(`저장 실패: ${error?.message || String(error) || '알 수 없는 오류'}`, 'error');
     }
   };
 }

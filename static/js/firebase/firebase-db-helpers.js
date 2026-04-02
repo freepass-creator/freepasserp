@@ -6,7 +6,7 @@
  */
 
 import {
-  get, onValue, update, query, orderByChild, equalTo
+  get, onValue, update, query, orderByChild, equalTo, limitToLast
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
 import { db } from './firebase-config.js';
 import { ref } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
@@ -60,10 +60,24 @@ export const isNotDeleted = (item) => item.status !== 'deleted';
 /** status !== 'deleted' && status !== 'inactive' 필터 */
 export const isActive = (item) => item.status !== 'deleted' && item.status !== 'inactive';
 
-// ─── onValue 래퍼 ────────────────────────────────────────────────────────────
+// ─── 공유 구독 캐시 (같은 경로 중복 구독 방지) ─────────────────────────────
+// 여러 페이지/모듈이 동일 경로를 watch할 때 Firebase onValue를 1개만 유지하고
+// 각 콜백에 결과를 개별 배포한다. 마지막 구독자가 해제되면 Firebase 리스너도 해제.
+
+const _sharedWatchers = new Map();
+
+function _applyTransform(raw, filter, sort) {
+  let items = raw.slice(); // 공유 배열 변경 방지
+  if (typeof filter === 'function') items = items.filter(filter);
+  if (typeof sort === 'function') items.sort(sort);
+  return items;
+}
+
+export { limitToLast, query, orderByChild };
 
 /**
  * 특정 경로를 watch하고, snapshot을 변환·필터·정렬한 뒤 callback에 전달한다.
+ * 동일 경로에 대한 Firebase onValue는 최초 1회만 생성하며 이후 구독자는 공유한다.
  *
  * @param {string} path           Firebase 경로
  * @param {Function} callback     결과 배열을 받는 함수
@@ -72,24 +86,50 @@ export const isActive = (item) => item.status !== 'deleted' && item.status !== '
  * @param {string} options.entryKey          entries 모드일 때 key 이름 (기본: 'uid')
  * @param {Function} [options.filter]        필터 함수
  * @param {Function} [options.sort]          정렬 함수
+ * @param {Function} [options.queryFn]       Firebase ref → query 변환 함수 (limitToLast 등)
+ * @param {string}   [options.queryKey]      queryFn 식별용 캐시 키 접미사
  * @returns unsubscribe 함수
  */
+
 export function watchCollection(path, callback, {
   mode = 'values',
   entryKey = 'uid',
   filter,
-  sort
+  sort,
+  queryFn,
+  queryKey
 } = {}) {
-  return onValue(ref(db, path), (snapshot) => {
-    let items = mode === 'entries'
-      ? snapshotToEntries(snapshot, entryKey)
-      : snapshotToValues(snapshot);
+  const cacheKey = queryKey !== undefined
+    ? `${path}\x00${mode}\x00${entryKey}\x00${queryKey}`
+    : `${path}\x00${mode}\x00${entryKey}`;
 
-    if (typeof filter === 'function') items = items.filter(filter);
-    if (typeof sort === 'function') items = items.sort(sort);
+  if (!_sharedWatchers.has(cacheKey)) {
+    const listeners = new Set();
+    const shared = { unsubFirebase: null, listeners, latestRaw: null };
+    const listenRef = typeof queryFn === 'function' ? queryFn(ref(db, path)) : ref(db, path);
+    shared.unsubFirebase = onValue(listenRef, (snapshot) => {
+      shared.latestRaw = mode === 'entries'
+        ? snapshotToEntries(snapshot, entryKey)
+        : snapshotToValues(snapshot);
+      listeners.forEach(fn => { try { fn(); } catch (e) { console.warn('[watchCollection] listener error', e); } });
+    });
+    _sharedWatchers.set(cacheKey, shared);
+  }
 
-    callback(items);
-  });
+  const shared = _sharedWatchers.get(cacheKey);
+  const notify = () => callback(_applyTransform(shared.latestRaw, filter, sort));
+  shared.listeners.add(notify);
+
+  // 이미 데이터가 있으면 즉시 호출 (재방문 시 캐시 활용)
+  if (shared.latestRaw !== null) { try { notify(); } catch (e) { console.warn('[watchCollection] immediate notify error', e); } }
+
+  return () => {
+    shared.listeners.delete(notify);
+    if (shared.listeners.size === 0) {
+      shared.unsubFirebase();
+      _sharedWatchers.delete(cacheKey);
+    }
+  };
 }
 
 // ─── 단일 레코드 조회 ────────────────────────────────────────────────────────

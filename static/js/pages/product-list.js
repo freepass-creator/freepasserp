@@ -150,6 +150,7 @@ function restoreFilterState(){
   });
 })();
 let overlayEscId = null;
+let _accordionDirty = true;
 function setFilterOverlay(open){
   state.filterOverlayOpen = !!open;
   $overlay?.classList.toggle('is-open', !!open);
@@ -157,6 +158,7 @@ function setFilterOverlay(open){
   if (open) {
     if (overlayEscId) removeEsc(overlayEscId);
     overlayEscId = pushEsc(() => setFilterOverlay(false));
+    if (_accordionDirty) { renderFilterAccordion(); _accordionDirty = false; }
   } else {
     if (overlayEscId) { removeEsc(overlayEscId); overlayEscId = null; }
   }
@@ -841,6 +843,7 @@ function currentProduct(){
 
 function buildShareUrl(product){
   const url = new URL(window.location.origin + '/catalog');
+  if (state.profile?.user_code) url.searchParams.set('a', state.profile.user_code);
   url.searchParams.set('id', product.productUid || product.id);
   return url.toString();
 }
@@ -1025,7 +1028,7 @@ function applyFilters(){
   }
   renderPeriodsHead();
   renderGridHeader();
-  renderFilterAccordion(baseSets);
+  if (state.filterOverlayOpen) { renderFilterAccordion(baseSets); _accordionDirty = false; } else { _accordionDirty = true; }
   syncPeriodChips();
   renderList();
   renderDetail();

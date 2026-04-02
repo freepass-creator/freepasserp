@@ -181,13 +181,23 @@ async function loadPage(url, options = {}) {
       syncTopBar(nextDoc);
 
       const styleHrefs = collectStyleHrefs(nextDoc);
-      await ensureStyles(styleHrefs);
+      const modulePath = PAGE_MODULE_PATHS[nextPathname];
+
+      // CSS + JS module load in parallel (was sequential: CSS then JS)
+      const stylesPromise = ensureStyles(styleHrefs);
+      const modulePromise = modulePath
+        ? import(modulePath + '?v=' + (window.APP_VER || '1')).catch((e) => { console.error('[app] module error', e); return null; })
+        : Promise.resolve(null);
 
       const container = document.createElement('div');
       container.className = 'page-tab';
       container.dataset.page = nextPathname;
+      container.style.display = 'none';
       container.replaceChildren(...Array.from(nextMainShell.childNodes).map((n) => n.cloneNode(true)));
       mainShell.appendChild(container);
+
+      const [, mod] = await Promise.all([stylesPromise, modulePromise]);
+      container.style.display = '';
 
       cached = {
         container,
@@ -195,7 +205,7 @@ async function loadPage(url, options = {}) {
         doc: nextDoc,
         title: nextDoc.title || '',
         bodyPage: nextDoc.body?.dataset?.page || '',
-        module: null,
+        module: mod,
         mounted: false
       };
       pageCache.set(nextPathname, cached);
@@ -203,13 +213,11 @@ async function loadPage(url, options = {}) {
       // 기존 script 태그 제거
       document.querySelectorAll('script[data-page-script]').forEach((n) => n.remove());
 
-      const modulePath = PAGE_MODULE_PATHS[nextPathname];
-      if (modulePath) {
+      if (mod) {
         try {
-          if (!cached.module) cached.module = await import(modulePath + '?v=' + (window.APP_VER || '1'));
-          if (typeof cached.module.mount === 'function') await cached.module.mount();
+          if (typeof mod.mount === 'function') await mod.mount();
         } catch (e) {
-          console.error('[app] module error', e);
+          console.error('[app] mount error', e);
         }
       }
       cached.mounted = true;

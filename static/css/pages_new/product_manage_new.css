@@ -172,5 +172,5 @@
 }
 
 #product-form {
-  padding-bottom: var(--panel-body-pad, 16px);
+  padding-bottom: 0;
 }
