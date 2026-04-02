@@ -48,7 +48,7 @@ export async function createManagedTermCode(providerCompanyCode = '') {
   const normalizedProviderCode = sanitizeValue(providerCompanyCode);
   if (!normalizedProviderCode) throw new Error('공급사코드가 없습니다.');
   const sequence = await nextSequence(`term_${normalizedProviderCode}`);
-  return `${normalizedProviderCode}_T${padNumber(sequence, 3)}`;
+  return `${normalizedProviderCode}_P${padNumber(sequence, 2)}`;
 }
 
 export function buildChatCode(productCode = '', agentCode = '', agentUid = '') {
