@@ -187,7 +187,8 @@ function fillForm(term) {
   const resolved = resolveFormValues(term, CONTENT_LABEL_TO_KEY);
   CONTENT_KEYS.forEach((key) => {
     if (!detailFields[key]) return;
-    const val = resolved[key] || (key === 'injury_compensation_limit' ? '무한' : '');
+    // 직접 저장된 필드값 우선, 없으면 content 파싱값
+    const val = (term[key] != null && String(term[key]).trim() !== '') ? String(term[key]).trim() : (resolved[key] || (key === 'injury_compensation_limit' ? '무한' : ''));
     detailFields[key].value = val;
     // select에 매칭 옵션이 없으면 동적 추가
     if (val && detailFields[key].tagName === 'SELECT' && detailFields[key].value !== val) {
