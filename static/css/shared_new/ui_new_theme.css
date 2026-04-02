@@ -308,6 +308,7 @@ body[data-page] [contenteditable="true"] {
   font-variant-numeric: tabular-nums;
   transition: transform 0.12s ease;
 }
+.sidebar-nav-badge[hidden] { display: none !important; }
 .sidebar-nav-badge:hover { transform: scale(1.08); }
 
 /* ───── MAIN CONTENT ───── */

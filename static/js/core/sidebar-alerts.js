@@ -28,8 +28,11 @@ function setBadge(href, count) {
       badge.hidden = false;
       link.classList.add('has-new-event');
     } else {
-      if (badge) badge.hidden = true;
+      if (badge) { badge.hidden = true; badge.textContent = ''; }
       link.classList.remove('has-new-event');
+      // 강제: 축소모드 빨간점 제거를 위해 아이콘 ::after도 초기화
+      const icon = link.querySelector('.sidebar-link-icon');
+      if (icon) icon.style.setProperty('--has-badge', '0');
     }
   });
 }
