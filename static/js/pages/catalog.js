@@ -219,10 +219,11 @@ async function loadShareDetail() {
   const detailEl = document.getElementById('catalog-share-detail');
   if (!shareProductId || !detailEl) return false;
 
-  // 그리드/툴바/CTA 숨기기
+  // 그리드/툴바/CTA/모달 숨기기
   document.getElementById('catalog-toolbar')?.setAttribute('hidden', '');
   grid.setAttribute('hidden', '');
-  document.getElementById('catalog-cta')?.setAttribute('hidden', '');
+  document.getElementById('catalog-cta')?.remove();
+  document.getElementById('catalog-modal')?.remove();
 
   try {
     const snapshot = await get(ref(db, `products/${shareProductId}`));
