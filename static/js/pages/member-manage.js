@@ -152,12 +152,14 @@ function fillForm(member) {
 }
 
 const MEMBER_COLS = [
-  { key: 'status',  label: '회원상태', align: 'c', filterable: true, w: 80 },
-  { key: 'role',    label: '회원구분', align: 'c', filterable: true, w: 80 },
-  { key: 'company', label: '회사명',   align: 'c', searchable: true },
-  { key: 'code',    label: '회원코드', align: 'c', searchable: true },
-  { key: 'name',    label: '이름',     align: 'c', searchable: true },
-  { key: 'date',    label: '반영일자', align: 'c', filterable: true },
+  { key: 'status',      label: '회원상태',   align: 'c', filterable: true, w: 80 },
+  { key: 'role',        label: '회원구분',   align: 'c', filterable: true, w: 80 },
+  { key: 'companyCode', label: '회사코드',   align: 'c', filterable: true },
+  { key: 'company',     label: '회사명',     align: 'c', searchable: true },
+  { key: 'code',        label: '사용자코드', align: 'c', searchable: true },
+  { key: 'email',       label: '이메일',     searchable: true },
+  { key: 'name',        label: '이름',       align: 'c', searchable: true },
+  { key: 'date',        label: '반영일자',   align: 'c', filterable: true },
 ];
 const memberThead = qs('#member-list-head');
 
@@ -180,8 +182,10 @@ function renderList(members) {
       switch (col.key) {
         case 'status': return renderBadgeRow([{ field: 'member_status', value: statusLabel(m.status) }]);
         case 'role': return renderBadgeRow([{ field: 'member_role', value: badgeRoleLabel(m.role) }]);
+        case 'companyCode': return escapeHtml(m.company_code || '');
         case 'company': return escapeHtml(m.company_name || '');
-        case 'code': return escapeHtml(m.user_code || m.admin_code || m.email || '-');
+        case 'code': return escapeHtml(m.user_code || m.admin_code || '-');
+        case 'email': return escapeHtml(m.email || '');
         case 'name': return escapeHtml(m.name || '');
         case 'date': return escapeHtml(formatShortDate(m.updated_at || m.created_at));
         default: return '';
@@ -191,8 +195,10 @@ function renderList(members) {
       switch (col.key) {
         case 'status': return statusLabel(m.status);
         case 'role': return badgeRoleLabel(m.role);
+        case 'companyCode': return m.company_code || '';
         case 'company': return m.company_name || '';
-        case 'code': return m.user_code || m.admin_code || m.email || '';
+        case 'code': return m.user_code || m.admin_code || '';
+        case 'email': return m.email || '';
         case 'name': return m.name || '';
         case 'date': return formatYearMonth(m.updated_at || m.created_at);
         default: return '';
