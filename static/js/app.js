@@ -211,7 +211,7 @@ async function loadPage(url, options = {}) {
       const modulePath = PAGE_MODULE_PATHS[nextPathname];
       if (modulePath) {
         try {
-          if (!cached.module) cached.module = await import(modulePath);
+          if (!cached.module) cached.module = await import(modulePath + '?t=' + Date.now());
           if (typeof cached.module.mount === 'function') await cached.module.mount();
         } catch (e) {
           console.error('[app] module error', e);

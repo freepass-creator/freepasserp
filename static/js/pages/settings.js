@@ -296,7 +296,7 @@ function bindDownloadSection(profile) {
     .map(item => `
       <div class="settings-download-row">
         <span class="settings-download-label">${item.label}</span>
-        <button class="settings-download-btn" data-dl="${item.label}" type="button">${DOWNLOAD_ICON} 다운로드</button>
+        <button class="settings-download-btn" data-dl="${item.label}" type="button" title="다운로드">${DOWNLOAD_ICON}</button>
       </div>
     `).join('');
 
