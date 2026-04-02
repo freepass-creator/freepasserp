@@ -412,9 +412,7 @@ function renderFeeSection(product, termFields = {}) {
 
   const policy = buildPolicyValues(product, termFields);
   const clawbackText = safeText(policy.commissionClawbackCondition);
-  const notesHtml = clawbackText !== '-'
-    ? `<div class="plist-detail__price-summary"><div class="plist-detail__price-note">* 수수료환수조건: ${escapeHtml(clawbackText)}</div></div>`
-    : '';
+  const notesHtml = `<div class="plist-detail__price-summary"><div class="plist-detail__price-note">* 수수료환수조건: ${clawbackText !== '-' ? escapeHtml(clawbackText) : '내용없음'}</div></div>`;
 
   return renderSection('기간별 수수료', `
     <div class="plist-detail__table-wrap">
