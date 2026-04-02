@@ -422,6 +422,10 @@ export async function saveProduct(product) {
 
 export function watchProducts(callback) { return watchCollection('products', callback, { sort: sortByCreatedDesc }); }
 
+export async function fetchProductsOnce() {
+  return fetchCollection('products', { sort: sortByCreatedDesc });
+}
+
 export async function updateProduct(productIdentifier, updates) {
   const record = await findProductRecord(productIdentifier);
   if (!record) throw new Error('수정할 상품이 없습니다.');

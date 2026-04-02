@@ -4,7 +4,7 @@ import { renderRoleMenu } from '../core/role-menu.js';
 import { logoutCurrentUser, sendPasswordReset, deleteCurrentUser } from '../firebase/firebase-auth.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { syncEditSaveButtonTone } from '../core/management-skeleton.js';
-import { updateUserProfile } from '../firebase/firebase-db.js';
+import { updateUserProfile, fetchProductsOnce } from '../firebase/firebase-db.js';
 import { fillProfile } from './settings/helpers.js';
 
 const LANDING_OPTIONS = [
@@ -207,6 +207,108 @@ function applyBadgeVisibility(badgeMap = {}) {
   });
 }
 
+// ─── 데이터 다운로드 ────────────────────────────────────────────────────────
+
+const DOWNLOAD_ICON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>';
+
+function toCsvString(headers, rows) {
+  const escape = (v) => {
+    const s = String(v ?? '');
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [headers.map(escape).join(',')];
+  rows.forEach(row => lines.push(row.map(escape).join(',')));
+  return '\uFEFF' + lines.join('\r\n');
+}
+
+function downloadCsv(filename, csvString) {
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+const PRODUCT_CSV_COLS = [
+  { key: 'car_number', label: '차량번호' },
+  { key: 'vehicle_status', label: '차량상태' },
+  { key: 'product_type', label: '상품구분' },
+  { key: 'maker', label: '제조사' },
+  { key: 'model_name', label: '모델명' },
+  { key: 'sub_model', label: '세부모델' },
+  { key: 'trim_name', label: '트림' },
+  { key: 'year', label: '연식' },
+  { key: 'fuel_type', label: '연료' },
+  { key: 'vehicle_class', label: '차종구분' },
+  { key: 'ext_color', label: '외부색상' },
+  { key: 'int_color', label: '내부색상' },
+  { key: 'mileage', label: '주행거리' },
+  { key: 'vehicle_price', label: '차량가격' },
+  { key: 'provider_company_code', label: '공급사코드' },
+  { key: 'policy_code', label: '정책코드' },
+  { key: 'options', label: '옵션' },
+  { key: 'partner_memo', label: '특이사항' },
+];
+
+const PERIOD_KEYS = ['1', '12', '24', '36', '48', '60'];
+
+async function downloadProducts() {
+  showToast('상품 데이터 준비 중...', 'progress', { duration: 0 });
+  try {
+    const products = await fetchProductsOnce();
+    const headers = [
+      ...PRODUCT_CSV_COLS.map(c => c.label),
+      ...PERIOD_KEYS.flatMap(p => [`${p}개월 대여료`, `${p}개월 보증금`, `${p}개월 수수료`]),
+    ];
+    const rows = products.map(item => {
+      const base = PRODUCT_CSV_COLS.map(c => item[c.key] ?? '');
+      const prices = PERIOD_KEYS.flatMap(p => {
+        const rent = item[`rent_${p}`] ?? item.price?.[p]?.rent ?? '';
+        const deposit = item[`deposit_${p}`] ?? item.price?.[p]?.deposit ?? '';
+        const fee = item[`fee_${p}`] ?? item.price?.[p]?.fee ?? '';
+        return [rent, deposit, fee];
+      });
+      return [...base, ...prices];
+    });
+    const csv = toCsvString(headers, rows);
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    downloadCsv(`상품목록_${today}.csv`, csv);
+    showToast(`${products.length}건 다운로드 완료`, 'success');
+  } catch (err) {
+    showToast('다운로드 실패', 'error');
+  }
+}
+
+function bindDownloadSection(profile) {
+  const list = document.getElementById('settings-download-list');
+  if (!list) return;
+
+  const items = [
+    { label: '상품 목록', fn: downloadProducts, roles: ['provider', 'agent', 'admin'] },
+  ];
+
+  list.innerHTML = items
+    .filter(item => item.roles.includes(profile.role))
+    .map(item => `
+      <div class="settings-download-row">
+        <span class="settings-download-label">${item.label}</span>
+        <button class="settings-download-btn" data-dl="${item.label}" type="button">${DOWNLOAD_ICON} 다운로드</button>
+      </div>
+    `).join('');
+
+  list.addEventListener('click', (e) => {
+    const btn = e.target.closest('.settings-download-btn');
+    if (!btn) return;
+    const label = btn.dataset.dl;
+    const item = items.find(i => i.label === label);
+    if (item) item.fn();
+  });
+}
+
 async function bootstrap() {
   try {
     const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
@@ -217,6 +319,7 @@ async function bootstrap() {
     bindCommonEvents();
 
     bindAppSettings(profile);
+    bindDownloadSection(profile);
   } catch (error) {
     showToast(error.message, 'error');
   }
