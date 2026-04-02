@@ -447,16 +447,11 @@ function renderNotices(items = []) {
           <div class="home-notice-writer">${notice.writer_name || '관리자'}</div>
         </div>
       </div>`;
+    wrap.querySelector('.home-notice-trigger')?.addEventListener('click', () => {
+      wrap.classList.toggle('is-open');
+    });
     return wrap;
   }));
-}
-
-function bindNoticeEvents() {
-  if (!noticeList) return;
-  noticeList.addEventListener('click', (e) => {
-    const trigger = e.target.closest('.home-notice-trigger');
-    if (trigger) { trigger.closest('.home-notice-item')?.classList.toggle('is-open'); }
-  });
 }
 
 // ─── 초기화 ─────────────────────────────────────────────────────────────────
@@ -481,7 +476,6 @@ async function bootstrap() {
     currentProfile = profile; currentUid = user.uid;
     renderRoleMenu(menu, profile.role);
     roleSummary.textContent = `${roleName(profile.role)} · 미처리 현황`;
-    bindNoticeEvents();
     mountWatchers();
     registerPageCleanup(onValue(ref(db, 'home_notices'), snap => {
       const raw = snap.val() || {};
