@@ -178,7 +178,7 @@
 .product-list-page-shell .plist-detail__chip { display: inline-flex; align-items: center; min-height: 20px; padding: 0 6px; border: 1px solid var(--border-soft); background: var(--surface-subtle); font-size: 12px; line-height: 1.4; color: var(--text-main); border-radius: var(--radius-ui); }
 .product-list-page-shell .plist-detail__table-wrap { border: 1px solid var(--border-soft); overflow: hidden; border-radius: var(--radius-ui); container-type: inline-size; }
 .product-list-page-shell .plist-detail__table th,
-.product-list-page-shell .plist-detail__table td { font-size: 12px; line-height: 1.5; }
+.product-list-page-shell .plist-detail__table td { font-size: 12px; line-height: 1.5; text-align: center; }
 
 @container (max-width: 300px) {
   .product-list-page-shell .plist-detail__table .price-cell .price-short { display: inline; }
