@@ -795,7 +795,7 @@ export async function saveContract(contract) {
   if (!partnerCode) throw new Error('파트너코드가 필요합니다.');
   const dateKey = todayDateKey();
   const [yyyy, mm, dd] = [dateKey.slice(0, 4), dateKey.slice(4, 6), dateKey.slice(6, 8)];
-  const contractCode = buildContractCode({ dateKey, sequence: await nextLocalSequence('contract') });
+  const contractCode = buildContractCode({ dateKey, sequence: await nextLocalSequence(`contract_${dateKey}`) });
   const productUid = sanitizeCodeValue(contract.product_uid || contract.product_code || contract.seed_product_key || '');
   const normalizedContract = {
     ...contract, product_uid: productUid, product_code: productUid, seed_product_key: productUid,
@@ -827,7 +827,7 @@ export async function updateContract(contractCode, updates) {
     const existingSettlement = settlementSnapshot.exists() ? (settlementSnapshot.val() || {}) : {};
     const completionDateKey = todayDateKey();
     const settlementCode = existingSettlement.settlement_code
-      || buildSettlementCode({ dateKey: completionDateKey, sequence: await nextLocalSequence('settlement') });
+      || buildSettlementCode({ dateKey: completionDateKey, sequence: await nextLocalSequence(`settlement_${completionDateKey}`) });
     // 상품에서 기간별 수수료 조회
     let feeAmount = existingSettlement.fee_amount || 0;
     let originFeeAmount = existingSettlement.origin_fee_amount || 0;
