@@ -14,6 +14,7 @@
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   overscroll-behavior-y: none;
+  padding-bottom: 70px;
 }
 
 /* 모바일 스크롤 최적화 */
@@ -122,21 +123,7 @@
   color: #94a3b8;
 }
 
-.catalog-header-call {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #16a34a;
-  text-decoration: none;
-  flex-shrink: 0;
-  transition: background 0.12s;
-}
-.catalog-header-call:hover { background: #dcfce7; }
+.catalog-header-call { display: none; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    VIEW 1: 단일 상품 상세
@@ -319,10 +306,10 @@
 .cat-badges { display: flex; gap: 6px; flex-wrap: wrap; }
 .cat-share-btn {
   display: flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px; border: 1px solid #e2e8f0; border-radius: 6px;
-  background: #fff; color: #64748b; cursor: pointer; flex-shrink: 0; padding: 0;
+  width: 28px; height: 28px; border: none;
+  background: transparent; color: #94a3b8; cursor: pointer; flex-shrink: 0; padding: 0;
 }
-.cat-share-btn:hover { background: #f8fafc; color: #1e293b; }
+.cat-share-btn:hover { color: #1e293b; }
 .cat-badge {
   display: inline-flex; align-items: center; height: 24px; padding: 0 10px;
   border-radius: 6px; background: #eff6ff; color: #2563eb;
@@ -958,8 +945,8 @@
 @media (max-width: 768px) {
   .catalog-header { height: 50px; }
   .catalog-header-filter:not([hidden]) { display: flex; }
-  .catalog-header-call { display: none; }
-  .catalog-mobile-cta:not([hidden]) { display: flex; }
+  .catalog-contact-bar__call { display: flex; }
+  .catalog-contact-bar__info { display: none !important; }
   .catalog-body { padding-bottom: 70px; }
 
   .catalog-sidebar-overlay {
@@ -994,8 +981,8 @@
   .catalog-header-position { display: none; }
 }
 
-/* 모바일 하단 전화 바 */
-.catalog-mobile-cta {
+/* 하단 연락 바 (웹+모바일 공통) */
+.catalog-contact-bar {
   display: none;
   position: fixed;
   bottom: 0;
@@ -1008,9 +995,11 @@
   backdrop-filter: blur(12px);
   border-top: 1px solid rgba(15, 23, 42, 0.07);
 }
-.catalog-mobile-cta[hidden] { display: none !important; }
+.catalog-contact-bar[hidden] { display: none !important; }
+.catalog-contact-bar:not([hidden]) { display: block; }
 
-.catalog-mobile-cta__link {
+/* 모바일: 전화하기 버튼 */
+.catalog-contact-bar__call {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1024,6 +1013,20 @@
   font-weight: 600;
   text-decoration: none;
 }
+
+/* 웹: 연락처 텍스트 */
+.catalog-contact-bar__info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  font-size: 12px;
+  color: #475569;
+}
+.catalog-contact-bar__call { display: none; }
+.catalog-contact-bar__info-name { font-weight: 600; color: #1e293b; }
+.catalog-contact-bar__info-phone { font-weight: 500; color: #1e293b; letter-spacing: 0.02em; }
 
 @media (max-width: 600px) {
   .catalog-header { padding: 0 8px; }

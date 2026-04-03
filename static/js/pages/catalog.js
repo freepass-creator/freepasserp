@@ -431,7 +431,7 @@ function renderProductDetail(p) {
     ['차령만료일', fmtDate(p.vehicle_age_expiry_date)],
     ['차량가격',   fmtMoney(p.vehicle_price)],
     ['특이사항',   p.partner_memo || p.note],
-    ...(!providerParam ? [['공급사', p.provider_company_code || p.partner_code]] : []),
+    ...(!providerParam ? [['공급코드', p.provider_company_code || p.partner_code]] : []),
   ].filter(([, v]) => has(v));
 
   if (extraRows.length) {
@@ -453,7 +453,8 @@ function renderProductDetail(p) {
 function showView(view) {
   singleView.hidden  = view !== 'single';
   catalogMain.hidden  = view !== 'catalog';
-  backBtn.hidden      = view !== 'single' || !allProducts.length;
+  // 뒤로가기: 카탈로그에서 진입한 경우만 표시 (공유 링크 직접 접속 시 숨김)
+  backBtn.hidden      = view !== 'single' || !enteredFromCatalog;
   // 필터 버튼: 카탈로그 뷰에서만 표시 (모바일 CSS에서 display 제어)
   const fb = qs('catalog-filter-btn');
   if (fb) fb.hidden = view !== 'catalog';
@@ -498,14 +499,18 @@ async function loadAgent() {
       agentPhone = phone;
       headerCall.href = `tel:${phone}`;
       headerCall.hidden = false;
-      // 모바일 하단 전화 바
-      const mobileCta = qs('catalog-mobile-cta');
-      const mobileCtaLink = qs('catalog-mobile-cta-link');
-      const mobileCtaText = qs('catalog-mobile-cta-text');
-      if (mobileCta && mobileCtaLink) {
-        mobileCtaLink.href = `tel:${phone}`;
-        if (mobileCtaText) mobileCtaText.textContent = `${name || '담당자'}${position ? ' ' + position : ''}에게 전화하기`;
-        mobileCta.hidden = false;
+      // 하단 연락 바
+      const contactBar = qs('catalog-contact-bar');
+      const contactCall = qs('catalog-contact-call');
+      const contactCallText = qs('catalog-contact-call-text');
+      const contactName = qs('catalog-contact-name');
+      const contactPhone = qs('catalog-contact-phone');
+      if (contactBar) {
+        if (contactCall) contactCall.href = `tel:${phone}`;
+        if (contactCallText) contactCallText.textContent = `${name || '담당자'}${position ? ' ' + position : ''}에게 전화하기`;
+        if (contactName) contactName.textContent = `${name || ''}${position ? ' ' + position : ''}`;
+        if (contactPhone) contactPhone.textContent = phone;
+        contactBar.hidden = false;
       }
     }
   } catch (e) {
@@ -968,10 +973,12 @@ function renderGrid() {
 
 // ─── 카드 클릭 → 단일 상품 뷰 전환 ──────────────────────────────────────
 
-let catalogScrollY = 0; // 카탈로그 스크롤 위치 저장
+let catalogScrollY = 0;
+let enteredFromCatalog = false;
 
 function showDetailView(p) {
   catalogScrollY = window.scrollY;
+  enteredFromCatalog = true;
   renderSingleView(p);
   showView('single');
   window.scrollTo({ top: 0 });

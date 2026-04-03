@@ -101,12 +101,16 @@
   </div>
 </main>
 
-<!-- 모바일 하단 전화 바 -->
-<div class="catalog-mobile-cta" id="catalog-mobile-cta" hidden>
-  <a class="catalog-mobile-cta__link" id="catalog-mobile-cta-link" href="tel:">
+<!-- 하단 연락 바 -->
+<div class="catalog-contact-bar" id="catalog-contact-bar" hidden>
+  <a class="catalog-contact-bar__call" id="catalog-contact-call" href="tel:">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
-    <span id="catalog-mobile-cta-text">전화 문의하기</span>
+    <span id="catalog-contact-call-text">전화 문의하기</span>
   </a>
+  <div class="catalog-contact-bar__info" id="catalog-contact-info">
+    <span class="catalog-contact-bar__info-name" id="catalog-contact-name"></span>
+    <span class="catalog-contact-bar__info-phone" id="catalog-contact-phone"></span>
+  </div>
 </div>
 
 <script type="module" src="{{ url_for('static', filename='js/pages/catalog.js') }}?v={{ app_version }}"></script>
