@@ -53,15 +53,16 @@ const ctaText        = qs('catalog-cta-text');
 const params     = new URLSearchParams(window.location.search);
 const agentCode  = params.get('a') || params.get('agent') || '';
 const shareId    = params.get('id') || '';
-const shareCar   = params.get('car') || '';
-const hasShare   = !!(shareId || shareCar);
+const shareCar       = params.get('car') || '';
+const providerParam  = params.get('provider') || '';
+const hasShare       = !!(shareId || shareCar);
 
 // ─── 상태 ──────────────────────────────────────────────────────────────────
 
 let allProducts   = [];
 let allPolicies   = {};
 let activeMaker   = '';
-let activeProvider = '';
+let activeProvider = providerParam; // URL에서 공급사 필터 초기값
 let activeFuel    = '';
 let agentPhone    = '';
 

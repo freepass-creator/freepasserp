@@ -4,7 +4,7 @@ import { renderRoleMenu } from '../core/role-menu.js';
 import { logoutCurrentUser, sendPasswordReset, deleteCurrentUser } from '../firebase/firebase-auth.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { syncEditSaveButtonTone } from '../core/management-skeleton.js';
-import { updateUserProfile, fetchProductsOnce } from '../firebase/firebase-db.js';
+import { updateUserProfile, fetchProductsOnce, fetchPartnersOnce } from '../firebase/firebase-db.js';
 import { storage } from '../firebase/firebase-config.js';
 import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { fillProfile } from './settings/helpers.js';
@@ -147,22 +147,71 @@ function bindAppSettings(profile) {
   if (!landingSelect) return;
 
   // 카탈로그 링크
+  const agentParam = profile.user_code ? `a=${encodeURIComponent(profile.user_code)}` : '';
+  const catalogBase = `${location.origin}/catalog`;
+
+  // 전체 카탈로그
   const catalogUrlInput = document.getElementById('settings-catalog-url');
   const catalogCopyBtn = document.getElementById('settings-catalog-copy');
-  if (catalogUrlInput && profile.user_code) {
-    const catalogUrl = `${location.origin}/catalog?a=${encodeURIComponent(profile.user_code)}`;
-    catalogUrlInput.value = catalogUrl;
+  if (catalogUrlInput && agentParam) {
+    catalogUrlInput.value = `${catalogBase}?${agentParam}`;
   }
-  catalogCopyBtn?.addEventListener('click', () => {
-    const url = catalogUrlInput?.value;
-    if (!url) return;
-    navigator.clipboard.writeText(url).then(() => {
+
+  function copyToClipboard(text, inputEl) {
+    navigator.clipboard.writeText(text).then(() => {
       showToast('링크가 복사되었습니다.', 'success');
     }).catch(() => {
-      catalogUrlInput.select();
-      document.execCommand('copy');
+      if (inputEl) { inputEl.select(); document.execCommand('copy'); }
       showToast('링크가 복사되었습니다.', 'success');
     });
+  }
+
+  catalogCopyBtn?.addEventListener('click', () => {
+    if (catalogUrlInput?.value) copyToClipboard(catalogUrlInput.value, catalogUrlInput);
+  });
+
+  // 공급사별 카탈로그
+  const providerSelect = document.getElementById('settings-catalog-provider');
+  const providerUrlInput = document.getElementById('settings-catalog-provider-url');
+  const providerCopyBtn = document.getElementById('settings-catalog-provider-copy');
+
+  function updateProviderUrl() {
+    const code = providerSelect?.value || '';
+    if (providerUrlInput && agentParam && code) {
+      providerUrlInput.value = `${catalogBase}?${agentParam}&provider=${encodeURIComponent(code)}`;
+    } else if (providerUrlInput) {
+      providerUrlInput.value = '';
+    }
+  }
+
+  (async () => {
+    try {
+      const partners = await fetchPartnersOnce();
+      const providers = partners.filter(p => p.partner_type === 'provider');
+      if (providerSelect) {
+        providerSelect.innerHTML = '<option value="">공급사 선택</option>' +
+          providers.map(p => `<option value="${p.partner_code || ''}">${p.partner_code || ''} / ${p.partner_name || ''}</option>`).join('');
+        // 마지막 선택값 복원
+        const saved = profile.settings?.catalog_provider || '';
+        if (saved) providerSelect.value = saved;
+        updateProviderUrl();
+      }
+    } catch (e) { console.warn('partner load failed', e); }
+  })();
+
+  providerSelect?.addEventListener('change', async () => {
+    updateProviderUrl();
+    // 선택값 저장
+    try {
+      const newSettings = { ...(currentProfile.settings || {}), catalog_provider: providerSelect.value };
+      await updateUserProfile(currentProfile.uid, { settings: newSettings });
+      currentProfile.settings = newSettings;
+    } catch (e) { /* ignore */ }
+  });
+
+  providerCopyBtn?.addEventListener('click', () => {
+    if (!providerSelect?.value) { showToast('공급사를 선택해주세요.', 'info'); return; }
+    if (providerUrlInput?.value) copyToClipboard(providerUrlInput.value, providerUrlInput);
   });
 
   function hrefToKey(href) { return href.replace(/\//g, '_'); }

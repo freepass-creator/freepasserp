@@ -93,6 +93,7 @@
 <div class="panel-body settings-right-panel-body">
 <section class="settings-section-block">
 <div class="section-title-row"><span class="section-title">내 카탈로그</span><span class="section-desc">고객에게 공유할 상품 페이지</span></div>
+<div class="settings-subsection-title is-small">전체 카탈로그</div>
 <div class="settings-catalog-link-row">
 <input class="settings-catalog-link-input" id="settings-catalog-url" readonly/>
 <button class="settings-catalog-copy-btn" id="settings-catalog-copy" type="button" title="링크 복사">
@@ -100,7 +101,19 @@
 복사
 </button>
 </div>
-<p class="settings-helper">이 링크를 고객에게 보내면 전체 상품을 검색·조회할 수 있습니다.</p>
+<p class="settings-helper">전체 상품을 검색·조회할 수 있는 링크입니다.</p>
+<div class="settings-subsection-title is-small" style="margin-top:12px">공급사별 카탈로그</div>
+<div class="settings-catalog-link-row">
+<select class="settings-catalog-provider-select" id="settings-catalog-provider"></select>
+<button class="settings-catalog-copy-btn" id="settings-catalog-provider-copy" type="button" title="링크 복사">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+복사
+</button>
+</div>
+<div class="settings-catalog-link-row" style="margin-top:4px">
+<input class="settings-catalog-link-input" id="settings-catalog-provider-url" readonly/>
+</div>
+<p class="settings-helper">선택한 공급사 상품만 보여지는 링크입니다.</p>
 </section>
 <section class="settings-section-block">
 <div class="section-title-row"><span class="section-title">초기 페이지</span><span class="section-desc">로그인 후 처음 표시할 페이지</span></div>
