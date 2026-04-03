@@ -121,11 +121,9 @@
     },
 
     "code_sequences": {
-      // 인증된 사용자는 읽기 가능, 쓰기는 트랜잭션으로만 실행됨
       ".read": "auth != null",
       "$key": {
-        ".write": "auth != null",
-        ".validate": "newData.isNumber() && newData.val() === data.val() + 1"
+        ".write": "auth != null"
       }
     },
 
