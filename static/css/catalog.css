@@ -10,6 +10,20 @@
   font-weight: 400;
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overscroll-behavior-y: none;
+}
+
+/* GPU 가속 — 모바일 꿀렁임 방지 */
+.catalog-header,
+.catalog-single,
+.catalog-main,
+.catalog-grid,
+.catalog-card {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: auto;
 }
 .catalog-body img { -webkit-user-drag: none; pointer-events: none; }
 
@@ -397,7 +411,7 @@
   margin-bottom: 8px;
 }
 
-.catalog-sidebar__section .is-hidden { display: none; }
+.catalog-sidebar__section.is-hidden { display: none; }
 
 .catalog-search-icon {
   position: absolute;

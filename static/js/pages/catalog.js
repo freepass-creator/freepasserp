@@ -380,7 +380,7 @@ function renderProductDetail(p) {
     ['차령만료일', fmtDate(p.vehicle_age_expiry_date)],
     ['차량가격',   fmtMoney(p.vehicle_price)],
     ['특이사항',   p.partner_memo || p.note],
-    ['공급사',     p.provider_company_code || p.partner_code],
+    ...(!providerParam ? [['공급사', p.provider_company_code || p.partner_code]] : []),
   ].filter(([, v]) => has(v));
 
   if (extraRows.length) {
@@ -466,6 +466,13 @@ async function loadData() {
       .map(([key, p]) => ({ ...p, _key: key }))
       .filter((p) => p && p.status !== 'deleted' && p.vehicle_status !== '계약완료')
       .sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+
+    // 공급사 전용 링크: 해당 공급사 상품만 남김
+    if (providerParam) {
+      allProducts = allProducts.filter((p) =>
+        (p.provider_company_code || p.partner_code || '') === providerParam
+      );
+    }
 
     if (hasShare) {
       const target = shareId
@@ -610,8 +617,9 @@ function getProviders() {
 
 function renderFilterChips(el, items, activeValue, dataAttr) {
   if (!el) return;
-  if (items.length <= 1) { el.innerHTML = ''; el.closest('.catalog-filter-row')?.classList.add('is-hidden'); return; }
-  el.closest('.catalog-filter-row')?.classList.remove('is-hidden');
+  const section = el.closest('.catalog-sidebar__section') || el.closest('.catalog-filter-row');
+  if (items.length <= 1) { el.innerHTML = ''; section?.classList.add('is-hidden'); return; }
+  section?.classList.remove('is-hidden');
   el.innerHTML = `<button class="catalog-chip${!activeValue ? ' is-active' : ''}" data-${dataAttr}="">전체</button>` +
     items.map(([value, label]) =>
       `<button class="catalog-chip${activeValue === value ? ' is-active' : ''}" data-${dataAttr}="${esc(value)}">${esc(label)}</button>`
@@ -620,12 +628,19 @@ function renderFilterChips(el, items, activeValue, dataAttr) {
 
 function renderAllChips() {
   const makers = getUniqueValues('maker').map(m => [m, m]);
-  const providers = getProviders();
   const fuels = getUniqueValues('fuel_type').map(f => [f, f]);
 
   renderFilterChips(chipsEl, makers, activeMaker, 'maker');
-  renderFilterChips(providerChipsEl, providers, activeProvider, 'provider');
   renderFilterChips(fuelChipsEl, fuels, activeFuel, 'fuel');
+
+  // 공급사 전용 링크면 공급사 필터 숨김
+  if (providerParam) {
+    providerChipsEl?.closest('.catalog-sidebar__section')?.classList.add('is-hidden');
+    renderFilterChips(providerChipsEl, [], '', 'provider');
+  } else {
+    const providers = getProviders();
+    renderFilterChips(providerChipsEl, providers, activeProvider, 'provider');
+  }
 }
 
 function bindChipClick(el, dataAttr, setter) {
