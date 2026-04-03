@@ -500,6 +500,16 @@ async function loadAgent() {
       singleCtaText.textContent = `${name || '담당자'}에게 전화 문의`;
       singleCta.hidden = false;
     }
+
+    // 페이지 타이틀 설정
+    const suffix = companyName ? ` | ${companyName}` : '';
+    if (shareId || shareCar) {
+      // 상세 링크 — renderSingleView에서 오버라이드
+    } else if (providerParam) {
+      document.title = `렌터카 [${providerParam}] 상품${suffix}`;
+    } else {
+      document.title = `렌터카 [전체] 상품${suffix}`;
+    }
   } catch (e) {
     console.warn('[catalog] agent load failed', e);
   }
@@ -557,7 +567,9 @@ async function loadData() {
 
 function renderSingleView(p) {
   const model = [p.maker, p.model_name].filter(Boolean).join(' ');
-  document.title = model || '렌트카 상품 안내';
+  const carNo = p.car_number || '';
+  const suffix = agentCompany?.textContent ? ` | ${agentCompany.textContent}` : '';
+  document.title = `렌터카 [${carNo} ${model}] 상품${suffix}`.trim();
 
   renderSingleGallery(getImages(p));
   singleBody.innerHTML = renderProductDetail(p);
