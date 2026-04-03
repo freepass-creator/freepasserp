@@ -144,7 +144,7 @@ export async function updatePartner(partnerCode, updates) {
 }
 
 export async function fetchPartnersOnce() {
-  return fetchCollection('partners', { filter: isNotDeleted, sort: sortByCreatedDesc });
+  return fetchCollection('partners', { filter: isNotDeleted, sort: sortByUpdatedOrCreatedDesc });
 }
 
 export function watchPartners(callback) {
@@ -321,14 +321,14 @@ export async function updateTerm(termCode, updates) {
 export async function deleteTerm(termCode) { return softDelete(`policies/${sanitizeCodeValue(termCode)}`); }
 
 export function watchTerms(callback) {
-  return watchCollection('policies', callback, { filter: isNotDeleted, sort: sortByCreatedDesc });
+  return watchCollection('policies', callback, { filter: isNotDeleted, sort: sortByUpdatedOrCreatedDesc });
 }
 
 export function watchTermsByProvider(providerCompanyCode, callback) {
   const normalizedProvider = sanitizeCodeValue(providerCompanyCode);
   return watchCollection('policies', callback, {
     filter: (item) => item.provider_company_code === normalizedProvider && isActive(item),
-    sort: sortByCreatedDesc
+    sort: sortByUpdatedOrCreatedDesc
   });
 }
 
@@ -439,10 +439,10 @@ export async function saveProduct(product) {
   return { productUid, productCode };
 }
 
-export function watchProducts(callback) { return watchCollection('products', callback, { sort: sortByCreatedDesc }); }
+export function watchProducts(callback) { return watchCollection('products', callback, { sort: sortByUpdatedOrCreatedDesc }); }
 
 export async function fetchProductsOnce() {
-  return fetchCollection('products', { sort: sortByCreatedDesc });
+  return fetchCollection('products', { sort: sortByUpdatedOrCreatedDesc });
 }
 
 export async function updateProduct(productIdentifier, updates) {
