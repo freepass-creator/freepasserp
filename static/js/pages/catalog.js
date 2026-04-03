@@ -989,11 +989,14 @@ window.addEventListener('popstate', () => {
 // 공유하기 (링크 복사)
 qs('single-share-btn')?.addEventListener('click', () => {
   if (!currentSingleProduct) return;
-  const pid = currentSingleProduct._key || currentSingleProduct.productUid || currentSingleProduct.id || '';
+  const p = currentSingleProduct;
+  const pid = p._key || p.productUid || p.id || '';
+  const carTitle = [p.car_number, p.maker, p.model_name].filter(Boolean).join(' ');
   const base = `${location.origin}/catalog`;
   const params = new URLSearchParams();
   if (agentCode) params.set('a', agentCode);
   if (pid) params.set('id', pid);
+  if (carTitle) params.set('t', carTitle);
   const url = `${base}?${params.toString()}`;
   navigator.clipboard.writeText(url).then(() => {
     const btn = qs('single-share-btn');

@@ -18,7 +18,7 @@ import io, re, zipfile
 
 app = Flask(__name__)
 
-APP_VERSION = '20260404v'
+APP_VERSION = '20260404w'
 
 @app.context_processor
 def inject_app_version():
@@ -123,7 +123,10 @@ def catalog_view():
     share_id = req.args.get('id', '')
     agent = req.args.get('a', '')
     # 동적 타이틀
-    if share_id:
+    car_title = req.args.get('t', '')
+    if share_id and car_title:
+        title = f'렌터카 {car_title} 상품'
+    elif share_id:
         title = '렌터카 상품 안내'
     elif provider:
         title = f'렌터카 {provider} 상품'
