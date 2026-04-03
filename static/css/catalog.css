@@ -527,7 +527,9 @@
 /* 아코디언 섹션 — 가로 칸 스타일 */
 .catalog-sidebar__section {
   padding: 2px 0;
+  border-bottom: 1px solid #f1f5f9;
 }
+.catalog-sidebar__section:last-child { border-bottom: none; }
 .catalog-sidebar__section.is-hidden { display: none; }
 
 .catalog-sidebar__title {
