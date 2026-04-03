@@ -21,7 +21,7 @@
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
         ".validate": "newData.hasChildren(['partner_code', 'partner_type', 'partner_name', 'status', 'created_at'])",
         "partner_type": {
-          ".validate": "newData.val() === 'provider' || newData.val() === 'sales_channel'"
+          ".validate": "newData.val() === 'provider' || newData.val() === 'sales_channel' || newData.val() === 'operator'"
         },
         "status": {
           ".validate": "newData.val() === 'active' || newData.val() === 'deleted'"
