@@ -36,8 +36,8 @@ const browseAllBtn   = qs('browse-all-btn');
 
 const catalogMain    = qs('catalog-main');
 const searchInput    = qs('catalog-search');
-const countBar       = qs('catalog-count-bar');
 const countText      = qs('catalog-count-text');
+const filterResetBtn = qs('catalog-filter-reset');
 const grid           = qs('catalog-grid');
 
 const footer         = qs('catalog-footer');
@@ -875,8 +875,7 @@ filterSectionsEl?.addEventListener('click', (e) => {
 
 function renderGrid() {
   const products = getFiltered();
-  countText.textContent = `${products.length}대`;
-  countBar.hidden = false;
+  countText.textContent = products.length.toLocaleString();
 
   if (!products.length) {
     grid.innerHTML = '<div class="catalog-empty">조건에 맞는 상품이 없습니다.</div>';
@@ -991,10 +990,21 @@ filterBtn?.addEventListener('click', () => {
 sidebarClose?.addEventListener('click', closeFilter);
 sidebarOverlay?.addEventListener('click', closeFilter);
 
+// 선택 초기화
+filterResetBtn?.addEventListener('click', () => {
+  FILTER_GROUPS.forEach(g => {
+    filters[g.key].clear();
+    if (providerParam && g.key === 'provider') filters.provider.add(providerParam);
+  });
+  if (searchInput) searchInput.value = '';
+  renderAllFilters();
+  renderGrid();
+});
+
 let _searchTimer = null;
 searchInput.addEventListener('input', () => {
   clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(() => { renderGrid(); closeFilter(); }, 200);
+  _searchTimer = setTimeout(() => { renderAllFilters(); renderGrid(); }, 200);
 });
 
 // ─── 부트스트랩 ────────────────────────────────────────────────────────────
