@@ -15,6 +15,39 @@ export function safeText(value, fallback = '-') {
   return normalizeText(value) || fallback;
 }
 
+/** 전화번호 포맷: 01012345678 → 010-1234-5678 */
+export function formatPhone(value) {
+  const d = String(value ?? '').replace(/[^0-9]/g, '');
+  if (d.length === 11) return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+  if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
+  if (d.length === 9) return `${d.slice(0, 2)}-${d.slice(2, 5)}-${d.slice(5)}`;
+  return d;
+}
+
+/** 사업자등록번호 포맷: 1234567890 → 123-45-67890 */
+export function formatBizNumber(value) {
+  const d = String(value ?? '').replace(/[^0-9]/g, '');
+  if (d.length === 10) return `${d.slice(0, 3)}-${d.slice(3, 5)}-${d.slice(5)}`;
+  return d;
+}
+
+/** 입력 중 자동 포맷 바인딩 */
+export function bindAutoFormat(input, formatter) {
+  if (!input) return;
+  input.addEventListener('input', () => {
+    const pos = input.selectionStart;
+    const before = input.value;
+    const digits = before.replace(/[^0-9]/g, '');
+    const formatted = formatter(digits);
+    if (formatted !== before) {
+      input.value = formatted;
+      // 커서 위치 보정
+      const diff = formatted.length - before.length;
+      input.setSelectionRange(pos + diff, pos + diff);
+    }
+  });
+}
+
 function toValidDate(value) {
   const timestamp = Number(value);
   const date = Number.isFinite(timestamp) && timestamp > 0

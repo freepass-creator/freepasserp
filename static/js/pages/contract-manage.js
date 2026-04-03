@@ -7,6 +7,7 @@ import { renderBadgeRow } from '../shared/badge.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { validateContract } from '../core/validators.js';
 import { savePageState, loadPageState } from '../core/page-state.js';
+import { formatPhone, bindAutoFormat } from '../core/management-format.js';
 
 const { uploadContractFilesDetailed, deleteProductImagesByUrls } = await import(`../firebase/firebase-storage.js?v=${window.APP_VER || '1'}`);
 
@@ -97,6 +98,7 @@ function bindDOM() {
     balance_confirmed: f('balance_confirmed'),
     delivery_confirmed: f('delivery_confirmed')
   };
+  bindAutoFormat(f('customer_phone'), formatPhone);
 }
 
 const CHECK_FIELD_KEYS = ['deposit_confirmed', 'docs_confirmed', 'approval_confirmed', 'contract_confirmed', 'balance_confirmed', 'delivery_confirmed'];

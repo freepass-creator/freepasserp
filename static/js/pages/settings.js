@@ -8,6 +8,7 @@ import { updateUserProfile, fetchProductsOnce, fetchPartnersOnce } from '../fire
 import { storage } from '../firebase/firebase-config.js';
 import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { fillProfile } from './settings/helpers.js';
+import { formatPhone, bindAutoFormat } from '../core/management-format.js';
 
 const LANDING_OPTIONS = [
   { href: '/home',         label: '대시보드',           roles: ['provider', 'agent', 'admin'] },
@@ -466,6 +467,7 @@ async function bootstrap() {
     bindAppSettings(profile);
     bindDownloadSection(profile);
     bindDocUploads();
+    bindAutoFormat(document.getElementById('settings-phone'), formatPhone);
   } catch (error) {
     showToast(error.message, 'error');
   }

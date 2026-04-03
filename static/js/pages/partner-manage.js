@@ -8,6 +8,7 @@ import { storage } from '../firebase/firebase-config.js';
 import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { renderBadgeRow } from '../shared/badge.js';
 import { showToast, showConfirm } from '../core/toast.js';
+import { formatPhone, formatBizNumber, bindAutoFormat } from '../core/management-format.js';
 import { formatShortDate, formatYearMonth } from '../core/management-format.js';
 import { renderTableGrid, renderSkeletonRows } from '../core/management-list.js';
 import { escapeHtml } from '../core/management-format.js';
@@ -40,6 +41,11 @@ function bindDOM() {
   resetButtons = [qs('#partner-form-reset')].filter(Boolean);
   submitButtons = [qs('#partner-submit-head')].filter(Boolean);
   deleteButtons = [qs('#partner-delete-head')].filter(Boolean);
+  // 자동 포맷
+  bindAutoFormat(qs('#partner_business_number'), formatBizNumber);
+  bindAutoFormat(qs('#partner_company_phone'), formatPhone);
+  bindAutoFormat(qs('#partner_ceo_phone'), formatPhone);
+  bindAutoFormat(qs('#partner_manager_phone'), formatPhone);
 }
 
 applyManagementButtonTones({ resetButtons, submitButtons, deleteButtons });

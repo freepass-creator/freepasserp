@@ -13,6 +13,7 @@
 import { auth, db } from '../firebase/firebase-config.js';
 import { signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
+import { formatPhone } from '../core/management-format.js';
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -500,7 +501,7 @@ async function loadAgent() {
       const headerPhone = qs('catalog-header-phone');
       const headerPhoneText = qs('catalog-header-phone-text');
       const headerDivider = qs('catalog-header-divider');
-      if (headerPhone) { headerPhoneText.textContent = phone; headerPhone.hidden = false; }
+      if (headerPhone) { headerPhoneText.textContent = formatPhone(phone); headerPhone.hidden = false; }
       if (headerDivider) headerDivider.hidden = false;
       // 하단 전화하기 바
       const bottomBar = qs('catalog-bottom-bar');

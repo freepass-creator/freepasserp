@@ -1,12 +1,15 @@
 import { signupWithEmail } from '../firebase/firebase-auth.js';
 import { saveUserProfile, getPartnerByBusinessNumber } from '../firebase/firebase-db.js';
 import { qs } from '../core/utils.js';
+import { formatPhone, formatBizNumber, bindAutoFormat } from '../core/management-format.js';
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
 const form = qs('#signup-form');
 const message = qs('#signup-message');
 const businessNumberInput = qs('#business_number');
+bindAutoFormat(businessNumberInput, formatBizNumber);
+bindAutoFormat(qs('#phone'), formatPhone);
 const partnerPreview = qs('#partner-preview');
 
 let matchedPartner = null;

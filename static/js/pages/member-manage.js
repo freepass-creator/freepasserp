@@ -5,7 +5,7 @@ import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { deleteUserProfile, fetchPartnersOnce, fetchUsersOnce, updateUserProfile, watchUsers } from '../firebase/firebase-db.js';
 import { renderBadgeRow } from '../shared/badge.js';
-import { formatShortDate, formatYearMonth } from '../core/management-format.js';
+import { formatShortDate, formatYearMonth, formatPhone, bindAutoFormat } from '../core/management-format.js';
 import { renderTableGrid, renderSkeletonRows } from '../core/management-list.js';
 import { escapeHtml } from '../core/management-format.js';
 import { showToast, showConfirm } from '../core/toast.js';
@@ -36,6 +36,7 @@ function bindDOM() {
   deleteButton = qs('#member-delete-head');
   roleSelect = qs('#member_role_select');
   companyCodeSelect = qs('#member_company_code_select');
+  bindAutoFormat(qs('#member_phone'), formatPhone);
 }
 
 applyManagementButtonTones({ neutralButtons: [refreshButton], submitButtons: [submitButton], deleteButtons: [deleteButton] });
