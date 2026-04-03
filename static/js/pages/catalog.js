@@ -371,11 +371,11 @@ function renderProductDetail(p) {
 
   // ── 추가정보 ──
   const extraRows = [
+    ['차량번호',   p.car_number],
     ['차종구분',   p.vehicle_class],
     ['최초등록일', fmtDate(p.first_registration_date)],
     ['차령만료일', fmtDate(p.vehicle_age_expiry_date)],
     ['차량가격',   fmtMoney(p.vehicle_price)],
-    ['차량번호',   p.car_number],
     ['특이사항',   p.partner_memo || p.note],
   ].filter(([, v]) => has(v));
 
