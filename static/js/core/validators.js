@@ -102,6 +102,16 @@ export function validateProduct(payload = {}) {
     errors.push('차령만료일 형식이 올바르지 않습니다. (YYMMDD 또는 YYYYMMDD)');
   }
 
+  // 대여료 최소 1칸 필수
+  const rentPeriods = ['1', '12', '24', '36', '48', '60'];
+  const hasAnyRent = rentPeriods.some(m => {
+    const v = Number(payload[`rent_${m}`] || payload.price?.[m]?.rent || 0);
+    return v > 0;
+  });
+  if (!hasAnyRent) {
+    errors.push('대여료를 최소 1개 기간에 입력해주세요.');
+  }
+
   // 금액 범위 검증 (입력된 경우에만)
   const priceFields = [
     ['rent_48', '48개월 대여료'], ['deposit_48', '48개월 보증금'],
