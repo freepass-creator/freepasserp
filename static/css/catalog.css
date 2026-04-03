@@ -14,7 +14,6 @@
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   overscroll-behavior-y: none;
-  padding-bottom: 70px;
 }
 
 /* 모바일 스크롤 최적화 */
@@ -941,6 +940,8 @@
   .catalog-header { height: 50px; }
   .catalog-header-filter:not([hidden]) { display: flex; }
   .catalog-header-phone { display: none; }
+  .catalog-bottom-bar:not([hidden]) { display: block; }
+  .catalog-body { padding-bottom: 70px; }
 
   .catalog-sidebar-overlay {
     display: none;
@@ -976,6 +977,7 @@
 
 /* 하단 전화하기 바 */
 .catalog-bottom-bar {
+  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -987,7 +989,7 @@
   backdrop-filter: blur(12px);
   border-top: 1px solid rgba(15, 23, 42, 0.07);
 }
-.catalog-bottom-bar[hidden] { display: none; }
+.catalog-bottom-bar[hidden] { display: none !important; }
 
 .catalog-bottom-bar__btn {
   display: flex;

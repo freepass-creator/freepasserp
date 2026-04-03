@@ -1005,6 +1005,8 @@ document.addEventListener('click', (e) => {
   if (agentCode) params.set('a', agentCode);
   if (pid) params.set('id', pid);
   if (carTitle) params.set('t', carTitle);
+  const companyText = agentCompany?.textContent?.trim();
+  if (companyText) params.set('c', companyText);
   const url = `${base}?${params.toString()}`;
   navigator.clipboard.writeText(url).then(() => {
     btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';

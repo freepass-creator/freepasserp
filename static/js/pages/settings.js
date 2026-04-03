@@ -148,13 +148,14 @@ function bindAppSettings(profile) {
 
   // 카탈로그 링크
   const agentParam = profile.user_code ? `a=${encodeURIComponent(profile.user_code)}` : '';
+  const companyParam = profile.company_name ? `&c=${encodeURIComponent(profile.company_name)}` : '';
   const catalogBase = `${location.origin}/catalog`;
 
   // 전체 카탈로그
   const catalogUrlInput = document.getElementById('settings-catalog-url');
   const catalogCopyBtn = document.getElementById('settings-catalog-copy');
   if (catalogUrlInput && agentParam) {
-    catalogUrlInput.value = `${catalogBase}?${agentParam}`;
+    catalogUrlInput.value = `${catalogBase}?${agentParam}${companyParam}`;
   }
 
   function copyToClipboard(text, inputEl) {
@@ -178,7 +179,7 @@ function bindAppSettings(profile) {
   function updateProviderUrl() {
     const code = providerSelect?.value || '';
     if (providerUrlInput && agentParam && code) {
-      providerUrlInput.value = `${catalogBase}?${agentParam}&provider=${encodeURIComponent(code)}`;
+      providerUrlInput.value = `${catalogBase}?${agentParam}&provider=${encodeURIComponent(code)}${companyParam}`;
     } else if (providerUrlInput) {
       providerUrlInput.value = '';
     }
