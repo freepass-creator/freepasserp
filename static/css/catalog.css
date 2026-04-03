@@ -413,12 +413,12 @@
   top: 52px;
   height: calc(100vh - 52px);
   overflow-y: auto;
-  padding: 16px;
+  padding: 12px;
   border-right: 1px solid #f1f5f9;
   background: #fff;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .catalog-sidebar__head {
@@ -492,48 +492,51 @@
   min-width: 0;
 }
 
-/* 아코디언 섹션 */
-.catalog-sidebar__section { }
+/* 아코디언 섹션 — 가로 칸 스타일 */
+.catalog-sidebar__section {
+  border-bottom: 1px solid #f1f5f9;
+}
+.catalog-sidebar__section:last-child { border-bottom: none; }
+.catalog-sidebar__section.is-hidden { display: none; }
 
 .catalog-sidebar__title {
-  font-size: 11px;
-  font-weight: 600;
-  color: #64748b;
-  margin-bottom: 8px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 36px;
+  padding: 0 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1e293b;
+  cursor: pointer;
   user-select: none;
 }
 .catalog-sidebar__title::after {
   content: '';
-  width: 6px; height: 6px;
+  width: 5px; height: 5px;
   border-right: 1.5px solid #94a3b8;
   border-bottom: 1.5px solid #94a3b8;
   transform: rotate(45deg);
   transition: transform 0.15s;
   flex-shrink: 0;
 }
-.catalog-sidebar__section.is-collapsed .catalog-sidebar__title::after {
-  transform: rotate(-45deg);
+.catalog-sidebar__section:not(.is-collapsed) .catalog-sidebar__title::after {
+  transform: rotate(-135deg);
 }
 
 .filter-check {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 4px;
-  border-radius: 4px;
+  padding: 3px 2px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   color: #1e293b;
-  transition: background 0.1s;
 }
-.filter-check:hover { background: #f8fafc; }
+.filter-check:hover { background: #f8fafc; border-radius: 3px; }
 
 .filter-check input[type="checkbox"] {
-  width: 14px; height: 14px;
+  width: 13px; height: 13px;
   margin: 0;
   accent-color: #1b2a4a;
   cursor: pointer;
@@ -555,7 +558,7 @@
 }
 
 .filter-check.is-dimmed {
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .filter-active-badge {
@@ -592,13 +595,19 @@
 .catalog-filter-body {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  max-height: 200px;
+  gap: 1px;
+  max-height: 180px;
   overflow-y: auto;
+  padding-bottom: 8px;
 }
 
 .catalog-sidebar__section.is-collapsed .catalog-filter-body {
   display: none;
+}
+
+#catalog-filter-sections {
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── Count bar ───────────────────────────────────────────────────────────── */
@@ -707,8 +716,9 @@
 }
 
 .catalog-card__sub {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
+  line-height: 1.4;
 }
 
 .catalog-card__provider {
@@ -725,13 +735,13 @@
 }
 
 .catalog-card__price {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #1e293b;
 }
 
 .catalog-card__dep {
-  font-size: 11px;
+  font-size: 10px;
   color: #94a3b8;
 }
 
@@ -751,11 +761,11 @@
 .catalog-card__tag {
   display: inline-flex;
   align-items: center;
-  height: 20px;
-  padding: 0 7px;
-  border-radius: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 3px;
   background: #f1f5f9;
-  font-size: 11px;
+  font-size: 10px;
   color: #64748b;
 }
 
