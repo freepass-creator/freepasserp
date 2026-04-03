@@ -665,8 +665,13 @@ function renderGrid() {
     const thumb  = imgs[0] || '';
     const model  = [p.maker, p.model_name].filter(Boolean).join(' ');
     const sub    = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
-    const rent48 = getRent(p, 48);
-    const dep48  = getDeposit(p, 48);
+    // 대표 가격: 48 > 36 > 60 > 24 > 12 순으로 첫 번째 있는 기간
+    const pricePeriods = [48, 36, 60, 24, 12, 1];
+    let cardRent = 0, cardDep = 0, cardMonth = 0;
+    for (const m of pricePeriods) {
+      const r = getRent(p, m);
+      if (r) { cardRent = r; cardDep = getDeposit(p, m); cardMonth = m; break; }
+    }
     const status = p.vehicle_status || '';
     const imageHtml = thumb
       ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(model)}" loading="lazy">`
@@ -682,7 +687,7 @@ function renderGrid() {
           <div class="catalog-card__model">${esc(model || '차량')}</div>
           ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
           <div class="catalog-card__price-row">
-            ${rent48 ? `<span class="catalog-card__price">월 ${fmtMoney(rent48)}</span>${dep48 ? `<span class="catalog-card__dep">보증금 ${fmtMoney(dep48)}</span>` : ''}` : `<span class="catalog-card__price-inquiry">가격 문의</span>`}
+            ${cardRent ? `<span class="catalog-card__price">월 ${fmtMoney(cardRent)}</span>${cardDep ? `<span class="catalog-card__dep">보증금 ${fmtMoney(cardDep)}</span>` : ''}<span class="catalog-card__dep">${cardMonth}개월</span>` : `<span class="catalog-card__price-inquiry">가격 문의</span>`}
           </div>
           ${tags.length ? `<div class="catalog-card__tags">${tags.map((t) => `<span class="catalog-card__tag">${esc(t)}</span>`).join('')}</div>` : ''}
         </div>
