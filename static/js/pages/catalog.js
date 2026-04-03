@@ -303,6 +303,26 @@ function sectionTitle(icon, text) {
   return `<div class="cat-section-title">${SECTION_ICONS[icon] || ''}<span>${esc(text)}</span></div>`;
 }
 
+// ─── 배지 색상 매핑 ──────────────────────────────────────────────────────
+
+function badgeClass(field, value) {
+  const v = String(value || '').toLowerCase();
+  if (field === 'product_type') {
+    if (v.includes('신차렌트')) return 'cat-badge--rent-new';
+    if (v.includes('리스')) return 'cat-badge--lease';
+    if (v.includes('중고렌트') || v.includes('재렌트')) return 'cat-badge--rent-used';
+    if (v.includes('신차구독')) return 'cat-badge--sub-new';
+    if (v.includes('중고구독') || v.includes('재구독')) return 'cat-badge--sub-used';
+    return 'cat-badge--outline';
+  }
+  // vehicle_status
+  if (v.includes('가능') || v.includes('판매')) return 'cat-badge--info';
+  if (v.includes('완료')) return 'cat-badge--success';
+  if (v.includes('대기') || v.includes('보류') || v.includes('예정')) return 'cat-badge--warning';
+  if (v.includes('불가') || v.includes('취소')) return 'cat-badge--danger';
+  return 'cat-badge--info';
+}
+
 // ─── 공유 상세 마크업 생성 (수수료 제외 전부) ─────────────────────────────
 
 function renderProductDetail(p) {
@@ -313,8 +333,11 @@ function renderProductDetail(p) {
   // ── 기본 정보 ──
   const status = p.vehicle_status || '';
   const productType = p.product_type || '';
-  const badgeHtml = [status, productType].filter(v => v && v !== '재고')
-    .map(v => `<span class="cat-badge">${esc(v)}</span>`).join('');
+  const badges = [
+    status && status !== '재고' ? { field: 'vehicle_status', value: status } : null,
+    productType ? { field: 'product_type', value: productType } : null,
+  ].filter(Boolean);
+  const badgeHtml = badges.map(b => `<span class="cat-badge ${badgeClass(b.field, b.value)}">${esc(b.value)}</span>`).join('');
   const optText = String(p.options ?? '').trim();
   const tags = [p.fuel_type, p.year ? `${p.year}년식` : '', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''].filter(Boolean);
 
@@ -654,9 +677,11 @@ function openPhotoViewer(startIndex = 0) {
   const total = sGalleryImages.length;
   photoViewerCounter.textContent = `${total}장`;
 
-  photoViewerScroll.innerHTML = sGalleryImages.map((src, i) =>
-    `<img class="photo-viewer__img" src="${esc(src)}" alt="사진 ${i + 1}" loading="${i <= startIndex + 1 ? 'eager' : 'lazy'}">`
-  ).join('');
+  photoViewerScroll.innerHTML =
+    `<div class="photo-viewer__hint">스크롤하여 사진 ${total}장을 확인하세요</div>` +
+    sGalleryImages.map((src, i) =>
+      `<img class="photo-viewer__img" src="${esc(src)}" alt="사진 ${i + 1}" loading="${i <= startIndex + 1 ? 'eager' : 'lazy'}" decoding="async">`
+    ).join('');
 
   photoViewer.hidden = false;
   document.body.style.overflow = 'hidden';
@@ -952,8 +977,11 @@ function renderGrid() {
       ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(model)}" loading="lazy" decoding="async">`
       : `<div class="catalog-card__no-image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
     const pType = p.product_type || '';
-    const badgeParts = [status, pType].filter(v => v && v !== '재고');
-    const badgeHtml = badgeParts.map(v => `<span class="catalog-card__badge">${esc(v)}</span>`).join('');
+    const cardBadges = [
+      status && status !== '재고' ? { field: 'vehicle_status', value: status } : null,
+      pType ? { field: 'product_type', value: pType } : null,
+    ].filter(Boolean);
+    const badgeHtml = cardBadges.map(b => `<span class="catalog-card__badge ${badgeClass(b.field, b.value)}">${esc(b.value)}</span>`).join('');
     const tags = [p.fuel_type, p.year ? `${p.year}년` : '', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''].filter(Boolean);
 
     return `
