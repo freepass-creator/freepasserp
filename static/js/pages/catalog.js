@@ -952,7 +952,9 @@ function closeFilter() {
   document.body.style.overflow = '';
 }
 
-filterBtn?.addEventListener('click', openFilter);
+filterBtn?.addEventListener('click', () => {
+  sidebar?.classList.contains('is-open') ? closeFilter() : openFilter();
+});
 sidebarClose?.addEventListener('click', closeFilter);
 sidebarOverlay?.addEventListener('click', closeFilter);
 
