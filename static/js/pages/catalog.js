@@ -273,6 +273,7 @@ function renderProductDetail(p) {
   let html = `
     <div class="cat-hero">
       ${badgeHtml ? `<div class="cat-badges">${badgeHtml}</div>` : ''}
+      ${p.car_number ? `<div class="cat-carno">${esc(p.car_number)}</div>` : ''}
       <h1 class="cat-title">${esc(model || '차량')}</h1>
       ${sub ? `<p class="cat-subtitle">${esc(sub)}</p>` : ''}
       ${optText ? `<p class="cat-options">${esc(optText)}</p>` : ''}
