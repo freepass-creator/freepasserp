@@ -242,69 +242,6 @@ html {
 /* 상세 본문 */
 .catalog-single__body { padding: 0; }
 
-/* ─── 풀스크린 사진 뷰어 ─────────────────────────────────────────────────── */
-
-.photo-viewer {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-}
-.photo-viewer[hidden] { display: none; }
-
-.photo-viewer__close {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 2001;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  backdrop-filter: blur(8px);
-}
-.photo-viewer__close:hover { background: rgba(255, 255, 255, 0.25); }
-
-.photo-viewer__counter {
-  position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 2001;
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.photo-viewer__scroll {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.photo-viewer__hint {
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 16px 0 8px;
-}
-
-.photo-viewer__img {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto 2px;
-  display: block;
-}
-.photo-viewer__img:last-child { margin-bottom: 0; }
-
 /* 액션 버튼 (공유 + 전체보기) */
 
 .catalog-single__actions {

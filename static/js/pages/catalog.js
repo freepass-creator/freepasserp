@@ -14,6 +14,7 @@ import { auth, db } from '../firebase/firebase-config.js';
 import { signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
 import { formatPhone } from '../core/management-format.js';
+import { open as openFullscreenViewer, close as closeFullscreenViewer, isOpen as isViewerOpen } from '../shared/fullscreen-photo-viewer.js';
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -666,49 +667,17 @@ function updateGallerySlide() {
   }
 }
 
-// ─── 풀스크린 사진 뷰어 (세로 스크롤) ────────────────────────────────────
-
-const photoViewer      = qs('photo-viewer');
-const photoViewerClose = qs('photo-viewer-close');
-const photoViewerScroll = qs('photo-viewer-scroll');
-const photoViewerCounter = qs('photo-viewer-counter');
+// ─── 풀스크린 사진 뷰어 (공유 모듈 사용) ──────────────────────────────────
 
 function openPhotoViewer(startIndex = 0) {
   if (!sGalleryImages.length) return;
-  const total = sGalleryImages.length;
-  photoViewerCounter.textContent = `${total}장`;
-
-  photoViewerScroll.innerHTML =
-    `<div class="photo-viewer__hint">스크롤하여 사진 ${total}장을 확인하세요</div>` +
-    sGalleryImages.map((src, i) =>
-      `<img class="photo-viewer__img" src="${esc(src)}" alt="사진 ${i + 1}" loading="${i <= startIndex + 1 ? 'eager' : 'lazy'}" decoding="async">`
-    ).join('');
-
-  photoViewer.hidden = false;
-  document.body.style.overflow = 'hidden';
   history.pushState({ view: 'photo' }, '');
-
-  // 해당 사진 위치로 스크롤
-  if (startIndex > 0) {
-    requestAnimationFrame(() => {
-      const imgs = photoViewerScroll.querySelectorAll('.photo-viewer__img');
-      imgs[startIndex]?.scrollIntoView({ behavior: 'instant' });
-    });
-  }
+  openFullscreenViewer(sGalleryImages, startIndex);
 }
 
-function closePhotoViewer() {
-  photoViewer.hidden = true;
-  document.body.style.overflow = '';
-}
-
-photoViewerClose.addEventListener('click', closePhotoViewer);
-photoViewerScroll.addEventListener('click', (e) => {
-  if (e.target.closest('.photo-viewer__img')) history.back();
-});
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (!photoViewer.hidden) { closePhotoViewer(); return; }
+  if (isViewerOpen()) { closeFullscreenViewer(); return; }
   if (!singleView.hidden) { history.back(); }
 });
 
@@ -1020,8 +989,8 @@ function showDetailView(p) {
 
 // 브라우저 뒤로가기 → 카탈로그 메인
 window.addEventListener('popstate', () => {
-  if (!photoViewer.hidden) {
-    closePhotoViewer();
+  if (isViewerOpen()) {
+    closeFullscreenViewer();
     return;
   }
   if (!singleView.hidden) {

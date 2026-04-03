@@ -85,15 +85,12 @@ function renderImageViewer() {
   }
 }
 
+import { open as openFullscreenViewer } from './fullscreen-photo-viewer.js';
+
 export function openImageViewer(photos, index = 0) {
   const nextPhotos = Array.isArray(photos) ? photos.filter(Boolean) : [];
   if (!nextPhotos.length) return;
-  imageViewerPhotos = nextPhotos;
-  imageViewerCurrentIndex = Math.min(Math.max(Number(index || 0), 0), nextPhotos.length - 1);
-  const root = ensureImageViewer();
-  root.hidden = false;
-  document.body.classList.add('image-viewer-open');
-  renderImageViewer();
+  openFullscreenViewer(nextPhotos, Math.min(Math.max(Number(index || 0), 0), nextPhotos.length - 1));
 }
 
 function closeImageViewer() {
