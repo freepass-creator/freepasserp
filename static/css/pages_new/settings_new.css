@@ -20,7 +20,11 @@
 .settings-right-panel-body {
   display: flex;
   flex-direction: column;
-  gap: var(--form-section-gap, 24px);
+  gap: 16px;
+  padding: var(--panel-body-pad, 16px);
+}
+.settings-left-panel-body .form-section {
+  gap: 8px;
 }
 
 .settings-section-block {
