@@ -29,9 +29,6 @@ const backBtn        = qs('catalog-back-btn');
 const singleView     = qs('catalog-single');
 const singleGallery  = qs('single-gallery');
 const singleBody     = qs('single-body');
-const singleCta      = qs('single-cta');
-const singleCtaLink  = qs('single-cta-link');
-const singleCtaText  = qs('single-cta-text');
 const browseAllBtn   = qs('browse-all-btn');
 
 const catalogMain    = qs('catalog-main');
@@ -40,9 +37,6 @@ const countText      = qs('catalog-count-text');
 const filterResetBtn = qs('catalog-filter-reset');
 const grid           = qs('catalog-grid');
 
-const footer         = qs('catalog-footer');
-const ctaLink        = qs('catalog-cta-link');
-const ctaText        = qs('catalog-cta-text');
 
 // ─── URL 파라미터 ──────────────────────────────────────────────────────────
 
@@ -326,7 +320,10 @@ function renderProductDetail(p) {
 
   let html = `
     <div class="cat-hero">
-      ${badgeHtml ? `<div class="cat-badges">${badgeHtml}</div>` : ''}
+      <div class="cat-badges-row">
+        <div class="cat-badges">${badgeHtml}</div>
+        <button class="cat-share-btn" id="cat-share-btn" type="button" title="링크 복사"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg></button>
+      </div>
       <h1 class="cat-title">${esc(model || '차량')}${p.car_number ? `<span class="cat-carno">${esc(p.car_number)}</span>` : ''}</h1>
       ${sub ? `<p class="cat-subtitle">${esc(sub)}</p>` : ''}
       ${optText ? `<p class="cat-options">${esc(optText)}</p>` : ''}
@@ -457,7 +454,6 @@ function showView(view) {
   singleView.hidden  = view !== 'single';
   catalogMain.hidden  = view !== 'catalog';
   backBtn.hidden      = view !== 'single' || !allProducts.length;
-  footer.hidden       = view !== 'catalog' || !agentPhone;
   // 필터 버튼: 카탈로그 뷰에서만 표시 (모바일 CSS에서 display 제어)
   const fb = qs('catalog-filter-btn');
   if (fb) fb.hidden = view !== 'catalog';
@@ -502,11 +498,6 @@ async function loadAgent() {
       agentPhone = phone;
       headerCall.href = `tel:${phone}`;
       headerCall.hidden = false;
-      ctaLink.href = `tel:${phone}`;
-      ctaText.textContent = `${name || '영업자'}에게 전화하기`;
-      singleCtaLink.href = `tel:${phone}`;
-      singleCtaText.textContent = `${name || '담당자'}에게 전화 문의`;
-      singleCta.hidden = false;
     }
   } catch (e) {
     console.warn('[catalog] agent load failed', e);
@@ -946,12 +937,14 @@ function renderGrid() {
     const imageHtml = thumb
       ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(model)}" loading="lazy">`
       : `<div class="catalog-card__no-image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
-    const badgeHtml = status && status !== '재고' && status !== '입고예정' ? `<span class="catalog-card__badge">${esc(status)}</span>` : '';
+    const pType = p.product_type || '';
+    const badgeParts = [status, pType].filter(v => v && v !== '재고');
+    const badgeHtml = badgeParts.map(v => `<span class="catalog-card__badge">${esc(v)}</span>`).join('');
     const tags = [p.fuel_type, p.year ? `${p.year}년` : '', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''].filter(Boolean);
 
     return `
       <article class="catalog-card" data-index="${i}" role="button" tabindex="0">
-        <div class="catalog-card__image-wrap">${imageHtml}${badgeHtml}${imgs.length > 1 ? `<span class="catalog-card__photo-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${imgs.length}</span>` : ''}</div>
+        <div class="catalog-card__image-wrap">${imageHtml}${badgeHtml ? `<div class="catalog-card__badges">${badgeHtml}</div>` : ''}${imgs.length > 1 ? `<span class="catalog-card__photo-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${imgs.length}</span>` : ''}</div>
         <div class="catalog-card__body">
           <div class="catalog-card__model">${esc(model || '차량')}${p.car_number ? ` <span class="catalog-card__carno">${esc(p.car_number)}</span>` : ''}</div>
           ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
@@ -986,8 +979,10 @@ window.addEventListener('popstate', () => {
 
 // ─── 이벤트 ───────────────────────────────────────────────────────────────
 
-// 공유하기 (링크 복사)
-qs('single-share-btn')?.addEventListener('click', () => {
+// 공유하기 (링크 복사) — 상세 hero 내 공유 아이콘
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('#cat-share-btn');
+  if (!btn) return;
   if (!currentSingleProduct) return;
   const p = currentSingleProduct;
   const pid = p._key || p.productUid || p.id || '';
@@ -999,8 +994,8 @@ qs('single-share-btn')?.addEventListener('click', () => {
   if (carTitle) params.set('t', carTitle);
   const url = `${base}?${params.toString()}`;
   navigator.clipboard.writeText(url).then(() => {
-    const btn = qs('single-share-btn');
-    if (btn) { btn.textContent = '복사 완료!'; setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> 링크 복사'; }, 1500); }
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    setTimeout(() => { btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg>'; }, 1500);
   }).catch(() => {
     const input = document.createElement('input');
     input.value = url;

@@ -44,20 +44,10 @@
   <div class="catalog-single__gallery" id="single-gallery"></div>
   <div class="catalog-single__body" id="single-body"></div>
   <div class="catalog-single__actions">
-    <button class="catalog-share-btn" id="single-share-btn" type="button">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-      링크 복사
-    </button>
     <button class="catalog-browse-btn" id="browse-all-btn" type="button">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       전체 상품 보기
     </button>
-  </div>
-  <div class="catalog-single__cta" id="single-cta" hidden>
-    <a class="catalog-cta__button" id="single-cta-link" href="tel:">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      <span id="single-cta-text">전화 문의하기</span>
-    </a>
   </div>
 </main>
 
@@ -114,12 +104,6 @@
 </main>
 
 <!-- 하단 고정 CTA (카탈로그 뷰) -->
-<footer class="catalog-footer" id="catalog-footer" hidden>
-  <a class="catalog-cta__button catalog-cta__button--footer" id="catalog-cta-link" href="tel:" aria-label="영업자에게 연락하기">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-    <span id="catalog-cta-text">영업자에게 연락하기</span>
-  </a>
-</footer>
 
 <script type="module" src="{{ url_for('static', filename='js/pages/catalog.js') }}?v={{ app_version }}"></script>
 </body>
