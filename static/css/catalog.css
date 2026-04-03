@@ -16,15 +16,14 @@
   overscroll-behavior-y: none;
 }
 
-/* GPU 가속 — 모바일 꿀렁임 방지 */
-.catalog-header,
+/* 모바일 스크롤 최적화 */
+* { -webkit-tap-highlight-color: transparent; }
+.catalog-header { position: sticky; backface-visibility: hidden; }
 .catalog-single,
 .catalog-main,
-.catalog-grid,
-.catalog-card {
+.catalog-grid {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
-  will-change: auto;
 }
 .catalog-body img { -webkit-user-drag: none; pointer-events: none; }
 
@@ -69,19 +68,17 @@
 .catalog-header-filter {
   display: none;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  width: 30px;
   height: 30px;
-  padding: 0 10px;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   background: #fff;
   color: #475569;
   cursor: pointer;
-  font-size: 11px;
-  font-weight: 500;
+  padding: 0;
 }
 .catalog-header-filter[hidden] { display: none !important; }
-.catalog-header-filter__label { display: none; }
 
 .catalog-header-right {
   display: flex;
@@ -967,7 +964,6 @@
 /* 모바일: 사이드바 → 슬라이드 패널 */
 @media (max-width: 768px) {
   .catalog-header-filter:not([hidden]) { display: flex; }
-  .catalog-header-filter__label { display: inline; }
 
   .catalog-sidebar-overlay {
     display: none;
@@ -1002,16 +998,14 @@
 }
 
 @media (max-width: 600px) {
-  .catalog-header { padding: 0 10px; }
-  .catalog-header-company { display: none; }
+  .catalog-header { padding: 0 8px; }
+  .catalog-header-position { display: none; }
   .catalog-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    padding: 0 14px 24px;
+    padding: 0 12px 24px;
   }
   .catalog-card__image-wrap { height: 140px; }
-  .catalog-count-bar { padding: 4px 14px 6px; }
-  .catalog-footer { padding: 10px 14px; }
   .cat-title { font-size: 16px; }
 }
 
