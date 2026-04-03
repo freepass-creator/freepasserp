@@ -134,21 +134,115 @@
 
 .catalog-single[hidden] { display: none; }
 
-/* 사진 세로 스크롤 갤러리 */
+/* 좌우 스와이프 갤러리 */
 
-.catalog-single__gallery {
-  display: flex;
-  flex-direction: column;
+.catalog-gallery__track {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 400px;
+  background: #0f172a;
+  overflow: hidden;
+  cursor: pointer;
 }
 
-.catalog-single__photo {
+.catalog-gallery__img {
   width: 100%;
-  display: block;
+  height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+.catalog-gallery__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 1;
+}
+.catalog-gallery__nav--prev { left: 10px; }
+.catalog-gallery__nav--next { right: 10px; }
+
+.catalog-gallery__counter {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* 상세 본문 */
 .catalog-single__body { padding: 0; }
+
+/* ─── 풀스크린 사진 뷰어 ─────────────────────────────────────────────────── */
+
+.photo-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+.photo-viewer[hidden] { display: none; }
+
+.photo-viewer__close {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2001;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  backdrop-filter: blur(8px);
+}
+.photo-viewer__close:hover { background: rgba(255, 255, 255, 0.25); }
+
+.photo-viewer__counter {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2001;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.photo-viewer__scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.photo-viewer__img {
+  width: 100%;
+  display: block;
+}
 
 /* 전체 상품 보기 버튼 */
 

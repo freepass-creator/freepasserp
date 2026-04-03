@@ -480,16 +480,92 @@ function renderSingleView(p) {
   singleBody.innerHTML = renderProductDetail(p);
 }
 
+let sGalleryIndex = 0;
+let sGalleryImages = [];
+let _sTouchStartX = 0;
+
 function renderSingleGallery(images) {
+  sGalleryImages = images;
+  sGalleryIndex = 0;
+
   if (!images.length) {
     singleGallery.innerHTML = '<div class="catalog-gallery__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
     return;
   }
-  // 세로 스크롤 — 모든 사진 나열
-  singleGallery.innerHTML = images.map((src, i) =>
-    `<img class="catalog-single__photo" src="${esc(src)}" alt="차량 사진 ${i + 1}" loading="${i === 0 ? 'eager' : 'lazy'}">`
-  ).join('');
+
+  updateGallerySlide();
+
+  // 스와이프
+  singleGallery.ontouchstart = (e) => { _sTouchStartX = e.touches[0].clientX; };
+  singleGallery.ontouchend = (e) => {
+    const dx = e.changedTouches[0].clientX - _sTouchStartX;
+    if (Math.abs(dx) < 40 || !sGalleryImages.length) return;
+    const total = sGalleryImages.length;
+    sGalleryIndex = dx < 0 ? (sGalleryIndex + 1) % total : (sGalleryIndex - 1 + total) % total;
+    updateGallerySlide();
+  };
 }
+
+function updateGallerySlide() {
+  const total = sGalleryImages.length;
+  const navBtns = total > 1 ? `
+    <button class="catalog-gallery__nav catalog-gallery__nav--prev" id="sg-prev" aria-label="이전"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
+    <button class="catalog-gallery__nav catalog-gallery__nav--next" id="sg-next" aria-label="다음"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
+    <div class="catalog-gallery__counter">${sGalleryIndex + 1} / ${total}</div>` : '';
+
+  singleGallery.innerHTML = `
+    <div class="catalog-gallery__track" id="gallery-track">
+      <img class="catalog-gallery__img" src="${esc(sGalleryImages[sGalleryIndex])}" alt="차량 사진 ${sGalleryIndex + 1}">
+      ${navBtns}
+    </div>`;
+
+  // 사진 클릭 → 풀스크린 뷰어
+  document.getElementById('gallery-track')?.addEventListener('click', (e) => {
+    if (e.target.closest('.catalog-gallery__nav')) return; // 네비 버튼 제외
+    openPhotoViewer(sGalleryIndex);
+  });
+
+  if (total > 1) {
+    document.getElementById('sg-prev')?.addEventListener('click', () => { sGalleryIndex = (sGalleryIndex - 1 + total) % total; updateGallerySlide(); });
+    document.getElementById('sg-next')?.addEventListener('click', () => { sGalleryIndex = (sGalleryIndex + 1) % total; updateGallerySlide(); });
+  }
+}
+
+// ─── 풀스크린 사진 뷰어 (세로 스크롤) ────────────────────────────────────
+
+const photoViewer      = qs('photo-viewer');
+const photoViewerClose = qs('photo-viewer-close');
+const photoViewerScroll = qs('photo-viewer-scroll');
+const photoViewerCounter = qs('photo-viewer-counter');
+
+function openPhotoViewer(startIndex = 0) {
+  if (!sGalleryImages.length) return;
+  const total = sGalleryImages.length;
+  photoViewerCounter.textContent = `${total}장`;
+
+  photoViewerScroll.innerHTML = sGalleryImages.map((src, i) =>
+    `<img class="photo-viewer__img" src="${esc(src)}" alt="사진 ${i + 1}" loading="${i <= startIndex + 1 ? 'eager' : 'lazy'}">`
+  ).join('');
+
+  photoViewer.hidden = false;
+  document.body.style.overflow = 'hidden';
+
+  // 해당 사진 위치로 스크롤
+  if (startIndex > 0) {
+    requestAnimationFrame(() => {
+      const imgs = photoViewerScroll.querySelectorAll('.photo-viewer__img');
+      imgs[startIndex]?.scrollIntoView({ behavior: 'instant' });
+    });
+  }
+}
+
+function closePhotoViewer() {
+  photoViewer.hidden = true;
+  document.body.style.overflow = '';
+}
+
+photoViewerClose.addEventListener('click', closePhotoViewer);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !photoViewer.hidden) closePhotoViewer(); });
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  VIEW 2: 카탈로그 그리드
