@@ -93,9 +93,18 @@
 .catalog-header-agent {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   white-space: nowrap;
 }
+
+.catalog-header-ci {
+  height: 20px;
+  width: auto;
+  max-width: 80px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.catalog-header-ci[hidden] { display: none; }
 
 .catalog-header-company {
   font-size: 11px;

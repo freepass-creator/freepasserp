@@ -467,9 +467,9 @@ function showView(view) {
 // ─── 영업자 정보 로드 ──────────────────────────────────────────────────────
 
 async function loadAgent() {
-  let name = '', phone = '', position = '', companyName = '';
+  let name = '', phone = '', position = '', companyName = '', ciUrl = '';
   try {
-    // 사용자 정보 (이름, 직급, 연락처)
+    // 사용자 정보
     if (agentCode) {
       const userSnap = await get(ref(db, 'users'));
       const users = userSnap.val() || {};
@@ -479,6 +479,7 @@ async function loadAgent() {
         phone    = agent.phone || agent.phone_number || '';
         position = agent.position || '';
         companyName = agent.company || agent.company_name || '';
+        ciUrl    = agent.ci_file_url || '';
       }
     }
 
@@ -491,6 +492,8 @@ async function loadAgent() {
       } catch {}
     }
 
+    const ciEl = qs('catalog-agent-ci');
+    if (ciUrl && ciEl) { ciEl.src = ciUrl; ciEl.hidden = false; }
     if (companyName) agentCompany.textContent = companyName;
     if (name) agentName.textContent = name;
     if (position && agentPosition) agentPosition.textContent = position;
