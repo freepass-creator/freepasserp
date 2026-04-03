@@ -11,15 +11,21 @@ watchAuth(async (user) => {
   if (!user) return;
 
   if (isMasterAdminEmail(user.email)) {
-    await upsertUserProfile(user.uid, {
-      email: user.email,
-      role: 'admin',
-      company_code: 'admin',
-      company_name: '프리패스모빌리티',
-      user_code: 'A0001',
-      admin_code: 'A0001',
-      status: 'active'
-    });
+    // 마스터관리자: 최초 생성 시에만 기본값, 이후 DB 값 유지
+    const existing = await getUserProfile(user.uid);
+    if (!existing) {
+      await upsertUserProfile(user.uid, {
+        email: user.email,
+        role: 'admin',
+        company_code: 'admin',
+        company_name: '프리패스모빌리티',
+        user_code: 'A0001',
+        admin_code: 'A0001',
+        status: 'active'
+      });
+    } else {
+      await upsertUserProfile(user.uid, { role: 'admin', status: 'active' });
+    }
   }
 
   const profile = await getUserProfile(user.uid);
