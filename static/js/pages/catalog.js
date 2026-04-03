@@ -402,9 +402,11 @@ function renderProductDetail(p) {
 function showView(view) {
   singleView.hidden  = view !== 'single';
   catalogMain.hidden  = view !== 'catalog';
-  // 뒤로가기: 단일뷰에서 카탈로그로 돌아갈 수 있을 때 표시
   backBtn.hidden      = view !== 'single' || !allProducts.length;
   footer.hidden       = view !== 'catalog' || !agentPhone;
+  // 필터 버튼: 카탈로그 뷰에서만 표시 (모바일 CSS에서 display 제어)
+  const fb = qs('catalog-filter-btn');
+  if (fb) fb.hidden = view !== 'catalog';
   document.body.style.overflow = '';
 }
 
@@ -653,6 +655,8 @@ function bindChipClick(el, dataAttr, setter) {
   });
 }
 
+// 칩 클릭 후 모바일 필터 패널 닫기는 showView에서 처리
+
 bindChipClick(chipsEl, 'maker', (v) => { activeMaker = v; });
 bindChipClick(providerChipsEl, 'provider', (v) => { activeProvider = v; });
 bindChipClick(fuelChipsEl, 'fuel', (v) => { activeFuel = v; });
@@ -757,10 +761,33 @@ grid.addEventListener('keydown', (e) => {
   card.click();
 });
 
+// 모바일 필터 패널
+const filterBtn     = qs('catalog-filter-btn');
+const sidebar       = qs('catalog-sidebar');
+const sidebarOverlay = qs('catalog-sidebar-overlay');
+const sidebarClose  = qs('catalog-sidebar-close');
+
+function openFilter() {
+  sidebar?.classList.add('is-open');
+  sidebarOverlay?.classList.add('is-open');
+  sidebarOverlay && (sidebarOverlay.hidden = false);
+  document.body.style.overflow = 'hidden';
+}
+function closeFilter() {
+  sidebar?.classList.remove('is-open');
+  sidebarOverlay?.classList.remove('is-open');
+  sidebarOverlay && (sidebarOverlay.hidden = true);
+  document.body.style.overflow = '';
+}
+
+filterBtn?.addEventListener('click', openFilter);
+sidebarClose?.addEventListener('click', closeFilter);
+sidebarOverlay?.addEventListener('click', closeFilter);
+
 let _searchTimer = null;
 searchInput.addEventListener('input', () => {
   clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(renderGrid, 200);
+  _searchTimer = setTimeout(() => { renderGrid(); closeFilter(); }, 200);
 });
 
 // ─── 부트스트랩 ────────────────────────────────────────────────────────────

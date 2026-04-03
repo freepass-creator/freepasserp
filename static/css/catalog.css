@@ -107,6 +107,23 @@
   white-space: nowrap;
 }
 
+.catalog-header-filter {
+  position: absolute;
+  left: 12px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  padding: 0;
+}
+.catalog-header-filter[hidden] { display: none !important; }
+
 .catalog-header-call {
   position: absolute;
   right: 12px;
@@ -399,6 +416,37 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.catalog-sidebar__head {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.catalog-sidebar__head-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.catalog-sidebar__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+}
+
+.catalog-sidebar-overlay {
+  display: none;
+}
+.catalog-sidebar-overlay[hidden] { display: none !important; }
 
 .catalog-sidebar__search {
   position: relative;
@@ -759,30 +807,38 @@
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 
-/* 모바일: 사이드바 → 상단 스택 */
+/* 모바일: 사이드바 → 슬라이드 패널 */
 @media (max-width: 768px) {
-  .catalog-main { flex-direction: column; }
+  .catalog-header-filter:not([hidden]) { display: flex; }
+
+  .catalog-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(15, 23, 42, 0.4);
+  }
+  .catalog-sidebar-overlay.is-open { display: block; }
 
   .catalog-sidebar {
-    width: 100%;
-    position: static;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid #f1f5f9;
-    padding: 12px 14px;
-    gap: 10px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 501;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    border-right: 1px solid #e2e8f0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .catalog-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 20px rgba(15, 23, 42, 0.1);
   }
 
-  .catalog-sidebar__section {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  .catalog-sidebar__title {
-    min-width: 32px;
-    padding-top: 5px;
-    margin-bottom: 0;
-  }
+  .catalog-sidebar__head { display: flex; }
 
   .catalog-header-position { display: none; }
 }
