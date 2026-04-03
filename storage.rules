@@ -39,6 +39,23 @@ service firebase.storage {
       allow delete: if isOwner(userId);
     }
 
+    // ─── 안내사항 이미지 (관리자만) ────────────────────────────────────────────
+    match /notice-images/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId)
+                            && isImageContentType()
+                            && isValidFileSize();
+      allow delete: if isOwner(userId);
+    }
+
+    // ─── 사용자 문서 (CI, 명함 등) ──────────────────────────────────────────
+    match /user-docs/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId)
+                            && isValidFileSize();
+      allow delete: if isOwner(userId);
+    }
+
     // ─── 기본 거부 ───────────────────────────────────────────────────────────
     match /{allPaths=**} {
       allow read, write: if false;
