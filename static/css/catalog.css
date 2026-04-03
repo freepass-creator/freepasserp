@@ -453,10 +453,9 @@
 }
 
 .catalog-sidebar__count-value {
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 700;
   color: #1e293b;
-  line-height: 1;
 }
 
 .catalog-sidebar__count-unit {
