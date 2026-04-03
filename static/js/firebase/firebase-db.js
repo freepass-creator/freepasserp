@@ -97,10 +97,10 @@ export async function updateUserProfile(uid, updates) {
 
   if (shouldAssignUserCode) {
     if (nextRole === 'admin') {
-      next.user_code = current.email === 'dudguq@gmail.com' ? 'A0001' : await createUserCode('admin');
+      next.user_code = current.email === 'dudguq@gmail.com' ? 'A0000' : await createUserCode('admin');
       next.admin_code = next.user_code;
-      next.company_code = 'MASTER';
-      next.company_name = 'FREEPASS';
+      next.company_code = 'admin';
+      next.company_name = '프리패스모빌리티';
     } else if (nextRole === 'provider') {
       if (!nextCompanyCode.startsWith('RP')) throw new Error('공급사 회원은 RP 계열 소속코드가 필요합니다.');
       next.user_code = await createUserCode('provider', nextCompanyCode);

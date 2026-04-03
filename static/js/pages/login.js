@@ -15,10 +15,10 @@ watchAuth(async (user) => {
       name: '마스터관리자',
       email: user.email,
       role: 'admin',
-      company_code: 'MASTER',
-      company_name: 'FREEPASS',
-      user_code: 'A0001',
-      admin_code: 'A0001',
+      company_code: 'admin',
+      company_name: '프리패스모빌리티',
+      user_code: 'A0000',
+      admin_code: 'A0000',
       status: 'active'
     });
   }
