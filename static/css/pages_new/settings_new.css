@@ -275,13 +275,11 @@
 }
 .settings-period-check input { cursor: pointer; }
 
-.settings-doc-row {
+.settings-doc-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: var(--form-control-height, 40px);
 }
-.settings-doc-label { font-size: 12px; color: var(--text-main); }
 .settings-doc-link { font-size: 12px; color: var(--text-subtle); text-decoration: underline; }
 
 .settings-badge-list { display: flex; flex-direction: column; }
