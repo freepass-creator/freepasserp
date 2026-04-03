@@ -602,12 +602,9 @@ export async function sendMessage(roomId, payload) {
   };
   // 보낸 사람은 자동으로 읽음 처리
   if (payload.sender_uid) updatePayload[`read_by/${payload.sender_uid}`] = now;
+  // 영업자/공급사만 처리상태에 영향 — 관리자는 개입해도 상태 변경 없음
   if (senderRole === 'agent' || senderRole === 'provider') {
     updatePayload.last_effective_sender_role = senderRole;
-    updatePayload.last_effective_sender_code = payload.sender_code || '';
-  } else if (senderRole === 'admin') {
-    // 관리자 = 공급사 시점: 관리자가 답하면 공급사가 회신한 것과 동일하게 처리
-    updatePayload.last_effective_sender_role = 'provider';
     updatePayload.last_effective_sender_code = payload.sender_code || '';
   }
   await update(roomRef, updatePayload);
