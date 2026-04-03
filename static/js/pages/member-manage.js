@@ -166,7 +166,7 @@ const memberThead = qs('#member-list-head');
 
 function renderList(members) {
   syncTopBarPageCount(members.length);
-  const visibleMembers = members.filter((member) => member.email !== 'dudguq@gmail.com');
+  const visibleMembers = members;
   renderTableGrid({
     thead: memberThead,
     tbody: list,
