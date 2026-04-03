@@ -141,7 +141,31 @@ function fmtDeductible(v) {
 
 function getPolicy(p) {
   const code = p.policy_code || p.term_code || '';
-  return code ? (allPolicies[code] || {}) : {};
+  // 1) 코드로 직접 매칭
+  if (code && allPolicies[code]) return allPolicies[code];
+  // 2) 전체 정책에서 term_code 필드 매칭
+  const all = Object.values(allPolicies).filter(t => t && t.status !== 'deleted');
+  if (code) {
+    const byCode = all.find(t => t.term_code === code);
+    if (byCode) return byCode;
+  }
+  // 3) term_name 매칭
+  const termName = (p.term_name || '').trim();
+  const providerCode = (p.provider_company_code || p.partner_code || '').trim();
+  if (termName && providerCode) {
+    const byNameProvider = all.find(t => t.term_name === termName && t.provider_company_code === providerCode);
+    if (byNameProvider) return byNameProvider;
+  }
+  if (termName) {
+    const byName = all.find(t => t.term_name === termName);
+    if (byName) return byName;
+  }
+  // 4) 공급사코드로 해당 공급사의 첫 번째 활성 정책
+  if (providerCode) {
+    const byProvider = all.find(t => t.provider_company_code === providerCode);
+    if (byProvider) return byProvider;
+  }
+  return {};
 }
 
 function parsePolicyCell(val) {
