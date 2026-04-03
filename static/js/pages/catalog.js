@@ -499,7 +499,9 @@ async function loadAgent() {
       // 상단바 전화번호 (웹)
       const headerPhone = qs('catalog-header-phone');
       const headerPhoneText = qs('catalog-header-phone-text');
+      const headerDivider = qs('catalog-header-divider');
       if (headerPhone) { headerPhoneText.textContent = phone; headerPhone.hidden = false; }
+      if (headerDivider) headerDivider.hidden = false;
       // 하단 전화하기 바
       const bottomBar = qs('catalog-bottom-bar');
       const bottomCall = qs('catalog-bottom-call');
