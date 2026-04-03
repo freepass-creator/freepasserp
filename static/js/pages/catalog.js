@@ -61,12 +61,12 @@ const hasShare       = !!(shareId || shareCar);
 
 // ─── 상태 ──────────────────────────────────────────────────────────────────
 
-let allProducts   = [];
-let allPolicies   = {};
-let activeMaker   = '';
-let activeProvider = providerParam; // URL에서 공급사 필터 초기값
-let activeFuel    = '';
-let agentPhone    = '';
+let allProducts    = [];
+let allPolicies    = {};
+let filterMakers   = new Set();
+let filterProviders = providerParam ? new Set([providerParam]) : new Set();
+let filterFuels    = new Set();
+let agentPhone     = '';
 
 // ─── 유틸 ──────────────────────────────────────────────────────────────────
 
@@ -488,7 +488,7 @@ async function loadData() {
       }
     }
 
-    renderAllChips();
+    renderAllFilters();
     renderGrid();
     showView('catalog');
   } catch (err) {
@@ -598,75 +598,94 @@ photoViewerClose.addEventListener('click', closePhotoViewer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !photoViewer.hidden) closePhotoViewer(); });
 
 // ═══════════════════════════════════════════════════════════════════════════
-//  VIEW 2: 카탈로그 그리드
+//  VIEW 2: 카탈로그 그리드 — 아코디언 체크박스 필터
 // ═══════════════════════════════════════════════════════════════════════════
 
-function getUniqueValues(field) {
-  const set = new Set();
-  allProducts.forEach((p) => { const v = p[field]; if (v) set.add(v); });
-  return [...set].sort();
-}
-
-function getProviders() {
+// 필터에서 현재 필터링된 상품 기준으로 옵션+카운트 계산 (연동 필터)
+function getFilterOptions(field, excludeField) {
   const map = new Map();
+  const q = (searchInput?.value || '').trim().toLowerCase();
+
   allProducts.forEach((p) => {
-    const code = p.provider_company_code || p.partner_code || '';
-    const name = p.provider_name || '';
-    if (code && !map.has(code)) map.set(code, name || code);
+    // excludeField를 제외한 나머지 필터 적용
+    if (excludeField !== 'maker' && filterMakers.size && !filterMakers.has(p.maker)) return;
+    if (excludeField !== 'provider' && filterProviders.size && !filterProviders.has(p.provider_company_code || p.partner_code || '')) return;
+    if (excludeField !== 'fuel' && filterFuels.size && !filterFuels.has(p.fuel_type)) return;
+    if (q) {
+      const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name, p.provider_name].join(' ').toLowerCase();
+      if (!text.includes(q)) return;
+    }
+
+    let value, label;
+    if (field === 'provider') {
+      value = p.provider_company_code || p.partner_code || '';
+      label = p.provider_name || value;
+    } else {
+      value = p[field] || '';
+      label = value;
+    }
+    if (!value) return;
+    if (!map.has(value)) map.set(value, { label, count: 0 });
+    map.get(value).count++;
   });
-  return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+
+  return [...map.entries()]
+    .map(([v, { label, count }]) => ({ value: v, label, count }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 }
 
-function renderFilterChips(el, items, activeValue, dataAttr) {
+function renderFilterSection(el, _field, filterSet, options) {
   if (!el) return;
-  const section = el.closest('.catalog-sidebar__section') || el.closest('.catalog-filter-row');
-  if (items.length <= 1) { el.innerHTML = ''; section?.classList.add('is-hidden'); return; }
+  const section = el.closest('.catalog-sidebar__section');
+  if (!options.length) { section?.classList.add('is-hidden'); el.innerHTML = ''; return; }
   section?.classList.remove('is-hidden');
-  el.innerHTML = `<button class="catalog-chip${!activeValue ? ' is-active' : ''}" data-${dataAttr}="">전체</button>` +
-    items.map(([value, label]) =>
-      `<button class="catalog-chip${activeValue === value ? ' is-active' : ''}" data-${dataAttr}="${esc(value)}">${esc(label)}</button>`
-    ).join('');
+
+  el.innerHTML = options.map(({ value, label, count }) => {
+    const checked = filterSet.has(value) ? 'checked' : '';
+    return `<label class="filter-check">
+      <input type="checkbox" value="${esc(value)}" ${checked}>
+      <span class="filter-check__label">${esc(label)}</span>
+      <span class="filter-check__count">${count}</span>
+    </label>`;
+  }).join('');
 }
 
-function renderAllChips() {
-  const makers = getUniqueValues('maker').map(m => [m, m]);
-  const fuels = getUniqueValues('fuel_type').map(f => [f, f]);
+function renderAllFilters() {
+  const makerOpts   = getFilterOptions('maker', 'maker');
+  const fuelOpts    = getFilterOptions('fuel_type', 'fuel');
 
-  renderFilterChips(chipsEl, makers, activeMaker, 'maker');
-  renderFilterChips(fuelChipsEl, fuels, activeFuel, 'fuel');
+  renderFilterSection(chipsEl, 'maker', filterMakers, makerOpts);
+  renderFilterSection(fuelChipsEl, 'fuel_type', filterFuels, fuelOpts);
 
-  // 공급사 전용 링크면 공급사 필터 숨김
   if (providerParam) {
     providerChipsEl?.closest('.catalog-sidebar__section')?.classList.add('is-hidden');
-    renderFilterChips(providerChipsEl, [], '', 'provider');
   } else {
-    const providers = getProviders();
-    renderFilterChips(providerChipsEl, providers, activeProvider, 'provider');
+    const providerOpts = getFilterOptions('provider', 'provider');
+    renderFilterSection(providerChipsEl, 'provider', filterProviders, providerOpts);
   }
 }
 
-function bindChipClick(el, dataAttr, setter) {
-  el?.addEventListener('click', (e) => {
-    const chip = e.target.closest('.catalog-chip');
-    if (!chip) return;
-    setter(chip.dataset[dataAttr] || '');
-    renderAllChips();
+function bindFilterChange(el, filterSet) {
+  el?.addEventListener('change', (e) => {
+    const cb = e.target.closest('input[type="checkbox"]');
+    if (!cb) return;
+    if (cb.checked) filterSet.add(cb.value);
+    else filterSet.delete(cb.value);
+    renderAllFilters();
     renderGrid();
   });
 }
 
-// 칩 클릭 후 모바일 필터 패널 닫기는 showView에서 처리
-
-bindChipClick(chipsEl, 'maker', (v) => { activeMaker = v; });
-bindChipClick(providerChipsEl, 'provider', (v) => { activeProvider = v; });
-bindChipClick(fuelChipsEl, 'fuel', (v) => { activeFuel = v; });
+bindFilterChange(chipsEl, filterMakers);
+bindFilterChange(providerChipsEl, filterProviders);
+bindFilterChange(fuelChipsEl, filterFuels);
 
 function getFiltered() {
-  const q = (searchInput.value || '').trim().toLowerCase();
+  const q = (searchInput?.value || '').trim().toLowerCase();
   return allProducts.filter((p) => {
-    if (activeMaker && p.maker !== activeMaker) return false;
-    if (activeProvider && (p.provider_company_code || p.partner_code || '') !== activeProvider) return false;
-    if (activeFuel && p.fuel_type !== activeFuel) return false;
+    if (filterMakers.size && !filterMakers.has(p.maker)) return false;
+    if (filterProviders.size && !filterProviders.has(p.provider_company_code || p.partner_code || '')) return false;
+    if (filterFuels.size && !filterFuels.has(p.fuel_type)) return false;
     if (q) {
       const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name, p.provider_name].join(' ').toLowerCase();
       if (!text.includes(q)) return false;
@@ -734,7 +753,7 @@ function showDetailView(p) {
 // ─── 이벤트 ───────────────────────────────────────────────────────────────
 
 browseAllBtn.addEventListener('click', () => {
-  renderAllChips();
+  renderAllFilters();
   renderGrid();
   showView('catalog');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -759,6 +778,14 @@ grid.addEventListener('keydown', (e) => {
   if (!card) return;
   e.preventDefault();
   card.click();
+});
+
+// 아코디언 토글
+qs('catalog-sidebar')?.addEventListener('click', (e) => {
+  const title = e.target.closest('.catalog-sidebar__title');
+  if (!title) return;
+  const section = title.closest('.catalog-sidebar__section');
+  section?.classList.toggle('is-collapsed');
 });
 
 // 모바일 필터 패널
