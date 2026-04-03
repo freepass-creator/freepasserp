@@ -84,9 +84,11 @@
 .catalog-header-agent {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   white-space: nowrap;
 }
+
+.catalog-header-sep { display: none; }
 
 .catalog-header-ci {
   height: 20px;
@@ -344,15 +346,13 @@
 }
 
 .cat-section {
-  padding: 16px 20px;
-  border-top: 1px solid #f1f5f9;
+  padding: 14px 20px 6px;
 }
-.cat-section:first-child { border-top: none; }
 
 .cat-section-title {
   display: flex; align-items: center; gap: 6px;
   font-size: 12px; font-weight: 600; color: #1e293b;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 .cat-section-title svg { color: #475569; flex-shrink: 0; }
 
@@ -545,9 +545,8 @@
 
 /* 아코디언 섹션 — 가로 칸 스타일 */
 .catalog-sidebar__section {
-  border-bottom: 1px solid #f1f5f9;
+  padding: 2px 0;
 }
-.catalog-sidebar__section:last-child { border-bottom: none; }
 .catalog-sidebar__section.is-hidden { display: none; }
 
 .catalog-sidebar__title {
