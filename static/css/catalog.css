@@ -941,7 +941,7 @@
   .catalog-header-filter:not([hidden]) { display: flex; }
   .catalog-header-phone { display: none; }
   .catalog-bottom-bar:not([hidden]) { display: block; }
-  .catalog-body { padding-bottom: 70px; }
+  .catalog-body { padding-bottom: 80px; }
 
   .catalog-sidebar-overlay {
     display: none;
@@ -972,7 +972,6 @@
 
   .catalog-sidebar__head { display: flex; }
 
-  .catalog-header-position { display: none; }
 }
 
 /* 하단 전화하기 바 */
@@ -1011,7 +1010,6 @@
 
 @media (max-width: 600px) {
   .catalog-header { padding: 0 8px; }
-  .catalog-header-position { display: none; }
   .catalog-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
