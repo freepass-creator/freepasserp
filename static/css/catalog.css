@@ -36,60 +36,62 @@
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 52px;
-  padding: 0 16px;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 12px;
   background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(15, 23, 42, 0.07);
 }
 
+.catalog-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .catalog-header-back {
-  position: absolute;
-  left: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fff;
   color: #475569;
   cursor: pointer;
+  padding: 0;
 }
 .catalog-header-back[hidden] { display: none; }
 
-.catalog-header-center {
+.catalog-header-filter {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+}
+.catalog-header-filter[hidden] { display: none !important; }
+.catalog-header-filter__label { display: none; }
+
+.catalog-header-right {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
 
-.catalog-header-ci {
-  height: 24px;
-  width: auto;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-.catalog-header-ci[hidden] { display: none; }
-
-.catalog-agent-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #1b2a4a;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.catalog-agent-avatar__initial { font-size: 13px; font-weight: 600; line-height: 1; }
-
 .catalog-header-company {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: #64748b;
   white-space: nowrap;
@@ -103,44 +105,23 @@
 }
 
 .catalog-header-position {
-  font-size: 11px;
+  font-size: 10px;
   color: #94a3b8;
   white-space: nowrap;
 }
 
-.catalog-header-filter {
-  position: absolute;
-  left: 12px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #fff;
-  color: #475569;
-  cursor: pointer;
-  padding: 0;
-}
-.catalog-header-filter[hidden] { display: none !important; }
-
 .catalog-header-call {
-  position: absolute;
-  right: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  width: 30px;
   height: 30px;
-  padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 50%;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   color: #16a34a;
-  font-size: 11px;
-  font-weight: 600;
   text-decoration: none;
-  white-space: nowrap;
+  flex-shrink: 0;
 }
 .catalog-header-call:hover { background: #dcfce7; }
 
@@ -901,6 +882,7 @@
 /* 모바일: 사이드바 → 슬라이드 패널 */
 @media (max-width: 768px) {
   .catalog-header-filter:not([hidden]) { display: flex; }
+  .catalog-header-filter__label { display: inline; }
 
   .catalog-sidebar-overlay {
     display: none;
