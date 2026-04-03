@@ -33,6 +33,9 @@ export function deriveStatusLabel(room, myUid) {
   if (!room) return '-';
   const hasMessage = Number(room.last_message_at || 0) > 0 || String(room.last_message || '').trim() !== '';
   if (!hasMessage) return '신규';
+  // DB에 저장된 chat_status 우선 사용
+  const dbStatus = room.chat_status || '';
+  if (dbStatus === '회신대기' || dbStatus === '회신완료') return dbStatus;
   if (myUid) {
     const readBy = room.read_by || {};
     const lastRead = Number(readBy[myUid] || 0);
