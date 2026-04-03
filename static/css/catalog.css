@@ -9,7 +9,7 @@
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 400;
   color: #1e293b;
-  letter-spacing: -0.03em;
+  letter-spacing: normal;
   -webkit-font-smoothing: antialiased;
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
