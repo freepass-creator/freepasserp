@@ -39,9 +39,6 @@ const browseAllBtn   = qs('browse-all-btn');
 
 const catalogMain    = qs('catalog-main');
 const searchInput    = qs('catalog-search');
-const chipsEl        = qs('catalog-filter-chips');
-const providerChipsEl = qs('catalog-provider-chips');
-const fuelChipsEl    = qs('catalog-fuel-chips');
 const countBar       = qs('catalog-count-bar');
 const countText      = qs('catalog-count-text');
 const grid           = qs('catalog-grid');
@@ -63,10 +60,53 @@ const hasShare       = !!(shareId || shareCar);
 
 let allProducts    = [];
 let allPolicies    = {};
-let filterMakers   = new Set();
-let filterProviders = providerParam ? new Set([providerParam]) : new Set();
-let filterFuels    = new Set();
 let agentPhone     = '';
+
+// ─── 필터 정의 ────────────────────────────────────────────────────────────
+
+const RENT_BUCKETS  = ['50만원 이하','50만원~','60만원~','70만원~','80만원~','90만원~','100만원~'];
+const DEP_BUCKETS   = ['무보증','100만원 이하','100만원~','200만원~','300만원~','400만원~','500만원~'];
+const MILE_BUCKETS  = ['0Km~','1만Km~','2만Km~','3만Km~','5만Km~','7만Km~','10만Km~','15만Km~','20만Km~'];
+
+function matchRangeBucket(buckets, value, n) {
+  const thresholds = {
+    '50만원 이하': [0, 500000], '50만원~': [500000, 600000], '60만원~': [600000, 700000],
+    '70만원~': [700000, 800000], '80만원~': [800000, 900000], '90만원~': [900000, 1000000],
+    '100만원~': [1000000, Infinity],
+    '무보증': [0, 1], '100만원 이하': [1, 1000000], '100만원~': [1000000, 2000000],
+    '200만원~': [2000000, 3000000], '300만원~': [3000000, 4000000],
+    '400만원~': [4000000, 5000000], '500만원~': [5000000, Infinity],
+    '0Km~': [0, 10000], '1만Km~': [10000, 20000], '2만Km~': [20000, 30000],
+    '3만Km~': [30000, 50000], '5만Km~': [50000, 70000], '7만Km~': [70000, 100000],
+    '10만Km~': [100000, 150000], '15만Km~': [150000, 200000], '20만Km~': [200000, Infinity],
+  };
+  const [min, max] = thresholds[value] || [0, Infinity];
+  return n >= min && n < max;
+}
+
+const FILTER_GROUPS = [
+  { key: 'maker',       title: '제조사',   type: 'check', field: 'maker', open: true },
+  { key: 'model_name',  title: '모델명',   type: 'check', field: 'model_name', open: false },
+  { key: 'sub_model',   title: '세부모델', type: 'check', field: 'sub_model', open: false },
+  { key: 'options',     title: '옵션',     type: 'search', field: 'options', open: false },
+  { key: 'fuel_type',   title: '연료',     type: 'check', field: 'fuel_type', open: true },
+  { key: 'ext_color',   title: '색상',     type: 'check', field: 'ext_color', open: false },
+  { key: 'year',        title: '연식',     type: 'check', field: 'year', open: false, sort: 'desc' },
+  { key: 'mileage',     title: '주행거리', type: 'range', buckets: MILE_BUCKETS, open: false },
+  { key: 'vehicle_class', title: '차종구분', type: 'check', field: 'vehicle_class', open: false },
+  { key: 'min_age',     title: '최저연령', type: 'check', open: false, policyField: 'basic_driver_age' },
+  { key: 'screening',   title: '심사기준', type: 'check', open: false, policyField: 'screening_criteria' },
+  { key: 'provider',    title: '공급사',   type: 'check', field: 'provider', open: false, hidden: !!providerParam },
+  { key: 'rent',        title: '대여료',   type: 'range', buckets: RENT_BUCKETS, open: false },
+  { key: 'deposit',     title: '보증금',   type: 'range', buckets: DEP_BUCKETS, open: false },
+];
+
+// 필터 상태: { key: Set }
+const filters = {};
+FILTER_GROUPS.forEach(g => {
+  filters[g.key] = new Set();
+});
+if (providerParam) filters.provider.add(providerParam);
 
 // ─── 유틸 ──────────────────────────────────────────────────────────────────
 
@@ -602,98 +642,212 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !photoVi
 //  VIEW 2: 카탈로그 그리드 — 아코디언 체크박스 필터
 // ═══════════════════════════════════════════════════════════════════════════
 
-// 필터에서 현재 필터링된 상품 기준으로 옵션+카운트 계산 (연동 필터)
-function getFilterOptions(field, excludeField) {
-  const map = new Map();
+// 상품에서 필터 값 추출
+function getProductFilterValue(p, group) {
+  if (group.key === 'provider') return p.provider_company_code || p.partner_code || '';
+  if (group.key === 'year') return p.year ? String(p.year) : '';
+  if (group.key === 'options') return (p.options || '').trim();
+  if (group.policyField) {
+    const pol = getPolicy(p);
+    const v = (pol[group.policyField] || '').trim();
+    return v && v !== '-' ? v : '';
+  }
+  if (group.field) return String(p[group.field] || '').trim();
+  return '';
+}
+
+function getProductLabel(p, group) {
+  if (group.key === 'provider') return p.provider_name || (p.provider_company_code || p.partner_code || '');
+  return getProductFilterValue(p, group);
+}
+
+function getProductRangeValue(p, group) {
+  if (group.key === 'mileage') return Number(p.mileage || 0);
+  if (group.key === 'rent') {
+    // 가장 저렴한 대여료
+    let min = 0;
+    for (const m of [1, 6, 12, 24, 36, 48, 60]) {
+      const r = getRent(p, m);
+      if (r && (!min || r < min)) min = r;
+    }
+    return min;
+  }
+  if (group.key === 'deposit') {
+    // 가장 저렴한 기간의 보증금
+    let bestRent = 0, bestDep = 0;
+    for (const m of [1, 6, 12, 24, 36, 48, 60]) {
+      const r = getRent(p, m);
+      if (r && (!bestRent || r < bestRent)) { bestRent = r; bestDep = getDeposit(p, m); }
+    }
+    return bestDep;
+  }
+  return 0;
+}
+
+// 상품이 특정 필터 그룹을 통과하는지
+function passesGroup(p, group) {
+  const selected = filters[group.key];
+  if (!selected || !selected.size) return true;
+
+  if (group.type === 'range') {
+    const n = getProductRangeValue(p, group);
+    for (const bucket of selected) {
+      if (matchRangeBucket(group.buckets, bucket, n)) return true;
+    }
+    return false;
+  }
+
+  if (group.type === 'search') {
+    const val = getProductFilterValue(p, group).toLowerCase();
+    for (const keyword of selected) {
+      if (val.includes(keyword.toLowerCase())) return true;
+    }
+    return false;
+  }
+
+  // check 타입
+  const val = getProductFilterValue(p, group);
+  return selected.has(val);
+}
+
+// 검색 + 전체 필터 통과
+function passesAllFilters(p, skipKey) {
   const q = (searchInput?.value || '').trim().toLowerCase();
+  if (q) {
+    const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name, p.provider_name, p.options].join(' ').toLowerCase();
+    if (!text.includes(q)) return false;
+  }
+  for (const group of FILTER_GROUPS) {
+    if (group.key === skipKey) continue;
+    if (!passesGroup(p, group)) return false;
+  }
+  return true;
+}
 
+function getFiltered() {
+  return allProducts.filter((p) => passesAllFilters(p, null));
+}
+
+// 연동 필터: 해당 그룹을 제외한 나머지 필터 적용한 상품에서 옵션+카운트 계산
+function computeFilterOptions(group) {
+  if (group.type === 'range') {
+    const counts = new Map();
+    group.buckets.forEach(b => counts.set(b, 0));
+    allProducts.forEach((p) => {
+      if (!passesAllFilters(p, group.key)) return;
+      const n = getProductRangeValue(p, group);
+      for (const b of group.buckets) {
+        if (matchRangeBucket(group.buckets, b, n)) { counts.set(b, (counts.get(b) || 0) + 1); break; }
+      }
+    });
+    return group.buckets.map(b => ({ value: b, label: b, count: counts.get(b) || 0 }));
+  }
+
+  // check 타입
+  const map = new Map();
   allProducts.forEach((p) => {
-    // excludeField를 제외한 나머지 필터 적용
-    if (excludeField !== 'maker' && filterMakers.size && !filterMakers.has(p.maker)) return;
-    if (excludeField !== 'provider' && filterProviders.size && !filterProviders.has(p.provider_company_code || p.partner_code || '')) return;
-    if (excludeField !== 'fuel' && filterFuels.size && !filterFuels.has(p.fuel_type)) return;
-    if (q) {
-      const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name, p.provider_name].join(' ').toLowerCase();
-      if (!text.includes(q)) return;
-    }
-
-    let value, label;
-    if (field === 'provider') {
-      value = p.provider_company_code || p.partner_code || '';
-      label = p.provider_name || value;
-    } else {
-      value = p[field] || '';
-      label = value;
-    }
+    if (!passesAllFilters(p, group.key)) return;
+    const value = getProductFilterValue(p, group);
+    const label = getProductLabel(p, group);
     if (!value) return;
     if (!map.has(value)) map.set(value, { label, count: 0 });
     map.get(value).count++;
   });
 
-  return [...map.entries()]
-    .map(([v, { label, count }]) => ({ value: v, label, count }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+  const result = [...map.entries()].map(([v, { label, count }]) => ({ value: v, label, count }));
+  if (group.sort === 'desc') return result.sort((a, b) => b.value.localeCompare(a.value));
+  return result.sort((a, b) => a.label.localeCompare(b.label, 'ko'));
 }
 
-function renderFilterSection(el, _field, filterSet, options) {
-  if (!el) return;
-  const section = el.closest('.catalog-sidebar__section');
-  if (!options.length) { section?.classList.add('is-hidden'); el.innerHTML = ''; return; }
-  section?.classList.remove('is-hidden');
+// ─── 필터 UI 렌더링 ──────────────────────────────────────────────────────
 
-  el.innerHTML = options.map(({ value, label, count }) => {
-    const checked = filterSet.has(value) ? 'checked' : '';
-    return `<label class="filter-check">
-      <input type="checkbox" value="${esc(value)}" ${checked}>
-      <span class="filter-check__label">${esc(label)}</span>
-      <span class="filter-check__count">${count}</span>
-    </label>`;
-  }).join('');
-}
+const filterSectionsEl = qs('catalog-filter-sections');
 
 function renderAllFilters() {
-  const makerOpts   = getFilterOptions('maker', 'maker');
-  const fuelOpts    = getFilterOptions('fuel_type', 'fuel');
+  if (!filterSectionsEl) return;
 
-  renderFilterSection(chipsEl, 'maker', filterMakers, makerOpts);
-  renderFilterSection(fuelChipsEl, 'fuel_type', filterFuels, fuelOpts);
+  let html = '';
+  for (const group of FILTER_GROUPS) {
+    if (group.hidden) continue;
 
-  if (providerParam) {
-    providerChipsEl?.closest('.catalog-sidebar__section')?.classList.add('is-hidden');
-  } else {
-    const providerOpts = getFilterOptions('provider', 'provider');
-    renderFilterSection(providerChipsEl, 'provider', filterProviders, providerOpts);
-  }
-}
+    const selected = filters[group.key];
+    const isOpen = group._open !== undefined ? group._open : group.open;
+    const collapsedCls = isOpen ? '' : ' is-collapsed';
+    const activeCount = selected.size;
+    const badge = activeCount ? `<span class="filter-active-badge">${activeCount}</span>` : '';
 
-function bindFilterChange(el, filterSet) {
-  el?.addEventListener('change', (e) => {
-    const cb = e.target.closest('input[type="checkbox"]');
-    if (!cb) return;
-    if (cb.checked) filterSet.add(cb.value);
-    else filterSet.delete(cb.value);
-    renderAllFilters();
-    renderGrid();
-  });
-}
-
-bindFilterChange(chipsEl, filterMakers);
-bindFilterChange(providerChipsEl, filterProviders);
-bindFilterChange(fuelChipsEl, filterFuels);
-
-function getFiltered() {
-  const q = (searchInput?.value || '').trim().toLowerCase();
-  return allProducts.filter((p) => {
-    if (filterMakers.size && !filterMakers.has(p.maker)) return false;
-    if (filterProviders.size && !filterProviders.has(p.provider_company_code || p.partner_code || '')) return false;
-    if (filterFuels.size && !filterFuels.has(p.fuel_type)) return false;
-    if (q) {
-      const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name, p.provider_name].join(' ').toLowerCase();
-      if (!text.includes(q)) return false;
+    if (group.type === 'search') {
+      const currentVal = [...selected][0] || '';
+      html += `
+        <div class="catalog-sidebar__section${collapsedCls}" data-filter-key="${group.key}">
+          <div class="catalog-sidebar__title">${esc(group.title)}${badge}</div>
+          <div class="catalog-filter-body">
+            <input class="filter-search-input" type="text" placeholder="옵션 검색..." value="${esc(currentVal)}" data-filter-search="${group.key}">
+          </div>
+        </div>`;
+      continue;
     }
-    return true;
-  });
+
+    const options = computeFilterOptions(group);
+    if (!options.length && !activeCount) continue;
+
+    html += `
+      <div class="catalog-sidebar__section${collapsedCls}" data-filter-key="${group.key}">
+        <div class="catalog-sidebar__title">${esc(group.title)}${badge}</div>
+        <div class="catalog-filter-body">
+          ${options.map(({ value, label, count }) => {
+            const checked = selected.has(value) ? 'checked' : '';
+            const dimmed = count === 0 && !checked ? ' is-dimmed' : '';
+            return `<label class="filter-check${dimmed}">
+              <input type="checkbox" value="${esc(value)}" ${checked} data-filter-key="${group.key}">
+              <span class="filter-check__label">${esc(label)}</span>
+              <span class="filter-check__count">${count}</span>
+            </label>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  filterSectionsEl.innerHTML = html;
 }
+
+// 이벤트: 체크박스 변경
+filterSectionsEl?.addEventListener('change', (e) => {
+  const cb = e.target.closest('input[type="checkbox"]');
+  if (!cb) return;
+  const key = cb.dataset.filterKey;
+  if (!key || !filters[key]) return;
+  if (cb.checked) filters[key].add(cb.value);
+  else filters[key].delete(cb.value);
+  renderAllFilters();
+  renderGrid();
+});
+
+// 이벤트: 옵션 검색
+filterSectionsEl?.addEventListener('input', (e) => {
+  const input = e.target.closest('[data-filter-search]');
+  if (!input) return;
+  const key = input.dataset.filterSearch;
+  if (!key || !filters[key]) return;
+  filters[key].clear();
+  const val = input.value.trim();
+  if (val) filters[key].add(val);
+  renderGrid();
+});
+
+// 이벤트: 아코디언 토글
+filterSectionsEl?.addEventListener('click', (e) => {
+  const title = e.target.closest('.catalog-sidebar__title');
+  if (!title) return;
+  const section = title.closest('.catalog-sidebar__section');
+  if (!section) return;
+  const key = section.dataset.filterKey;
+  const group = FILTER_GROUPS.find(g => g.key === key);
+  if (group) {
+    group._open = section.classList.contains('is-collapsed');
+    section.classList.toggle('is-collapsed');
+  }
+});
 
 function renderGrid() {
   const products = getFiltered();

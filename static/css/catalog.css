@@ -518,16 +518,6 @@
 .catalog-sidebar__section.is-collapsed .catalog-sidebar__title::after {
   transform: rotate(-45deg);
 }
-.catalog-sidebar__section.is-collapsed .catalog-filter-chips {
-  display: none;
-}
-
-/* 체크박스 필터 리스트 */
-.catalog-filter-chips {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
 
 .filter-check {
   display: flex;
@@ -562,6 +552,53 @@
   font-size: 10px;
   color: #94a3b8;
   flex-shrink: 0;
+}
+
+.filter-check.is-dimmed {
+  opacity: 0.4;
+}
+
+.filter-active-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #1b2a4a;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.filter-search-input {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 11px;
+  color: #1e293b;
+  outline: none;
+  box-sizing: border-box;
+}
+.filter-search-input:focus {
+  border-color: #3b82f6;
+}
+
+.catalog-filter-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.catalog-sidebar__section.is-collapsed .catalog-filter-body {
+  display: none;
 }
 
 /* ─── Count bar ───────────────────────────────────────────────────────────── */
