@@ -999,15 +999,11 @@
 .catalog-bottom-bar {
   display: none;
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
   z-index: 200;
-  padding: 10px 16px;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(15, 23, 42, 0.07);
+  pointer-events: none;
 }
 .catalog-bottom-bar[hidden] { display: none !important; }
 
@@ -1019,13 +1015,15 @@
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  height: 42px;
-  border-radius: 8px;
+  height: 46px;
+  border-radius: 12px;
   background: #1b2a4a;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
+  pointer-events: auto;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25), 0 2px 6px rgba(15, 23, 42, 0.1);
 }
 .catalog-bottom-bar__btn:hover { background: #142038; }
 
