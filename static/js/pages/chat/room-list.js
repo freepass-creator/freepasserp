@@ -29,29 +29,32 @@ export function escapeHtml(value = '') {
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 }
 
-export function deriveStatusLabel(room) {
+export function deriveStatusLabel(room, myUid) {
   if (!room) return '-';
   const hasMessage = Number(room.last_message_at || 0) > 0 || String(room.last_message || '').trim() !== '';
   if (!hasMessage) return '신규';
+  if (myUid) {
+    const lastRead = Number((room.read_by || {})[myUid] || 0);
+    const lastMsg = Number(room.last_message_at || 0);
+    if (lastMsg > lastRead) return '읽지않음';
+  }
   return '대화중';
 }
 
-export function deriveReplyStatus(room, myRole) {
-  if (!room || !myRole) return '미확인';
+export function deriveReplyStatus(room) {
+  if (!room) return '';
   const hasMessage = Number(room.last_message_at || 0) > 0 || String(room.last_message || '').trim() !== '';
-  if (!hasMessage) return '미확인';
+  if (!hasMessage) return '';
   const eff = room.last_effective_sender_role || '';
   const last = room.last_sender_role || '';
   const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
-  if (!sender) return '미확인';
-  // 관리자/공급사: 공급사가 마지막 = 회신완료, 영업자가 마지막 = 회신대기
-  if (myRole === 'admin' || myRole === 'provider') return sender === 'provider' ? '회신완료' : '회신대기';
-  // 영업자: 영업자가 마지막 = 회신완료, 공급사가 마지막 = 회신대기
-  return sender === 'agent' ? '회신완료' : '회신대기';
+  if (!sender) return '';
+  // 영업자가 마지막 = 문의접수, 공급사/관리자가 마지막 = 응답완료
+  return sender === 'agent' ? '문의접수' : '응답완료';
 }
 
-export function isReplyPending(room, myRole) {
-  return deriveReplyStatus(room, myRole) === '회신대기';
+export function isReplyPending(room) {
+  return deriveReplyStatus(room) === '문의접수';
 }
 
 const ROOM_COLS = [
@@ -75,14 +78,14 @@ export function renderChatRoomList({ thead, container, rooms, selectedRoomId, pr
     selectedKey: selectedRoomId || '',
     getKey: (room) => room.room_id || '',
     onSelect,
-    getRowClass: (room) => isReplyPending(room, myRole) ? 'is-reply-pending' : '',
+    getRowClass: (room) => isReplyPending(room) ? 'is-reply-pending' : '',
     getCellValue: (col, room) => {
       const product = getRoomProductLookupKeys(room).map((key) => productsMap.get(key)).find(Boolean) || null;
       const at = room.last_message_at || room.created_at;
       switch (col.key) {
         case 'status': return renderBadgeRow([{ field: 'chat_status', value: deriveStatusLabel(room, myUid) }]);
         case 'reply': {
-          const reply = deriveReplyStatus(room, myRole);
+          const reply = deriveReplyStatus(room);
           return reply ? renderBadgeRow([{ field: 'reply_status', value: reply }]) : '';
         }
         case 'carNo': return escapeHtml(product?.carNo || room.car_number || '-');
@@ -99,7 +102,7 @@ export function renderChatRoomList({ thead, container, rooms, selectedRoomId, pr
       const at = room.last_message_at || room.created_at;
       switch (col.key) {
         case 'status': return deriveStatusLabel(room, myUid);
-        case 'reply': return deriveReplyStatus(room, myRole);
+        case 'reply': return deriveReplyStatus(room);
         case 'carNo': return product?.carNo || room.car_number || '';
         case 'model': return String(product?.subModel || product?.model || room.model_name || '').replace(/20(\d{2})~/g, '$1~');
         case 'partner': return product?.partnerCode || room.provider_company_code || room.partner_code || '';

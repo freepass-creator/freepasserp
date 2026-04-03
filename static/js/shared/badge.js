@@ -80,6 +80,8 @@ const BADGE_KIND_BY_LABEL = {
   '삭제': 'status-neutral',
   '대화중': 'status-info',
   '읽지않음': 'status-danger',
+  '문의접수': 'status-warning',
+  '응답완료': 'status-success',
   '회신대기': 'status-danger',
   '회신완료': 'status-success',
   '신규': 'status-info',
