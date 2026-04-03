@@ -379,7 +379,7 @@ function bindDocUploads() {
     const fileRef = sRef(storage, path);
     const progress = showToast('업로드 중...', 'progress', { duration: 0 });
     try {
-      await uploadBytes(fileRef, file);
+      await uploadBytes(fileRef, file, { contentType: file.type || 'application/octet-stream' });
       const url = await getDownloadURL(fileRef);
       const field = type === 'ci' ? 'ci_file_url' : 'card_file_url';
       await updateUserProfile(currentProfile.uid, { [field]: url });

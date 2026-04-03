@@ -262,7 +262,8 @@ function bindStlEvents() {
 async function uploadNoticeImage(file) {
   const path = `notice-images/${currentProfile.uid}/${Date.now()}_${file.name}`;
   const r = sRef(storage, path);
-  await uploadBytes(r, file);
+  const metadata = { contentType: file.type || 'image/png' };
+  await uploadBytes(r, file, metadata);
   return { url: await getDownloadURL(r), storageRef: r };
 }
 
