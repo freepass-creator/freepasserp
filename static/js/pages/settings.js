@@ -5,6 +5,8 @@ import { logoutCurrentUser, sendPasswordReset, deleteCurrentUser } from '../fire
 import { showToast, showConfirm } from '../core/toast.js';
 import { syncEditSaveButtonTone } from '../core/management-skeleton.js';
 import { updateUserProfile, fetchProductsOnce } from '../firebase/firebase-db.js';
+import { storage } from '../firebase/firebase-config.js';
+import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { fillProfile } from './settings/helpers.js';
 
 const LANDING_OPTIONS = [
@@ -332,6 +334,51 @@ function bindDownloadSection(profile) {
   });
 }
 
+function bindDocUploads() {
+  const ciFileInput = document.getElementById('settings_ci_file');
+  const cardFileInput = document.getElementById('settings_card_file');
+  document.getElementById('settings_ci_upload')?.addEventListener('click', () => ciFileInput?.click());
+  document.getElementById('settings_card_upload')?.addEventListener('click', () => cardFileInput?.click());
+
+  // 기존 URL 표시
+  const ciUrl = currentProfile?.ci_file_url;
+  const cardUrl = currentProfile?.card_file_url;
+  const ciLink = document.getElementById('settings_ci_link');
+  const cardLink = document.getElementById('settings_card_link');
+  if (ciUrl && ciLink) { ciLink.href = ciUrl; ciLink.hidden = false; }
+  if (cardUrl && cardLink) { cardLink.href = cardUrl; cardLink.hidden = false; }
+
+  async function uploadDoc(file, type) {
+    if (!currentProfile?.uid) { showToast('로그인이 필요합니다.', 'error'); return; }
+    const path = `user-docs/${currentProfile.uid}/${type}_${Date.now()}_${file.name}`;
+    const fileRef = sRef(storage, path);
+    const progress = showToast('업로드 중...', 'progress', { duration: 0 });
+    try {
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      const field = type === 'ci' ? 'ci_file_url' : 'card_file_url';
+      await updateUserProfile(currentProfile.uid, { [field]: url });
+      currentProfile[field] = url;
+      progress.dismiss();
+      showToast('업로드 완료', 'success');
+      const linkEl = type === 'ci' ? ciLink : cardLink;
+      if (linkEl) { linkEl.href = url; linkEl.hidden = false; }
+    } catch (err) {
+      progress.dismiss();
+      showToast('업로드 실패', 'error');
+    }
+  }
+
+  ciFileInput?.addEventListener('change', () => {
+    if (ciFileInput.files?.[0]) uploadDoc(ciFileInput.files[0], 'ci');
+    ciFileInput.value = '';
+  });
+  cardFileInput?.addEventListener('change', () => {
+    if (cardFileInput.files?.[0]) uploadDoc(cardFileInput.files[0], 'card');
+    cardFileInput.value = '';
+  });
+}
+
 async function bootstrap() {
   try {
     const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
@@ -343,6 +390,7 @@ async function bootstrap() {
 
     bindAppSettings(profile);
     bindDownloadSection(profile);
+    bindDocUploads();
   } catch (error) {
     showToast(error.message, 'error');
   }
