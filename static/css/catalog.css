@@ -518,6 +518,7 @@
 .catalog-content {
   flex: 1;
   min-width: 0;
+  padding-top: 16px;
 }
 
 /* 아코디언 섹션 — 가로 칸 스타일 */
