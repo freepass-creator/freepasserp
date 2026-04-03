@@ -467,20 +467,19 @@ function showView(view) {
 // ─── 영업자 정보 로드 ──────────────────────────────────────────────────────
 
 async function loadAgent() {
-  if (!agentCode) return;
+  let name = '', phone = '', position = '', companyName = '';
   try {
     // 사용자 정보 (이름, 직급, 연락처)
-    const userSnap = await get(ref(db, 'users'));
-    const users = userSnap.val() || {};
-    const agent = Object.values(users).find((u) => u && u.user_code === agentCode);
-
-    let name = '', phone = '', position = '', companyName = '';
-
-    if (agent) {
-      name     = agent.name || agent.user_name || '';
-      phone    = agent.phone || agent.phone_number || '';
-      position = agent.position || '';
-      companyName = agent.company || agent.company_name || '';
+    if (agentCode) {
+      const userSnap = await get(ref(db, 'users'));
+      const users = userSnap.val() || {};
+      const agent = Object.values(users).find((u) => u && u.user_code === agentCode);
+      if (agent) {
+        name     = agent.name || agent.user_name || '';
+        phone    = agent.phone || agent.phone_number || '';
+        position = agent.position || '';
+        companyName = agent.company || agent.company_name || '';
+      }
     }
 
     // 공급사 링크면 파트너에서 회사명 가져오기
@@ -506,18 +505,18 @@ async function loadAgent() {
       singleCtaText.textContent = `${name || '담당자'}에게 전화 문의`;
       singleCta.hidden = false;
     }
-
-    // 페이지 타이틀 설정
-    const suffix = companyName ? ` | ${companyName}` : '';
-    if (shareId || shareCar) {
-      // 상세 링크 — renderSingleView에서 오버라이드
-    } else if (providerParam) {
-      document.title = `렌터카 [${providerParam}] 상품${suffix}`;
-    } else {
-      document.title = `렌터카 [전체] 상품${suffix}`;
-    }
   } catch (e) {
     console.warn('[catalog] agent load failed', e);
+  }
+
+  // 페이지 타이틀 설정 (try 밖에서 — 에러 나도 실행)
+  const suffix = companyName ? ` | ${companyName}` : '';
+  if (shareId || shareCar) {
+    // 상세 링크 — renderSingleView에서 오버라이드
+  } else if (providerParam) {
+    document.title = `렌터카 [${providerParam}] 상품${suffix}`;
+  } else {
+    document.title = `렌터카 [전체] 상품${suffix}`;
   }
 }
 
