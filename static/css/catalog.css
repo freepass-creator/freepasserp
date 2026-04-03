@@ -209,6 +209,21 @@ html {
 .catalog-gallery__nav--prev { left: 10px; }
 .catalog-gallery__nav--next { right: 10px; }
 
+.catalog-gallery__hint {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  pointer-events: none;
+}
+
 .catalog-gallery__counter {
   position: absolute;
   bottom: 10px;

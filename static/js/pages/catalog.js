@@ -651,6 +651,7 @@ function updateGallerySlide() {
     <div class="catalog-gallery__track" id="gallery-track">
       <img class="catalog-gallery__img" src="${esc(sGalleryImages[sGalleryIndex])}" alt="차량 사진 ${sGalleryIndex + 1}" decoding="async" fetchpriority="high">
       ${navBtns}
+      ${total > 0 ? `<div class="catalog-gallery__hint">사진을 눌러 ${total}장 모두 보기</div>` : ''}
     </div>`;
 
   // 사진 클릭 → 풀스크린 뷰어
@@ -702,6 +703,9 @@ function closePhotoViewer() {
 }
 
 photoViewerClose.addEventListener('click', closePhotoViewer);
+photoViewerScroll.addEventListener('click', (e) => {
+  if (e.target.closest('.photo-viewer__img')) history.back();
+});
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (!photoViewer.hidden) { closePhotoViewer(); return; }
