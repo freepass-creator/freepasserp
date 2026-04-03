@@ -81,19 +81,19 @@ function buildCompanyCodeOptions(role, selectedCode = '') {
 
   const options = ['<option value="">선택</option>'];
   if (role === 'admin') {
-    options.push('<option value="MASTER">MASTER</option>');
+    options.push('<option value="admin">admin / 프리패스모빌리티</option>');
   }
   items.forEach((partner) => {
     const selected = selectedCode === partner.partner_code ? 'selected' : '';
     options.push(`<option value="${partner.partner_code}" ${selected}>${partner.partner_code} / ${partner.partner_name}</option>`);
   });
   companyCodeSelect.innerHTML = options.join('');
-  if (role === 'admin' && selectedCode === 'MASTER') companyCodeSelect.value = 'MASTER';
+  if (role === 'admin' && (selectedCode === 'admin' || selectedCode === 'MASTER')) companyCodeSelect.value = 'admin';
 }
 
 function syncCompanyName(code) {
-  if (code === 'MASTER') {
-    qs('#member_company_name').value = 'FREEPASS';
+  if (code === 'admin') {
+    qs('#member_company_name').value = '프리패스모빌리티';
     return;
   }
   const partner = currentPartners.find((item) => item.partner_code === code);
@@ -273,7 +273,7 @@ async function bootstrap() {
     registerPageCleanup(() => clearDirtyCheck());
 
     roleSelect?.addEventListener('change', () => {
-      buildCompanyCodeOptions(roleSelect.value, roleSelect.value === 'admin' ? 'MASTER' : '');
+      buildCompanyCodeOptions(roleSelect.value, roleSelect.value === 'admin' ? 'admin' : '');
       syncCompanyName(companyCodeSelect.value);
     });
     companyCodeSelect?.addEventListener('change', () => syncCompanyName(companyCodeSelect.value));
