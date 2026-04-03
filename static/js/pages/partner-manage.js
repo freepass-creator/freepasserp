@@ -213,6 +213,21 @@ async function handleDelete() {
     message.textContent = '삭제할 파트너를 먼저 선택하세요.';
     return;
   }
+  // 소속 직원 확인
+  const { fetchUsersOnce, fetchProductsOnce } = await import('../firebase/firebase-db.js');
+  const users = await fetchUsersOnce();
+  const hasUsers = users.some(u => u.company_code === editingCode && u.status !== 'deleted');
+  if (hasUsers) {
+    showToast('소속 직원이 있는 파트너는 삭제할 수 없습니다.', 'error');
+    return;
+  }
+  // 등록 상품 확인
+  const products = await fetchProductsOnce();
+  const hasProducts = products.some(p => (p.provider_company_code || p.partner_code) === editingCode && p.status !== 'deleted');
+  if (hasProducts) {
+    showToast('등록된 상품이 있는 파트너는 삭제할 수 없습니다.', 'error');
+    return;
+  }
   if (!await showConfirm(`선택한 파트너 ${editingCode} 를 삭제할까요?`)) return;
   await deletePartner(editingCode);
   showToast(`삭제 완료: ${editingCode}`, 'success');
