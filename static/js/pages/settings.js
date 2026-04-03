@@ -188,15 +188,26 @@ function bindAppSettings(profile) {
 
   (async () => {
     try {
-      const partners = await fetchPartnersOnce();
-      const providers = partners.filter(p => p.partner_type === 'provider');
-      if (providerSelect) {
-        providerSelect.innerHTML = '<option value="">공급사 선택</option>' +
-          providers.map(p => `<option value="${p.partner_code || ''}">${p.partner_code || ''} / ${p.partner_name || ''}</option>`).join('');
-        // 마지막 선택값 복원
-        const saved = profile.settings?.catalog_provider || '';
-        if (saved) providerSelect.value = saved;
-        updateProviderUrl();
+      if (profile.role === 'provider') {
+        // 공급사: 자기 공급사코드 고정
+        const myCode = profile.company_code || '';
+        if (providerSelect && myCode) {
+          providerSelect.innerHTML = `<option value="${myCode}">${myCode}</option>`;
+          providerSelect.value = myCode;
+          providerSelect.disabled = true;
+          updateProviderUrl();
+        }
+      } else {
+        // 관리자/영업자: 전체 공급사 선택 가능
+        const partners = await fetchPartnersOnce();
+        const providers = partners.filter(p => p.partner_type === 'provider');
+        if (providerSelect) {
+          providerSelect.innerHTML = '<option value="">공급사 선택</option>' +
+            providers.map(p => `<option value="${p.partner_code || ''}">${p.partner_code || ''} / ${p.partner_name || ''}</option>`).join('');
+          const saved = profile.settings?.catalog_provider || '';
+          if (saved) providerSelect.value = saved;
+          updateProviderUrl();
+        }
       }
     } catch (e) { console.warn('partner load failed', e); }
   })();
