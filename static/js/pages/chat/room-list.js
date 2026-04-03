@@ -58,7 +58,7 @@ export function isReplyPending(room) {
 }
 
 const ROOM_COLS = [
-  { key: 'status',   label: '대화상태',     align: 'c', filterable: true, w: 80 },
+  { key: 'status',   label: '문의구분',     align: 'c', filterable: true, w: 80 },
   { key: 'reply',    label: '처리상태',     align: 'c', filterable: true, w: 80 },
   { key: 'carNo',    label: '차량번호',     align: 'c', searchable: true },
   { key: 'model',    label: '세부모델',     searchable: true },
