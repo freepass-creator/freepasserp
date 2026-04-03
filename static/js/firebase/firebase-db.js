@@ -589,12 +589,18 @@ export async function sendMessage(roomId, payload) {
   [payload.sender_uid, currentRoom.agent_uid, currentRoom.provider_uid].filter(Boolean).forEach((uid) => {
     if (currentHiddenBy[uid]) delete currentHiddenBy[uid];
   });
+  // 대화상태 자동 결정
+  let chatStatus = '대화중';
+  const effectiveRole = senderRole === 'admin' ? 'provider' : senderRole;
+  if (effectiveRole === 'agent') chatStatus = '회신대기';
+  else if (effectiveRole === 'provider') chatStatus = '회신완료';
+
   const updatePayload = {
     last_message: payload.text, last_message_at: now,
     last_sender_role: senderRole, last_sender_code: payload.sender_code || '',
     unread_for_agent: nextUnreadForAgent, unread_for_provider: nextUnreadForProvider,
     hidden_by: currentHiddenBy,
-    chat_status: '대화중',
+    chat_status: chatStatus,
     updated_at: now
   };
   // 보낸 사람은 자동으로 읽음 처리
