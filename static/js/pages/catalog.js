@@ -44,13 +44,6 @@ const countBar       = qs('catalog-count-bar');
 const countText      = qs('catalog-count-text');
 const grid           = qs('catalog-grid');
 
-const modal          = qs('catalog-modal');
-const modalGallery   = qs('catalog-modal-gallery');
-const modalBody      = qs('catalog-modal-body');
-const modalClose     = qs('catalog-modal-close');
-const modalCta       = qs('catalog-modal-cta');
-const modalCtaText   = qs('catalog-modal-cta-text');
-
 const footer         = qs('catalog-footer');
 const ctaLink        = qs('catalog-cta-link');
 const ctaText        = qs('catalog-cta-text');
@@ -70,8 +63,6 @@ let allPolicies   = {};
 let activeMaker   = '';
 let activeProvider = '';
 let activeFuel    = '';
-let galleryIndex  = 0;
-let galleryImages = [];
 let agentPhone    = '';
 
 // ─── 유틸 ──────────────────────────────────────────────────────────────────
@@ -394,7 +385,8 @@ function renderProductDetail(p) {
 function showView(view) {
   singleView.hidden  = view !== 'single';
   catalogMain.hidden  = view !== 'catalog';
-  backBtn.hidden      = !(view === 'catalog' && hasShare);
+  // 뒤로가기: 단일뷰에서 카탈로그로 돌아갈 수 있을 때 표시
+  backBtn.hidden      = view !== 'single' || !allProducts.length;
   footer.hidden       = view !== 'catalog' || !agentPhone;
   document.body.style.overflow = '';
 }
@@ -427,8 +419,7 @@ async function loadAgent() {
       headerCall.hidden = false;
       ctaLink.href = `tel:${phone}`;
       ctaText.textContent = `${name || '영업자'}에게 전화하기`;
-      modalCta.href = `tel:${phone}`;
-      modalCtaText.textContent = '전화 문의하기';
+      // 모달 CTA 제거됨 — 단일 뷰로 통합
       singleCtaLink.href = `tel:${phone}`;
       singleCtaText.textContent = `${name || '담당자'}에게 전화 문의`;
       singleCta.hidden = false;
@@ -489,47 +480,15 @@ function renderSingleView(p) {
   singleBody.innerHTML = renderProductDetail(p);
 }
 
-let sGalleryIndex = 0;
-let sGalleryImages = [];
-let _sTouchStartX = 0;
-
 function renderSingleGallery(images) {
-  sGalleryImages = images;
-  sGalleryIndex = 0;
-  updateSingleGallery();
-
-  singleGallery.addEventListener('touchstart', (e) => { _sTouchStartX = e.touches[0].clientX; }, { passive: true });
-  singleGallery.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - _sTouchStartX;
-    if (Math.abs(dx) < 40 || !sGalleryImages.length) return;
-    sGalleryIndex = dx < 0
-      ? (sGalleryIndex + 1) % sGalleryImages.length
-      : (sGalleryIndex - 1 + sGalleryImages.length) % sGalleryImages.length;
-    updateSingleGallery();
-  }, { passive: true });
-}
-
-function updateSingleGallery() {
-  if (!sGalleryImages.length) {
-    singleGallery.innerHTML = '<div class="catalog-gallery__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
+  if (!images.length) {
+    singleGallery.innerHTML = '<div class="catalog-gallery__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
     return;
   }
-  const total = sGalleryImages.length;
-  const navBtns = total > 1 ? `
-    <button class="catalog-gallery__nav catalog-gallery__nav--prev" id="sg-prev" aria-label="이전"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-    <button class="catalog-gallery__nav catalog-gallery__nav--next" id="sg-next" aria-label="다음"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
-    <div class="catalog-gallery__counter">${sGalleryIndex + 1} / ${total}</div>` : '';
-
-  singleGallery.innerHTML = `
-    <div class="catalog-single__gallery-track">
-      <img class="catalog-single__gallery-img" src="${esc(sGalleryImages[sGalleryIndex])}" alt="차량 사진 ${sGalleryIndex + 1}">
-      ${navBtns}
-    </div>`;
-
-  if (total > 1) {
-    document.getElementById('sg-prev')?.addEventListener('click', () => { sGalleryIndex = (sGalleryIndex - 1 + total) % total; updateSingleGallery(); });
-    document.getElementById('sg-next')?.addEventListener('click', () => { sGalleryIndex = (sGalleryIndex + 1) % total; updateSingleGallery(); });
-  }
+  // 세로 스크롤 — 모든 사진 나열
+  singleGallery.innerHTML = images.map((src, i) =>
+    `<img class="catalog-single__photo" src="${esc(src)}" alt="차량 사진 ${i + 1}" loading="${i === 0 ? 'eager' : 'lazy'}">`
+  ).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -640,43 +599,15 @@ function renderGrid() {
   }).join('');
 }
 
-// ─── 모달 (그리드 카드 클릭) ──────────────────────────────────────────────
+// ─── 카드 클릭 → 단일 상품 뷰 전환 ──────────────────────────────────────
 
-function openModal(p) {
-  galleryImages = getImages(p);
-  galleryIndex  = 0;
-  renderModalGallery();
-  modalBody.innerHTML = renderProductDetail(p);
-  modal.hidden = false;
-  document.body.style.overflow = 'hidden';
-}
+let catalogScrollY = 0; // 카탈로그 스크롤 위치 저장
 
-function closeModal() {
-  modal.hidden = true;
-  document.body.style.overflow = '';
-}
-
-function renderModalGallery() {
-  if (!galleryImages.length) {
-    modalGallery.innerHTML = '<div class="catalog-gallery__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>';
-    return;
-  }
-  const total = galleryImages.length;
-  const navBtns = total > 1 ? `
-    <button class="catalog-gallery__nav catalog-gallery__nav--prev" id="gallery-prev" aria-label="이전"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
-    <button class="catalog-gallery__nav catalog-gallery__nav--next" id="gallery-next" aria-label="다음"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
-    <div class="catalog-gallery__counter">${galleryIndex + 1} / ${total}</div>` : '';
-
-  modalGallery.innerHTML = `
-    <div class="catalog-gallery__track">
-      <img class="catalog-gallery__img" src="${esc(galleryImages[galleryIndex])}" alt="차량 사진 ${galleryIndex + 1}">
-      ${navBtns}
-    </div>`;
-
-  if (total > 1) {
-    document.getElementById('gallery-prev')?.addEventListener('click', () => { galleryIndex = (galleryIndex - 1 + total) % total; renderModalGallery(); });
-    document.getElementById('gallery-next')?.addEventListener('click', () => { galleryIndex = (galleryIndex + 1) % total; renderModalGallery(); });
-  }
+function showDetailView(p) {
+  catalogScrollY = window.scrollY;
+  renderSingleView(p);
+  showView('single');
+  window.scrollTo({ top: 0 });
 }
 
 // ─── 이벤트 ───────────────────────────────────────────────────────────────
@@ -689,8 +620,8 @@ browseAllBtn.addEventListener('click', () => {
 });
 
 backBtn.addEventListener('click', () => {
-  showView('single');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showView('catalog');
+  window.scrollTo({ top: catalogScrollY });
 });
 
 grid.addEventListener('click', (e) => {
@@ -698,7 +629,7 @@ grid.addEventListener('click', (e) => {
   if (!card) return;
   const idx = Number(card.dataset.index);
   const products = getFiltered();
-  if (products[idx]) openModal(products[idx]);
+  if (products[idx]) showDetailView(products[idx]);
 });
 
 grid.addEventListener('keydown', (e) => {
@@ -708,20 +639,6 @@ grid.addEventListener('keydown', (e) => {
   e.preventDefault();
   card.click();
 });
-
-modalClose.addEventListener('click', closeModal);
-modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
-
-let _touchStartX = 0;
-modalGallery.addEventListener('touchstart', (e) => { _touchStartX = e.touches[0].clientX; }, { passive: true });
-modalGallery.addEventListener('touchend', (e) => {
-  const dx = e.changedTouches[0].clientX - _touchStartX;
-  if (Math.abs(dx) < 40 || !galleryImages.length) return;
-  const total = galleryImages.length;
-  galleryIndex = dx < 0 ? (galleryIndex + 1) % total : (galleryIndex - 1 + total) % total;
-  renderModalGallery();
-}, { passive: true });
 
 let _searchTimer = null;
 searchInput.addEventListener('input', () => {
