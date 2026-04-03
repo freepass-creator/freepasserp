@@ -241,6 +241,8 @@
 
 .photo-viewer__img {
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
   display: block;
 }
 
@@ -318,9 +320,11 @@
 .cat-section:first-child { border-top: none; }
 
 .cat-section-title {
-  font-size: 12px; font-weight: 700; color: #94a3b8;
-  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 700; color: #1b2a4a;
+  margin-bottom: 12px;
 }
+.cat-section-title svg { color: #3b82f6; flex-shrink: 0; }
 
 /* 가격/보험 테이블 */
 .cat-table {

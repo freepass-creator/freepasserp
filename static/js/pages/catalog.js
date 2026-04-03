@@ -239,6 +239,19 @@ function fmtRentalGuide(pol) {
   return `${bracket ? `[${bracket}] ` : ''}${info}`.trim();
 }
 
+// ─── 섹션 아이콘 ──────────────────────────────────────────────────────────
+
+const SECTION_ICONS = {
+  price:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  insurance: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>',
+  rental:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="m21 3-7 7"/><path d="M11 13H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/></svg>',
+  extra:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+};
+
+function sectionTitle(icon, text) {
+  return `<div class="cat-section-title">${SECTION_ICONS[icon] || ''}<span>${esc(text)}</span></div>`;
+}
+
 // ─── 공유 상세 마크업 생성 (수수료 제외 전부) ─────────────────────────────
 
 function renderProductDetail(p) {
@@ -281,7 +294,7 @@ function renderProductDetail(p) {
     const guideText = fmtRentalGuide(pol);
     html += `
       <div class="cat-section">
-        <div class="cat-section-title">기간별 대여료 및 보증금 안내</div>
+        ${sectionTitle('price', '기간별 대여료 및 보증금 안내')}
         <table class="cat-table">
           <thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead>
           <tbody>${priceRows.map(({ m, rent, dep }) => `
@@ -312,7 +325,7 @@ function renderProductDetail(p) {
   if (hasInsurance) {
     html += `
       <div class="cat-section">
-        <div class="cat-section-title">차량보험정보</div>
+        ${sectionTitle('insurance', '차량보험정보')}
         <table class="cat-table cat-table--insurance">
           <thead><tr><th>항목</th><th>한도</th><th>면책금</th></tr></thead>
           <tbody>${insRows.map(([label, limit, deduct]) => `
@@ -348,7 +361,7 @@ function renderProductDetail(p) {
   if (rentalRows.length) {
     html += `
       <div class="cat-section">
-        <div class="cat-section-title">대여조건</div>
+        ${sectionTitle('rental', '대여조건')}
         <div class="cat-rows">${rentalRows.map(([label, value]) =>
           `<div class="cat-row"><span class="cat-row-label">${esc(label)}</span><span class="cat-row-value">${esc(value)}</span></div>`
         ).join('')}</div>
@@ -369,7 +382,7 @@ function renderProductDetail(p) {
   if (extraRows.length) {
     html += `
       <div class="cat-section">
-        <div class="cat-section-title">추가정보</div>
+        ${sectionTitle('extra', '추가정보')}
         <div class="cat-rows">${extraRows.map(([label, value]) =>
           `<div class="cat-row"><span class="cat-row-label">${esc(label)}</span><span class="cat-row-value">${esc(value)}</span></div>`
         ).join('')}</div>
