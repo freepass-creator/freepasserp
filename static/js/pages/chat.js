@@ -293,6 +293,13 @@ async function bootstrap() {
             modelName: [product.maker, product.model, product.subModel, product.trim].filter(Boolean).join(' ')
           }).then((roomId) => {
             currentRoomId = roomId;
+            // 생성된 방 자동 오픈 + 입력칸 포커스
+            const tryOpen = () => {
+              const newRoom = visibleRoomsCache.find(r => r.room_id === roomId);
+              if (newRoom) { roomSelectionController.openRoom(newRoom); return; }
+              setTimeout(tryOpen, 300);
+            };
+            tryOpen();
           }).catch((e) => {
             console.warn('[chat] ensureRoom failed', e);
           }).finally(() => {
