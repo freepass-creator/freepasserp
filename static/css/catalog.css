@@ -324,7 +324,7 @@
 }
 
 .cat-carno {
-  font-size: 11px; font-weight: 500; color: #64748b; margin-bottom: 2px;
+  font-size: 11px; font-weight: 400; color: #94a3b8; margin-left: 6px;
 }
 .cat-title {
   font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.35; margin: 0;
@@ -695,8 +695,8 @@
 
 .catalog-card__carno {
   font-size: 11px;
-  font-weight: 500;
-  color: #64748b;
+  font-weight: 400;
+  color: #94a3b8;
 }
 
 .catalog-card__model {

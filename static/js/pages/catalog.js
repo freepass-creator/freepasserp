@@ -313,8 +313,7 @@ function renderProductDetail(p) {
   let html = `
     <div class="cat-hero">
       ${badgeHtml ? `<div class="cat-badges">${badgeHtml}</div>` : ''}
-      ${p.car_number ? `<div class="cat-carno">${esc(p.car_number)}</div>` : ''}
-      <h1 class="cat-title">${esc(model || '차량')}</h1>
+      <h1 class="cat-title">${esc(model || '차량')}${p.car_number ? `<span class="cat-carno">${esc(p.car_number)}</span>` : ''}</h1>
       ${sub ? `<p class="cat-subtitle">${esc(sub)}</p>` : ''}
       ${optText ? `<p class="cat-options">${esc(optText)}</p>` : ''}
       <div class="cat-meta">
@@ -882,8 +881,7 @@ function renderGrid() {
       <article class="catalog-card" data-index="${i}" role="button" tabindex="0">
         <div class="catalog-card__image-wrap">${imageHtml}${badgeHtml}${imgs.length > 1 ? `<span class="catalog-card__photo-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${imgs.length}</span>` : ''}</div>
         <div class="catalog-card__body">
-          ${p.car_number ? `<div class="catalog-card__carno">${esc(p.car_number)}</div>` : ''}
-          <div class="catalog-card__model">${esc(model || '차량')}</div>
+          <div class="catalog-card__model">${esc(model || '차량')}${p.car_number ? ` <span class="catalog-card__carno">${esc(p.car_number)}</span>` : ''}</div>
           ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
           <div class="catalog-card__price-row">
             ${cardRent ? `<span class="catalog-card__price">월 ${fmtMoney(cardRent)}</span>${cardDep ? `<span class="catalog-card__dep">보증금 ${fmtMoney(cardDep)}</span>` : ''}<span class="catalog-card__dep">${cardMonth}개월</span>` : `<span class="catalog-card__price-inquiry">가격 문의</span>`}
