@@ -18,7 +18,7 @@ import io, re, zipfile
 
 app = Flask(__name__)
 
-APP_VERSION = '20260404t'
+APP_VERSION = '20260404u'
 
 @app.context_processor
 def inject_app_version():
@@ -126,9 +126,9 @@ def catalog_view():
     if share_id:
         title = '렌터카 상품 안내'
     elif provider:
-        title = f'렌터카 [{provider}] 상품'
+        title = f'렌터카 {provider} 상품'
     else:
-        title = '렌터카 [전체] 상품'
+        title = '렌터카 전체 상품'
     og_desc = '렌터카 장기렌트 상품을 검색하고 비교해보세요.'
     return render_template('new/catalog_new.html', page_title=title, og_title=title, og_desc=og_desc)
 

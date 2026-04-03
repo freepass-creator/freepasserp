@@ -517,9 +517,9 @@ async function loadAgent() {
   if (shareId || shareCar) {
     // 상세 링크 — renderSingleView에서 오버라이드
   } else if (providerParam) {
-    document.title = `렌터카 [${providerParam}] 상품${suffix}`;
+    document.title = `렌터카 ${providerParam} 상품${suffix}`;
   } else {
-    document.title = `렌터카 [전체] 상품${suffix}`;
+    document.title = `렌터카 전체 상품${suffix}`;
   }
 }
 
@@ -577,7 +577,7 @@ function renderSingleView(p) {
   const model = [p.maker, p.model_name].filter(Boolean).join(' ');
   const carNo = p.car_number || '';
   const suffix = agentCompany?.textContent ? ` | ${agentCompany.textContent}` : '';
-  document.title = `렌터카 [${carNo} ${model}] 상품${suffix}`.trim();
+  document.title = `렌터카 ${carNo} ${model} 상품${suffix}`.trim();
 
   renderSingleGallery(getImages(p));
   singleBody.innerHTML = renderProductDetail(p);
