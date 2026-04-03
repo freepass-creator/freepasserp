@@ -573,7 +573,10 @@ async function loadData() {
 //  VIEW 1: 단일 상품 상세
 // ═══════════════════════════════════════════════════════════════════════════
 
+let currentSingleProduct = null;
+
 function renderSingleView(p) {
+  currentSingleProduct = p;
   const model = [p.maker, p.model_name].filter(Boolean).join(' ');
   const carNo = p.car_number || '';
   const suffix = agentCompany?.textContent ? ` | ${agentCompany.textContent}` : '';
@@ -982,6 +985,28 @@ window.addEventListener('popstate', () => {
 });
 
 // ─── 이벤트 ───────────────────────────────────────────────────────────────
+
+// 공유하기 (링크 복사)
+qs('single-share-btn')?.addEventListener('click', () => {
+  if (!currentSingleProduct) return;
+  const pid = currentSingleProduct._key || currentSingleProduct.productUid || currentSingleProduct.id || '';
+  const base = `${location.origin}/catalog`;
+  const params = new URLSearchParams();
+  if (agentCode) params.set('a', agentCode);
+  if (pid) params.set('id', pid);
+  const url = `${base}?${params.toString()}`;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = qs('single-share-btn');
+    if (btn) { btn.textContent = '복사 완료!'; setTimeout(() => { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> 링크 복사'; }, 1500); }
+  }).catch(() => {
+    const input = document.createElement('input');
+    input.value = url;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+  });
+});
 
 browseAllBtn.addEventListener('click', () => {
   renderAllFilters();
