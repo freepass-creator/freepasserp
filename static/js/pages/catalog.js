@@ -38,6 +38,8 @@ const browseAllBtn   = qs('browse-all-btn');
 const catalogMain    = qs('catalog-main');
 const searchInput    = qs('catalog-search');
 const chipsEl        = qs('catalog-filter-chips');
+const providerChipsEl = qs('catalog-provider-chips');
+const fuelChipsEl    = qs('catalog-fuel-chips');
 const countBar       = qs('catalog-count-bar');
 const countText      = qs('catalog-count-text');
 const grid           = qs('catalog-grid');
@@ -66,6 +68,8 @@ const hasShare   = !!(shareId || shareCar);
 let allProducts   = [];
 let allPolicies   = {};
 let activeMaker   = '';
+let activeProvider = '';
+let activeFuel    = '';
 let galleryIndex  = 0;
 let galleryImages = [];
 let agentPhone    = '';
@@ -463,7 +467,7 @@ async function loadData() {
       }
     }
 
-    renderChips();
+    renderAllChips();
     renderGrid();
     showView('catalog');
   } catch (err) {
@@ -532,33 +536,64 @@ function updateSingleGallery() {
 //  VIEW 2: 카탈로그 그리드
 // ═══════════════════════════════════════════════════════════════════════════
 
-function getMakers() {
+function getUniqueValues(field) {
   const set = new Set();
-  allProducts.forEach((p) => { if (p.maker) set.add(p.maker); });
+  allProducts.forEach((p) => { const v = p[field]; if (v) set.add(v); });
   return [...set].sort();
 }
 
-function renderChips() {
-  const makers = getMakers();
-  if (makers.length <= 1) { chipsEl.innerHTML = ''; return; }
-  chipsEl.innerHTML = `<button class="catalog-chip${!activeMaker ? ' is-active' : ''}" data-maker="">전체</button>` +
-    makers.map((m) => `<button class="catalog-chip${activeMaker === m ? ' is-active' : ''}" data-maker="${esc(m)}">${esc(m)}</button>`).join('');
+function getProviders() {
+  const map = new Map();
+  allProducts.forEach((p) => {
+    const code = p.provider_company_code || p.partner_code || '';
+    const name = p.provider_name || '';
+    if (code && !map.has(code)) map.set(code, name || code);
+  });
+  return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
 }
 
-chipsEl.addEventListener('click', (e) => {
-  const chip = e.target.closest('.catalog-chip');
-  if (!chip) return;
-  activeMaker = chip.dataset.maker || '';
-  renderChips();
-  renderGrid();
-});
+function renderFilterChips(el, items, activeValue, dataAttr) {
+  if (!el) return;
+  if (items.length <= 1) { el.innerHTML = ''; el.closest('.catalog-filter-row')?.classList.add('is-hidden'); return; }
+  el.closest('.catalog-filter-row')?.classList.remove('is-hidden');
+  el.innerHTML = `<button class="catalog-chip${!activeValue ? ' is-active' : ''}" data-${dataAttr}="">전체</button>` +
+    items.map(([value, label]) =>
+      `<button class="catalog-chip${activeValue === value ? ' is-active' : ''}" data-${dataAttr}="${esc(value)}">${esc(label)}</button>`
+    ).join('');
+}
+
+function renderAllChips() {
+  const makers = getUniqueValues('maker').map(m => [m, m]);
+  const providers = getProviders();
+  const fuels = getUniqueValues('fuel_type').map(f => [f, f]);
+
+  renderFilterChips(chipsEl, makers, activeMaker, 'maker');
+  renderFilterChips(providerChipsEl, providers, activeProvider, 'provider');
+  renderFilterChips(fuelChipsEl, fuels, activeFuel, 'fuel');
+}
+
+function bindChipClick(el, dataAttr, setter) {
+  el?.addEventListener('click', (e) => {
+    const chip = e.target.closest('.catalog-chip');
+    if (!chip) return;
+    setter(chip.dataset[dataAttr] || '');
+    renderAllChips();
+    renderGrid();
+  });
+}
+
+bindChipClick(chipsEl, 'maker', (v) => { activeMaker = v; });
+bindChipClick(providerChipsEl, 'provider', (v) => { activeProvider = v; });
+bindChipClick(fuelChipsEl, 'fuel', (v) => { activeFuel = v; });
 
 function getFiltered() {
   const q = (searchInput.value || '').trim().toLowerCase();
   return allProducts.filter((p) => {
     if (activeMaker && p.maker !== activeMaker) return false;
+    if (activeProvider && (p.provider_company_code || p.partner_code || '') !== activeProvider) return false;
+    if (activeFuel && p.fuel_type !== activeFuel) return false;
     if (q) {
-      const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name].join(' ').toLowerCase();
+      const text = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name, p.provider_name].join(' ').toLowerCase();
       if (!text.includes(q)) return false;
     }
     return true;
@@ -595,6 +630,7 @@ function renderGrid() {
         <div class="catalog-card__body">
           <div class="catalog-card__model">${esc(model || '차량')}</div>
           ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
+          ${p.provider_name ? `<div class="catalog-card__provider">${esc(p.provider_name)}</div>` : ''}
           <div class="catalog-card__price-row">
             ${rent48 ? `<span class="catalog-card__price">월 ${fmtMoney(rent48)}</span>${dep48 ? `<span class="catalog-card__dep">보증금 ${fmtMoney(dep48)}</span>` : ''}` : `<span class="catalog-card__price-inquiry">가격 문의</span>`}
           </div>
@@ -646,7 +682,7 @@ function renderModalGallery() {
 // ─── 이벤트 ───────────────────────────────────────────────────────────────
 
 browseAllBtn.addEventListener('click', () => {
-  renderChips();
+  renderAllChips();
   renderGrid();
   showView('catalog');
   window.scrollTo({ top: 0, behavior: 'smooth' });

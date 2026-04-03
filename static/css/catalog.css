@@ -326,6 +326,23 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
+.catalog-filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.catalog-filter-row.is-hidden { display: none; }
+
+.catalog-filter-label {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  min-width: 36px;
+  padding-top: 6px;
+}
+
 .catalog-filter-chips {
   display: flex;
   gap: 6px;
@@ -455,6 +472,11 @@
 .catalog-card__sub {
   font-size: 12px;
   color: #64748b;
+}
+
+.catalog-card__provider {
+  font-size: 11px;
+  color: #94a3b8;
 }
 
 .catalog-card__price-row {
