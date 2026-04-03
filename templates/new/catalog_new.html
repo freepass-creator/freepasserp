@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title id="page-title">렌트카 상품 안내</title>
+<title id="page-title">{{ og_title or '렌터카 상품 안내' }}</title>
+<meta property="og:title" content="{{ og_title or '렌터카 상품 안내' }}">
+<meta property="og:description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
+<meta property="og:type" content="website">
+<meta name="description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_theme.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}?v={{ app_version }}">
