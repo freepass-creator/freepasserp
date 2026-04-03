@@ -38,12 +38,14 @@ function countPendingRooms(rooms, role, uid, companyCode) {
     if (role === 'provider' && room.provider_code && room.provider_code !== companyCode) return false;
     // 메시지 없으면 제외
     if (!Number(room.last_message_at || 0)) return false;
-    // 회신대기 기준
+    // 내가 확인/처리해야 할 건
     const eff = room.last_effective_sender_role || '';
     const last = room.last_sender_role || '';
     const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
     if (!sender) return false;
+    // 관리자/공급사: 문의접수 건 (영업자가 보냄)
     if (role === 'admin' || role === 'provider') return sender === 'agent';
+    // 영업자: 회신완료 건 (공급사가 답함)
     return sender === 'provider';
   }).length;
 }

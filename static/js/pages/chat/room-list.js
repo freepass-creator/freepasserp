@@ -49,8 +49,8 @@ export function deriveReplyStatus(room) {
   const last = room.last_sender_role || '';
   const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
   if (!sender) return '';
-  // 영업자가 마지막 = 문의접수, 공급사/관리자가 마지막 = 응답완료
-  return sender === 'agent' ? '문의접수' : '응답완료';
+  // 영업자가 마지막 = 문의접수, 공급사/관리자가 마지막 = 회신완료
+  return sender === 'agent' ? '문의접수' : '회신완료';
 }
 
 export function isReplyPending(room) {

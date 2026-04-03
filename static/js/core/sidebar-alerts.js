@@ -63,14 +63,14 @@ function countUnreadRooms(rooms) {
     if (profile.role === 'provider' && room.provider_code && room.provider_code !== companyCode) return false;
     // 메시지 없으면 제외
     if (!Number(room.last_message_at || 0)) return false;
-    // 회신대기 기준: 마지막 발송자(agent/provider만)가 상대방이면 회신대기
+    // 내가 확인/처리해야 할 건 카운트
     const eff = room.last_effective_sender_role || '';
     const last = room.last_sender_role || '';
     const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
     if (!sender) return false;
-    // 관리자/공급사: 영업자가 마지막 = 회신대기
+    // 관리자/공급사: 문의접수 (영업자가 보냄 → 답해야 함)
     if (profile.role === 'admin' || profile.role === 'provider') return sender === 'agent';
-    // 영업자: 공급사가 마지막 = 회신대기
+    // 영업자: 회신완료 (공급사가 답함 → 확인해야 함)
     return sender === 'provider';
   }).length;
 }
