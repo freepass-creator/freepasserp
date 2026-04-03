@@ -17,8 +17,8 @@ watchAuth(async (user) => {
       role: 'admin',
       company_code: 'admin',
       company_name: '프리패스모빌리티',
-      user_code: 'A0000',
-      admin_code: 'A0000',
+      user_code: 'A0001',
+      admin_code: 'A0001',
       status: 'active'
     });
   }

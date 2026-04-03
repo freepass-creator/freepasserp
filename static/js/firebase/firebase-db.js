@@ -97,7 +97,7 @@ export async function updateUserProfile(uid, updates) {
 
   if (shouldAssignUserCode) {
     if (nextRole === 'admin') {
-      next.user_code = current.email === 'dudguq@gmail.com' ? 'A0000' : await createUserCode('admin');
+      next.user_code = current.email === 'dudguq@gmail.com' ? 'A0001' : await createUserCode('admin');
       next.admin_code = next.user_code;
       next.company_code = 'admin';
       next.company_name = '프리패스모빌리티';
