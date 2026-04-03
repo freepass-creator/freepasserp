@@ -23,7 +23,6 @@ const qs = (id) => document.getElementById(id);
 const agentName      = qs('catalog-agent-name');
 const agentCompany   = qs('catalog-agent-company');
 const agentPosition  = qs('catalog-agent-position');
-const headerCall     = qs('catalog-header-call');
 const backBtn        = qs('catalog-back-btn');
 
 const singleView     = qs('catalog-single');
@@ -497,20 +496,18 @@ async function loadAgent() {
 
     if (phone) {
       agentPhone = phone;
-      headerCall.href = `tel:${phone}`;
-      headerCall.hidden = false;
-      // 하단 연락 바
-      const contactBar = qs('catalog-contact-bar');
-      const contactCall = qs('catalog-contact-call');
-      const contactCallText = qs('catalog-contact-call-text');
-      const contactName = qs('catalog-contact-name');
-      const contactPhone = qs('catalog-contact-phone');
-      if (contactBar) {
-        if (contactCall) contactCall.href = `tel:${phone}`;
-        if (contactCallText) contactCallText.textContent = `${name || '담당자'}${position ? ' ' + position : ''}에게 전화하기`;
-        if (contactName) contactName.textContent = `${name || ''}${position ? ' ' + position : ''}`;
-        if (contactPhone) contactPhone.textContent = phone;
-        contactBar.hidden = false;
+      // 상단바 전화번호 (웹)
+      const headerPhone = qs('catalog-header-phone');
+      const headerPhoneText = qs('catalog-header-phone-text');
+      if (headerPhone) { headerPhoneText.textContent = phone; headerPhone.hidden = false; }
+      // 하단 전화하기 바
+      const bottomBar = qs('catalog-bottom-bar');
+      const bottomCall = qs('catalog-bottom-call');
+      const bottomCallText = qs('catalog-bottom-call-text');
+      if (bottomBar && bottomCall) {
+        bottomCall.href = `tel:${phone}`;
+        if (bottomCallText) bottomCallText.textContent = `${name || '담당자'}${position ? ' ' + position : ''}에게 전화하기`;
+        bottomBar.hidden = false;
       }
     }
   } catch (e) {

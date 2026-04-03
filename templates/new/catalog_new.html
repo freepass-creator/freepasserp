@@ -25,15 +25,14 @@
     </button>
   </div>
   <div class="catalog-header-right" id="catalog-agent-card">
-    <div class="catalog-header-agent">
-      <img class="catalog-header-ci" id="catalog-agent-ci" src="" alt="" hidden>
-      <span class="catalog-header-company" id="catalog-agent-company"></span>
-      <span class="catalog-header-name" id="catalog-agent-name"></span>
-      <span class="catalog-header-position" id="catalog-agent-position"></span>
-    </div>
-    <a class="catalog-header-call" id="catalog-header-call" href="tel:" hidden title="전화">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
-    </a>
+    <img class="catalog-header-ci" id="catalog-agent-ci" src="" alt="" hidden>
+    <span class="catalog-header-company" id="catalog-agent-company"></span>
+    <span class="catalog-header-name" id="catalog-agent-name"></span>
+    <span class="catalog-header-position" id="catalog-agent-position"></span>
+    <span class="catalog-header-phone" id="catalog-header-phone" hidden>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
+      <span id="catalog-header-phone-text"></span>
+    </span>
   </div>
 </header>
 
@@ -101,16 +100,12 @@
   </div>
 </main>
 
-<!-- 하단 연락 바 -->
-<div class="catalog-contact-bar" id="catalog-contact-bar" hidden>
-  <a class="catalog-contact-bar__call" id="catalog-contact-call" href="tel:">
+<!-- 하단 전화하기 바 -->
+<div class="catalog-bottom-bar" id="catalog-bottom-bar" hidden>
+  <a class="catalog-bottom-bar__btn" id="catalog-bottom-call" href="tel:">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
-    <span id="catalog-contact-call-text">전화 문의하기</span>
+    <span id="catalog-bottom-call-text">전화 문의하기</span>
   </a>
-  <div class="catalog-contact-bar__info" id="catalog-contact-info">
-    <span class="catalog-contact-bar__info-name" id="catalog-contact-name"></span>
-    <span class="catalog-contact-bar__info-phone" id="catalog-contact-phone"></span>
-  </div>
 </div>
 
 <script type="module" src="{{ url_for('static', filename='js/pages/catalog.js') }}?v={{ app_version }}"></script>
