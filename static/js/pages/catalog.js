@@ -107,7 +107,7 @@ const FILTER_GROUPS = [
   { key: 'vehicle_class', title: '차종구분', type: 'check', field: 'vehicle_class', open: false },
   { key: 'min_age',     title: '최저연령', type: 'check', open: false, policyField: 'basic_driver_age' },
   { key: 'screening',   title: '심사기준', type: 'check', open: false, policyField: 'screening_criteria' },
-  { key: 'provider',    title: '공급사',   type: 'check', field: 'provider', open: false, hidden: !!providerParam },
+  { key: 'provider',    title: '공급사코드', type: 'check', field: 'provider', open: false, hidden: !!providerParam, labelField: 'code' },
 ];
 
 // 필터 상태: { key: Set }
@@ -639,7 +639,11 @@ function closePhotoViewer() {
 }
 
 photoViewerClose.addEventListener('click', closePhotoViewer);
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !photoViewer.hidden) closePhotoViewer(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (!photoViewer.hidden) { closePhotoViewer(); return; }
+  if (!singleView.hidden) { history.back(); }
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  VIEW 2: 카탈로그 그리드 — 아코디언 체크박스 필터
@@ -660,7 +664,7 @@ function getProductFilterValue(p, group) {
 }
 
 function getProductLabel(p, group) {
-  if (group.key === 'provider') return p.provider_name || (p.provider_company_code || p.partner_code || '');
+  if (group.key === 'provider') return p.provider_company_code || p.partner_code || '';
   return getProductFilterValue(p, group);
 }
 
@@ -920,7 +924,16 @@ function showDetailView(p) {
   renderSingleView(p);
   showView('single');
   window.scrollTo({ top: 0 });
+  history.pushState({ view: 'single' }, '');
 }
+
+// 브라우저 뒤로가기 → 카탈로그 메인
+window.addEventListener('popstate', () => {
+  if (!singleView.hidden) {
+    showView('catalog');
+    window.scrollTo({ top: catalogScrollY });
+  }
+});
 
 // ─── 이벤트 ───────────────────────────────────────────────────────────────
 
@@ -932,8 +945,7 @@ browseAllBtn.addEventListener('click', () => {
 });
 
 backBtn.addEventListener('click', () => {
-  showView('catalog');
-  window.scrollTo({ top: catalogScrollY });
+  history.back();
 });
 
 grid.addEventListener('click', (e) => {
