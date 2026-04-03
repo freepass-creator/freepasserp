@@ -95,6 +95,7 @@ const FILTER_GROUPS = [
   { key: 'rent',        title: '대여료',   type: 'range', buckets: RENT_BUCKETS, open: true },
   { key: 'deposit',     title: '보증금',   type: 'range', buckets: DEP_BUCKETS, open: true },
   { key: 'period',      title: '기간',     type: 'period', options: PERIOD_OPTIONS, open: true },
+  { key: 'product_type', title: '상품구분', type: 'check', field: 'product_type', open: false },
   { key: 'maker',       title: '제조사',   type: 'check', field: 'maker', open: false },
   { key: 'model_name',  title: '모델명',   type: 'check', field: 'model_name', open: false },
   { key: 'sub_model',   title: '세부모델', type: 'check', field: 'sub_model', open: false },
@@ -117,6 +118,11 @@ FILTER_GROUPS.forEach(g => {
 if (providerParam) filters.provider.add(providerParam);
 
 // ─── 유틸 ──────────────────────────────────────────────────────────────────
+
+function shortYear(text) {
+  // "2023~" → "23~", "2024" → "24", 본문 내 4자리 연도를 2자리로
+  return String(text || '').replace(/\b(20)(\d{2})\b/g, '$2');
+}
 
 function esc(text) {
   const d = document.createElement('div');
@@ -307,7 +313,7 @@ function sectionTitle(icon, text) {
 
 function renderProductDetail(p) {
   const model = [p.maker, p.model_name].filter(Boolean).join(' ');
-  const sub   = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
+  const sub   = [shortYear(p.sub_model), p.trim_name].filter(Boolean).join(' · ');
   const pol   = buildPolicy(p);
 
   // ── 기본 정보 ──
@@ -686,6 +692,7 @@ function getProductFilterValue(p, group) {
 
 function getProductLabel(p, group) {
   if (group.key === 'provider') return p.provider_company_code || p.partner_code || '';
+  if (group.key === 'sub_model') return shortYear(getProductFilterValue(p, group));
   return getProductFilterValue(p, group);
 }
 
@@ -922,7 +929,7 @@ function renderGrid() {
     const imgs   = getImages(p);
     const thumb  = imgs[0] || '';
     const model  = [p.maker, p.model_name].filter(Boolean).join(' ');
-    const sub    = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
+    const sub    = [shortYear(p.sub_model), p.trim_name].filter(Boolean).join(' · ');
     // 대표 가격: 가장 저렴한 대여료 기간
     const pricePeriods = [1, 6, 12, 24, 36, 48, 60];
     let cardRent = 0, cardDep = 0, cardMonth = 0;
