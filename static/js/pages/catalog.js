@@ -377,6 +377,7 @@ function renderProductDetail(p) {
     ['차령만료일', fmtDate(p.vehicle_age_expiry_date)],
     ['차량가격',   fmtMoney(p.vehicle_price)],
     ['특이사항',   p.partner_memo || p.note],
+    ['공급사',     p.provider_company_code || p.partner_code],
   ].filter(([, v]) => has(v));
 
   if (extraRows.length) {
@@ -679,7 +680,6 @@ function renderGrid() {
           ${p.car_number ? `<div class="catalog-card__carno">${esc(p.car_number)}</div>` : ''}
           <div class="catalog-card__model">${esc(model || '차량')}</div>
           ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
-          ${p.provider_name ? `<div class="catalog-card__provider">${esc(p.provider_name)}</div>` : ''}
           <div class="catalog-card__price-row">
             ${rent48 ? `<span class="catalog-card__price">월 ${fmtMoney(rent48)}</span>${dep48 ? `<span class="catalog-card__dep">보증금 ${fmtMoney(dep48)}</span>` : ''}` : `<span class="catalog-card__price-inquiry">가격 문의</span>`}
           </div>
