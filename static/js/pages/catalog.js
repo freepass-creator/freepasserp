@@ -24,7 +24,6 @@ const agentName      = qs('catalog-agent-name');
 const agentCompany   = qs('catalog-agent-company');
 const agentPosition  = qs('catalog-agent-position');
 const headerCall     = qs('catalog-header-call');
-const headerCallText = qs('catalog-header-call-text');
 const backBtn        = qs('catalog-back-btn');
 
 const singleView     = qs('catalog-single');
@@ -99,7 +98,7 @@ const FILTER_GROUPS = [
   { key: 'maker',       title: '제조사',   type: 'check', field: 'maker', open: true },
   { key: 'model_name',  title: '모델명',   type: 'check', field: 'model_name', open: false },
   { key: 'sub_model',   title: '세부모델', type: 'check', field: 'sub_model', open: false },
-  { key: 'options',     title: '옵션',     type: 'search', field: 'options', open: false },
+  { key: 'options',     title: '선택옵션', type: 'search', field: 'options', open: false },
   { key: 'fuel_type',   title: '연료',     type: 'check', field: 'fuel_type', open: false },
   { key: 'ext_color',   title: '색상',     type: 'check', field: 'ext_color', open: false },
   { key: 'year',        title: '연식',     type: 'check', field: 'year', open: false, sort: 'desc' },
@@ -482,7 +481,6 @@ async function loadAgent() {
     if (phone) {
       agentPhone = phone;
       headerCall.href = `tel:${phone}`;
-      headerCallText.textContent = phone;
       headerCall.hidden = false;
       ctaLink.href = `tel:${phone}`;
       ctaText.textContent = `${name || '영업자'}에게 전화하기`;
@@ -746,10 +744,12 @@ function getFiltered() {
 // 연동 필터: 해당 그룹을 제외한 나머지 필터 적용한 상품에서 옵션+카운트 계산
 function computeFilterOptions(group) {
   if (group.type === 'period') {
-    return group.options.map(({ value, label }) => {
-      const count = allProducts.filter(p => passesAllFilters(p, group.key) && getRent(p, Number(value)) > 0).length;
-      return { value, label, count };
-    });
+    return group.options
+      .map(({ value, label }) => {
+        const count = allProducts.filter(p => passesAllFilters(p, group.key) && getRent(p, Number(value)) > 0).length;
+        return { value, label, count };
+      })
+      .filter(o => o.count > 0 || filters[group.key]?.has(o.value));
   }
 
   if (group.type === 'range') {
@@ -762,7 +762,9 @@ function computeFilterOptions(group) {
         if (matchRangeBucket(group.buckets, b, n)) { counts.set(b, (counts.get(b) || 0) + 1); break; }
       }
     });
-    return group.buckets.map(b => ({ value: b, label: b, count: counts.get(b) || 0 }));
+    return group.buckets
+      .map(b => ({ value: b, label: b, count: counts.get(b) || 0 }))
+      .filter(o => o.count > 0 || filters[group.key]?.has(o.value));
   }
 
   // check 타입
