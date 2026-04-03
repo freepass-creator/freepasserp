@@ -23,6 +23,8 @@ const qs = (id) => document.getElementById(id);
 const agentAvatar    = qs('catalog-agent-avatar');
 const agentName      = qs('catalog-agent-name');
 const agentCompany   = qs('catalog-agent-company');
+const agentPosition  = qs('catalog-agent-position');
+const agentCi        = qs('catalog-agent-ci');
 const headerCall     = qs('catalog-header-call');
 const headerCallText = qs('catalog-header-call-text');
 const backBtn        = qs('catalog-back-btn');
@@ -417,15 +419,19 @@ async function loadAgent() {
     const agent = Object.values(users).find((u) => u && u.user_code === agentCode);
     if (!agent) return;
 
-    const name    = agent.name || agent.user_name || '';
-    const company = agent.company || agent.company_name || '';
-    const phone   = agent.phone || agent.phone_number || '';
+    const name     = agent.name || agent.user_name || '';
+    const company  = agent.company || agent.company_name || '';
+    const phone    = agent.phone || agent.phone_number || '';
+    const position = agent.position || '';
+    const ciUrl    = agent.ci_file_url || '';
 
     if (name) {
       agentName.textContent = name;
       agentAvatar.innerHTML = `<span class="catalog-agent-avatar__initial">${esc(name.charAt(0))}</span>`;
     }
     if (company) agentCompany.textContent = company;
+    if (position && agentPosition) agentPosition.textContent = position;
+    if (ciUrl && agentCi) { agentCi.src = ciUrl; agentCi.hidden = false; agentAvatar.hidden = true; }
 
     if (phone) {
       agentPhone = phone;

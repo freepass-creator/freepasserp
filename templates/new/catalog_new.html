@@ -10,26 +10,24 @@
 </head>
 <body class="catalog-body" data-page="카탈로그">
 
-<!-- 영업자 명함 헤더 -->
+<!-- 헤더 -->
 <header class="catalog-header" id="catalog-header">
-  <div class="catalog-agent-card" id="catalog-agent-card">
+  <button class="catalog-header-back" id="catalog-back-btn" type="button" hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+  </button>
+  <div class="catalog-header-center" id="catalog-agent-card">
+    <img class="catalog-header-ci" id="catalog-agent-ci" src="" alt="" hidden>
     <div class="catalog-agent-avatar" id="catalog-agent-avatar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
     </div>
-    <div class="catalog-agent-info">
-      <div class="catalog-agent-name" id="catalog-agent-name"></div>
-      <div class="catalog-agent-company" id="catalog-agent-company"></div>
-    </div>
+    <span class="catalog-header-company" id="catalog-agent-company"></span>
+    <span class="catalog-header-name" id="catalog-agent-name"></span>
+    <span class="catalog-header-position" id="catalog-agent-position"></span>
   </div>
-  <div class="catalog-header-right">
-    <button class="catalog-header-back" id="catalog-back-btn" type="button" hidden>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-    </button>
-    <a class="catalog-header-call" id="catalog-header-call" href="tel:" hidden>
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      <span id="catalog-header-call-text">전화</span>
-    </a>
-  </div>
+  <a class="catalog-header-call" id="catalog-header-call" href="tel:" hidden>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <span id="catalog-header-call-text">연락하기</span>
+  </a>
 </header>
 
 <!-- ═══ VIEW 1: 상품 상세 (공유링크 또는 카드 클릭) ═══ -->
@@ -61,35 +59,39 @@
 
 <!-- ═══ VIEW 2: 전체 카탈로그 ═══ -->
 <main class="catalog-main" id="catalog-main" hidden>
-  <div class="catalog-toolbar" id="catalog-toolbar">
-    <div class="catalog-search-wrap">
-      <svg class="catalog-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input class="catalog-search" id="catalog-search" type="search" placeholder="모델명, 차량번호, 제조사 검색...">
+  <!-- 데스크톱: 좌측 필터 사이드바 -->
+  <aside class="catalog-sidebar" id="catalog-sidebar">
+    <div class="catalog-sidebar__search">
+      <svg class="catalog-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input class="catalog-search" id="catalog-search" type="search" placeholder="모델명, 차량번호 검색...">
     </div>
-    <div class="catalog-filter-row">
-      <span class="catalog-filter-label">제조사</span>
+    <div class="catalog-sidebar__section">
+      <div class="catalog-sidebar__title">제조사</div>
       <div class="catalog-filter-chips" id="catalog-filter-chips"></div>
     </div>
-    <div class="catalog-filter-row">
-      <span class="catalog-filter-label">공급사</span>
+    <div class="catalog-sidebar__section">
+      <div class="catalog-sidebar__title">공급사</div>
       <div class="catalog-filter-chips" id="catalog-provider-chips"></div>
     </div>
-    <div class="catalog-filter-row">
-      <span class="catalog-filter-label">연료</span>
+    <div class="catalog-sidebar__section">
+      <div class="catalog-sidebar__title">연료</div>
       <div class="catalog-filter-chips" id="catalog-fuel-chips"></div>
     </div>
-  </div>
-  <div class="catalog-count-bar" id="catalog-count-bar" hidden>
-    <span id="catalog-count-text"></span>
-  </div>
-  <div class="catalog-grid" id="catalog-grid">
-    <div class="catalog-skeleton-wrap">
-      <div class="catalog-skeleton-card"></div>
-      <div class="catalog-skeleton-card"></div>
-      <div class="catalog-skeleton-card"></div>
-      <div class="catalog-skeleton-card"></div>
-      <div class="catalog-skeleton-card"></div>
-      <div class="catalog-skeleton-card"></div>
+  </aside>
+  <!-- 우측: 상품 그리드 -->
+  <div class="catalog-content">
+    <div class="catalog-count-bar" id="catalog-count-bar" hidden>
+      <span id="catalog-count-text"></span>
+    </div>
+    <div class="catalog-grid" id="catalog-grid">
+      <div class="catalog-skeleton-wrap">
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+      </div>
     </div>
   </div>
 </main>

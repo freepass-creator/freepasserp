@@ -21,50 +21,48 @@
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 56px;
-  padding: 0 20px;
+  justify-content: center;
+  height: 52px;
+  padding: 0 16px;
   background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(15, 23, 42, 0.07);
 }
 
-.catalog-header-right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
 .catalog-header-back {
+  position: absolute;
+  left: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: #fff;
   color: #475569;
   cursor: pointer;
-  transition: background 0.12s;
 }
-.catalog-header-back:hover { background: #f1f5f9; }
 .catalog-header-back[hidden] { display: none; }
 
-/* 영업자 명함 */
-
-.catalog-agent-card {
+.catalog-header-center {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
+.catalog-header-ci {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.catalog-header-ci[hidden] { display: none; }
+
 .catalog-agent-avatar {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: #1b2a4a;
   color: #fff;
@@ -73,56 +71,45 @@
   justify-content: center;
   flex-shrink: 0;
 }
+.catalog-agent-avatar__initial { font-size: 13px; font-weight: 600; line-height: 1; }
 
-.catalog-agent-avatar__initial {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1;
+.catalog-header-company {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
 }
 
-.catalog-agent-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-
-.catalog-agent-name {
-  font-size: 13px;
+.catalog-header-name {
+  font-size: 12px;
   font-weight: 600;
   color: #0f172a;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.catalog-agent-company {
+.catalog-header-position {
   font-size: 11px;
-  color: #64748b;
+  color: #94a3b8;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-
-/* 헤더 전화 버튼 */
 
 .catalog-header-call {
+  position: absolute;
+  right: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: 32px;
-  padding: 0 12px;
+  gap: 4px;
+  height: 30px;
+  padding: 0 10px;
   border-radius: 999px;
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   color: #16a34a;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
-  transition: background 0.12s;
 }
-
 .catalog-header-call:hover { background: #dcfce7; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -374,30 +361,47 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .catalog-main {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
+  display: flex;
+  gap: 0;
 }
 
 .catalog-main[hidden] { display: none; }
 
-/* ─── Toolbar ─────────────────────────────────────────────────────────────── */
+/* ─── 사이드바 (데스크톱) ─────────────────────────────────────────────────── */
 
-.catalog-toolbar {
+.catalog-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 52px;
+  height: calc(100vh - 52px);
+  overflow-y: auto;
+  padding: 16px;
+  border-right: 1px solid #f1f5f9;
+  background: #fff;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 20px 10px;
+  gap: 16px;
 }
 
-.catalog-search-wrap {
+.catalog-sidebar__search {
   position: relative;
-  width: 100%;
-  max-width: 480px;
 }
+
+.catalog-sidebar__title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.catalog-sidebar__section .is-hidden { display: none; }
 
 .catalog-search-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: #94a3b8;
@@ -406,55 +410,42 @@
 
 .catalog-search {
   width: 100%;
-  height: 38px;
-  padding: 0 12px 0 36px;
+  height: 34px;
+  padding: 0 10px 0 30px;
   border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #fff;
   font-size: 12px;
   color: #0f172a;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .catalog-search:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
-.catalog-filter-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.catalog-filter-row.is-hidden { display: none; }
-
-.catalog-filter-label {
-  flex-shrink: 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
-  min-width: 36px;
-  padding-top: 6px;
+.catalog-content {
+  flex: 1;
+  min-width: 0;
 }
 
 .catalog-filter-chips {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
 .catalog-chip {
   display: inline-flex;
   align-items: center;
-  height: 28px;
-  padding: 0 12px;
+  height: 26px;
+  padding: 0 10px;
   border: 1px solid #e2e8f0;
-  border-radius: 999px;
+  border-radius: 6px;
   background: #fff;
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
   cursor: pointer;
   transition: all 0.12s;
@@ -754,9 +745,37 @@
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 
+/* 모바일: 사이드바 → 상단 스택 */
+@media (max-width: 768px) {
+  .catalog-main { flex-direction: column; }
+
+  .catalog-sidebar {
+    width: 100%;
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .catalog-sidebar__section {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .catalog-sidebar__title {
+    min-width: 32px;
+    padding-top: 5px;
+    margin-bottom: 0;
+  }
+
+  .catalog-header-position { display: none; }
+}
+
 @media (max-width: 600px) {
-  .catalog-header { padding: 0 14px; }
-  .catalog-toolbar { padding: 12px 14px 8px; }
+  .catalog-header { padding: 0 10px; }
+  .catalog-header-company { display: none; }
   .catalog-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -765,9 +784,7 @@
   .catalog-card__image-wrap { height: 140px; }
   .catalog-count-bar { padding: 4px 14px 6px; }
   .catalog-footer { padding: 10px 14px; }
-
-  .catalog-single__title { font-size: 20px; }
-  .catalog-single__gallery-track { max-height: 300px; }
+  .cat-title { font-size: 16px; }
 }
 
 @media (max-width: 360px) {
