@@ -93,9 +93,9 @@ function matchRangeBucket(buckets, value, n) {
 
 const FILTER_GROUPS = [
   { key: 'rent',        title: '대여료',   type: 'range', buckets: RENT_BUCKETS, open: true },
-  { key: 'deposit',     title: '보증금',   type: 'range', buckets: DEP_BUCKETS, open: false },
-  { key: 'period',      title: '기간',     type: 'period', options: PERIOD_OPTIONS, open: false },
-  { key: 'maker',       title: '제조사',   type: 'check', field: 'maker', open: true },
+  { key: 'deposit',     title: '보증금',   type: 'range', buckets: DEP_BUCKETS, open: true },
+  { key: 'period',      title: '기간',     type: 'period', options: PERIOD_OPTIONS, open: true },
+  { key: 'maker',       title: '제조사',   type: 'check', field: 'maker', open: false },
   { key: 'model_name',  title: '모델명',   type: 'check', field: 'model_name', open: false },
   { key: 'sub_model',   title: '세부모델', type: 'check', field: 'sub_model', open: false },
   { key: 'options',     title: '선택옵션', type: 'search', field: 'options', open: false },
@@ -463,19 +463,31 @@ function showView(view) {
 async function loadAgent() {
   if (!agentCode) return;
   try {
-    const snap = await get(ref(db, 'users'));
-    if (!snap.exists()) return;
-    const users = snap.val();
+    // 사용자 정보 (이름, 직급, 연락처)
+    const userSnap = await get(ref(db, 'users'));
+    const users = userSnap.val() || {};
     const agent = Object.values(users).find((u) => u && u.user_code === agentCode);
-    if (!agent) return;
 
-    const name     = agent.name || agent.user_name || '';
-    const company  = agent.company || agent.company_name || '';
-    const phone    = agent.phone || agent.phone_number || '';
-    const position = agent.position || '';
+    let name = '', phone = '', position = '', companyName = '';
 
+    if (agent) {
+      name     = agent.name || agent.user_name || '';
+      phone    = agent.phone || agent.phone_number || '';
+      position = agent.position || '';
+      companyName = agent.company || agent.company_name || '';
+    }
+
+    // 공급사 링크면 파트너에서 회사명 가져오기
+    if (providerParam) {
+      try {
+        const partnerSnap = await get(ref(db, `partners/${providerParam}`));
+        const partner = partnerSnap.val();
+        if (partner?.partner_name) companyName = partner.partner_name;
+      } catch {}
+    }
+
+    if (companyName) agentCompany.textContent = companyName;
     if (name) agentName.textContent = name;
-    if (company) agentCompany.textContent = company;
     if (position && agentPosition) agentPosition.textContent = position;
 
     if (phone) {
@@ -484,7 +496,6 @@ async function loadAgent() {
       headerCall.hidden = false;
       ctaLink.href = `tel:${phone}`;
       ctaText.textContent = `${name || '영업자'}에게 전화하기`;
-      // 모달 CTA 제거됨 — 단일 뷰로 통합
       singleCtaLink.href = `tel:${phone}`;
       singleCtaText.textContent = `${name || '담당자'}에게 전화 문의`;
       singleCta.hidden = false;
@@ -859,6 +870,18 @@ filterSectionsEl?.addEventListener('input', (e) => {
   renderGrid();
 });
 
+// 아코디언 상태 localStorage
+const FILTER_OPEN_KEY = 'freepass.catalog.filterOpen';
+function loadFilterOpenState() {
+  try { const s = localStorage.getItem(FILTER_OPEN_KEY); if (s) { const map = JSON.parse(s); FILTER_GROUPS.forEach(g => { if (map[g.key] !== undefined) g._open = map[g.key]; }); } } catch {}
+}
+function saveFilterOpenState() {
+  const map = {};
+  FILTER_GROUPS.forEach(g => { map[g.key] = g._open !== undefined ? g._open : g.open; });
+  try { localStorage.setItem(FILTER_OPEN_KEY, JSON.stringify(map)); } catch {}
+}
+loadFilterOpenState();
+
 // 이벤트: 아코디언 토글
 filterSectionsEl?.addEventListener('click', (e) => {
   const title = e.target.closest('.catalog-sidebar__title');
@@ -870,6 +893,7 @@ filterSectionsEl?.addEventListener('click', (e) => {
   if (group) {
     group._open = section.classList.contains('is-collapsed');
     section.classList.toggle('is-collapsed');
+    saveFilterOpenState();
   }
 });
 
