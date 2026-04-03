@@ -62,15 +62,25 @@ let agentPhone     = '';
 
 // ─── 필터 정의 ────────────────────────────────────────────────────────────
 
-const RENT_BUCKETS  = ['50만원 이하','50만원~','60만원~','70만원~','80만원~','90만원~','100만원~'];
+const RENT_BUCKETS  = ['50만원 이하','50만원~','60만원~','70만원~','80만원~','90만원~','100만원~','150만원~','200만원~'];
 const DEP_BUCKETS   = ['무보증','100만원 이하','100만원~','200만원~','300만원~','400만원~','500만원~'];
 const MILE_BUCKETS  = ['0Km~','1만Km~','2만Km~','3만Km~','5만Km~','7만Km~','10만Km~','15만Km~','20만Km~'];
+const PERIOD_OPTIONS = [
+  { value: '1', label: '월렌트' },
+  { value: '12', label: '12개월' },
+  { value: '24', label: '24개월' },
+  { value: '36', label: '36개월' },
+  { value: '48', label: '48개월' },
+  { value: '60', label: '60개월' },
+];
 
 function matchRangeBucket(buckets, value, n) {
   const thresholds = {
     '50만원 이하': [0, 500000], '50만원~': [500000, 600000], '60만원~': [600000, 700000],
     '70만원~': [700000, 800000], '80만원~': [800000, 900000], '90만원~': [900000, 1000000],
-    '100만원~': [1000000, Infinity],
+    '100만원~': [1000000, 1500000],
+    '150만원~': [1500000, 2000000],
+    '200만원~': [2000000, Infinity],
     '무보증': [0, 1], '100만원 이하': [1, 1000000], '100만원~': [1000000, 2000000],
     '200만원~': [2000000, 3000000], '300만원~': [3000000, 4000000],
     '400만원~': [4000000, 5000000], '500만원~': [5000000, Infinity],
@@ -83,11 +93,14 @@ function matchRangeBucket(buckets, value, n) {
 }
 
 const FILTER_GROUPS = [
+  { key: 'rent',        title: '대여료',   type: 'range', buckets: RENT_BUCKETS, open: true },
+  { key: 'deposit',     title: '보증금',   type: 'range', buckets: DEP_BUCKETS, open: false },
+  { key: 'period',      title: '기간',     type: 'period', options: PERIOD_OPTIONS, open: false },
   { key: 'maker',       title: '제조사',   type: 'check', field: 'maker', open: true },
   { key: 'model_name',  title: '모델명',   type: 'check', field: 'model_name', open: false },
   { key: 'sub_model',   title: '세부모델', type: 'check', field: 'sub_model', open: false },
   { key: 'options',     title: '옵션',     type: 'search', field: 'options', open: false },
-  { key: 'fuel_type',   title: '연료',     type: 'check', field: 'fuel_type', open: true },
+  { key: 'fuel_type',   title: '연료',     type: 'check', field: 'fuel_type', open: false },
   { key: 'ext_color',   title: '색상',     type: 'check', field: 'ext_color', open: false },
   { key: 'year',        title: '연식',     type: 'check', field: 'year', open: false, sort: 'desc' },
   { key: 'mileage',     title: '주행거리', type: 'range', buckets: MILE_BUCKETS, open: false },
@@ -95,8 +108,6 @@ const FILTER_GROUPS = [
   { key: 'min_age',     title: '최저연령', type: 'check', open: false, policyField: 'basic_driver_age' },
   { key: 'screening',   title: '심사기준', type: 'check', open: false, policyField: 'screening_criteria' },
   { key: 'provider',    title: '공급사',   type: 'check', field: 'provider', open: false, hidden: !!providerParam },
-  { key: 'rent',        title: '대여료',   type: 'range', buckets: RENT_BUCKETS, open: false },
-  { key: 'deposit',     title: '보증금',   type: 'range', buckets: DEP_BUCKETS, open: false },
 ];
 
 // 필터 상태: { key: Set }
@@ -681,6 +692,14 @@ function passesGroup(p, group) {
   const selected = filters[group.key];
   if (!selected || !selected.size) return true;
 
+  if (group.type === 'period') {
+    // 선택한 기간에 가격이 있는 상품만
+    for (const m of selected) {
+      if (getRent(p, Number(m)) > 0) return true;
+    }
+    return false;
+  }
+
   if (group.type === 'range') {
     const n = getProductRangeValue(p, group);
     for (const bucket of selected) {
@@ -722,6 +741,13 @@ function getFiltered() {
 
 // 연동 필터: 해당 그룹을 제외한 나머지 필터 적용한 상품에서 옵션+카운트 계산
 function computeFilterOptions(group) {
+  if (group.type === 'period') {
+    return group.options.map(({ value, label }) => {
+      const count = allProducts.filter(p => passesAllFilters(p, group.key) && getRent(p, Number(value)) > 0).length;
+      return { value, label, count };
+    });
+  }
+
   if (group.type === 'range') {
     const counts = new Map();
     group.buckets.forEach(b => counts.set(b, 0));

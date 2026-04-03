@@ -19,7 +19,9 @@ const RANGE_BUCKETS = {
     { value: "70", label: "70만원~", match: v => v >= 700000 && v < 800000 },
     { value: "80", label: "80만원~", match: v => v >= 800000 && v < 900000 },
     { value: "90", label: "90만원~", match: v => v >= 900000 && v < 1000000 },
-    { value: "100", label: "100만원~", match: v => v >= 1000000 }
+    { value: "100", label: "100만원~", match: v => v >= 1000000 && v < 1500000 },
+    { value: "150", label: "150만원~", match: v => v >= 1500000 && v < 2000000 },
+    { value: "200", label: "200만원~", match: v => v >= 2000000 }
   ],
   deposit: [
     { value: "none", label: "무보증", match: v => v === 0 },
@@ -211,7 +213,7 @@ const INFO_COLS = [
 
 // 기간별 대여료 컬럼 — 9,999,999 기준 고정폭, 대여료/보증금 구간 필터
 const PRICE_COLS = PRICE_MONTHS.map(m => ({
-  key: `price_${m}`, label: `${m}개월`, wCh: '9,999,999', num: true, priceMonth: m,
+  key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, wCh: '9,999,999', num: true, priceMonth: m,
   filterKey: 'rent', filterKey2: 'deposit', filterType: 'dual', filterLabel1: '대여료', filterLabel2: '보증금',
   sortField: `rent_${m}`
 }));
@@ -544,7 +546,7 @@ function applyRoleFilter(products){
 function getSelectedPeriods(){const arr=state.filters.periods.slice().sort((a,b)=>Number(a)-Number(b)); return arr.length?arr:DEFAULT_PERIODS.slice();}
 function getValueForRange(groupKey,item){const p=getSelectedPeriods()[0]||'48'; if(groupKey==='rent') return moneyToNumber(item.price[p]?.rent); if(groupKey==='deposit') return moneyToNumber(item.price[p]?.deposit); if(groupKey==='fee') return moneyToNumber(item.price[p]?.fee); if(groupKey==='mileage') return item.mileageValue||0; if(groupKey==='vehiclePrice') return moneyToNumber(item.vehiclePrice)||0; return 0;}
 function getTermVal(group,item){ const tf=getTermFields(item); return tf[group.field]||( group.fallback ? item[group.fallback] : '')||''; }
-function getGroupOptions(group,source){ if(group.type==='periods') return group.options.map(v=>({value:v,label:`${v}M`})); if(group.type==='range') return RANGE_BUCKETS[group.key].map(b=>({value:b.value,label:b.label})); if(group.type==='year'){const years=[...new Set(source.map(i=>i.year).filter(Boolean))].sort((a,b)=>b-a); return years.map(y=>({value:String(y),label:`${y}~`}));} if(group.type==='termSelect'){const values=[...new Set(source.map(i=>getTermVal(group,i)).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'ko')); return values.map(v=>({value:String(v),label:String(v)}));} const values=[...new Set(source.map(i=> group.type==='policySelect' ? i[group.field] : i[group.key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'ko')); return values.map(v=>({value:String(v),label:String(v)})); }
+function getGroupOptions(group,source){ if(group.type==='periods') return group.options.map(v=>({value:v,label:v==='1'?'월렌트':`${v}개월`})); if(group.type==='range') return RANGE_BUCKETS[group.key].map(b=>({value:b.value,label:b.label})); if(group.type==='year'){const years=[...new Set(source.map(i=>i.year).filter(Boolean))].sort((a,b)=>b-a); return years.map(y=>({value:String(y),label:`${y}~`}));} if(group.type==='termSelect'){const values=[...new Set(source.map(i=>getTermVal(group,i)).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'ko')); return values.map(v=>({value:String(v),label:String(v)}));} const values=[...new Set(source.map(i=> group.type==='policySelect' ? i[group.field] : i[group.key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'ko')); return values.map(v=>({value:String(v),label:String(v)})); }
 function matchRange(groupKey,optionValue,item){const bucket=RANGE_BUCKETS[groupKey].find(x=>x.value===optionValue); return bucket?bucket.match(getValueForRange(groupKey,item)):false;}
 function matchSingle(group,optionValue,item){ if(group.type==='periods') return true; if(group.type==='range') return matchRange(group.key, optionValue, item); if(group.type==='year') return String(item.year)===String(optionValue); if(group.type==='termSelect') return String(getTermVal(group,item))===String(optionValue); if(group.type==='policySelect') return String(item[group.field]||'')===String(optionValue); return String(item[group.key]||'')===String(optionValue); }
 function passesGroup(group,item,selected){ if(group.key==='periods') return true; if(!selected||!selected.length) return true; return selected.some(v=>matchSingle(group,v,item)); }
