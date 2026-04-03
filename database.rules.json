@@ -79,11 +79,8 @@
 
     "rooms": {
       ".read": "auth != null",
-      ".indexOn": ["product_uid", "agent_uid", "provider_uid", "last_message_at"],
-      "$room_id": {
-        // 대화방 참여자(agent, provider) 또는 admin만 쓰기 가능
-        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || data.child('agent_uid').val() === auth.uid || data.child('provider_uid').val() === auth.uid || !data.exists())"
-      }
+      ".write": "auth != null",
+      ".indexOn": ["product_uid", "agent_uid", "provider_uid", "last_message_at"]
     },
 
     "messages": {
