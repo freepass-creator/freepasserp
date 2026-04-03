@@ -626,7 +626,7 @@ function updateGallerySlide() {
 
   singleGallery.innerHTML = `
     <div class="catalog-gallery__track" id="gallery-track">
-      <img class="catalog-gallery__img" src="${esc(sGalleryImages[sGalleryIndex])}" alt="차량 사진 ${sGalleryIndex + 1}">
+      <img class="catalog-gallery__img" src="${esc(sGalleryImages[sGalleryIndex])}" alt="차량 사진 ${sGalleryIndex + 1}" decoding="async" fetchpriority="high">
       ${navBtns}
     </div>`;
 
@@ -949,7 +949,7 @@ function renderGrid() {
     }
     const status = p.vehicle_status || '';
     const imageHtml = thumb
-      ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(model)}" loading="lazy">`
+      ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(model)}" loading="lazy" decoding="async">`
       : `<div class="catalog-card__no-image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
     const pType = p.product_type || '';
     const badgeParts = [status, pType].filter(v => v && v !== '재고');

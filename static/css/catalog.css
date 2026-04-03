@@ -17,15 +17,45 @@
 }
 
 /* 모바일 스크롤 최적화 */
-* { -webkit-tap-highlight-color: transparent; }
-.catalog-header { position: sticky; backface-visibility: hidden; }
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+html {
+  scroll-behavior: auto;
+  overflow-scrolling: touch;
+}
+.catalog-header {
+  position: sticky;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
 .catalog-single,
 .catalog-main,
-.catalog-grid {
+.catalog-grid,
+.catalog-card,
+.catalog-sidebar {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
-.catalog-body img { -webkit-user-drag: none; pointer-events: none; }
+.catalog-body img {
+  -webkit-user-drag: none;
+  pointer-events: none;
+  content-visibility: auto;
+}
+
+/* 이미지 로딩 최적화 */
+.catalog-card__image {
+  aspect-ratio: 16 / 10;
+  background: #f1f5f9;
+}
+.catalog-gallery__img,
+.catalog-card__image {
+  image-rendering: auto;
+  decoding: async;
+}
 
 /* ─── Header ──────────────────────────────────────────────────────────────── */
 
