@@ -12,7 +12,6 @@ watchAuth(async (user) => {
 
   if (isMasterAdminEmail(user.email)) {
     await upsertUserProfile(user.uid, {
-      name: '마스터관리자',
       email: user.email,
       role: 'admin',
       company_code: 'admin',
