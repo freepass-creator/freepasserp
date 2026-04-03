@@ -933,14 +933,6 @@ grid.addEventListener('keydown', (e) => {
   card.click();
 });
 
-// 아코디언 토글
-qs('catalog-sidebar')?.addEventListener('click', (e) => {
-  const title = e.target.closest('.catalog-sidebar__title');
-  if (!title) return;
-  const section = title.closest('.catalog-sidebar__section');
-  section?.classList.toggle('is-collapsed');
-});
-
 // 모바일 필터 패널
 const filterBtn     = qs('catalog-filter-btn');
 const sidebar       = qs('catalog-sidebar');
