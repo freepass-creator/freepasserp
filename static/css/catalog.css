@@ -77,15 +77,16 @@
 .catalog-header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
+  white-space: nowrap;
 }
 
 .catalog-header-agent {
-  display: flex;
-  align-items: center;
-  gap: 4px;
   white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1e293b;
 }
 
 .catalog-header-sep { display: none; }
