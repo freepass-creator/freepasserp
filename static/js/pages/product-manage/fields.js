@@ -11,13 +11,13 @@ export const CODE_BOUND_FIELDS = [
 
 export const STATIC_SELECT_OPTIONS = {
   vehicle_status: ['출고가능', '출고협의', '출고불가', '계약대기', '계약완료'],
-  product_type: ['재렌트', '신차렌트', '재구독', '신차구독'],
+  product_type: ['중고렌트', '신차렌트', '중고구독', '신차구독'],
   fuel_type: ['가솔린', '디젤', 'LPG', '하이브리드', '전기', '수소']
 };
 
 export const DEFAULT_SELECT_VALUES = {
   vehicle_status: '출고가능',
-  product_type: '재렌트'
+  product_type: '중고렌트'
 };
 
 export const LINKED_SPEC_FIELDS = new Set(['maker', 'model_name', 'sub_model']);

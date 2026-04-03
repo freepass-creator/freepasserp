@@ -685,6 +685,7 @@ function openPhotoViewer(startIndex = 0) {
 
   photoViewer.hidden = false;
   document.body.style.overflow = 'hidden';
+  history.pushState({ view: 'photo' }, '');
 
   // 해당 사진 위치로 스크롤
   if (startIndex > 0) {
@@ -1015,6 +1016,10 @@ function showDetailView(p) {
 
 // 브라우저 뒤로가기 → 카탈로그 메인
 window.addEventListener('popstate', () => {
+  if (!photoViewer.hidden) {
+    closePhotoViewer();
+    return;
+  }
   if (!singleView.hidden) {
     showView('catalog');
     window.scrollTo({ top: catalogScrollY });
