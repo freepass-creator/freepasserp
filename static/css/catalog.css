@@ -18,17 +18,36 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 60px;
+  height: 56px;
   padding: 0 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(15, 23, 42, 0.07);
 }
 
 .catalog-header-right {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
 }
+
+.catalog-header-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.catalog-header-back:hover { background: #f1f5f9; }
+.catalog-header-back[hidden] { display: none; }
 
 /* 영업자 명함 */
 
@@ -40,8 +59,8 @@
 }
 
 .catalog-agent-avatar {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #1b2a4a;
   color: #fff;
@@ -52,7 +71,7 @@
 }
 
 .catalog-agent-avatar__initial {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1;
 }
@@ -87,7 +106,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 34px;
+  height: 32px;
   padding: 0 12px;
   border-radius: 999px;
   background: #f0fdf4;
@@ -102,12 +121,208 @@
 
 .catalog-header-call:hover { background: #dcfce7; }
 
-/* ─── Main ────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   VIEW 1: 단일 상품 상세
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.catalog-single {
+  max-width: 560px;
+  margin: 0 auto;
+  background: #fff;
+  min-height: calc(100vh - 56px);
+}
+
+.catalog-single[hidden] { display: none; }
+
+/* 갤러리 */
+
+.catalog-single__gallery-track {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 400px;
+  background: #0f172a;
+  overflow: hidden;
+}
+
+.catalog-single__gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 상품 기본 정보 */
+
+.catalog-single__info {
+  padding: 20px 20px 0;
+}
+
+.catalog-single__badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.catalog-single__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.catalog-single__subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 4px 0 0;
+}
+
+.catalog-single__tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.catalog-single__tag {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  font-size: 12px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* 가격표 */
+
+.catalog-single__pricing {
+  padding: 20px;
+  margin: 16px 20px 0;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.catalog-single__section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+
+.catalog-single__price-table {
+  width: 100%;
+}
+
+.catalog-single__inquiry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #3b82f6;
+  padding: 20px;
+  margin: 16px 20px 0;
+  background: #eff6ff;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+}
+
+/* 차량 스펙 */
+
+.catalog-single__specs {
+  padding: 20px;
+}
+
+.catalog-single__spec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+}
+
+.catalog-single__spec-row:last-child { border-bottom: none; }
+
+.catalog-single__spec-label {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.catalog-single__spec-value {
+  color: #0f172a;
+  font-weight: 500;
+  text-align: right;
+}
+
+/* 전체 상품 보기 버튼 */
+
+.catalog-single__browse {
+  padding: 8px 20px 16px;
+}
+
+.catalog-browse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.catalog-browse-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1b2a4a;
+}
+
+/* 단일 뷰 CTA */
+
+.catalog-single__cta {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 20px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.catalog-single__cta[hidden] { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VIEW 2: 카탈로그 그리드
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .catalog-main {
   max-width: 1280px;
   margin: 0 auto;
 }
+
+.catalog-main[hidden] { display: none; }
 
 /* ─── Toolbar ─────────────────────────────────────────────────────────────── */
 
@@ -356,6 +571,99 @@
   100% { background-position: -100% 0; }
 }
 
+/* ─── Shared: 가격표 (단일 뷰 + 모달) ────────────────────────────────────── */
+
+.catalog-price-table { width: 100%; }
+
+.catalog-price-table__head {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.catalog-price-table__row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 8px;
+  padding: 10px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  align-items: center;
+}
+
+.catalog-price-table__row:last-child { border-bottom: none; }
+
+.catalog-price-table__period {
+  font-weight: 600;
+  color: #475569;
+}
+
+.catalog-price-table__rent {
+  font-weight: 700;
+  color: #1b2a4a;
+}
+
+.catalog-price-table__dep {
+  color: #64748b;
+}
+
+/* ─── Shared: 갤러리 네비게이션 ───────────────────────────────────────────── */
+
+.catalog-gallery__empty {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #cbd5e1;
+}
+
+.catalog-gallery__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: #0f172a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.12s;
+  z-index: 1;
+}
+
+.catalog-gallery__nav:hover { background: #fff; }
+.catalog-gallery__nav--prev { left: 10px; }
+.catalog-gallery__nav--next { right: 10px; }
+
+.catalog-gallery__counter {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* ─── Detail Modal ────────────────────────────────────────────────────────── */
 
 .catalog-modal-overlay {
@@ -369,6 +677,8 @@
   justify-content: center;
   padding: 0;
 }
+
+.catalog-modal-overlay[hidden] { display: none; }
 
 @media (min-width: 600px) {
   .catalog-modal-overlay {
@@ -418,7 +728,7 @@
 
 .catalog-modal__close:hover { background: rgba(15, 23, 42, 0.12); }
 
-/* ─── Gallery ─────────────────────────────────────────────────────────────── */
+/* ─── Modal Gallery ──────────────────────────────────────────────────────── */
 
 .catalog-modal__gallery {
   flex-shrink: 0;
@@ -439,54 +749,6 @@
   display: block;
 }
 
-.catalog-gallery__empty {
-  width: 100%;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f1f5f9;
-  color: #cbd5e1;
-}
-
-.catalog-gallery__nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
-  color: #0f172a;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: background 0.12s;
-  z-index: 1;
-}
-
-.catalog-gallery__nav:hover { background: #fff; }
-.catalog-gallery__nav--prev { left: 10px; }
-.catalog-gallery__nav--next { right: 10px; }
-
-.catalog-gallery__counter {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 22px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.55);
-  color: #fff;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-}
-
 /* ─── Modal body ──────────────────────────────────────────────────────────── */
 
 .catalog-modal__body {
@@ -499,7 +761,7 @@
   font-weight: 700;
   color: #0f172a;
   line-height: 1.25;
-  padding-right: 40px; /* close button */
+  padding-right: 40px;
 }
 
 .catalog-modal__subtitle {
@@ -538,47 +800,6 @@
 .catalog-detail__label { color: #64748b; flex-shrink: 0; }
 .catalog-detail__value { color: #0f172a; font-weight: 500; text-align: right; }
 
-/* 가격표 */
-
-.catalog-price-table { width: 100%; }
-
-.catalog-price-table__head {
-  display: grid;
-  grid-template-columns: 80px 1fr 1fr;
-  gap: 8px;
-  padding: 6px 8px;
-  background: #f8fafc;
-  border-radius: 6px;
-  font-size: 11px;
-  color: #94a3b8;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.catalog-price-table__row {
-  display: grid;
-  grid-template-columns: 80px 1fr 1fr;
-  gap: 8px;
-  padding: 10px 8px;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 13px;
-  align-items: center;
-}
-
-.catalog-price-table__period {
-  font-weight: 600;
-  color: #475569;
-}
-
-.catalog-price-table__rent {
-  font-weight: 700;
-  color: #1b2a4a;
-}
-
-.catalog-price-table__dep {
-  color: #64748b;
-}
-
 /* 가격 문의 */
 
 .catalog-modal__inquiry {
@@ -599,7 +820,7 @@
   flex-shrink: 0;
 }
 
-/* ─── Bottom CTA button (shared) ─────────────────────────────────────────── */
+/* ─── Shared CTA button ──────────────────────────────────────────────────── */
 
 .catalog-cta__button {
   display: flex;
@@ -634,10 +855,12 @@
   z-index: 200;
   padding: 12px 20px;
   padding-bottom: max(12px, env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
   border-top: 1px solid rgba(15, 23, 42, 0.06);
 }
+
+.catalog-footer[hidden] { display: none; }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 
@@ -652,6 +875,9 @@
   .catalog-card__image-wrap { height: 140px; }
   .catalog-count-bar { padding: 4px 14px 6px; }
   .catalog-footer { padding: 10px 14px; }
+
+  .catalog-single__title { font-size: 20px; }
+  .catalog-single__gallery-track { max-height: 300px; }
 }
 
 @media (max-width: 360px) {

@@ -146,6 +146,25 @@ function bindAppSettings(profile) {
   const msg = document.getElementById('settings-app-message');
   if (!landingSelect) return;
 
+  // 카탈로그 링크
+  const catalogUrlInput = document.getElementById('settings-catalog-url');
+  const catalogCopyBtn = document.getElementById('settings-catalog-copy');
+  if (catalogUrlInput && profile.user_code) {
+    const catalogUrl = `${location.origin}/catalog?a=${encodeURIComponent(profile.user_code)}`;
+    catalogUrlInput.value = catalogUrl;
+  }
+  catalogCopyBtn?.addEventListener('click', () => {
+    const url = catalogUrlInput?.value;
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('링크가 복사되었습니다.', 'success');
+    }).catch(() => {
+      catalogUrlInput.select();
+      document.execCommand('copy');
+      showToast('링크가 복사되었습니다.', 'success');
+    });
+  });
+
   function hrefToKey(href) { return href.replace(/\//g, '_'); }
   function keyToHref(key) { return key.replace(/^_/, '/'); }
 
@@ -337,8 +356,14 @@ function bindDownloadSection(profile) {
 function bindDocUploads() {
   const ciFileInput = document.getElementById('settings_ci_file');
   const cardFileInput = document.getElementById('settings_card_file');
-  document.getElementById('settings_ci_upload')?.addEventListener('click', () => ciFileInput?.click());
-  document.getElementById('settings_card_upload')?.addEventListener('click', () => cardFileInput?.click());
+  document.getElementById('settings_ci_upload')?.addEventListener('click', () => {
+    if (!profileEditMode) return;
+    ciFileInput?.click();
+  });
+  document.getElementById('settings_card_upload')?.addEventListener('click', () => {
+    if (!profileEditMode) return;
+    cardFileInput?.click();
+  });
 
   // 기존 URL 표시
   const ciUrl = currentProfile?.ci_file_url;

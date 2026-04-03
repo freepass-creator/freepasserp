@@ -200,7 +200,7 @@
 }
 
 .settings-profile-form .form-grid {
-  gap: var(--form-field-gap, 4px);
+  gap: var(--form-gap, 16px);
 }
 
 .settings-account-actions {
@@ -282,6 +282,11 @@
 }
 .settings-doc-link { font-size: 12px; color: var(--text-subtle); text-decoration: underline; }
 
+/* 보기 모드에서 업로드 버튼 숨김 */
+.panel[data-panel-mode="view"] .settings-doc-actions .inline-button {
+  display: none;
+}
+
 .settings-badge-list { display: flex; flex-direction: column; }
 .settings-badge-row {
   display: flex;
@@ -323,6 +328,42 @@
 }
 .settings-download-btn:hover { background: #fafaf9; }
 .settings-download-btn svg { flex-shrink: 0; }
+
+/* 카탈로그 링크 */
+.settings-catalog-link-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.settings-catalog-link-input {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-soft, #e1e5ea);
+  border-radius: var(--radius-ui, 6px);
+  background: var(--surface-subtle, #f8fafc);
+  font-size: 12px;
+  color: var(--text-main);
+  outline: none;
+  min-width: 0;
+}
+.settings-catalog-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-soft, #e1e5ea);
+  border-radius: var(--radius-ui, 6px);
+  background: var(--surface-base, #fff);
+  font-size: 11px;
+  color: var(--text-main);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s;
+}
+.settings-catalog-copy-btn:hover { background: #fafaf9; }
+.settings-catalog-copy-btn svg { flex-shrink: 0; }
 
 @media (max-width: 900px) {
   .settings-page-shell {
