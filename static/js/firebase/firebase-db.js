@@ -589,11 +589,8 @@ export async function sendMessage(roomId, payload) {
   [payload.sender_uid, currentRoom.agent_uid, currentRoom.provider_uid].filter(Boolean).forEach((uid) => {
     if (currentHiddenBy[uid]) delete currentHiddenBy[uid];
   });
-  // 대화상태 자동 결정
-  let chatStatus = '대화중';
-  const effectiveRole = senderRole === 'admin' ? 'provider' : senderRole;
-  if (effectiveRole === 'agent') chatStatus = '회신대기';
-  else if (effectiveRole === 'provider') chatStatus = '회신완료';
+  // 대화상태: 메시지 보내면 항상 '대화중'
+  const chatStatus = '대화중';
 
   const updatePayload = {
     last_message: payload.text, last_message_at: now,

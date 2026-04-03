@@ -29,31 +29,21 @@ export function escapeHtml(value = '') {
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 }
 
-export function deriveStatusLabel(room, myUid) {
+export function deriveStatusLabel(room) {
   if (!room) return '-';
   const hasMessage = Number(room.last_message_at || 0) > 0 || String(room.last_message || '').trim() !== '';
   if (!hasMessage) return '신규';
-  // DB에 저장된 chat_status 우선 사용
-  const dbStatus = room.chat_status || '';
-  if (dbStatus === '회신대기' || dbStatus === '회신완료') return dbStatus;
-  if (myUid) {
-    const readBy = room.read_by || {};
-    const lastRead = Number(readBy[myUid] || 0);
-    const lastMsg = Number(room.last_message_at || 0);
-    if (lastMsg > lastRead) return '읽지않음';
-  }
   return '대화중';
 }
 
 export function deriveReplyStatus(room, myRole) {
-  if (!room || !myRole) return '';
+  if (!room || !myRole) return '미확인';
   const hasMessage = Number(room.last_message_at || 0) > 0 || String(room.last_message || '').trim() !== '';
-  if (!hasMessage) return '';
-  // admin은 제외하고 마지막 agent/provider만 판단
+  if (!hasMessage) return '미확인';
   const eff = room.last_effective_sender_role || '';
   const last = room.last_sender_role || '';
   const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
-  if (!sender) return '';
+  if (!sender) return '미확인';
   // 관리자/공급사: 공급사가 마지막 = 회신완료, 영업자가 마지막 = 회신대기
   if (myRole === 'admin' || myRole === 'provider') return sender === 'provider' ? '회신완료' : '회신대기';
   // 영업자: 영업자가 마지막 = 회신완료, 공급사가 마지막 = 회신대기
