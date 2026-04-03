@@ -50,34 +50,28 @@
   flex-shrink: 0;
 }
 
-.catalog-header-back {
+.catalog-header-back,
+.catalog-header-filter {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
-  border: 1px solid #e2e8f0;
+  border: none;
   border-radius: 6px;
-  background: #fff;
-  color: #475569;
+  background: transparent;
+  color: #64748b;
   cursor: pointer;
   padding: 0;
+  transition: background 0.12s, color 0.12s;
+}
+.catalog-header-back:hover,
+.catalog-header-filter:hover {
+  background: #f1f5f9;
+  color: #1e293b;
 }
 .catalog-header-back[hidden] { display: none; }
-
-.catalog-header-filter {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background: #fff;
-  color: #475569;
-  cursor: pointer;
-  padding: 0;
-}
+.catalog-header-filter { display: none; }
 .catalog-header-filter[hidden] { display: none !important; }
 
 .catalog-header-right {
@@ -963,7 +957,11 @@
 
 /* 모바일: 사이드바 → 슬라이드 패널 */
 @media (max-width: 768px) {
+  .catalog-header { height: 50px; }
   .catalog-header-filter:not([hidden]) { display: flex; }
+  .catalog-header-call { display: none; }
+  .catalog-mobile-cta:not([hidden]) { display: flex; }
+  .catalog-body { padding-bottom: 70px; }
 
   .catalog-sidebar-overlay {
     display: none;
@@ -995,6 +993,37 @@
   .catalog-sidebar__head { display: flex; }
 
   .catalog-header-position { display: none; }
+}
+
+/* 모바일 하단 전화 바 */
+.catalog-mobile-cta {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+.catalog-mobile-cta[hidden] { display: none !important; }
+
+.catalog-mobile-cta__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 42px;
+  border-radius: 8px;
+  background: #1b2a4a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 @media (max-width: 600px) {

@@ -498,6 +498,15 @@ async function loadAgent() {
       agentPhone = phone;
       headerCall.href = `tel:${phone}`;
       headerCall.hidden = false;
+      // 모바일 하단 전화 바
+      const mobileCta = qs('catalog-mobile-cta');
+      const mobileCtaLink = qs('catalog-mobile-cta-link');
+      const mobileCtaText = qs('catalog-mobile-cta-text');
+      if (mobileCta && mobileCtaLink) {
+        mobileCtaLink.href = `tel:${phone}`;
+        if (mobileCtaText) mobileCtaText.textContent = `${name || '담당자'}${position ? ' ' + position : ''}에게 전화하기`;
+        mobileCta.hidden = false;
+      }
     }
   } catch (e) {
     console.warn('[catalog] agent load failed', e);
