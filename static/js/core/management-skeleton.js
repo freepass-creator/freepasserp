@@ -477,7 +477,7 @@ export function createSubmitHandler({ getFormMode, setEditMode, isSelected, onSa
         clearMessage?.();
         return;
       }
-      if (!isSelected()) return;
+      if (getFormMode() !== 'create' && !isSelected()) return;
       if (!await showConfirm('저장하시겠습니까?')) return;
       await onSave();
     } catch (error) {
