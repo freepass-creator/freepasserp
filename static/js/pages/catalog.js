@@ -676,6 +676,7 @@ function renderGrid() {
       <article class="catalog-card" data-index="${i}" role="button" tabindex="0">
         <div class="catalog-card__image-wrap">${imageHtml}${badgeHtml}${imgs.length > 1 ? `<span class="catalog-card__photo-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${imgs.length}</span>` : ''}</div>
         <div class="catalog-card__body">
+          ${p.car_number ? `<div class="catalog-card__carno">${esc(p.car_number)}</div>` : ''}
           <div class="catalog-card__model">${esc(model || '차량')}</div>
           ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
           ${p.provider_name ? `<div class="catalog-card__provider">${esc(p.provider_name)}</div>` : ''}
