@@ -665,12 +665,12 @@ function renderGrid() {
     const thumb  = imgs[0] || '';
     const model  = [p.maker, p.model_name].filter(Boolean).join(' ');
     const sub    = [p.sub_model, p.trim_name].filter(Boolean).join(' · ');
-    // 대표 가격: 48 > 36 > 60 > 24 > 12 순으로 첫 번째 있는 기간
-    const pricePeriods = [48, 36, 60, 24, 12, 1];
+    // 대표 가격: 가장 저렴한 대여료 기간
+    const pricePeriods = [1, 6, 12, 24, 36, 48, 60];
     let cardRent = 0, cardDep = 0, cardMonth = 0;
     for (const m of pricePeriods) {
       const r = getRent(p, m);
-      if (r) { cardRent = r; cardDep = getDeposit(p, m); cardMonth = m; break; }
+      if (r && (!cardRent || r < cardRent)) { cardRent = r; cardDep = getDeposit(p, m); cardMonth = m; }
     }
     const status = p.vehicle_status || '';
     const imageHtml = thumb
