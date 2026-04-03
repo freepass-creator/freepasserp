@@ -18,7 +18,7 @@ import io, re, zipfile
 
 app = Flask(__name__)
 
-APP_VERSION = '20260405z'
+APP_VERSION = '20260406a'
 
 @app.context_processor
 def inject_app_version():

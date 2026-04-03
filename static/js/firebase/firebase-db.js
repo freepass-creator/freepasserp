@@ -144,7 +144,7 @@ export async function updatePartner(partnerCode, updates) {
 }
 
 export async function fetchPartnersOnce() {
-  return fetchCollection('partners', { filter: isNotDeleted, sort: sortByCode('partner_code') });
+  return fetchCollection('partners', { filter: isNotDeleted, sort: sortByCreatedDesc });
 }
 
 export function watchPartners(callback) {
@@ -154,7 +154,7 @@ export function watchPartners(callback) {
       const ap = a.status === 'pending' ? 0 : 1;
       const bp = b.status === 'pending' ? 0 : 1;
       if (ap !== bp) return ap - bp;
-      return String(a.partner_code || '').localeCompare(String(b.partner_code || ''));
+      return (b.updated_at || b.created_at || 0) - (a.updated_at || a.created_at || 0);
     }
   });
 }
