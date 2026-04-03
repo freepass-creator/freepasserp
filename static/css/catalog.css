@@ -1029,6 +1029,13 @@
     padding: 0 12px 32px;
   }
   .catalog-card__image-wrap { height: 140px; }
+  .catalog-card__body { padding: 8px 10px 10px; gap: 3px; }
+  .catalog-card__model { font-size: 12px; }
+  .catalog-card__sub { font-size: 10px; }
+  .catalog-card__price { font-size: 12px; }
+  .catalog-card__dep { font-size: 9px; }
+  .catalog-card__tags { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .catalog-card__tag { flex-shrink: 0; }
   .cat-title { font-size: 16px; }
 }
 
