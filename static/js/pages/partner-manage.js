@@ -4,6 +4,8 @@ import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { deletePartner, savePartner, updatePartner, watchPartners } from '../firebase/firebase-db.js';
+import { storage } from '../firebase/firebase-config.js';
+import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { renderBadgeRow } from '../shared/badge.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { formatShortDate, formatYearMonth } from '../core/management-format.js';
@@ -104,6 +106,11 @@ function fillForm(partner) {
   qs('#partner_email').value = partner.email || '';
   qs('#partner_fax').value = partner.fax || '';
   qs('#partner_note').value = partner.note || '';
+  // 첨부서류 링크
+  const bizLink = qs('#partner_biz_link');
+  const cardLink = qs('#partner_card_link');
+  if (bizLink) { bizLink.href = partner.biz_file_url || '#'; bizLink.hidden = !partner.biz_file_url; }
+  if (cardLink) { cardLink.href = partner.card_file_url || '#'; cardLink.hidden = !partner.card_file_url; }
   applyFormMode('view');
   renderList(currentPartners);
 }
@@ -239,6 +246,40 @@ async function bootstrap() {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       try { await handleSubmit(); } catch (error) { showToast(`저장 실패: ${error.message}`, 'error'); }
+    });
+
+    // 첨부서류 업로드
+    const bizFileInput = qs('#partner_biz_file');
+    const cardFileInput = qs('#partner_card_file');
+    qs('#partner_biz_upload')?.addEventListener('click', () => bizFileInput?.click());
+    qs('#partner_card_upload')?.addEventListener('click', () => cardFileInput?.click());
+
+    async function uploadPartnerFile(file, type) {
+      const code = editingCodeInput.value.trim();
+      if (!code) { showToast('파트너를 먼저 선택하세요.', 'info'); return; }
+      const path = `partner-docs/${code}/${type}_${Date.now()}_${file.name}`;
+      const fileRef = sRef(storage, path);
+      showToast('업로드 중...', 'progress', { duration: 0 });
+      try {
+        await uploadBytes(fileRef, file);
+        const url = await getDownloadURL(fileRef);
+        const field = type === 'biz' ? 'biz_file_url' : 'card_file_url';
+        await updatePartner(code, { [field]: url });
+        showToast('업로드 완료', 'success');
+        const linkEl = type === 'biz' ? qs('#partner_biz_link') : qs('#partner_card_link');
+        if (linkEl) { linkEl.href = url; linkEl.hidden = false; }
+      } catch (err) {
+        showToast('업로드 실패', 'error');
+      }
+    }
+
+    bizFileInput?.addEventListener('change', () => {
+      if (bizFileInput.files?.[0]) uploadPartnerFile(bizFileInput.files[0], 'biz');
+      bizFileInput.value = '';
+    });
+    cardFileInput?.addEventListener('change', () => {
+      if (cardFileInput.files?.[0]) uploadPartnerFile(cardFileInput.files[0], 'card');
+      cardFileInput.value = '';
     });
 
     setIdleMode();
