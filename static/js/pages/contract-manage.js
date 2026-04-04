@@ -858,7 +858,6 @@ async function bootstrap() {
 
 let _mounted = false;
 export async function mount() {
-  document.body.classList.add('page-contract');
   // 상품리스트에서 계약으로 넘어온 경우: 즉시 폼 뷰 표시
   if (localStorage.getItem('freepass_pending_contract_seed') && isMobileQuery.matches) {
     document.body.classList.add('contract-m-open');
@@ -870,7 +869,6 @@ export async function mount() {
 }
 export function unmount() {
   runPageCleanup();
-  document.body.classList.remove('page-contract');
   document.body.classList.remove('contract-m-open');
   _mounted = false;
 }

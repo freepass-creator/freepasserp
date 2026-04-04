@@ -559,7 +559,6 @@ async function bootstrap() {
 
 let _mounted = false;
 export async function mount() {
-  document.body.classList.add('page-chat');
   bindDOM();
   _mounted = false;
   await bootstrap();
@@ -567,7 +566,6 @@ export async function mount() {
 }
 export function unmount() {
   runPageCleanup();
-  document.body.classList.remove('page-chat');
   document.body.classList.remove('chat-m-open');
   _mounted = false;
 }

@@ -1360,12 +1360,10 @@ function renderMobileCatalogGrid() {
 }
 
 function bindMobile() {
-  // 모바일 필터 버튼 표시 및 클릭
+  // 모바일 필터 버튼 클릭 (표시는 CSS data-page 셀렉터로 제어)
   const mobileFilterBtn = document.getElementById('mobile-filter-btn');
   if (mobileFilterBtn) {
-    mobileFilterBtn.hidden = false;
     mobileFilterBtn.addEventListener('click', openMobileSidebar);
-    registerPageCleanup(() => { mobileFilterBtn.hidden = true; });
   }
   // 사이드바 닫기
   $plsMClose?.addEventListener('click', closeMobileSidebar);
@@ -1463,7 +1461,6 @@ async function init(){
 }
 let _mounted = false;
 export async function mount() {
-  document.body.classList.add('page-product-list');
   bindDOM();
   $list?.addEventListener('click', _handleRowClick);
   _mounted = false;
@@ -1475,9 +1472,6 @@ export async function mount() {
 }
 export function unmount() {
   runPageCleanup();
-  document.body.classList.remove('page-product-list');
-  const filterBtn = document.getElementById('mobile-filter-btn');
-  if (filterBtn) filterBtn.hidden = true;
   _mounted = false;
 }
 export function onShow() {
