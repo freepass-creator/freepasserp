@@ -139,6 +139,31 @@ async function handleMobileBack() {
   return true;
 }
 
+/** 뒤로가기 버튼 표시/숨김 — chat.js, contract-manage.js에서 호출 */
+window.showMobileBackBtn = () => {
+  const btn = document.getElementById('mobile-back-btn');
+  if (btn) btn.hidden = false;
+};
+window.hideMobileBackBtn = () => {
+  const btn = document.getElementById('mobile-back-btn');
+  if (btn) btn.hidden = true;
+};
+
+/** visualViewport: 키보드 올라올 때 채팅 패널 bottom 조정 */
+function initKeyboardAdjust() {
+  if (!window.visualViewport) return;
+  const TAB_H = 56;
+  window.visualViewport.addEventListener('resize', () => {
+    if (!document.body.classList.contains('chat-m-open')) return;
+    const panel = document.querySelector('.layout-633');
+    if (!panel) return;
+    const kbHeight = window.innerHeight - window.visualViewport.height;
+    panel.style.bottom = kbHeight > 50
+      ? `${kbHeight}px`                                    // 키보드 열림: 탭바 무시
+      : `calc(${TAB_H}px + env(safe-area-inset-bottom))`; // 키보드 닫힘: 원래대로
+  });
+}
+
 function initMobileBackTrap() {
   if (!mq.matches) return;
   history.pushState({ mobileBack: true }, '');
@@ -158,4 +183,5 @@ requireAuth().then(({ profile }) => {
   renderTopbarUser(profile);
   updateActiveTab();
   initMobileBackTrap();
+  initKeyboardAdjust();
 }).catch(() => {});

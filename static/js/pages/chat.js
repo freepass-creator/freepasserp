@@ -77,12 +77,17 @@ function openMobileChatView() {
   if (!isMobileQuery.matches) return;
   document.body.classList.add('chat-m-open');
   history.pushState({ chatOpen: true }, '');
+  if (window.showMobileBackBtn) window.showMobileBackBtn();
   const input = document.getElementById('message-input');
   if (input) input.focus();
 }
 
 function closeMobileChatView() {
   document.body.classList.remove('chat-m-open');
+  if (window.hideMobileBackBtn) window.hideMobileBackBtn();
+  // visualViewport 조정 초기화
+  const panel = document.querySelector('.layout-633');
+  if (panel) panel.style.bottom = '';
 }
 
 function renderMobileRooms(rooms) {
@@ -301,11 +306,7 @@ async function bootstrap() {
 
     // 모바일 뒤로가기: 채팅창 → 대화목록
     document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
-      if (history.state?.chatOpen) history.back();
-      else closeMobileChatView();
-    });
-    window.addEventListener('popstate', (e) => {
-      if (document.body.classList.contains('chat-m-open')) closeMobileChatView();
+      closeMobileChatView();
     });
 
     // 상세패널 버튼 이벤트

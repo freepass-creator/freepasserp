@@ -27,9 +27,6 @@
   /* 방 열린 상태: 목록 숨기고 채팅패널만 전체화면 */
   body.chat-m-open .chat-m-rooms { display: none !important; }
 
-  /* 채팅 오픈 시 탭바 숨김 — 전송버튼이 키보드에 가리지 않도록 */
-  body.chat-m-open .mobile-tab-bar { display: none !important; }
-
   body.chat-m-open.page-chat .layout-633 {
     display: flex !important;
     flex-direction: column !important;
@@ -37,7 +34,7 @@
     top: 46px !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: 0 !important;
+    bottom: calc(56px + env(safe-area-inset-bottom)) !important;
     height: auto !important;
     width: auto !important;
     min-height: 0 !important;
@@ -89,6 +86,5 @@
     position: static !important;
     flex-shrink: 0 !important;
     margin-top: 0 !important;
-    padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
   }
 }

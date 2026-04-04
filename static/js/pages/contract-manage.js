@@ -117,10 +117,17 @@ function openMobileContractFormView() {
   if (!isMobileQuery.matches) return;
   document.body.classList.add('contract-m-open');
   history.pushState({ contractOpen: true }, '');
+  if (window.showMobileBackBtn) window.showMobileBackBtn();
 }
 
 function closeMobileContractFormView() {
   document.body.classList.remove('contract-m-open');
+  if (window.hideMobileBackBtn) window.hideMobileBackBtn();
+  // 목록으로 돌아올 때 수정 모드 해제 → 목록 클릭 시 경고 안 뜨게
+  if (mode === 'edit') {
+    mode = 'view';
+    clearDirtyCheck();
+  }
 }
 
 const docsController = createContractDocsController({
@@ -672,11 +679,7 @@ async function bootstrap() {
 
     // 모바일 뒤로가기: 계약 입력/수정 → 계약목록
     document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
-      if (history.state?.contractOpen) history.back();
-      else closeMobileContractFormView();
-    });
-    window.addEventListener('popstate', (e) => {
-      if (document.body.classList.contains('contract-m-open')) closeMobileContractFormView();
+      closeMobileContractFormView();
     });
 
     chatButton?.addEventListener('click', async () => {
