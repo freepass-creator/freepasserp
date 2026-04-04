@@ -583,6 +583,7 @@ export function onHide() {
 }
 export function onShow() {
   document.body.classList.add('page-chat');
+  if (window.hideMobileBackBtn) window.hideMobileBackBtn();
   _registerMobileBack();
 }
 export function unmount() {

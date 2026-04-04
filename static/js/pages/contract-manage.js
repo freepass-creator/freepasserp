@@ -896,6 +896,7 @@ export function unmount() {
 }
 export function onShow() {
   document.body.classList.add('page-contract');
+  if (window.hideMobileBackBtn) window.hideMobileBackBtn();
   _registerMobileBack();
   setDirtyCheck(() => mode === 'edit');
 }
