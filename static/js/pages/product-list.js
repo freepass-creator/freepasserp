@@ -1233,8 +1233,8 @@ function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
   return galleryHtml
     + renderCatalogDetailHero(product, actionsHtml)
     + renderCatalogConditions(condRows)
-    + renderCatalogInsuranceTable(insRows)
     + renderCatalogPriceTable(priceRows, { showFee: true, guideNote })
+    + renderCatalogInsuranceTable(insRows)
     + renderCatalogClawback(tf.commission_clawback_condition || '');
 }
 
