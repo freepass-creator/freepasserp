@@ -1,0 +1,129 @@
+/* ===== MOBILE CONTRACT PAGE — 768px 이하 전용 =====
+   contract_manage_new.html 에서만 로드
+   =================================================== */
+
+/* 모바일 카드 목록 — 데스크탑 숨김 */
+#contract-m-list { display: none; }
+
+/* 계약 카드 (미디어 밖 — 항상 스타일 유지) */
+.contract-m-card {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.contract-m-card:active { background: #f8fafc; }
+.contract-m-card.is-selected { background: #f0f4ff; }
+
+.contract-m-card__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.contract-m-card__name {
+  flex: 1; min-width: 0;
+  font-size: 14px; font-weight: 600; color: #0f172a;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.contract-m-card__badge {
+  flex-shrink: 0;
+  height: 20px; padding: 0 7px; border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+  display: inline-flex; align-items: center;
+}
+.contract-m-card__sub {
+  font-size: 12px; color: #64748b;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.contract-m-empty {
+  padding: 60px 20px; text-align: center;
+  font-size: 14px; color: #94a3b8;
+}
+
+@media (max-width: 768px) {
+  /* 계약 페이지 — 탑바~탭바 사이 고정 컨테이너 */
+  body.page-contract .contract-page-shell {
+    position: fixed !important;
+    top: 46px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: calc(56px + env(safe-area-inset-bottom)) !important;
+    height: auto !important;
+    width: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    min-height: 0 !important;
+    z-index: 100;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  /* 기본: 목록만 표시 (데스크탑 패널 숨김) */
+  body.page-contract .contract-page-shell .panel-slot { display: none !important; }
+  body.page-contract .contract-page-shell .pls-grid-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  body.page-contract .contract-page-shell .pls-grid-panel .pls-grid-scroll {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 모바일 카드 목록 표시 (데스크탑 테이블 숨기고 카드 표시) */
+  body.page-contract .contract-page-shell .pls-grid-panel { display: none !important; }
+  body.page-contract #contract-m-list {
+    display: flex !important;
+    flex-direction: column;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    min-height: calc(100dvh - 46px - 56px - env(safe-area-inset-bottom));
+    background: #fff;
+  }
+
+  /* contract-m-open: 폼 전체화면 */
+  body.contract-m-open .contract-page-shell .pls-grid-panel { display: none !important; }
+  body.contract-m-open #contract-m-list { display: none !important; }
+  body.contract-m-open .contract-page-shell .panel-slot {
+    display: flex !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  body.contract-m-open .contract-page-shell .panel-slot .panel--form {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  body.contract-m-open .contract-page-shell .panel-slot .panel--form .panel-head {
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1;
+  }
+  body.contract-m-open .contract-page-shell .panel-slot .panel--form .panel-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0 !important;
+  }
+}
