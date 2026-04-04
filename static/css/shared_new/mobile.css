@@ -897,7 +897,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 0 14px 14px;
+    padding: 14px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
