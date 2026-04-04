@@ -111,9 +111,9 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 
   /* ─── 탑바 버튼 — 페이지별 표시 제어 ──────────────────────────────────── */
 
-  /* 뒤로가기: 대화/계약 페이지에서만 표시 */
-  body.page-chat #mobile-back-btn,
-  body.page-contract #mobile-back-btn { display: flex !important; }
+  /* 뒤로가기: 채팅창·계약폼 열렸을 때만 표시 */
+  body.chat-m-open #mobile-back-btn,
+  body.contract-m-open #mobile-back-btn { display: flex !important; }
 
   /* ─── 설정 페이지 ───────────────────────────────────────────────────────── */
   .settings-page-shell {
