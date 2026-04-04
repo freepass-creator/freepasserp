@@ -760,7 +760,6 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
     -webkit-overflow-scrolling: touch;
     min-height: calc(100dvh - 46px - 56px - env(safe-area-inset-bottom));
     background: #fff;
-    padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
 
   /* contract-m-open: 폼 전체화면 — 올바른 flex chain */
