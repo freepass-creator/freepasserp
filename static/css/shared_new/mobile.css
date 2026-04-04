@@ -801,9 +801,8 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   /* 필터 버튼: 상품목록 페이지에서만 표시 */
   body.page-product-list #mobile-filter-btn { display: flex !important; }
 
-  /* 상품목록: 외부 스크롤·패딩 제거 → 내부 그리드 스크롤만 사용 */
+  /* 상품목록: 외부 패딩 제거 → 내부 그리드 패딩으로만 여백 관리 */
   body.page-product-list .main-shell--new {
-    overflow: hidden !important;
     padding: 0 !important;
   }
 
