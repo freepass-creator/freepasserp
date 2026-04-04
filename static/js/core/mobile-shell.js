@@ -131,7 +131,12 @@ async function handleMobileBack() {
   const page = window.__currentPage || '';
   if (page === '/product-list') {
     const exit = await showConfirm('앱을 종료하시겠습니까?');
-    return !exit; // 종료 확인하면 false(트랩 해제), 취소하면 true(트랩 유지)
+    if (exit) {
+      // 확인: 트랩 entry가 이미 pop됐으므로 한 번 더 뒤로가기
+      history.go(-1);
+      return false;
+    }
+    return true; // 취소: 트랩 유지
   }
 
   // 3. 나머지 페이지 → 상품목록으로
