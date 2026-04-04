@@ -412,3 +412,78 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   text-align: center;
   padding: 8px 0 4px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SHARED MOBILE LIST CARD — 대화·계약 목록 공통 카드
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.m-list-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+}
+.m-list-card:active { background: #f8fafc; }
+.m-list-card.is-active { background: #f0f4ff; }
+
+.m-list-card__avatar {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.m-list-card__body {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.m-list-card__main {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+}
+.m-list-card__name {
+  flex: 1; min-width: 0;
+  font-size: 14px; font-weight: 600; color: #0f172a;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.m-list-card__sub {
+  display: flex; align-items: center; gap: 6px; min-width: 0;
+}
+.m-list-card__info {
+  flex: 1; min-width: 0;
+  font-size: 12px; color: #64748b;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.m-list-card__date {
+  flex-shrink: 0;
+  font-size: 11px; color: #94a3b8;
+}
+
+/* 뱃지 공통 */
+.m-list-badge {
+  flex-shrink: 0;
+  height: 20px; padding: 0 7px; border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+  display: inline-flex; align-items: center;
+  white-space: nowrap;
+}
+.m-list-badge--blue    { background: #3b82f6; color: #fff; }
+.m-list-badge--green   { background: #10b981; color: #fff; }
+.m-list-badge--red     { background: #ef4444; color: #fff; }
+.m-list-badge--yellow  { background: #f59e0b; color: #fff; }
+.m-list-badge--gray    { background: #94a3b8; color: #fff; }
+
+/* 빈 목록 */
+.m-list-empty {
+  padding: 60px 20px;
+  text-align: center;
+  font-size: 14px; color: #94a3b8;
+}

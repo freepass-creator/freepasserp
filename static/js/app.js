@@ -232,6 +232,7 @@ async function loadPage(url, options = {}) {
     document.body.dataset.page = cached.bodyPage || '';
     setActiveSidebar(nextPathname);
     currentPageKey = nextPathname;
+    window.__currentPage = nextPathname;
 
   } finally {
     isPageNavigating = false;
@@ -262,6 +263,7 @@ function registerInitialPage() {
     mounted: true   // script 태그로 이미 mount됨
   });
   currentPageKey = pathname;
+  window.__currentPage = pathname;
 }
 
 // ─── 네비게이션 ─────────────────────────────────────────────────────────────

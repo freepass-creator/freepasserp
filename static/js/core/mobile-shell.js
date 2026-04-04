@@ -8,6 +8,7 @@
 import { requireAuth } from './auth-guard.js';
 import { logoutCurrentUser } from '../firebase/firebase-auth.js';
 import { getPageTitle } from './role-menu.js';
+import { showConfirm } from './toast.js';
 
 const mq = window.matchMedia('(max-width: 768px)');
 if (!mq.matches) { /* 데스크탑 — 아무 작업 없음 */ }
@@ -105,12 +106,56 @@ function renderTopbarUser(profile) {
   if (rankEl)    rankEl.textContent    = rank;
 }
 
-// ─── 초기화 ──────────────────────────────────────────────────────────────────
+// ─── 모바일 뒤로가기 ──────────────────────────────────────────────────────────
 
-// 뒤로가기 버튼은 각 페이지 JS에서 직접 처리 (chat.js, contract-manage.js 등)
+let _mobileBackHandler = null;
+
+/** 페이지별 뒤로가기 핸들러 등록. fn()이 true를 반환하면 "처리됨"으로 간주. */
+window.setMobileBackHandler = (fn) => { _mobileBackHandler = fn; };
+window.clearMobileBackHandler = () => { _mobileBackHandler = null; };
+
+function navigateToProductList() {
+  const tab = tabBar?.querySelector('.mobile-tab[data-href="/product-list"]');
+  if (tab) tab.click();
+  else window.location.href = '/product-list';
+}
+
+async function handleMobileBack() {
+  // 1. 페이지별 핸들러 (채팅방 닫기, 계약폼 닫기)
+  if (_mobileBackHandler) {
+    const handled = _mobileBackHandler();
+    if (handled) return true; // 앱 안에서 처리됨
+  }
+
+  // 2. 상품목록 → 종료 확인
+  const page = window.__currentPage || '';
+  if (page === '/product-list') {
+    const exit = await showConfirm('앱을 종료하시겠습니까?');
+    return !exit; // 종료 확인하면 false(트랩 해제), 취소하면 true(트랩 유지)
+  }
+
+  // 3. 나머지 페이지 → 상품목록으로
+  navigateToProductList();
+  return true;
+}
+
+function initMobileBackTrap() {
+  if (!mq.matches) return;
+  history.pushState({ mobileBack: true }, '');
+
+  window.addEventListener('popstate', async () => {
+    const keepInApp = await handleMobileBack();
+    if (keepInApp) {
+      history.pushState({ mobileBack: true }, '');
+    }
+  });
+}
+
+// ─── 초기화 ──────────────────────────────────────────────────────────────────
 
 requireAuth().then(({ profile }) => {
   renderTabBar();
   renderTopbarUser(profile);
   updateActiveTab();
+  initMobileBackTrap();
 }).catch(() => {});

@@ -36,14 +36,6 @@ watchAuth(async (user) => {
     return;
   }
 
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile) { window.location.href = '/product-list'; return; }
-
-  const landingPage = profile.settings?.landing_page;
-  if (landingPage) { window.location.href = landingPage; return; }
-
-  if (profile.role === 'admin') { window.location.href = '/partner'; return; }
-  if (profile.role === 'provider') { window.location.href = '/product-new'; return; }
   window.location.href = '/product-list';
 });
 

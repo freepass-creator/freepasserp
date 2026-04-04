@@ -1072,12 +1072,14 @@ html {
   }
 
   /* 모바일 필터: 터치 최적화 */
-  .catalog-sidebar__title { height: 44px; font-size: 14px; }
-  .filter-check { padding: 8px 4px; font-size: 14px; min-height: 40px; }
-  .filter-check input[type="checkbox"] { width: 18px; height: 18px; }
+  .catalog-sidebar__title { height: 40px; font-size: 13px; }
+  .filter-check { padding: 6px 4px; font-size: 13px; min-height: 38px; }
+  .filter-check input[type="checkbox"] { width: 17px; height: 17px; }
   .filter-check__count { font-size: 12px; }
-  .filter-search-input { height: 44px; font-size: 16px; }   /* iOS 줌 방지 */
-  .catalog-search { height: 44px; font-size: 16px; }        /* iOS 줌 방지 */
+  .filter-search-input { height: 40px; font-size: 16px; }   /* iOS 줌 방지 */
+  .catalog-search { height: 40px; font-size: 16px; box-sizing: border-box; }  /* iOS 줌 방지 */
+  .catalog-sidebar__search { padding: 0 12px 8px; }
+  .catalog-search-icon { left: 22px; }
   .catalog-sidebar__summary { padding-top: 8px; padding-bottom: 4px; }
   .catalog-sidebar__count-value { font-size: 14px; }
   .catalog-sidebar__reset { font-size: 13px; }

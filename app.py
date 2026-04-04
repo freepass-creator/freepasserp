@@ -96,17 +96,17 @@ def reset_password():
 pages_bp = Blueprint('pages', __name__)
 
 _NEW_ROUTES = [
-    ('/home',          'new/home_new.html',            '홈'),
-    ('/product-list',  'new/product_list_new.html',    '상품목록'),
-    ('/chat',          'new/chat_new.html',             '대화'),
-    ('/contract',      'new/contract_manage_new.html', '계약'),
-    ('/settlement',    'new/settlement_manage_new.html','정산'),
-    ('/product-new',   'new/product_manage_new.html',  '재고'),
-    ('/terms',         'new/policy_manage_new.html',   '정책'),
-    ('/partner',       'new/partner_manage_new.html',  '파트너'),
-    ('/member',        'new/member_manage_new.html',   '회원'),
-    ('/admin',         'new/admin_new.html',            '관리자'),
-    ('/settings',      'new/settings_new.html',        '설정'),
+    ('/home',          'new/home.html',       '홈'),
+    ('/product-list',  'new/product.html',    '상품목록'),
+    ('/chat',          'new/chat.html',       '대화'),
+    ('/contract',      'new/contract.html',   '계약'),
+    ('/settlement',    'new/settlement.html', '정산'),
+    ('/product-new',   'new/stock.html',      '재고'),
+    ('/terms',         'new/policy.html',     '정책'),
+    ('/partner',       'new/partner.html',    '파트너'),
+    ('/member',        'new/member.html',     '회원'),
+    ('/admin',         'new/admin.html',      '관리자'),
+    ('/settings',      'new/settings.html',   '설정'),
     ('/codes',         'code-manage.html',              '코드관리'),
     ('/request',       'request-manage.html',           '요청하기'),
 ]
@@ -135,7 +135,7 @@ def catalog_view():
     else:
         title = f'렌터카 전체 상품{suffix}'
     og_desc = '렌터카 장기렌트 상품을 검색하고 비교해보세요.'
-    return render_template('new/catalog_new.html', page_title=title, og_title=title, og_desc=og_desc)
+    return render_template('new/catalog.html', page_title=title, og_title=title, og_desc=og_desc)
 
 for _path, _tpl, _title in _NEW_ROUTES:
     _ep = _path.lstrip('/').replace('-', '_').replace('/', '_')

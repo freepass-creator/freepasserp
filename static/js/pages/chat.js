@@ -97,35 +97,33 @@ function renderMobileRooms(rooms) {
     const model = product?.subModel || product?.model || room.model_name || '';
     const carNo = product?.carNo || room.car_number || '';
     const mainLine = carNo ? `${carNo}${model ? ` ${model}` : ''}` : (model || '-');
-    const subLine = truncate(room.last_message || '대화 시작 전', 28);
     const at = room.last_message_at || room.created_at;
     const replyStatus = deriveReplyStatus(room);
     const isActive = room.room_id === currentRoomId;
-    const replyBadgeCls = replyStatus === '문의접수' ? 'chat-m-room-card__badge--unread' : 'chat-m-room-card__badge--done';
-    const replyBadge = replyStatus ? `<span class="chat-m-room-card__badge ${replyBadgeCls}">${escapeHtml(replyStatus)}</span>` : '';
-    const timeStr = at ? formatTime(at) : '';
+    const badgeCls = replyStatus === '문의접수' ? 'm-list-badge--red' : 'm-list-badge--green';
+    const badge = replyStatus ? `<span class="m-list-badge ${badgeCls}">${escapeHtml(replyStatus)}</span>` : '';
     const providerCode = room.provider_company_code || '';
     const agentCode = room.agent_code || '';
     const msgText = room.last_message || '대화 시작 전';
-    const subLeft = [providerCode, agentCode, timeStr, truncate(msgText, 18)].filter(Boolean).join(' · ');
-    return `<div class="chat-m-room-card${isActive ? ' is-active' : ''}" data-room-id="${escapeHtml(room.room_id || '')}">
-      <div class="chat-m-room-card__avatar">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg>
+    const subInfo = [providerCode, agentCode, truncate(msgText, 20)].filter(Boolean).join(' · ');
+    return `<div class="m-list-card${isActive ? ' is-active' : ''}" data-room-id="${escapeHtml(room.room_id || '')}">
+      <div class="m-list-card__avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
-      <div class="chat-m-room-card__body">
-        <div class="chat-m-room-card__main">
-          <span class="chat-m-room-card__name">${escapeHtml(mainLine)}</span>
-          ${replyBadge}
+      <div class="m-list-card__body">
+        <div class="m-list-card__main">
+          <span class="m-list-card__name">${escapeHtml(mainLine)}</span>
+          ${badge}
         </div>
-        <div class="chat-m-room-card__sub">
-          <span class="chat-m-room-card__msg">${escapeHtml(subLeft)}</span>
-          <span class="chat-m-room-card__date">${escapeHtml(formatDate(at))}</span>
+        <div class="m-list-card__sub">
+          <span class="m-list-card__info">${escapeHtml(subInfo)}</span>
+          <span class="m-list-card__date">${escapeHtml(formatDate(at))}</span>
         </div>
       </div>
     </div>`;
   }).join('');
 
-  container.querySelectorAll('.chat-m-room-card').forEach(card => {
+  container.querySelectorAll('.m-list-card').forEach(card => {
     card.addEventListener('click', () => {
       const roomId = card.dataset.roomId;
       const room = visibleRoomsCache.find(r => r.room_id === roomId);
@@ -557,9 +555,21 @@ async function bootstrap() {
   }
 }
 
+function _registerMobileBack() {
+  if (!window.setMobileBackHandler) return;
+  window.setMobileBackHandler(() => {
+    if (document.body.classList.contains('chat-m-open')) {
+      closeMobileChatView();
+      return true;
+    }
+    return false;
+  });
+}
+
 let _mounted = false;
 export async function mount() {
   document.body.classList.add('page-chat');
+  _registerMobileBack();
   bindDOM();
   _mounted = false;
   await bootstrap();
@@ -568,6 +578,11 @@ export async function mount() {
 export function onHide() {
   document.body.classList.remove('page-chat');
   document.body.classList.remove('chat-m-open');
+  if (window.clearMobileBackHandler) window.clearMobileBackHandler();
+}
+export function onShow() {
+  document.body.classList.add('page-chat');
+  _registerMobileBack();
 }
 export function unmount() {
   runPageCleanup();

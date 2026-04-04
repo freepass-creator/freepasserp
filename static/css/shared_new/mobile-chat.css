@@ -1,79 +1,35 @@
 /* ===== MOBILE CHAT PAGE — 768px 이하 전용 =====
-   chat_new.html 에서만 로드
+   chat.html 에서만 로드
    =============================================== */
 
 /* 채팅 방 목록 — 데스크탑 숨김 */
 .chat-m-rooms { display: none; }
 
-/* 방 카드 (미디어 밖 — 항상 스타일 유지) */
-.chat-m-room-card {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid #f1f5f9;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  background: #fff;
-  min-width: 0;
-}
-.chat-m-room-card:active { background: #f8fafc; }
-.chat-m-room-card.is-active { background: #f0f4ff; }
-
-.chat-m-room-card__avatar {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: #e8edf5;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; color: #64748b;
-}
-.chat-m-room-card__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.chat-m-room-card__main {
-  display: flex; align-items: center; gap: 6px; min-width: 0;
-}
-.chat-m-room-card__sub {
-  display: flex; align-items: center; gap: 6px; min-width: 0;
-}
-.chat-m-room-card__name {
-  flex: 1; min-width: 0;
-  font-size: 14px; font-weight: 600; color: #0f172a;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.chat-m-room-card__msg {
-  flex: 1; min-width: 0;
-  font-size: 12px; color: #64748b;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.chat-m-room-card__date {
-  flex-shrink: 0; font-size: 11px; color: #94a3b8;
-}
-.chat-m-room-card__badge {
-  flex-shrink: 0;
-  height: 20px; padding: 0 7px; border-radius: 999px;
-  font-size: 11px; font-weight: 600;
-  display: inline-flex; align-items: center;
-  background: #3b82f6; color: #fff;
-}
-.chat-m-room-card__badge--unread { background: #ef4444; }
-.chat-m-room-card__badge--done { background: #10b981; }
-.chat-m-room-card__badge--pending { background: #f59e0b; }
-.chat-m-empty {
-  padding: 60px 20px; text-align: center;
-  font-size: 14px; color: #94a3b8;
-}
-
 @media (max-width: 768px) {
   /* 채팅 페이지 기본: 방 목록만 표시, 데스크탑 패널 숨김 */
   body.page-chat .layout-633 { display: none !important; }
 
+  /* 방 목록: 탑바~탭바 사이 고정 */
   .chat-m-rooms {
     display: flex !important;
     flex-direction: column;
-    min-height: calc(100dvh - 46px - 56px - env(safe-area-inset-bottom));
+    position: fixed;
+    top: 46px;
+    left: 0;
+    right: 0;
+    bottom: calc(56px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background: #fff;
+    z-index: 100;
   }
 
   /* 방 열린 상태: 목록 숨기고 채팅패널만 전체화면 */
   body.chat-m-open .chat-m-rooms { display: none !important; }
 
-  /* layout-633: 탑바 ~ 탭바 사이를 채우는 유일한 fixed 요소 */
+  /* 채팅 오픈 시 탭바 숨김 — 전송버튼이 키보드에 가리지 않도록 */
+  body.chat-m-open .mobile-tab-bar { display: none !important; }
+
   body.chat-m-open.page-chat .layout-633 {
     display: flex !important;
     flex-direction: column !important;
@@ -81,7 +37,7 @@
     top: 46px !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: calc(56px + env(safe-area-inset-bottom)) !important;
+    bottom: 0 !important;
     height: auto !important;
     width: auto !important;
     min-height: 0 !important;
@@ -133,5 +89,6 @@
     position: static !important;
     flex-shrink: 0 !important;
     margin-top: 0 !important;
+    padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
   }
 }

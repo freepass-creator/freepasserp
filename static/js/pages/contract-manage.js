@@ -461,34 +461,35 @@ function renderMobileList(visible) {
     const agentCode = c.agent_code || '';
     const month = c.rent_month ? `${c.rent_month}개월` : '';
     const customer = c.customer_name || '';
-    const subLine = [partner, agentCode, month, customer].filter(Boolean).join(' · ');
+    const subInfo = [partner, agentCode, month, customer].filter(Boolean).join(' · ');
     const status = c.contract_status || '계약대기';
     const at = c.created_at || c.updated_at;
     const d = at ? new Date(at) : null;
     const dateStr = d ? `${String(d.getFullYear()).slice(-2)}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}` : '';
     const isActive = c.contract_code === selectedCode;
-    let badgeCls = 'chat-m-room-card__badge';
-    if (status === '계약완료') badgeCls += ' chat-m-room-card__badge--done';
-    else if (status === '계약철회') badgeCls += ' chat-m-room-card__badge--unread';
-    else badgeCls += ' chat-m-room-card__badge--pending';
-    return `<div class="chat-m-room-card${isActive ? ' is-active' : ''}" data-contract-code="${escapeHtml(c.contract_code || '')}">
-      <div class="chat-m-room-card__avatar">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    let badgeCls = 'm-list-badge';
+    if (status === '계약완료') badgeCls += ' m-list-badge--green';
+    else if (status === '계약철회') badgeCls += ' m-list-badge--red';
+    else if (status === '계약발송') badgeCls += ' m-list-badge--blue';
+    else badgeCls += ' m-list-badge--yellow';
+    return `<div class="m-list-card${isActive ? ' is-active' : ''}" data-contract-code="${escapeHtml(c.contract_code || '')}">
+      <div class="m-list-card__avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m9 15 2 2 4-4"/></svg>
       </div>
-      <div class="chat-m-room-card__body">
-        <div class="chat-m-room-card__main">
-          <span class="chat-m-room-card__name">${escapeHtml(mainLine)}</span>
+      <div class="m-list-card__body">
+        <div class="m-list-card__main">
+          <span class="m-list-card__name">${escapeHtml(mainLine)}</span>
           <span class="${badgeCls}">${escapeHtml(status)}</span>
         </div>
-        <div class="chat-m-room-card__sub">
-          <span class="chat-m-room-card__msg">${escapeHtml(subLine)}</span>
-          <span class="chat-m-room-card__date">${escapeHtml(dateStr)}</span>
+        <div class="m-list-card__sub">
+          <span class="m-list-card__info">${escapeHtml(subInfo)}</span>
+          <span class="m-list-card__date">${escapeHtml(dateStr)}</span>
         </div>
       </div>
     </div>`;
   }).join('');
 
-  el.querySelectorAll('.chat-m-room-card').forEach((card) => {
+  el.querySelectorAll('.m-list-card').forEach((card) => {
     card.addEventListener('click', async () => {
       const code = card.dataset.contractCode;
       const item = allContracts.find((c) => c.contract_code === code);
@@ -856,9 +857,21 @@ async function bootstrap() {
   }
 }
 
+function _registerMobileBack() {
+  if (!window.setMobileBackHandler) return;
+  window.setMobileBackHandler(() => {
+    if (document.body.classList.contains('contract-m-open')) {
+      closeMobileContractFormView();
+      return true;
+    }
+    return false;
+  });
+}
+
 let _mounted = false;
 export async function mount() {
   document.body.classList.add('page-contract');
+  _registerMobileBack();
   // 상품리스트에서 계약으로 넘어온 경우: 즉시 폼 뷰 표시
   if (localStorage.getItem('freepass_pending_contract_seed') && isMobileQuery.matches) {
     document.body.classList.add('contract-m-open');
@@ -871,6 +884,7 @@ export async function mount() {
 export function onHide() {
   document.body.classList.remove('page-contract');
   document.body.classList.remove('contract-m-open');
+  if (window.clearMobileBackHandler) window.clearMobileBackHandler();
 }
 export function unmount() {
   runPageCleanup();
@@ -878,6 +892,8 @@ export function unmount() {
   _mounted = false;
 }
 export function onShow() {
+  document.body.classList.add('page-contract');
+  _registerMobileBack();
   setDirtyCheck(() => mode === 'edit');
 }
 // Auto-mount on first script load (server-rendered page)

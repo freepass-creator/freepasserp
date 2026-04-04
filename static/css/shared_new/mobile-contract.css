@@ -5,45 +5,6 @@
 /* 모바일 카드 목록 — 데스크탑 숨김 */
 #contract-m-list { display: none; }
 
-/* 계약 카드 (미디어 밖 — 항상 스타일 유지) */
-.contract-m-card {
-  padding: 14px 16px;
-  border-bottom: 1px solid #f1f5f9;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.contract-m-card:active { background: #f8fafc; }
-.contract-m-card.is-selected { background: #f0f4ff; }
-
-.contract-m-card__top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.contract-m-card__name {
-  flex: 1; min-width: 0;
-  font-size: 14px; font-weight: 600; color: #0f172a;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.contract-m-card__badge {
-  flex-shrink: 0;
-  height: 20px; padding: 0 7px; border-radius: 999px;
-  font-size: 11px; font-weight: 600;
-  display: inline-flex; align-items: center;
-}
-.contract-m-card__sub {
-  font-size: 12px; color: #64748b;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.contract-m-empty {
-  padding: 60px 20px; text-align: center;
-  font-size: 14px; color: #94a3b8;
-}
 
 @media (max-width: 768px) {
   /* 계약 페이지 — 탑바~탭바 사이 고정 컨테이너 */
@@ -91,7 +52,7 @@
     flex-direction: column;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    min-height: calc(100dvh - 46px - 56px - env(safe-area-inset-bottom));
+    height: calc(100dvh - 46px - 56px - env(safe-area-inset-bottom));
     background: #fff;
   }
 
