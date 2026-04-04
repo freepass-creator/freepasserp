@@ -807,8 +807,8 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   }
 
   /* 뒤로가기: 대화/계약 페이지에서 항상 표시 (상품목록은 패널 내부 자체 뒤로가기 사용) */
-  body[data-page="대화"] #mobile-back-btn,
-  body[data-page="계약"] #mobile-back-btn { display: flex !important; }
+  body.page-chat #mobile-back-btn,
+  body.page-contract #mobile-back-btn { display: flex !important; }
 
   /* 설정 페이지: 2열 그리드 → 단일 컬럼 세로 스택 */
   .settings-page-shell {

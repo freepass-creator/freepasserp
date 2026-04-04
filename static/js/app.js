@@ -150,6 +150,10 @@ async function loadPage(url, options = {}) {
         savePageState(currentPageKey, { scrollTop: cur.container.scrollTop || 0, _autoSaved: true });
         cur.container.style.display = 'none';
       }
+      // 이전 페이지의 page-* body 클래스 제거 (모바일 레이아웃 잔류 방지)
+      if (cur?.module && typeof cur.module.onHide === 'function') {
+        try { cur.module.onHide(); } catch (_) {}
+      }
       clearDirtyCheck();
     }
 

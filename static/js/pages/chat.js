@@ -559,14 +559,19 @@ async function bootstrap() {
 
 let _mounted = false;
 export async function mount() {
+  document.body.classList.add('page-chat');
   bindDOM();
   _mounted = false;
   await bootstrap();
   _mounted = true;
 }
+export function onHide() {
+  document.body.classList.remove('page-chat');
+  document.body.classList.remove('chat-m-open');
+}
 export function unmount() {
   runPageCleanup();
-  document.body.classList.remove('chat-m-open');
+  onHide();
   _mounted = false;
 }
 // Auto-mount on first script load (server-rendered page)
