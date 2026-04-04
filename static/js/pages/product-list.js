@@ -19,6 +19,7 @@ import {
   renderCatalogInsuranceTable,
   renderCatalogConditions,
   renderCatalogClawback,
+  renderCatalogExtra,
 } from "../shared/catalog-card.js";
 
 const DEFAULT_PERIODS = ["1", "12", "24", "36", "48", "60"];
@@ -1230,12 +1231,26 @@ function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
     ['연간약정주행거리', first(tf.annual_mileage,   pol.annualMileage)],
   ];
 
+  // 추가정보 행
+  const fmt = (v) => v ? String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+  const fmtDate = (v) => { if (!v) return ''; const s = String(v).replace(/\D/g, ''); if (s.length === 8) return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`; return v; };
+  const extraRows = [
+    ['차량번호',   product.car_number],
+    ['차종구분',   product.vehicle_class],
+    ['최초등록일', fmtDate(product.first_registration_date)],
+    ['차령만료일', fmtDate(product.vehicle_age_expiry_date)],
+    ['차량가격',   fmt(product.vehicle_price)],
+    ['특이사항',   product.partner_memo || product.note],
+    ['공급코드',   product.providerCompanyCode || product.provider_company_code || product.partner_code],
+  ];
+
   // 카탈로그와 동일한 섹션 순서, 수수료 컬럼 + 환수조건(표 아래)만 추가
   return galleryHtml
     + renderCatalogDetailHero(product, actionsHtml)
     + renderCatalogPriceTable(priceRows, { showFee: true, guideNote, clawbackNote: tf.commission_clawback_condition || '' })
     + renderCatalogInsuranceTable(insRows)
-    + renderCatalogConditions(condRows);
+    + renderCatalogConditions(condRows)
+    + renderCatalogExtra(extraRows);
 }
 
 function bindMobileDetailGallery(container) {
