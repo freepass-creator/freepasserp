@@ -312,7 +312,7 @@ function initShellNavigation() {
   }, true);
 
   document.addEventListener('click', async (event) => {
-    const link = event.target.closest('.sidebar-link');
+    const link = event.target.closest('.sidebar-link, .mobile-tab');
     if (!link) return;
     const nextPathname = getSidebarPath(link);
     if (!nextPathname) return;

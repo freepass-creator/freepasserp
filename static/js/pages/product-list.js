@@ -1,14 +1,25 @@
 function moneyText(value){ const n = Number(value || 0); return n ? n.toLocaleString('ko-KR') : '-'; }
 function safeText(value){ return String(value ?? '').trim() || '-'; }
 
+import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
 import { renderColorBadge } from "../core/product-colors.js";
 import { requireAuth } from "../core/auth-guard.js";
 import { qs, registerPageCleanup, runPageCleanup } from "../core/utils.js";
 import { renderRoleMenu } from "../core/role-menu.js";
 import { pushEsc, removeEsc } from "../core/esc-stack.js";
 import { ensureRoom, watchProducts, resolveTermForProduct } from "../firebase/firebase-db.js";
+import { showConfirm, showToast } from "../core/toast.js";
 import { bindProductDetailPhotoEvents, extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
 import { renderBadgeRow } from "../shared/badge.js";
+import {
+  esc,
+  renderCatalogCard,
+  renderCatalogDetailHero,
+  renderCatalogPriceTable,
+  renderCatalogInsuranceTable,
+  renderCatalogConditions,
+  renderCatalogClawback,
+} from "../shared/catalog-card.js";
 
 const DEFAULT_PERIODS = ["1", "12", "24", "36", "48", "60"];
 const RANGE_BUCKETS = {
@@ -174,6 +185,9 @@ let $stateSep = qs('#topBarStateSep');
 let $stateIdentity = qs('#topBarIdentity');
 let $shell = qs('#productListShell');
 let $detailPanel = qs('#plsDetailPanel');
+// 모바일 카탈로그 뷰 DOM refs
+let $plsMGrid, $plsMSidebar, $plsMOverlay, $plsMClose, $plsMCount, $plsMSearch, $plsMReset, $plsMFilters;
+let $plsMDetail, $plsMDetailBack, $plsMDetailTitle, $plsMDetailContent, $plsMDetailHeadActions;
 
 function bindDOM() {
   menu = qs('#sidebar-menu');
@@ -184,6 +198,20 @@ function bindDOM() {
   $stateIdentity = qs('#topBarIdentity');
   $shell = qs('#productListShell');
   $detailPanel = qs('#plsDetailPanel');
+  // 모바일
+  $plsMGrid    = qs('#plsMCatalogGrid');
+  $plsMSidebar = qs('#plsMCatalogSidebar');
+  $plsMOverlay = qs('#plsMCatalogOverlay');
+  $plsMClose   = qs('#plsMCatalogClose');
+  $plsMCount   = qs('#plsMCatalogCount');
+  $plsMSearch  = qs('#plsMCatalogSearch');
+  $plsMReset   = qs('#plsMCatalogReset');
+  $plsMFilters = qs('#plsMCatalogFilterSections');
+  $plsMDetail        = qs('#plsMDetail');
+  $plsMDetailBack    = qs('#plsMDetailBack');
+  $plsMDetailTitle   = qs('#plsMDetailTitle');
+  $plsMDetailContent = qs('#plsMDetailContent');
+  $plsMDetailHeadActions = qs('#plsMDetailHeadActions');
 }
 
 /* ── 엑셀 그리드 컬럼 정의 ── */
@@ -706,7 +734,6 @@ function renderList(){
 
     return `<tr class="pls-row${active}" data-id="${item.id}">${infoCells}${priceCells}</tr>`;
   }).join('');
-
 }
 
 // 행 클릭 — 이벤트 위임 (renderList 호출마다 리스너 누적 방지)
@@ -836,7 +863,14 @@ async function ensureTermLoaded(product){
   } finally {
     delete state.termLoading[cacheKey];
     scheduleRenderList();
-    if (state.selectedId === product.id) renderDetail();
+    if (state.selectedId === product.id) {
+      renderDetail();
+      // 모바일 상세 패널도 재렌더링 (정책 데이터 반영)
+      if ($plsMDetailContent && $plsMDetail && !$plsMDetail.hidden) {
+        $plsMDetailContent.innerHTML = renderMobileCatalogDetail(product);
+        bindMobileDetailGallery($plsMDetailContent);
+      }
+    }
   }
 }
 function currentProduct(){
@@ -869,40 +903,37 @@ async function handleShare(){
   window.prompt('아래 링크를 복사하세요.', shareUrl);
 }
 
-async function handleInquiry(){
+async function handleInquiry(btnEl) {
   const product = currentProduct();
-  if (!product) {
-    window.alert('문의할 상품을 먼저 선택하세요.');
-    return;
-  }
-  if (state.role !== 'agent' || !state.user || !state.profile) {
-    window.alert('영업자 계정에서만 문의할 수 있습니다.');
-    return;
-  }
+  if (!product) { showToast('문의할 상품을 먼저 선택하세요.', 'info'); return; }
+  if (state.role !== 'agent' || !state.user || !state.profile) { showToast('영업자 계정에서만 문의할 수 있습니다.', 'error'); return; }
+  if (!await showConfirm('이 상품에 대해 대화를 시작하시겠습니까?')) return;
+  if (btnEl) btnEl.disabled = true;
   try {
-    if (!await showConfirm('이 상품에 대해 대화를 시작하시겠습니까?')) return;
     const roomId = await ensureRoom({
       productUid: product.productUid || '',
       productCode: product.productCode || product.id,
-      providerUid: product.providerUid,
-      providerCompanyCode: product.providerCompanyCode || product.partnerCode,
+      providerUid: product.providerUid || '',
+      providerCompanyCode: product.providerCompanyCode || product.partnerCode || '',
       providerName: product.providerName || '',
       agentUid: state.user.uid,
       agentCode: state.profile.user_code || '',
       agentName: state.profile.name || state.profile.user_name || '',
-      vehicleNumber: product.carNo || '',
-      modelName: [product.maker, product.model, product.subModel, product.trim].filter(Boolean).join(' ')
+      vehicleNumber: product.carNo && product.carNo !== '-' ? product.carNo : '',
+      modelName: [product.maker, product.model, product.subModel, product.trim].filter(v => v && v !== '-').join(' ')
     });
-    window.location.href = `/chat?room_id=${encodeURIComponent(roomId)}&product_code=${encodeURIComponent(product.id)}`;
-  } catch (error) {
-    window.alert(`문의 연결 실패: ${error.message}`);
+    localStorage.setItem('freepass_pending_chat_room', roomId);
+    window.location.href = '/chat';
+  } catch (e) {
+    if (btnEl) btnEl.disabled = false;
+    showToast('채팅 연결에 실패했습니다.', 'error');
   }
 }
 
 async function handleContract(){
   const product=currentProduct();
   if(!product) {
-    window.alert('계약할 상품을 먼저 선택하세요.');
+    showToast('계약할 상품을 먼저 선택하세요.', 'info');
     return;
   }
   if(!await showConfirm('이 상품에 대해 계약을 생성하시겠습니까?')) {
@@ -970,7 +1001,7 @@ function syncTopBarIdentity(product) {
   if (!$stateSep || !$stateIdentity) return;
   const badge = document.getElementById('topBarWorkBadge');
   if (product) {
-    const label = [product.carNo, product.maker, product.model].filter(v => v && v !== '-').join(' ');
+    const label = product.carNo || '';
     $stateIdentity.textContent = label;
     $stateIdentity.hidden = false;
     $stateSep.hidden = false;
@@ -982,17 +1013,32 @@ function syncTopBarIdentity(product) {
   }
 }
 
+function syncDetailBadges(product) {
+  const el = document.getElementById('productDetailBadges');
+  if (!el) return;
+  if (!product) { el.innerHTML = ''; return; }
+  const badges = [
+    product.vehicleStatus && product.vehicleStatus !== '-' && product.vehicleStatus !== '재고'
+      ? { field: 'vehicle_status', value: product.vehicleStatus } : null,
+    product.productType && product.productType !== '-'
+      ? { field: 'product_type', value: product.productType } : null,
+  ].filter(Boolean);
+  el.innerHTML = badges.map(b => renderBadgeRow([b])).join('');
+}
+
 function renderDetail(){
   const product=state.filteredProducts.find(i=>i.id===state.selectedId);
   if(!product){
     $title.textContent='상세정보';
     $detail.innerHTML='<div class="detail-empty">좌측 목록에서 차량을 선택하세요.</div>';
     syncTopBarIdentity(null);
+    syncDetailBadges(null);
     hideDetailPanel();
     return;
   }
   const _carNo = safe(product.carNo);
   $title.textContent = _carNo && _carNo !== '-' ? `상세정보(${_carNo})` : '상세정보';
+  syncDetailBadges(product);
   syncTopBarIdentity(product);
   $detail.innerHTML=renderProductDetailMarkup(product,{ activePhotoIndex: state.activePhotoIndex, termFields: getTermFields(product) });
   bindProductDetailPhotoEvents($detail,(index)=>{ state.activePhotoIndex=index; renderDetail(); });
@@ -1034,6 +1080,7 @@ function applyFilters(){
   syncPeriodChips();
   renderList();
   renderDetail();
+  renderMobileCatalogGrid();
   persistFilterState();
 }
 $openFilterBtn?.addEventListener('click',()=>{ 
@@ -1048,7 +1095,7 @@ $filterSearch?.addEventListener('input', () => { state.searchQuery = $filterSear
 $resetFilterBtn?.addEventListener('click',()=>{ FILTER_SCHEMA.forEach(g=>{state.filters[g.key]=g.key==='periods'?DEFAULT_PERIODS.slice():[]; state.openGroups[g.key]=!!g.open;}); state.searchQuery=''; if($filterSearch) $filterSearch.value=''; applyFilters(); });
 $toggleAllGroupsBtn?.addEventListener('click',()=>{ const anyOpen=FILTER_SCHEMA.some(g=>state.openGroups[g.key]); FILTER_SCHEMA.forEach(g=>{state.openGroups[g.key]=!anyOpen;}); persistFilterState(); renderFilterAccordion(); const icon=$toggleAllGroupsBtn.querySelector('svg'); if(icon) icon.style.transform=anyOpen?'':'rotate(180deg)'; });
 qs('#shareProductBtn')?.addEventListener('click', handleShare);
-qs('#inquiryProductBtn')?.addEventListener('click', handleInquiry);
+qs('#inquiryProductBtn')?.addEventListener('click', (e) => handleInquiry(e.currentTarget));
 qs('#contractProductBtn')?.addEventListener('click', handleContract);
 
 function syncPeriodChips() {
@@ -1084,15 +1131,290 @@ function bindPeriodSelector() {
 function applyRoleActions() {
   const inquiryBtn = qs('#inquiryProductBtn');
   const contractBtn = qs('#contractProductBtn');
-  const shareBtn = qs('#shareProductBtn');
-  if (state.role === 'agent') {
+  const role = state.role;
+  // 문의: 영업자만
+  if (role === 'agent') {
     inquiryBtn?.classList.remove('detail-actions-hidden');
-    contractBtn?.classList.remove('detail-actions-hidden');
-    shareBtn?.classList.remove('detail-actions-hidden');
   } else {
     inquiryBtn?.classList.add('detail-actions-hidden');
+  }
+  // 계약: 영업자만
+  if (role === 'agent') {
+    contractBtn?.classList.remove('detail-actions-hidden');
+  } else {
     contractBtn?.classList.add('detail-actions-hidden');
   }
+  // 공유: 전체 (항상 표시, 기본 숨김 없음)
+}
+
+// ─── 모바일 카탈로그 뷰 ───────────────────────────────────────────────────────
+
+// 카탈로그와 동일한 순서
+const MOBILE_FILTER_KEYS = ['rent','deposit','periods','productType','maker','model','subModel','fuel','extColor','year','mileage','vehicleClass','basicDriverAge','reviewStatus'];
+
+function openMobileSidebar() {
+  renderMobileSidebarFilters();
+  $plsMSidebar?.classList.add('is-open');
+  $plsMOverlay?.classList.add('is-open');
+}
+function closeMobileSidebar() {
+  $plsMSidebar?.classList.remove('is-open');
+  $plsMOverlay?.classList.remove('is-open');
+}
+
+// ── 모바일 상세: 카탈로그 스타일 렌더링 ────────────────────────────────────
+
+function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
+  // 갤러리 (plsMGallery IDs는 bindMobileDetailGallery 에서 사용하므로 로컬 유지)
+  const photos = product.photos || [];
+  const total = photos.length;
+  const galleryHtml = total
+    ? `<div class="catalog-gallery__track pls-m-gallery" id="plsMGallery" data-photos='${JSON.stringify(photos).replace(/'/g,"&#39;")}' data-idx="0">
+        <img class="catalog-gallery__img" src="${esc(photos[0])}" alt="차량사진" id="plsMGalleryImg">
+        ${total > 1 ? `
+          <button class="catalog-gallery__nav catalog-gallery__nav--prev" id="plsMGalleryPrev" aria-label="이전"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg></button>
+          <button class="catalog-gallery__nav catalog-gallery__nav--next" id="plsMGalleryNext" aria-label="다음"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg></button>
+          <div class="catalog-gallery__counter" id="plsMGalleryCtr">1 / ${total}</div>` : ''}
+        ${total > 0 ? `<div class="catalog-gallery__hint">사진을 눌러 ${total}장 모두 보기</div>` : ''}
+      </div>`
+    : `<div class="catalog-gallery__empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+
+  // 가격표 행 (수수료 포함 — ERP 전용)
+  const periods = ['1', '6', '12', '24', '36', '48', '60'];
+  const tf = getTermFields(product);
+  const priceRows = periods
+    .filter(m => Number(product.price?.[m]?.rent || 0) > 0)
+    .map(m => ({ m, rent: product.price[m].rent, dep: product.price[m].deposit, fee: product.price[m].fee }));
+  const guideNote = tf.rental_guide_note || '';
+
+  // 보험 행
+  function first(...vs) { for (const v of vs) { if (v && String(v).trim() && v !== '-') return v; } return ''; }
+  function parsePol(raw) {
+    const s = String(raw ?? '').trim();
+    if (!s || s === '-') return { limit: '-', deductible: '-' };
+    const parts = s.split('/').map(x => x.trim()).filter(Boolean);
+    return parts.length >= 2 ? { limit: parts[0], deductible: parts.slice(1).join(' / ') } : { limit: s, deductible: '-' };
+  }
+  const pol = product.policy || {};
+  const bodily   = parsePol(first(tf.injury_limit_deductible,          pol.bodily));
+  const property = parsePol(first(tf.property_limit_deductible,        pol.property));
+  const selfB    = parsePol(first(tf.personal_injury_limit_deductible, pol.selfBodily));
+  const unins    = parsePol(first(tf.uninsured_limit_deductible,       pol.uninsured));
+  const own      = parsePol(first(tf.own_damage_limit_deductible,      pol.ownDamage));
+  const insRows = [
+    ['대인',         first(tf.injury_compensation_limit,          bodily.limit),    first(tf.injury_deductible,           bodily.deductible)],
+    ['대물',         first(tf.property_compensation_limit,        property.limit),  first(tf.property_deductible,         property.deductible)],
+    ['자기신체사고', first(tf.personal_injury_compensation_limit, selfB.limit),     first(tf.personal_injury_deductible,  selfB.deductible)],
+    ['무보험차상해', first(tf.uninsured_compensation_limit,       unins.limit),     first(tf.uninsured_deductible,        unins.deductible)],
+    ['자기차량손해', first(tf.own_damage_compensation,            own.limit),       first(tf.own_damage_min_deductible,   own.deductible)],
+    ['긴급출동',     first(tf.roadside_assistance, product.condition?.emergency),   '-'],
+  ];
+
+  // 대여조건 행
+  const condRows = [
+    ['1만Km추가비용',   first(tf.mileage_upcharge_per_10000km)],
+    ['보증금분납',       first(tf.deposit_installment)],
+    ['결제방식',         first(tf.payment_method,   pol.paymentMethod)],
+    ['위약금',           first(tf.penalty_condition, product.condition?.penaltyRate)],
+    ['보증금카드결제',   first(tf.deposit_card_payment)],
+    ['대여지역',         first(tf.rental_region,    product.condition?.rentalRegion)],
+    ['탁송비',           first(tf.delivery_fee,     product.condition?.deliveryFee)],
+    ['운전연령하향',     first(tf.driver_age_lowering, pol.ageLowering)],
+    ['운전연령하향비용', first(tf.age_lowering_cost,   pol.ageLoweringCost)],
+    ['개인운전자범위',   first(tf.personal_driver_scope)],
+    ['사업자운전자범위', first(tf.business_driver_scope)],
+    ['추가운전자수',     first(tf.additional_driver_allowance_count)],
+    ['추가운전자비용',   first(tf.additional_driver_cost)],
+    ['정비서비스',       first(tf.maintenance_service, product.condition?.maintenance)],
+    ['최소운전연령',     first(tf.basic_driver_age, product.ageText)],
+    ['연간약정주행거리', first(tf.annual_mileage,   pol.annualMileage)],
+  ];
+
+  return galleryHtml
+    + renderCatalogDetailHero(product, actionsHtml)
+    + renderCatalogConditions(condRows)
+    + renderCatalogInsuranceTable(insRows)
+    + renderCatalogPriceTable(priceRows, { showFee: true, guideNote })
+    + renderCatalogClawback(tf.commission_clawback_condition || '');
+}
+
+function bindMobileDetailGallery(container) {
+  const wrap = container.querySelector('#plsMGallery');
+  if (!wrap) return;
+  let photos, idx;
+  try { photos = JSON.parse(wrap.dataset.photos || '[]'); } catch { return; }
+  if (!photos.length) return;
+  idx = 0;
+  const img = container.querySelector('#plsMGalleryImg');
+  const ctr = container.querySelector('#plsMGalleryCtr');
+  const update = () => {
+    if (img) img.src = photos[idx];
+    if (ctr) ctr.textContent = `${idx + 1} / ${photos.length}`;
+    wrap.dataset.idx = idx;
+  };
+  if (photos.length > 1) {
+    container.querySelector('#plsMGalleryPrev')?.addEventListener('click', (e) => { e.stopPropagation(); idx = (idx - 1 + photos.length) % photos.length; update(); });
+    container.querySelector('#plsMGalleryNext')?.addEventListener('click', (e) => { e.stopPropagation(); idx = (idx + 1) % photos.length; update(); });
+  }
+  // 사진 클릭 → 풀스크린 뷰어 (카탈로그와 동일)
+  wrap.addEventListener('click', (e) => {
+    if (e.target.closest('.catalog-gallery__nav')) return;
+    openFullscreenViewer(photos, idx);
+  });
+  // 스와이프
+  let _tx = 0;
+  wrap.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; }, { passive: true });
+  wrap.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - _tx;
+    if (Math.abs(dx) < 40) return;
+    idx = dx < 0 ? (idx + 1) % photos.length : (idx - 1 + photos.length) % photos.length;
+    update();
+  });
+}
+
+function openMobileDetail(id) {
+  if (!$plsMDetail || !$plsMDetailContent) return;
+  state.selectedId = id;
+
+  const product = state.filteredProducts.find(p => p.id === id);
+  if (!product) return;
+
+  ensureTermLoaded(product);
+
+  if ($plsMDetailTitle) {
+    const p = state.profile || {};
+    const userLabel = [p.company_name || p.company, p.name || p.user_name, p.position || p.rank].filter(Boolean).join(' ');
+    $plsMDetailTitle.textContent = userLabel || '상세정보';
+  }
+  // 카탈로그 스타일 상세 렌더링 — 액션 버튼 컨텐츠 내부로
+  // 문의: 영업자만 / 계약: 영업자+공급사+관리자 / 공유: 전체
+  const role = state.role;
+  const inquiryBtn = role === 'agent'
+    ? `<button class="cat-share-btn" id="plsMDetailInquiry" title="대화" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>`
+    : '';
+  const contractBtn = role === 'agent'
+    ? `<button class="cat-share-btn" id="plsMDetailContract" title="계약" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></button>`
+    : '';
+  const actionsHtml = `${inquiryBtn}${contractBtn}<button class="cat-share-btn" id="plsMDetailShare" title="공유" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>`;
+  $plsMDetailContent.innerHTML = renderMobileCatalogDetail(product, { actionsHtml });
+  bindMobileDetailGallery($plsMDetailContent);
+  $plsMDetailContent.querySelector('#plsMDetailInquiry')?.addEventListener('click', (e) => handleInquiry(e.currentTarget));
+  $plsMDetailContent.querySelector('#plsMDetailShare')?.addEventListener('click', handleShare);
+  $plsMDetailContent.querySelector('#plsMDetailContract')?.addEventListener('click', handleContract);
+
+  // 헤더: 뒤로가기만, 액션 버튼 없음
+  if ($plsMDetailBack) $plsMDetailBack.onclick = closeMobileDetail;
+  if ($plsMDetailHeadActions) $plsMDetailHeadActions.innerHTML = '';
+  $plsMDetail.hidden = false;
+}
+
+
+function closeMobileDetail() {
+  if ($plsMDetail) $plsMDetail.hidden = true;
+  if ($plsMDetailBack) $plsMDetailBack.onclick = null;
+  state.selectedId = null;
+}
+
+function renderMobileSidebarFilters() {
+  if (!$plsMFilters) return;
+  const bs = buildBaseSets();
+  const groups = MOBILE_FILTER_KEYS.map(k => FILTER_SCHEMA.find(g => g.key === k)).filter(Boolean);
+  $plsMFilters.innerHTML = groups.map(group => {
+    const baseSet = group.key === 'periods' ? state.allProducts : (bs.get(group.key) || []);
+    const options = getGroupOptions(group, baseSet);
+    const selected = state.filters[group.key];
+    const activeCount = selected.length;
+    const isOpen = state.openGroups[group.key];
+    const badge = activeCount ? `<span class="filter-active-badge">${activeCount}</span>` : '';
+    const body = options.map(option => {
+      const count = group.key === 'periods' ? state.allProducts.length : baseSet.filter(item => matchSingle(group, option.value, item)).length;
+      if (group.key !== 'periods' && count === 0 && !selected.includes(option.value)) return '';
+      const checked = selected.includes(option.value) ? 'checked' : '';
+      return `<label class="filter-check">
+        <input type="checkbox" data-mobile-group="${esc(group.key)}" data-value="${esc(option.value)}" ${checked}>
+        <span class="filter-check__label">${esc(option.label)}</span>
+        <span class="filter-check__count">${count}</span>
+      </label>`;
+    }).join('');
+    return `<div class="catalog-sidebar__section${isOpen ? '' : ' is-collapsed'}" data-filter-key="${esc(group.key)}">
+      <div class="catalog-sidebar__title">${esc(group.title)}${badge}</div>
+      <div class="catalog-filter-body">${body}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMobileCatalogGrid() {
+  if (!$plsMGrid) return;
+  const products = state.filteredProducts;
+  if ($plsMCount) $plsMCount.textContent = products.length;
+
+  if (!products.length) {
+    $plsMGrid.innerHTML = '<div class="catalog-empty">조건에 맞는 상품이 없습니다.</div>';
+    return;
+  }
+
+  const periods = state.filters.periods.length ? state.filters.periods : DEFAULT_PERIODS;
+  $plsMGrid.innerHTML = products.map(p =>
+    renderCatalogCard(p, { periods, dataAttr: `data-id="${esc(p.id)}"` })
+  ).join('');
+}
+
+function bindMobile() {
+  // 모바일 필터 버튼 표시 및 클릭
+  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+  if (mobileFilterBtn) {
+    mobileFilterBtn.hidden = false;
+    mobileFilterBtn.addEventListener('click', openMobileSidebar);
+    registerPageCleanup(() => { mobileFilterBtn.hidden = true; });
+  }
+  // 사이드바 닫기
+  $plsMClose?.addEventListener('click', closeMobileSidebar);
+  $plsMOverlay?.addEventListener('click', closeMobileSidebar);
+  // 검색 (공유 searchQuery)
+  $plsMSearch?.addEventListener('input', () => {
+    state.searchQuery = $plsMSearch.value.trim();
+    if ($filterSearch) $filterSearch.value = state.searchQuery;
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(applyFilters, 150);
+  });
+  // 필터 초기화
+  $plsMReset?.addEventListener('click', () => {
+    FILTER_SCHEMA.forEach(g => { state.filters[g.key] = g.key === 'periods' ? DEFAULT_PERIODS.slice() : []; state.openGroups[g.key] = !!g.open; });
+    state.searchQuery = '';
+    if ($plsMSearch) $plsMSearch.value = '';
+    if ($filterSearch) $filterSearch.value = '';
+    applyFilters();
+  });
+  // 필터 체크박스
+  $plsMFilters?.addEventListener('change', (e) => {
+    const input = e.target.closest('input[type="checkbox"][data-mobile-group]');
+    if (!input) return;
+    const key = input.dataset.mobileGroup;
+    const cur = new Set(state.filters[key]);
+    if (input.checked) cur.add(input.dataset.value);
+    else cur.delete(input.dataset.value);
+    if (key === 'periods' && cur.size === 0) cur.add(DEFAULT_PERIODS[0]);
+    state.filters[key] = [...cur];
+    applyFilters();
+    renderMobileSidebarFilters();
+  });
+  // 필터 아코디언 토글
+  $plsMFilters?.addEventListener('click', (e) => {
+    const title = e.target.closest('.catalog-sidebar__title');
+    if (!title) return;
+    const section = title.closest('.catalog-sidebar__section');
+    if (!section) return;
+    const key = section.dataset.filterKey;
+    if (key) { state.openGroups[key] = !state.openGroups[key]; section.classList.toggle('is-collapsed', !state.openGroups[key]); }
+  });
+  // 카드 클릭 → 모바일 상세 패널
+  $plsMGrid?.addEventListener('click', (e) => {
+    const card = e.target.closest('.catalog-card[data-id]');
+    if (!card) return;
+    openMobileDetail(card.dataset.id);
+  });
+  // 상세 패널 뒤로가기
+  // 뒤로가기는 openMobileDetail 내에서 .onclick으로 동적 설정 (채팅/상세 상태에 따라 분기)
 }
 
 async function init(){ 
@@ -1105,6 +1427,7 @@ async function init(){
   if (savedPeriods?.length) state.filters.periods = savedPeriods.slice();
   renderRoleMenu(menu, profile.role);
   applyRoleActions();
+  bindMobile();
   syncFilterOverlayWidth();
   setFilterOverlay(state.filterOverlayOpen);
   bindFilterAccordion();
@@ -1140,6 +1463,7 @@ async function init(){
 }
 let _mounted = false;
 export async function mount() {
+  document.body.classList.add('page-product-list');
   bindDOM();
   $list?.addEventListener('click', _handleRowClick);
   _mounted = false;
@@ -1151,6 +1475,9 @@ export async function mount() {
 }
 export function unmount() {
   runPageCleanup();
+  document.body.classList.remove('page-product-list');
+  const filterBtn = document.getElementById('mobile-filter-btn');
+  if (filterBtn) filterBtn.hidden = true;
   _mounted = false;
 }
 export function onShow() {

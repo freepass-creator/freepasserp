@@ -1,12 +1,13 @@
 {% extends 'new/layout/workspace_new.html' %}
 {% block workspace_page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages_new/product_list_new.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}?v={{ app_version }}" data-page-style="true">
 {% endblock %}
 {% block page_title_text %}전체 상품 검색{% endblock %}
 {% block workspace_body %}
 <div class="work-page min-h-work product-list-page-shell" id="productListShell">
 
-<!-- ━━━ 엑셀 데이터 그리드 (전체 화면) ━━━ -->
+<!-- ━━━ 데스크탑: 엑셀 데이터 그리드 ━━━ -->
 <section class="panel pls-grid-panel">
 <div class="pls-grid-scroll" id="plsGridScroll">
   <table class="pls-table" id="plsTable">
@@ -16,16 +17,17 @@
 </div>
 </section>
 
-<!-- ━━━ 상세 슬라이드 패널 (행 선택 시 등장) ━━━ -->
+<!-- ━━━ 데스크탑: 상세 슬라이드 패널 ━━━ -->
 <aside class="pls-detail-panel" id="plsDetailPanel" hidden>
 <div class="panel-head panel-head-default">
   <div class="panel-head-title-wrap">
     <div class="panel-head-title" id="detailPanelTitle">상세정보</div>
   </div>
   <div class="panel-head-actions" id="productDetailActions">
+    <div id="productDetailBadges" class="panel-head-badges"></div>
     <button class="inline-button btn-icon-only btn-tone-inquiry" id="inquiryProductBtn" title="대화" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>
-    <button class="inline-button btn-icon-only btn-tone-share" id="shareProductBtn" title="공유" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
     <button class="inline-button btn-icon-only btn-tone-contract" id="contractProductBtn" title="계약" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></button>
+    <button class="inline-button btn-icon-only btn-tone-share" id="shareProductBtn" title="공유" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>
     <button class="inline-button btn-icon-only" id="closeDetailBtn" title="닫기" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
 </div>
@@ -36,6 +38,61 @@
 </div>
 </aside>
 
+<!-- ━━━ 모바일: 카탈로그 뷰 ━━━ -->
+<div class="pls-m-catalog-wrap">
+  <!-- 필터 사이드바 오버레이 -->
+  <div class="catalog-sidebar-overlay" id="plsMCatalogOverlay"></div>
+  <!-- 필터 사이드바 -->
+  <aside class="catalog-sidebar" id="plsMCatalogSidebar">
+    <div class="catalog-sidebar__head">
+      <span class="catalog-sidebar__head-title">필터</span>
+      <button class="catalog-sidebar__close" id="plsMCatalogClose" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="catalog-sidebar__summary">
+      <div class="catalog-sidebar__count">
+        <span class="catalog-sidebar__count-label">상품차량</span>
+        <span class="catalog-sidebar__count-value" id="plsMCatalogCount">0</span><span class="catalog-sidebar__count-unit">대</span>
+      </div>
+      <button class="catalog-sidebar__reset" id="plsMCatalogReset" type="button">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        선택 초기화
+      </button>
+    </div>
+    <div class="catalog-sidebar__search">
+      <svg class="catalog-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input class="catalog-search" id="plsMCatalogSearch" type="search" placeholder="모델명, 차량번호 검색...">
+    </div>
+    <div id="plsMCatalogFilterSections"></div>
+  </aside>
+  <!-- 카탈로그 그리드 -->
+  <div class="catalog-content">
+    <div class="catalog-grid" id="plsMCatalogGrid">
+      <div class="catalog-skeleton-wrap">
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+        <div class="catalog-skeleton-card"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━ 모바일: 상세 패널 (카드 클릭 시 전체화면) ━━━ -->
+<div class="pls-m-detail" id="plsMDetail" hidden>
+  <div class="pls-m-detail__head">
+    <button class="mobile-topbar__icon-btn pls-m-detail__back" id="plsMDetailBack" type="button" aria-label="뒤로">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <span class="pls-m-detail__title" id="plsMDetailTitle">상세정보</span>
+    <div class="pls-m-detail__head-actions" id="plsMDetailHeadActions"></div>
+  </div>
+  <!-- 상세정보 패널 -->
+  <div class="pls-m-detail__body" id="plsMDetailBody">
+    <div class="detail-card" id="plsMDetailContent"></div>
+  </div>
+</div>
 
 </div>
 {% endblock %}

@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_theme.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/fullscreen-photo-viewer.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/mobile.css') }}?v={{ app_version }}">
 </head>
 <body class="catalog-body" data-page="카탈로그">
 
@@ -26,17 +27,13 @@
     </button>
   </div>
   <div class="catalog-header-right" id="catalog-agent-card">
-    <span class="catalog-header-phone" id="catalog-header-phone" hidden>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
-      <span id="catalog-header-phone-text"></span>
-    </span>
-    <span class="catalog-header-divider" id="catalog-header-divider" hidden>|</span>
     <img class="catalog-header-ci" id="catalog-agent-ci" src="" alt="" hidden>
     <span class="catalog-header-company" id="catalog-agent-company"></span>
     <span class="catalog-header-name" id="catalog-agent-name"></span>
     <span class="catalog-header-position" id="catalog-agent-position"></span>
   </div>
 </header>
+
 
 <!-- ═══ VIEW 1: 상품 상세 (공유링크 또는 카드 클릭) ═══ -->
 <main class="catalog-single" id="catalog-single" hidden>
@@ -93,11 +90,12 @@
   </div>
 </main>
 
-<!-- 하단 전화하기 바 -->
+
+<!-- 하단 전화하기 바 (모바일 전용) -->
 <div class="catalog-bottom-bar" id="catalog-bottom-bar" hidden>
   <a class="catalog-bottom-bar__btn" id="catalog-bottom-call" href="tel:">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
-    <span id="catalog-bottom-call-text">전화 문의하기</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.62 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16z"/></svg>
+    <span id="catalog-bottom-call-text">담당자에게 전화하기</span>
   </a>
 </div>
 

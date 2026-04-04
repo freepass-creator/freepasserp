@@ -178,7 +178,18 @@
 }
 
 @media (max-width: 480px) {
-  .auth-shell { align-items: center; padding-top: 48px; background: #fff; }
-  .auth-brand { font-size: 18px; }
-  .auth-card { box-shadow: none; border: 0; padding: 0 20px; border-radius: 0; }
+  .auth-shell { align-items: center; padding: 40px 0 32px; background: #fff; gap: 20px; }
+  .auth-brand { font-size: 18px; letter-spacing: 0.16em; }
+  .auth-card { box-shadow: none; border: 0; padding: 0 24px; border-radius: 0; gap: 20px; }
+  .auth-card__title { font-size: 20px; }
+  .auth-card__sub { font-size: 14px; }
+  /* 입력란: iOS 줌 방지(16px) + 터치 타겟(48px) */
+  .auth-field input { height: 48px; font-size: 16px; border-radius: 10px; padding: 0 14px; }
+  .auth-field label { font-size: 12px; }
+  /* 버튼: 터치 타겟 */
+  .auth-submit { height: 48px; font-size: 15px; border-radius: 10px; margin-top: 6px; }
+  /* 하단 링크 */
+  .auth-footer { font-size: 13px; gap: 10px; }
+  .auth-message { font-size: 13px; }
+  .auth-copyright { font-size: 12px; }
 }

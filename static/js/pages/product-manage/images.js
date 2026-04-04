@@ -1,4 +1,5 @@
 import { prepareProductImageFiles } from '../../firebase/firebase-storage.js';
+import { open as fpOpen, close as fpClose } from '../../shared/fullscreen-photo-viewer.js';
 
 export function createProductImageManager(options = {}) {
   const {
@@ -24,8 +25,6 @@ export function createProductImageManager(options = {}) {
   let removedStoredImageUrls = new Set();
   let imagePrepareQueue = Promise.resolve();
   let imagePrepareActiveCount = 0;
-  let imageViewerRoot = null;
-  let imageViewerCurrentIndex = 0;
 
   function normalizeImageUrls(value) {
     if (Array.isArray(value)) return value.map((item) => String(item || '').trim()).filter(Boolean);
@@ -187,84 +186,19 @@ export function createProductImageManager(options = {}) {
 
   function getCurrentPreviewEntries() { return Array.isArray(currentPreviewEntries) ? currentPreviewEntries : []; }
 
-  function ensureImageViewer() {
-    if (imageViewerRoot) return imageViewerRoot;
-    const wrapper = document.createElement('div');
-    wrapper.className = 'image-viewer-overlay';
-    wrapper.hidden = true;
-    wrapper.innerHTML = `
-      <div class="image-viewer-backdrop" data-viewer-close></div>
-      <div class="image-viewer-dialog" role="dialog" aria-modal="true" aria-label="상품 이미지 크게 보기">
-        <button type="button" class="image-viewer-close" data-viewer-close aria-label="닫기"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-        <div class="image-viewer-count" data-viewer-count>0 / 0</div>
-        <div class="image-viewer-main-wrap">
-          <button type="button" class="image-viewer-nav image-viewer-nav--prev" data-viewer-step="-1" aria-label="이전 사진">‹</button>
-          <div class="image-viewer-main"><img data-viewer-image alt="상품 이미지 크게 보기"></div>
-          <button type="button" class="image-viewer-nav image-viewer-nav--next" data-viewer-step="1" aria-label="다음 사진">›</button>
-        </div>
-        <div class="image-viewer-thumbs" data-viewer-thumbs></div>
-      </div>`;
-    document.body.appendChild(wrapper);
-    wrapper.addEventListener('click', (event) => {
-      const closeTarget = event.target?.closest?.('[data-viewer-close]');
-      if (closeTarget) return closeImageViewer();
-      const thumb = event.target?.closest?.('[data-viewer-thumb-index]');
-      if (thumb) return openImageViewer(Number(thumb.dataset.viewerThumbIndex || 0));
-      const stepButton = event.target?.closest?.('[data-viewer-step]');
-      if (stepButton) {
-        const step = Number(stepButton.dataset.viewerStep || 0);
-        if (step) openImageViewer(imageViewerCurrentIndex + step);
-      }
-    });
-    imageViewerRoot = wrapper;
-    return imageViewerRoot;
-  }
-
-  function renderImageViewer() {
-    const root = ensureImageViewer();
-    const entries = getCurrentPreviewEntries();
-    if (!entries.length) return closeImageViewer();
-    const nextIndex = Math.min(Math.max(Number(imageViewerCurrentIndex || 0), 0), entries.length - 1);
-    imageViewerCurrentIndex = nextIndex;
-    const activeEntry = entries[nextIndex];
-    const imageNode = root.querySelector('[data-viewer-image]');
-    const countNode = root.querySelector('[data-viewer-count]');
-    const thumbsNode = root.querySelector('[data-viewer-thumbs]');
-    const prevButton = root.querySelector('.image-viewer-nav--prev');
-    const nextButton = root.querySelector('.image-viewer-nav--next');
-    if (imageNode) { imageNode.src = activeEntry?.url || ''; imageNode.alt = activeEntry?.label ? `${activeEntry.label} 크게 보기` : '상품 이미지 크게 보기'; }
-    if (countNode) countNode.textContent = `${nextIndex + 1} / ${entries.length}`;
-    if (prevButton) prevButton.disabled = entries.length <= 1;
-    if (nextButton) nextButton.disabled = entries.length <= 1;
-    if (thumbsNode) {
-      thumbsNode.innerHTML = entries.map((entry, index) => `
-        <button type="button" class="image-viewer-thumb${index === nextIndex ? ' is-active' : ''}" data-viewer-thumb-index="${index}" aria-label="${escapeHtml(entry.label)} 보기">
-          <img src="${entry.url}" alt="${escapeHtml(entry.label)} 썸네일">
-        </button>`).join('');
-    }
-    root.hidden = false;
-    document.body.classList.add('image-viewer-open');
-  }
-
   function openImageViewer(index = 0) {
     const entries = getCurrentPreviewEntries();
     if (!entries.length) return;
-    const safeIndex = ((Number(index) || 0) % entries.length + entries.length) % entries.length;
-    imageViewerCurrentIndex = safeIndex;
-    renderImageViewer();
+    const urls = entries.map((e) => e.url);
+    fpOpen(urls, index);
   }
 
   function closeImageViewer() {
-    if (!imageViewerRoot) return;
-    imageViewerRoot.hidden = true;
-    document.body.classList.remove('image-viewer-open');
+    fpClose();
   }
 
-  function handleImageViewerKeydown(event) {
-    if (!imageViewerRoot || imageViewerRoot.hidden) return;
-    if (event.key === 'Escape') closeImageViewer();
-    if (event.key === 'ArrowLeft') openImageViewer(imageViewerCurrentIndex - 1);
-    if (event.key === 'ArrowRight') openImageViewer(imageViewerCurrentIndex + 1);
+  function handleImageViewerKeydown() {
+    // fullscreen-photo-viewer가 키보드 이벤트 직접 처리
   }
 
   function syncImageInteraction(editable) {
@@ -303,7 +237,7 @@ export function createProductImageManager(options = {}) {
     currentPreviewEntries = buildPreviewEntries(getStoredImageUrls(), getPendingFiles());
     if (previewList) previewList.innerHTML = buildPreviewMarkup(currentPreviewEntries);
     updatePreviewSummary();
-    if (imageViewerRoot && !imageViewerRoot.hidden) renderImageViewer();
+    // fullscreen-photo-viewer는 별도 상태 관리, 프리뷰 변경 시 자동 갱신 불필요
   }
 
   function removeStoredImageAt(index) {
@@ -373,8 +307,6 @@ export function createProductImageManager(options = {}) {
 
   function cleanup() {
     closeImageViewer();
-    imageViewerRoot?.remove?.();
-    imageViewerRoot = null;
     clearPreviewObjectUrls();
   }
 

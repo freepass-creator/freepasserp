@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_viewmode.css') }}" data-page-style="true">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/ui_new_section.css') }}" data-page-style="true">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/fullscreen-photo-viewer.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared_new/mobile.css') }}" data-page-style="true">
 {% block workspace_page_css %}{% endblock %}
 {% endblock %}
 {% block body %}
@@ -21,6 +22,25 @@
     <nav id="sidebar-menu" class="sidebar-menu"></nav>
   </aside>
   <div class="main-area">
+    <!-- 모바일 상단 타이틀바 -->
+    <div class="mobile-topbar" id="mobile-topbar">
+      <div class="mobile-topbar__left">
+        <button class="mobile-topbar__icon-btn" id="mobile-back-btn" type="button" aria-label="뒤로" hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button class="mobile-topbar__icon-btn" id="mobile-filter-btn" type="button" aria-label="필터" hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg>
+        </button>
+      </div>
+      <div class="mobile-topbar__right">
+        <div class="mobile-topbar__user-info" id="mobile-topbar-user">
+          <span class="mobile-topbar__company" id="mobile-topbar-company"></span>
+          <span class="mobile-topbar__name" id="mobile-topbar-name"></span>
+          <span class="mobile-topbar__rank" id="mobile-topbar-rank"></span>
+        </div>
+      </div>
+    </div>
+    <!-- 데스크탑 탑바 -->
     <div class="top-bar">
       <div class="top-bar-user">
         <span class="top-bar-user-item" id="topBarOrg">-</span>
@@ -40,8 +60,16 @@
     </main>
   </div>
 </div>
+
+<!-- 모바일 하단 탭바 -->
+<nav class="mobile-tab-bar" id="mobile-tab-bar" role="tablist"></nav>
+
+
 {% endblock %}
-{% block page_js %}<script type="module" src="{{ url_for('static', filename='js/core/top-bar.js') }}"></script>
+{% block page_js %}
+<script>if(new URLSearchParams(location.search).get('embed')==='1'){document.documentElement.classList.add('is-embed');}</script>
+<script type="module" src="{{ url_for('static', filename='js/core/top-bar.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='js/core/sidebar-alerts.js') }}?v=2"></script>
+<script type="module" src="{{ url_for('static', filename='js/core/mobile-shell.js') }}"></script>
 {% block workspace_page_js %}{% endblock %}
 {% endblock %}

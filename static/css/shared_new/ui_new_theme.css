@@ -473,6 +473,14 @@ body[data-page] [contenteditable="true"] {
   padding: 0;
 }
 
+.panel-head-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.panel-head-badges:empty { display: none; }
+
 .panel-head-actions .inline-button.btn-icon-only {
   background: transparent;
   border-color: transparent;

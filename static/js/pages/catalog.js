@@ -11,10 +11,19 @@
  */
 
 import { auth, db } from '../firebase/firebase-config.js';
-import { signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import { ref, get } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
 import { formatPhone } from '../core/management-format.js';
 import { open as openFullscreenViewer, close as closeFullscreenViewer, isOpen as isViewerOpen } from '../shared/fullscreen-photo-viewer.js';
+import {
+  esc, has, fmt,
+  renderCatalogCard,
+  renderCatalogDetailHero,
+  renderCatalogPriceTable,
+  renderCatalogInsuranceTable,
+  renderCatalogConditions,
+  renderCatalogExtra,
+} from '../shared/catalog-card.js';
 
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -52,7 +61,6 @@ const hasShare       = !!(shareId || shareCar);
 
 let allProducts    = [];
 let allPolicies    = {};
-let agentPhone     = '';
 
 // ─── 필터 정의 ────────────────────────────────────────────────────────────
 
@@ -115,30 +123,7 @@ if (providerParam) filters.provider.add(providerParam);
 // ─── 유틸 ──────────────────────────────────────────────────────────────────
 
 function shortYear(text) {
-  // "2023~" → "23~", "2024" → "24", 본문 내 4자리 연도를 2자리로
   return String(text || '').replace(/\b(20)(\d{2})\b/g, '$2');
-}
-
-function esc(text) {
-  const d = document.createElement('div');
-  d.textContent = String(text ?? '');
-  return d.innerHTML;
-}
-
-function safe(v) {
-  const s = String(v ?? '').trim();
-  return s || '-';
-}
-
-function has(v) {
-  const s = String(v ?? '').trim();
-  return s && s !== '-';
-}
-
-function fmtMoney(v) {
-  const n = Number(String(v || '').replace(/[^\d.-]/g, '') || 0);
-  if (!n) return null;
-  return n.toLocaleString('ko-KR') + '원';
 }
 
 function fmtDate(v) {
@@ -291,185 +276,59 @@ function fmtRentalGuide(pol) {
   return `${bracket ? `[${bracket}] ` : ''}${info}`.trim();
 }
 
-// ─── 섹션 아이콘 ──────────────────────────────────────────────────────────
-
-const SECTION_ICONS = {
-  price:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-  insurance: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>',
-  rental:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="m21 3-7 7"/><path d="M11 13H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/></svg>',
-  extra:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
-};
-
-function sectionTitle(icon, text) {
-  return `<div class="cat-section-title">${SECTION_ICONS[icon] || ''}<span>${esc(text)}</span></div>`;
-}
-
-// ─── 배지 색상 매핑 ──────────────────────────────────────────────────────
-
-function badgeClass(field, value) {
-  const v = String(value || '').toLowerCase();
-  if (field === 'product_type') {
-    if (v.includes('신차렌트')) return 'cat-badge--rent-new';
-    if (v.includes('리스')) return 'cat-badge--lease';
-    if (v.includes('중고렌트') || v.includes('재렌트')) return 'cat-badge--rent-used';
-    if (v.includes('신차구독')) return 'cat-badge--sub-new';
-    if (v.includes('중고구독') || v.includes('재구독')) return 'cat-badge--sub-used';
-    return 'cat-badge--outline';
-  }
-  // vehicle_status
-  if (v.includes('가능') || v.includes('판매')) return 'cat-badge--info';
-  if (v.includes('완료')) return 'cat-badge--success';
-  if (v.includes('대기') || v.includes('보류') || v.includes('예정')) return 'cat-badge--warning';
-  if (v.includes('불가') || v.includes('취소')) return 'cat-badge--danger';
-  return 'cat-badge--info';
-}
-
-// ─── 공유 상세 마크업 생성 (수수료 제외 전부) ─────────────────────────────
+// ─── 상세 마크업 생성 ─────────────────────────────────────────────────────
 
 function renderProductDetail(p) {
-  const model = [p.maker, p.model_name].filter(Boolean).join(' ');
-  const sub   = [shortYear(p.sub_model), p.trim_name].filter(Boolean).join(' · ');
-  const pol   = buildPolicy(p);
+  const pol = buildPolicy(p);
 
-  // ── 기본 정보 ──
-  const status = p.vehicle_status || '';
-  const productType = p.product_type || '';
-  const badges = [
-    status && status !== '재고' ? { field: 'vehicle_status', value: status } : null,
-    productType ? { field: 'product_type', value: productType } : null,
-  ].filter(Boolean);
-  const badgeHtml = badges.map(b => `<span class="cat-badge ${badgeClass(b.field, b.value)}">${esc(b.value)}</span>`).join('');
-  const optText = String(p.options ?? '').trim();
-  const tags = [p.fuel_type, p.year ? `${p.year}년식` : '', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''].filter(Boolean);
+  const shareBtn = `<button class="cat-share-btn" id="cat-share-btn" type="button" title="링크 복사"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg></button>`;
 
-  let html = `
-    <div class="cat-hero">
-      <div class="cat-badges-row">
-        <div class="cat-badges">${badgeHtml}</div>
-        <button class="cat-share-btn" id="cat-share-btn" type="button" title="링크 복사"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg></button>
-      </div>
-      <h1 class="cat-title">${esc(model || '차량')}${p.car_number ? `<span class="cat-carno">${esc(p.car_number)}</span>` : ''}</h1>
-      ${sub ? `<p class="cat-subtitle">${esc(sub)}</p>` : ''}
-      ${optText ? `<p class="cat-options">${esc(optText)}</p>` : ''}
-      <div class="cat-meta">
-        <span class="cat-meta-text">${tags.map(t => esc(t)).join(' · ') || '-'}</span>
-        ${has(p.ext_color) ? `<span class="cat-color-badge">외장 ${esc(p.ext_color)}</span>` : ''}
-        ${has(p.int_color) ? `<span class="cat-color-badge">내장 ${esc(p.int_color)}</span>` : ''}
-      </div>
-    </div>
-  `;
-
-  // ── 가격표 (1~60개월) ──
   const periods = ['1', '6', '12', '24', '36', '48', '60'];
   const priceRows = periods
-    .filter(m => Number(p.price?.[m]?.rent || 0) > 0)
-    .map(m => {
-      const item = p.price?.[m] || {};
-      return { m, rent: Number(item.rent || 0), dep: Number(item.deposit || 0) };
-    });
+    .filter(m => getRent(p, Number(m)) > 0)
+    .map(m => ({ m, rent: getRent(p, Number(m)), dep: getDeposit(p, Number(m)), fee: 0 }));
 
-  if (priceRows.length) {
-    const guideText = fmtRentalGuide(pol);
-    html += `
-      <div class="cat-section">
-        ${sectionTitle('price', '기간별 대여료 및 보증금 안내')}
-        <table class="cat-table">
-          <thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead>
-          <tbody>${priceRows.map(({ m, rent, dep }) => `
-            <tr>
-              <td>${m}개월</td>
-              <td class="cat-price-cell">${fmtMoney(rent) || '-'}</td>
-              <td>${fmtMoney(dep) || '-'}</td>
-            </tr>
-          `).join('')}</tbody>
-        </table>
-        ${guideText ? `<div class="cat-note">* ${esc(guideText)}</div>` : ''}
-      </div>
-    `;
-  } else {
-    html += `<div class="cat-section cat-inquiry"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> 가격은 문의해 주세요</div>`;
-  }
-
-  // ── 차량보험정보 ──
   const insRows = [
-    ['대인',         pol.injuryLimit,   pol.injuryDeductible],
-    ['대물',         pol.propertyLimit, pol.propertyDeductible],
-    ['자기신체사고', pol.selfBodyLimit,  pol.selfBodyDeductible],
-    ['무보험차상해', pol.uninsuredLimit, pol.uninsuredDeductible],
-    ['자기차량손해', pol.ownDamageComp,  fmtOwnDamageDeductible(pol)],
-    ['긴급출동',     pol.roadsideAssistance, '-'],
+    ['대인',         pol.injuryLimit,        pol.injuryDeductible],
+    ['대물',         pol.propertyLimit,      pol.propertyDeductible],
+    ['자기신체사고', pol.selfBodyLimit,       pol.selfBodyDeductible],
+    ['무보험차상해', pol.uninsuredLimit,      pol.uninsuredDeductible],
+    ['자기차량손해', pol.ownDamageComp,       fmtOwnDamageDeductible(pol)],
+    ['긴급출동',     pol.roadsideAssistance,  '-'],
   ];
-  const hasInsurance = insRows.some(([, l, d]) => has(l) || (has(d) && d !== '-'));
-  if (hasInsurance) {
-    html += `
-      <div class="cat-section">
-        ${sectionTitle('insurance', '차량보험정보')}
-        <table class="cat-table cat-table--insurance">
-          <thead><tr><th>항목</th><th>한도</th><th>면책금</th></tr></thead>
-          <tbody>${insRows.map(([label, limit, deduct]) => `
-            <tr>
-              <td>${esc(label)}</td>
-              <td>${esc(safe(limit))}</td>
-              <td>${esc(safe(deduct))}</td>
-            </tr>
-          `).join('')}</tbody>
-        </table>
-      </div>
-    `;
-  }
 
-  // ── 대여조건 ──
-  const rentalRows = [
-    ['1만Km추가비용',     pol.mileageUpcharge],
-    ['보증금분납',         pol.depositInstallment],
-    ['결제방식',           pol.paymentMethod],
-    ['위약금',             pol.penaltyCondition],
-    ['보증금카드결제',     pol.depositCardPayment],
-    ['대여지역',           pol.rentalRegion],
-    ['탁송비',             pol.deliveryFee],
-    ['운전연령하향',       pol.driverAgeLowering],
-    ['운전연령하향비용',   pol.ageLoweringCost],
-    ['개인운전자범위',     pol.personalDriverScope],
-    ['사업자운전자범위',   pol.businessDriverScope],
-    ['추가운전자수',       pol.additionalDriverCount],
-    ['추가운전자비용',     pol.additionalDriverCost],
-    ['정비서비스',         pol.maintenanceService],
-  ].filter(([, v]) => has(v));
+  const condRows = [
+    ['1만Km추가비용',   pol.mileageUpcharge],
+    ['보증금분납',       pol.depositInstallment],
+    ['결제방식',         pol.paymentMethod],
+    ['위약금',           pol.penaltyCondition],
+    ['보증금카드결제',   pol.depositCardPayment],
+    ['대여지역',         pol.rentalRegion],
+    ['탁송비',           pol.deliveryFee],
+    ['운전연령하향',     pol.driverAgeLowering],
+    ['운전연령하향비용', pol.ageLoweringCost],
+    ['개인운전자범위',   pol.personalDriverScope],
+    ['사업자운전자범위', pol.businessDriverScope],
+    ['추가운전자수',     pol.additionalDriverCount],
+    ['추가운전자비용',   pol.additionalDriverCost],
+    ['정비서비스',       pol.maintenanceService],
+  ];
 
-  if (rentalRows.length) {
-    html += `
-      <div class="cat-section">
-        ${sectionTitle('rental', '대여조건')}
-        <div class="cat-rows">${rentalRows.map(([label, value]) =>
-          `<div class="cat-row"><span class="cat-row-label">${esc(label)}</span><span class="cat-row-value">${esc(value)}</span></div>`
-        ).join('')}</div>
-      </div>
-    `;
-  }
-
-  // ── 추가정보 ──
   const extraRows = [
     ['차량번호',   p.car_number],
     ['차종구분',   p.vehicle_class],
     ['최초등록일', fmtDate(p.first_registration_date)],
     ['차령만료일', fmtDate(p.vehicle_age_expiry_date)],
-    ['차량가격',   fmtMoney(p.vehicle_price)],
+    ['차량가격',   fmt(p.vehicle_price)],
     ['특이사항',   p.partner_memo || p.note],
     ...(!providerParam ? [['공급코드', p.provider_company_code || p.partner_code]] : []),
-  ].filter(([, v]) => has(v));
+  ];
 
-  if (extraRows.length) {
-    html += `
-      <div class="cat-section">
-        ${sectionTitle('extra', '추가정보')}
-        <div class="cat-rows">${extraRows.map(([label, value]) =>
-          `<div class="cat-row"><span class="cat-row-label">${esc(label)}</span><span class="cat-row-value">${esc(value)}</span></div>`
-        ).join('')}</div>
-      </div>
-    `;
-  }
-
-  return html;
+  return renderCatalogDetailHero(p, shareBtn)
+    + renderCatalogPriceTable(priceRows, { showFee: false, guideNote: fmtRentalGuide(pol) })
+    + renderCatalogInsuranceTable(insRows)
+    + renderCatalogConditions(condRows)
+    + renderCatalogExtra(extraRows);
 }
 
 // ─── 뷰 전환 ──────────────────────────────────────────────────────────────
@@ -513,21 +372,15 @@ async function loadAgent() {
       } catch {}
     }
 
+    // 헤더 에이전트 카드 (항상 표시)
     const ciEl = qs('catalog-agent-ci');
     if (ciUrl && ciEl) { ciEl.src = ciUrl; ciEl.hidden = false; }
     if (companyName) agentCompany.textContent = companyName;
     if (name) agentName.textContent = name;
     if (position && agentPosition) agentPosition.textContent = position;
 
+    // 하단 전화하기 바
     if (phone) {
-      agentPhone = phone;
-      // 상단바 전화번호 (웹)
-      const headerPhone = qs('catalog-header-phone');
-      const headerPhoneText = qs('catalog-header-phone-text');
-      const headerDivider = qs('catalog-header-divider');
-      if (headerPhone) { headerPhoneText.textContent = formatPhone(phone); headerPhone.hidden = false; }
-      if (headerDivider) headerDivider.hidden = false;
-      // 하단 전화하기 바
       const bottomBar = qs('catalog-bottom-bar');
       const bottomCall = qs('catalog-bottom-call');
       const bottomCallText = qs('catalog-bottom-call-text');
@@ -934,43 +787,9 @@ function renderGrid() {
     return;
   }
 
-  grid.innerHTML = products.map((p, i) => {
-    const imgs   = getImages(p);
-    const thumb  = imgs[0] || '';
-    const model  = [p.maker, p.model_name].filter(Boolean).join(' ');
-    const sub    = [shortYear(p.sub_model), p.trim_name].filter(Boolean).join(' · ');
-    // 대표 가격: 가장 저렴한 대여료 기간
-    const pricePeriods = [1, 6, 12, 24, 36, 48, 60];
-    let cardRent = 0, cardDep = 0, cardMonth = 0;
-    for (const m of pricePeriods) {
-      const r = getRent(p, m);
-      if (r && (!cardRent || r < cardRent)) { cardRent = r; cardDep = getDeposit(p, m); cardMonth = m; }
-    }
-    const status = p.vehicle_status || '';
-    const imageHtml = thumb
-      ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(model)}" loading="lazy" decoding="async">`
-      : `<div class="catalog-card__no-image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
-    const pType = p.product_type || '';
-    const cardBadges = [
-      status && status !== '재고' ? { field: 'vehicle_status', value: status } : null,
-      pType ? { field: 'product_type', value: pType } : null,
-    ].filter(Boolean);
-    const badgeHtml = cardBadges.map(b => `<span class="catalog-card__badge ${badgeClass(b.field, b.value)}">${esc(b.value)}</span>`).join('');
-    const tags = [p.fuel_type, p.year ? `${p.year}년` : '', p.mileage ? `${Number(p.mileage).toLocaleString()}km` : ''].filter(Boolean);
-
-    return `
-      <article class="catalog-card" data-index="${i}" role="button" tabindex="0">
-        <div class="catalog-card__image-wrap">${imageHtml}${badgeHtml ? `<div class="catalog-card__badges">${badgeHtml}</div>` : ''}${imgs.length > 1 ? `<span class="catalog-card__photo-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${imgs.length}</span>` : ''}</div>
-        <div class="catalog-card__body">
-          <div class="catalog-card__model">${esc(model || '차량')}${p.car_number ? ` <span class="catalog-card__carno">${esc(p.car_number)}</span>` : ''}</div>
-          ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
-          <div class="catalog-card__price-row">
-            ${cardRent ? `<span class="catalog-card__price">월 ${fmtMoney(cardRent)}</span>${cardDep ? `<span class="catalog-card__dep">보증금 ${fmtMoney(cardDep)}</span>` : ''}<span class="catalog-card__dep">${cardMonth}개월</span>` : `<span class="catalog-card__price-inquiry">가격 문의</span>`}
-          </div>
-          ${tags.length ? `<div class="catalog-card__tags">${tags.map((t) => `<span class="catalog-card__tag">${esc(t)}</span>`).join('')}</div>` : ''}
-        </div>
-      </article>`;
-  }).join('');
+  grid.innerHTML = products.map((p, i) =>
+    renderCatalogCard(p, { dataAttr: `data-index="${i}"` })
+  ).join('');
 }
 
 // ─── 카드 클릭 → 단일 상품 뷰 전환 ──────────────────────────────────────
@@ -1102,6 +921,19 @@ searchInput.addEventListener('input', () => {
 // ─── 부트스트랩 ────────────────────────────────────────────────────────────
 
 (async function bootstrap() {
-  try { await signInAnonymously(auth); } catch (e) { console.warn('[catalog] anonymous auth failed', e); }
+  // 인증 상태를 먼저 확인 (Promise로 래핑) → loadAgent 전에 isLoggedIn 결정
+  const currentUser = await new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      unsub();
+      resolve(user);
+    });
+  });
+
+  if (!currentUser) {
+    // 미로그인 → 익명 로그인 시도
+    try { await signInAnonymously(auth); } catch (e) { console.warn('[catalog] anonymous auth failed', e); }
+  }
+
+
   await Promise.all([loadAgent(), loadData()]);
 })();

@@ -473,6 +473,10 @@ function mountWatchers() {
 }
 
 async function bootstrap() {
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    window.location.replace('/product-list');
+    return;
+  }
   try {
     const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
     currentProfile = profile; currentUid = user.uid;

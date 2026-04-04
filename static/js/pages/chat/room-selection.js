@@ -74,6 +74,10 @@ export function createChatRoomSelectionController({
       element.classList.toggle('active', isSelected);
     });
 
+    // 입력칸 포커스 — await 전에 호출해야 모바일 gesture context 유지
+    const input = document.getElementById('message-input');
+    if (input) input.focus();
+
     const _profile = getCurrentProfile();
     const _user = getCurrentUser();
     await markRoomRead(room.room_id, _profile?.role, _user?.uid);
@@ -94,12 +98,6 @@ export function createChatRoomSelectionController({
       sep.hidden = false;
       if (badge) badge.textContent = '채팅';
     }
-
-    // 입력칸 자동 포커스
-    requestAnimationFrame(() => {
-      const input = document.getElementById('message-input');
-      if (input) input.focus();
-    });
   }
 
   async function moveToNextRoomAfterRemoval(visibleRoomsCache = []) {

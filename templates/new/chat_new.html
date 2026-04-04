@@ -5,6 +5,7 @@
 {% block page_title_text %}실시간 문의·응대{% endblock %}
 {% block top_bar_actions %}{% endblock %}
 {% block workspace_body %}
+<script>document.body.classList.add('page-chat');</script>
 <div class="work-page min-h-work layout-633 product-list-page-shell">
 <section class="panel pls-grid-panel">
 <div class="pls-grid-scroll"><table class="pls-table"><thead id="room-list-head"></thead><tbody id="room-list"></tbody></table></div>
@@ -49,6 +50,8 @@
 </section>
 </div>
 </div>
+<!-- 모바일: 방 목록 -->
+<div class="chat-m-rooms" id="chatMRooms"></div>
 {% endblock %}
 {% block workspace_page_js %}
 <script type="module" src="{{ url_for('static', filename='js/pages/chat.js') }}" data-page-script="true"></script>

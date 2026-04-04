@@ -4,7 +4,7 @@ import { renderRoleMenu } from '../core/role-menu.js';
 import { deleteRoomEverywhere, ensureRoom, hideRoomForUser, markRoomRead, resolveTermForProduct, sendMessage, watchMessages, watchProducts, watchRooms } from '../firebase/firebase-db.js';
 import { extractTermFields, normalizeProduct } from '../shared/product-list-detail-view.js';
 import { createChatRoomSelectionController } from './chat/room-selection.js';
-import { escapeHtml, normalizeLookupKey, renderChatRoomList, syncSelectedRoomRow } from './chat/room-list.js';
+import { escapeHtml, normalizeLookupKey, renderChatRoomList, syncSelectedRoomRow, truncate, deriveStatusLabel, deriveReplyStatus, formatDate, formatTime } from './chat/room-list.js';
 import { renderSkeletonRows } from '../core/management-list.js';
 import { showToast, showConfirm } from '../core/toast.js';
 
@@ -44,6 +44,17 @@ if (pendingChatRoom) localStorage.removeItem('freepass_pending_chat_room');
 const preferredRoomId = params.get('room_id') || pendingChatRoom || null;
 const preferredProductCode = params.get('product_code');
 
+// room_id가 있으면 즉시 채팅뷰 오픈 + 입력창 활성 (모듈 로드 직후 동기 실행)
+if (preferredRoomId) {
+  const _mf = document.getElementById('message-form');
+  if (_mf) _mf.classList.remove('is-disabled');
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    document.body.classList.add('chat-m-open');
+  }
+  const _mi = document.getElementById('message-input');
+  if (_mi) _mi.focus();
+}
+
 let currentRoomId = preferredRoomId || null;
 let currentProfile = null;
 let currentUser = null;
@@ -57,6 +68,73 @@ let activePhotoIndex = 0;
 
 const termCache = {};
 const termLoading = {};
+
+// ── 모바일 채팅 ──────────────────────────────────────────────────────────────
+
+const isMobileQuery = window.matchMedia('(max-width: 768px)');
+
+function openMobileChatView() {
+  if (!isMobileQuery.matches) return;
+  document.body.classList.add('chat-m-open');
+  const input = document.getElementById('message-input');
+  if (input) input.focus();
+}
+
+function closeMobileChatView() {
+  document.body.classList.remove('chat-m-open');
+}
+
+function renderMobileRooms(rooms) {
+  const container = document.getElementById('chatMRooms');
+  if (!container) return;
+  if (!rooms.length) {
+    container.innerHTML = '<div class="chat-m-empty">등록된 대화가 없습니다.</div>';
+    return;
+  }
+  container.innerHTML = rooms.map(room => {
+    const product = getRoomProductLookupKeys(room).map(k => productsMap.get(k)).find(Boolean) || null;
+    const model = product?.subModel || product?.model || room.model_name || '';
+    const carNo = product?.carNo || room.car_number || '';
+    const mainLine = carNo ? `${carNo}${model ? ` ${model}` : ''}` : (model || '-');
+    const subLine = truncate(room.last_message || '대화 시작 전', 28);
+    const at = room.last_message_at || room.created_at;
+    const replyStatus = deriveReplyStatus(room);
+    const isActive = room.room_id === currentRoomId;
+    const replyBadgeCls = replyStatus === '문의접수' ? 'chat-m-room-card__badge--unread' : 'chat-m-room-card__badge--done';
+    const replyBadge = replyStatus ? `<span class="chat-m-room-card__badge ${replyBadgeCls}">${escapeHtml(replyStatus)}</span>` : '';
+    const timeStr = at ? formatTime(at) : '';
+    const providerCode = room.provider_company_code || '';
+    const agentCode = room.agent_code || '';
+    const msgText = room.last_message || '대화 시작 전';
+    const subLeft = [providerCode, agentCode, timeStr, truncate(msgText, 18)].filter(Boolean).join(' · ');
+    return `<div class="chat-m-room-card${isActive ? ' is-active' : ''}" data-room-id="${escapeHtml(room.room_id || '')}">
+      <div class="chat-m-room-card__avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg>
+      </div>
+      <div class="chat-m-room-card__body">
+        <div class="chat-m-room-card__main">
+          <span class="chat-m-room-card__name">${escapeHtml(mainLine)}</span>
+          ${replyBadge}
+        </div>
+        <div class="chat-m-room-card__sub">
+          <span class="chat-m-room-card__msg">${escapeHtml(subLeft)}</span>
+          <span class="chat-m-room-card__date">${escapeHtml(formatDate(at))}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.chat-m-room-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const roomId = card.dataset.roomId;
+      const room = visibleRoomsCache.find(r => r.room_id === roomId);
+      if (!room) return;
+      currentRoomId = roomId;
+      roomSelectionController.openRoom(room);
+      openMobileChatView();
+    });
+  });
+}
 
 function getProductLookupKeys(product = {}) {
   return [...new Set([
@@ -133,7 +211,7 @@ function roleName(role) {
   return '';
 }
 
-function formatTime(ts) {
+function formatMessageTime(ts) {
   try { return new Date(ts).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }); } catch (_) { return ''; }
 }
 
@@ -150,7 +228,7 @@ function renderMessages(messages) {
     const own = message.sender_uid === currentUser.uid ? 'out' : 'in';
     const roleClass = `role-${message.sender_role || 'etc'}`;
     const senderLabel = `${escapeHtml(message.sender_code || roleName(message.sender_role))} ${formatRoleBadge(message.sender_role)}`;
-    const time = formatTime(message.created_at);
+    const time = formatMessageTime(message.created_at);
 
     // 날짜 구분선
     const msgDate = new Date(message.created_at);
@@ -222,6 +300,11 @@ async function bootstrap() {
     roomSelectionController.applyChatHeadActions({ deleteRoomBtn, hideRoomBtn, chatShareBtn: qs('#detailShareBtn'), chatContractBtn: qs('#detailContractBtn') });
     registerPageCleanup(() => roomSelectionController.cleanup());
 
+    // 모바일 뒤로가기: 채팅창 → 대화목록
+    document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
+      closeMobileChatView();
+    });
+
     // 상세패널 버튼 이벤트
     qs('#detailShareBtn')?.addEventListener('click', async () => {
       const room = roomSelectionController.getCurrentRoom();
@@ -277,7 +360,7 @@ async function bootstrap() {
       });
 
       if (profile.role === 'agent' && preferredProductCode && !currentRoomId && !_ensureRoomPending) {
-        const product = productsMap.get(preferredProductCode);
+        const product = productsMap.get(normalizeLookupKey(preferredProductCode));
         if (product) {
           _ensureRoomPending = true;
           ensureRoom({
@@ -296,7 +379,7 @@ async function bootstrap() {
             // 생성된 방 자동 오픈 + 입력칸 포커스
             const tryOpen = () => {
               const newRoom = visibleRoomsCache.find(r => r.room_id === roomId);
-              if (newRoom) { roomSelectionController.openRoom(newRoom); return; }
+              if (newRoom) { roomSelectionController.openRoom(newRoom); openMobileChatView(); return; }
               setTimeout(tryOpen, 300);
             };
             tryOpen();
@@ -324,6 +407,7 @@ async function bootstrap() {
           myRole: currentProfile?.role || '',
           myUid: currentUser?.uid || '',
         });
+        renderMobileRooms(visibleRoomsCache);
         if (currentRoomId) syncSelectedRoomRow(roomList, currentRoomId);
       }
     }));
@@ -354,6 +438,8 @@ async function bootstrap() {
       roomList.innerHTML = '';
 
       if (!visibleRooms.length) {
+        // preferredRoomId 대기 중이면 clearRoomSelection 하지 않음 (currentRoomId 보존)
+        if (currentRoomId && currentRoomId === preferredRoomId) return;
         renderChatRoomList({
           thead: document.getElementById('room-list-head'),
           container: roomList,
@@ -365,6 +451,7 @@ async function bootstrap() {
           myRole: currentProfile?.role || '',
           myUid: currentUser?.uid || '',
         });
+        renderMobileRooms([]);
         roomSelectionController.clearRoomSelection('등록된 대화가 없습니다.', '등록된 대화가 없습니다.');
         return;
       }
@@ -379,6 +466,7 @@ async function bootstrap() {
         onSelect: (room) => roomSelectionController.openRoom(room),
         myRole: currentProfile?.role || '',
       });
+      renderMobileRooms(visibleRooms);
 
       if (currentRoomId && roomMap.has(currentRoomId)) {
         const currentRoom = roomMap.get(currentRoomId);
@@ -387,11 +475,14 @@ async function bootstrap() {
         syncSelectedRoomRow(roomList, currentRoomId);
         if (openedRoomId !== currentRoomId) {
           roomSelectionController.openRoom(currentRoom);
+          openMobileChatView();
         }
         return;
       }
 
       if (currentRoomId && !roomMap.has(currentRoomId)) {
+        // URL로 전달된 방이 아직 Firebase에 전파 중이면 기다림 (clearRoomSelection 하지 않음)
+        if (currentRoomId === preferredRoomId) return;
         roomSelectionController.clearRoomSelection();
         return;
       }
@@ -434,8 +525,8 @@ async function bootstrap() {
     });
 
 
-    // 초기: 대화방 미선택 → 입력폼 비활성
-    messageForm?.classList.add('is-disabled');
+    // 초기: 대화방 미선택 → 입력폼 비활성 (preferredRoomId 있으면 이미 선택된 상태)
+    if (!currentRoomId) messageForm?.classList.add('is-disabled');
 
     messageForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -463,6 +554,7 @@ async function bootstrap() {
 
 let _mounted = false;
 export async function mount() {
+  document.body.classList.add('page-chat');
   bindDOM();
   _mounted = false;
   await bootstrap();
@@ -470,6 +562,8 @@ export async function mount() {
 }
 export function unmount() {
   runPageCleanup();
+  document.body.classList.remove('page-chat');
+  document.body.classList.remove('chat-m-open');
   _mounted = false;
 }
 // Auto-mount on first script load (server-rendered page)

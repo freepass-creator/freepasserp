@@ -418,22 +418,25 @@ function bindDownloadSection(profile) {
 function bindDocUploads() {
   const ciFileInput = document.getElementById('settings_ci_file');
   const cardFileInput = document.getElementById('settings_card_file');
-  document.getElementById('settings_ci_upload')?.addEventListener('click', () => {
-    if (!profileEditMode) return;
-    ciFileInput?.click();
-  });
-  document.getElementById('settings_card_upload')?.addEventListener('click', () => {
-    if (!profileEditMode) return;
-    cardFileInput?.click();
-  });
-
-  // 기존 URL 표시
-  const ciUrl = currentProfile?.ci_file_url;
-  const cardUrl = currentProfile?.card_file_url;
   const ciLink = document.getElementById('settings_ci_link');
   const cardLink = document.getElementById('settings_card_link');
-  if (ciUrl && ciLink) { ciLink.href = ciUrl; ciLink.hidden = false; }
-  if (cardUrl && cardLink) { cardLink.href = cardUrl; cardLink.hidden = false; }
+  const ciDeleteBtn = document.getElementById('settings_ci_delete');
+  const cardDeleteBtn = document.getElementById('settings_card_delete');
+
+  function syncDocUI(type, url) {
+    const linkEl = type === 'ci' ? ciLink : cardLink;
+    const delBtn = type === 'ci' ? ciDeleteBtn : cardDeleteBtn;
+    if (linkEl) { linkEl.href = url || '#'; linkEl.hidden = !url; }
+    if (delBtn) { delBtn.hidden = !url; }
+  }
+
+  // 기존 URL 표시
+  syncDocUI('ci', currentProfile?.ci_file_url);
+  syncDocUI('card', currentProfile?.card_file_url);
+
+  // 업로드 버튼 — 수정모드 무관하게 항상 동작
+  document.getElementById('settings_ci_upload')?.addEventListener('click', () => ciFileInput?.click());
+  document.getElementById('settings_card_upload')?.addEventListener('click', () => cardFileInput?.click());
 
   async function uploadDoc(file, type) {
     if (!currentProfile?.uid) { showToast('로그인이 필요합니다.', 'error'); return; }
@@ -448,11 +451,23 @@ function bindDocUploads() {
       currentProfile[field] = url;
       progress.dismiss();
       showToast('업로드 완료', 'success');
-      const linkEl = type === 'ci' ? ciLink : cardLink;
-      if (linkEl) { linkEl.href = url; linkEl.hidden = false; }
+      syncDocUI(type, url);
     } catch (err) {
       progress.dismiss();
       showToast('업로드 실패', 'error');
+    }
+  }
+
+  async function deleteDoc(type) {
+    if (!await showConfirm('삭제하시겠습니까?')) return;
+    const field = type === 'ci' ? 'ci_file_url' : 'card_file_url';
+    try {
+      await updateUserProfile(currentProfile.uid, { [field]: null });
+      currentProfile[field] = null;
+      showToast('삭제 완료', 'success');
+      syncDocUI(type, null);
+    } catch (err) {
+      showToast('삭제 실패', 'error');
     }
   }
 
@@ -464,6 +479,8 @@ function bindDocUploads() {
     if (cardFileInput.files?.[0]) uploadDoc(cardFileInput.files[0], 'card');
     cardFileInput.value = '';
   });
+  ciDeleteBtn?.addEventListener('click', () => deleteDoc('ci'));
+  cardDeleteBtn?.addEventListener('click', () => deleteDoc('card'));
 }
 
 async function bootstrap() {

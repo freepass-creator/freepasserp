@@ -10,6 +10,9 @@
         ".write": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
         "role": {
           ".validate": "!data.exists() || newData.val() === data.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'"
+        },
+        "status": {
+          ".validate": "root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.val() === data.val()"
         }
       }
     },
@@ -86,6 +89,8 @@
     "messages": {
       "$room_id": {
         ".read": "auth != null",
+        // admin은 메시지 스레드 전체 삭제 가능
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
         "$message_id": {
           // 대화방 참여자 또는 admin만 메시지 작성 가능
           ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('rooms').child($room_id).child('agent_uid').val() === auth.uid || root.child('rooms').child($room_id).child('provider_uid').val() === auth.uid)",
@@ -99,17 +104,17 @@
     },
 
     "contracts": {
-      ".read": "auth != null",
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider' || root.child('users').child(auth.uid).child('role').val() === 'agent')",
       ".indexOn": ["product_uid", "partner_code", "contract_status", "created_at"],
       "$contract_code": {
-        // admin만 생성/수정 가능
-        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
-        ".validate": "newData.hasChildren(['contract_code', 'partner_code', 'created_at'])"
+        // admin: 전체, agent: 자신의 계약만 생성/수정/삭제
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'agent' && (newData.child('agent_uid').val() === auth.uid || (!newData.exists() && data.child('agent_uid').val() === auth.uid))))",
+        ".validate": "!newData.exists() || newData.hasChildren(['contract_code', 'partner_code', 'created_at'])"
       }
     },
 
     "settlements": {
-      ".read": "auth != null",
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider')",
       ".indexOn": ["contract_code", "settlement_status"],
       "$settlement_code": {
         // admin만 생성/수정 가능
@@ -120,7 +125,7 @@
     "code_sequences": {
       ".read": "auth != null",
       "$key": {
-        ".write": "auth != null"
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider' || root.child('users').child(auth.uid).child('role').val() === 'agent')"
       }
     },
 

@@ -111,6 +111,17 @@ let currentContract = null;
 let mode = 'create';
 let _bootDone = false;
 
+const isMobileQuery = window.matchMedia('(max-width: 768px)');
+
+function openMobileContractFormView() {
+  if (!isMobileQuery.matches) return;
+  document.body.classList.add('contract-m-open');
+}
+
+function closeMobileContractFormView() {
+  document.body.classList.remove('contract-m-open');
+}
+
 const docsController = createContractDocsController({
   input: docInput,
   dropzone: docDropzone,
@@ -308,6 +319,7 @@ async function fillForm(contract) {
   setMode('view');
   markIncompleteFields(contract);
   renderList();
+  openMobileContractFormView();
 }
 
 function markIncompleteFields(contract) {
@@ -367,7 +379,7 @@ const CONTRACT_COLS = [
   { key: 'channel',       label: '영업채널코드', align: 'c', filterable: true },
   { key: 'agent',         label: '영업자코드',   align: 'c', filterable: true },
   { key: 'car',           label: '차량번호',     align: 'c', searchable: true },
-  { key: 'model',         label: '모델명',       align: 'c', searchable: true },
+  { key: 'model',         label: '세부모델',     align: 'c', searchable: true },
   { key: 'month',         label: '기간',         align: 'c', searchable: true },
   { key: 'rent',          label: '대여료',       align: 'c', searchable: true },
   { key: 'deposit',       label: '보증금',       align: 'c', searchable: true },
@@ -380,6 +392,7 @@ function renderList() {
   const roleVisible = allContracts.filter(contractVisible).sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
   const visible = roleVisible;
   syncTopBarPageCount(visible.length);
+  renderMobileList(visible);
   renderTableGrid({
     thead: contractThead,
     tbody: listBody,
@@ -419,7 +432,7 @@ function renderList() {
         case 'channel': return c.agent_channel_code || c.agent_company_code || '';
         case 'agent': return c.agent_code || '';
         case 'car': return c.car_number || '';
-        case 'model': return c.model_name || c.sub_model || c.vehicle_name || '';
+        case 'model': return c.sub_model || c.model_name || c.vehicle_name || '';
         case 'month': return c.rent_month ? `${c.rent_month}개월` : '';
         case 'rent': return c.rent_amount ? String(c.rent_amount) : '';
         case 'deposit': return c.deposit_amount ? String(c.deposit_amount) : '';
@@ -428,6 +441,65 @@ function renderList() {
         default: return '';
       }
     }
+  });
+}
+
+function renderMobileList(visible) {
+  const el = document.getElementById('contract-m-list');
+  if (!el) return;
+  const selectedCode = contractCodeHidden.value || '';
+  if (!visible.length) {
+    el.innerHTML = '<div class="chat-m-empty">등록된 계약이 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = visible.map((c) => {
+    const carNo = c.car_number || '';
+    const model = c.sub_model || c.model_name || c.vehicle_name || '';
+    const mainLine = [carNo, model].filter(Boolean).join(' ') || '-';
+    const partner = c.partner_code || c.provider_company_code || '';
+    const channel = c.agent_channel_code || c.agent_company_code || '';
+    const agentCode = c.agent_code || '';
+    const customer = c.customer_name || '';
+    const month = c.rent_month ? `${c.rent_month}개월` : '';
+    const depositAmt = Number(c.deposit_amount || 0);
+    const rentAmt = Number(c.rent_amount || 0);
+    const deposit = depositAmt ? depositAmt.toLocaleString('ko-KR') + '원' : '';
+    const rent = rentAmt ? rentAmt.toLocaleString('ko-KR') + '원' : '';
+    const subLine = [partner, channel, agentCode, customer, month, deposit, rent].filter(Boolean).join(' · ');
+    const status = c.contract_status || '계약대기';
+    const at = c.created_at || c.updated_at;
+    const d = at ? new Date(at) : null;
+    const dateStr = d ? `${String(d.getFullYear()).slice(-2)}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}` : '';
+    const isActive = c.contract_code === selectedCode;
+    let badgeCls = 'chat-m-room-card__badge';
+    if (status === '계약완료') badgeCls += ' chat-m-room-card__badge--done';
+    else if (status === '계약철회') badgeCls += ' chat-m-room-card__badge--unread';
+    else badgeCls += ' chat-m-room-card__badge--pending';
+    return `<div class="chat-m-room-card${isActive ? ' is-active' : ''}" data-contract-code="${escapeHtml(c.contract_code || '')}">
+      <div class="chat-m-room-card__avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div class="chat-m-room-card__body">
+        <div class="chat-m-room-card__main">
+          <span class="chat-m-room-card__name">${escapeHtml(mainLine)}</span>
+          <span class="${badgeCls}">${escapeHtml(status)}</span>
+        </div>
+        <div class="chat-m-room-card__sub">
+          <span class="chat-m-room-card__msg">${escapeHtml(subLine)}</span>
+          <span class="chat-m-room-card__date">${escapeHtml(dateStr)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.chat-m-room-card').forEach((card) => {
+    card.addEventListener('click', async () => {
+      const code = card.dataset.contractCode;
+      const item = allContracts.find((c) => c.contract_code === code);
+      if (!item) return;
+      if (mode === 'edit' && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
+      fillForm(item);
+    });
   });
 }
 
@@ -455,9 +527,13 @@ async function maybeCreateFromPendingSeed() {
   let seed = null;
   try {
     seed = JSON.parse(raw);
-  } catch (error) {
+  } catch (_) {
     localStorage.removeItem('freepass_pending_contract_seed');
-    throw error;
+    return;
+  }
+  if (!seed || typeof seed !== 'object') {
+    localStorage.removeItem('freepass_pending_contract_seed');
+    return;
   }
 
   const remoteContracts = await fetchContractsOnce();
@@ -596,6 +672,11 @@ async function bootstrap() {
     const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
     currentProfile = { ...profile, uid: user.uid };
     renderRoleMenu(menu, profile.role);
+
+    // 모바일 뒤로가기: 계약 입력/수정 → 계약목록
+    document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
+      closeMobileContractFormView();
+    });
 
     chatButton?.addEventListener('click', async () => {
       if (!currentContract) return;
@@ -761,7 +842,14 @@ async function bootstrap() {
       requestAnimationFrame(() => { listBody.scrollTop = restoredState.scrollTop; });
     }
 
-    await maybeCreateFromPendingSeed();
+    try {
+      await maybeCreateFromPendingSeed();
+    } catch (seedError) {
+      console.error('계약 시드 처리 오류:', seedError);
+      localStorage.removeItem('freepass_pending_contract_seed');
+      const errMsg = seedError?.message || seedError?.code || String(seedError) || '알 수 없는 오류';
+      showToast(`계약 생성 실패: ${errMsg}`, 'error');
+    }
   } catch (error) {
     console.error(error);
     showToast(`초기화 오류: ${error.message}`, 'error');
@@ -770,6 +858,11 @@ async function bootstrap() {
 
 let _mounted = false;
 export async function mount() {
+  document.body.classList.add('page-contract');
+  // 상품리스트에서 계약으로 넘어온 경우: 즉시 폼 뷰 표시
+  if (localStorage.getItem('freepass_pending_contract_seed') && isMobileQuery.matches) {
+    document.body.classList.add('contract-m-open');
+  }
   bindDOM();
   _mounted = false;
   await bootstrap();
@@ -777,6 +870,8 @@ export async function mount() {
 }
 export function unmount() {
   runPageCleanup();
+  document.body.classList.remove('page-contract');
+  document.body.classList.remove('contract-m-open');
   _mounted = false;
 }
 export function onShow() {

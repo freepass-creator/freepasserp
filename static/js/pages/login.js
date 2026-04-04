@@ -11,7 +11,7 @@ watchAuth(async (user) => {
   if (!user) return;
 
   if (isMasterAdminEmail(user.email)) {
-    // 마스터관리자: 최초 생성 시에만 기본값, 이후 DB 값 유지
+    // 마스터관리자: 최초 생성 시에만 기본값 설정, 이후 DB 값 유지
     const existing = await getUserProfile(user.uid);
     if (!existing) {
       await upsertUserProfile(user.uid, {
@@ -23,9 +23,8 @@ watchAuth(async (user) => {
         admin_code: 'A0001',
         status: 'active'
       });
-    } else {
-      await upsertUserProfile(user.uid, { role: 'admin', status: 'active' });
     }
+    // 기존 계정은 DB 값을 그대로 유지 (클라이언트에서 role 덮어쓰기 금지)
   }
 
   const profile = await getUserProfile(user.uid);
@@ -36,6 +35,9 @@ watchAuth(async (user) => {
     message.textContent = `현재 계정 상태는 ${profile.status || 'pending'} 입니다. 관리자 승인 후 로그인할 수 있습니다.`;
     return;
   }
+
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) { window.location.href = '/product-list'; return; }
 
   const landingPage = profile.settings?.landing_page;
   if (landingPage) { window.location.href = landingPage; return; }

@@ -52,6 +52,18 @@ form?.addEventListener('submit', async (event) => {
   const position = qs('#position').value.trim();
   const phone = qs('#phone').value.trim();
 
+  if (!name) {
+    message.textContent = '이름을 입력하세요.';
+    return;
+  }
+  if (!email) {
+    message.textContent = '이메일을 입력하세요.';
+    return;
+  }
+  if (password.length < 8) {
+    message.textContent = '비밀번호는 8자 이상이어야 합니다.';
+    return;
+  }
   if (password !== passwordConfirm) {
     message.textContent = '비밀번호와 비밀번호 확인이 일치하지 않습니다.';
     return;

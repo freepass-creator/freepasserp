@@ -210,6 +210,12 @@ def download_photos_zip():
     if not urls:
         return jsonify({'ok': False, 'message': 'urls가 필요합니다.'}), 400
 
+    # SSRF 방지: Firebase Storage URL만 허용
+    _ALLOWED_HOSTS = ('firebasestorage.googleapis.com', 'storage.googleapis.com')
+    urls = [u for u in urls if urlparse(u).hostname in _ALLOWED_HOSTS]
+    if not urls:
+        return jsonify({'ok': False, 'message': '허용되지 않은 URL입니다.'}), 400
+
     urls = urls[:30]
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:

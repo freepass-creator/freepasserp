@@ -1,12 +1,21 @@
 /* ===== CHAT — 카카오톡 스타일 ===== */
 
 .chat-panel-body {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 0;
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   height: 100%;
   padding-bottom: 0;
+}
+
+.chat-panel-body .message-list {
+  flex: 1;
+  min-height: 0;
+}
+
+.chat-panel-body .message-form {
+  flex-shrink: 0;
+  margin-top: 0;
 }
 
 .chat-head .panel-head-subtitle {
@@ -260,4 +269,19 @@
 
 .message-form.is-disabled input {
   cursor: default;
+}
+
+@media (max-width: 768px) {
+  /* 말풍선 */
+  .message-bubble { font-size: 14px; line-height: 1.6; padding: 10px 14px; }
+  /* 보낸사람 · 역할뱃지 · 시간 */
+  .message-sender { font-size: 11px; }
+  .message-role-badge { font-size: 10px; }
+  .message-time { font-size: 11px; }
+  /* 날짜 구분선 */
+  .message-date-divider { font-size: 12px; }
+  /* 입력란: iOS 줌 방지 + 터치 타겟 */
+  .message-form input { font-size: 16px; min-height: 44px; }
+  .message-send-btn { width: 44px; height: 44px; }
+  .message-form { padding: 10px 12px; }
 }
