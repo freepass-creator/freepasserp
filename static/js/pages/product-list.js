@@ -20,6 +20,7 @@ import {
   renderCatalogConditions,
   renderCatalogClawback,
   renderCatalogExtra,
+  fmt,
 } from "../shared/catalog-card.js";
 
 const DEFAULT_PERIODS = ["1", "12", "24", "36", "48", "60"];
@@ -1231,14 +1232,13 @@ function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
     ['연간약정주행거리', first(tf.annual_mileage,   pol.annualMileage)],
   ];
 
-  // 추가정보 행
-  const fmt = (v) => v ? String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
-  const fmtDate = (v) => { if (!v) return ''; const s = String(v).replace(/\D/g, ''); if (s.length === 8) return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`; return v; };
+  // 추가정보 행 (catalog.js와 동일)
+  const _fmtDate = (v) => { const d = String(v ?? '').replace(/[^\d]/g, ''); if (!d) return null; if (d.length === 8) return `${d.slice(0,4)}.${d.slice(4,6)}.${d.slice(6,8)}`; if (d.length === 6) return `20${d.slice(0,2)}.${d.slice(2,4)}.${d.slice(4,6)}`; return String(v ?? '').trim() || null; };
   const extraRows = [
     ['차량번호',   product.car_number],
     ['차종구분',   product.vehicle_class],
-    ['최초등록일', fmtDate(product.first_registration_date)],
-    ['차령만료일', fmtDate(product.vehicle_age_expiry_date)],
+    ['최초등록일', _fmtDate(product.first_registration_date)],
+    ['차령만료일', _fmtDate(product.vehicle_age_expiry_date)],
     ['차량가격',   fmt(product.vehicle_price)],
     ['특이사항',   product.partner_memo || product.note],
     ['공급코드',   product.providerCompanyCode || product.provider_company_code || product.partner_code],
