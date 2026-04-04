@@ -1230,13 +1230,12 @@ function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
     ['연간약정주행거리', first(tf.annual_mileage,   pol.annualMileage)],
   ];
 
-  // 카탈로그와 동일한 섹션 순서, 수수료 컬럼 + 환수조건만 추가
+  // 카탈로그와 동일한 섹션 순서, 수수료 컬럼 + 환수조건(표 아래)만 추가
   return galleryHtml
     + renderCatalogDetailHero(product, actionsHtml)
-    + renderCatalogPriceTable(priceRows, { showFee: true, guideNote })
+    + renderCatalogPriceTable(priceRows, { showFee: true, guideNote, clawbackNote: tf.commission_clawback_condition || '' })
     + renderCatalogInsuranceTable(insRows)
-    + renderCatalogConditions(condRows)
-    + renderCatalogClawback(tf.commission_clawback_condition || '');
+    + renderCatalogConditions(condRows);
 }
 
 function bindMobileDetailGallery(container) {

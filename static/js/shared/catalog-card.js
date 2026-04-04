@@ -221,10 +221,11 @@ export function renderCatalogDetailHero(p, actionsHtml = '') {
  *
  * @param {Array}  priceRows           — [{m, rent, dep, fee}, ...]
  * @param {object} opts
- * @param {boolean} [opts.showFee]     — 수수료 컬럼 표시 여부 (ERP only)
- * @param {string}  [opts.guideNote]   — 가격표 하단 안내 문구
+ * @param {boolean} [opts.showFee]      — 수수료 컬럼 표시 여부 (ERP only)
+ * @param {string}  [opts.guideNote]    — 가격표 하단 안내 문구
+ * @param {string}  [opts.clawbackNote] — 수수료 환수조건 (ERP only, 표 바로 아래)
  */
-export function renderCatalogPriceTable(priceRows, { showFee = false, guideNote = '' } = {}) {
+export function renderCatalogPriceTable(priceRows, { showFee = false, guideNote = '', clawbackNote = '' } = {}) {
   if (!priceRows.length) {
     return `<div class="cat-section cat-inquiry"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.4 2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6 6l.86-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> 가격은 문의해 주세요</div>`;
   }
@@ -241,6 +242,7 @@ export function renderCatalogPriceTable(priceRows, { showFee = false, guideNote 
     </tr>`).join('')}</tbody>
   </table>
   ${guideNote ? `<div class="cat-note">* ${esc(guideNote)}</div>` : ''}
+  ${clawbackNote ? `<div class="cat-note">* ${esc(clawbackNote)}</div>` : ''}
 </div>`;
 }
 
