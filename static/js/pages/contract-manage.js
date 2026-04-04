@@ -116,6 +116,7 @@ const isMobileQuery = window.matchMedia('(max-width: 768px)');
 function openMobileContractFormView() {
   if (!isMobileQuery.matches) return;
   document.body.classList.add('contract-m-open');
+  history.pushState({ contractOpen: true }, '');
 }
 
 function closeMobileContractFormView() {
@@ -457,15 +458,10 @@ function renderMobileList(visible) {
     const model = c.sub_model || c.model_name || c.vehicle_name || '';
     const mainLine = [carNo, model].filter(Boolean).join(' ') || '-';
     const partner = c.partner_code || c.provider_company_code || '';
-    const channel = c.agent_channel_code || c.agent_company_code || '';
     const agentCode = c.agent_code || '';
-    const customer = c.customer_name || '';
     const month = c.rent_month ? `${c.rent_month}개월` : '';
-    const depositAmt = Number(c.deposit_amount || 0);
-    const rentAmt = Number(c.rent_amount || 0);
-    const deposit = depositAmt ? depositAmt.toLocaleString('ko-KR') + '원' : '';
-    const rent = rentAmt ? rentAmt.toLocaleString('ko-KR') + '원' : '';
-    const subLine = [partner, channel, agentCode, customer, month, deposit, rent].filter(Boolean).join(' · ');
+    const customer = c.customer_name || '';
+    const subLine = [partner, agentCode, month, customer].filter(Boolean).join(' · ');
     const status = c.contract_status || '계약대기';
     const at = c.created_at || c.updated_at;
     const d = at ? new Date(at) : null;
@@ -675,7 +671,11 @@ async function bootstrap() {
 
     // 모바일 뒤로가기: 계약 입력/수정 → 계약목록
     document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
-      closeMobileContractFormView();
+      if (history.state?.contractOpen) history.back();
+      else closeMobileContractFormView();
+    });
+    window.addEventListener('popstate', (e) => {
+      if (document.body.classList.contains('contract-m-open')) closeMobileContractFormView();
     });
 
     chatButton?.addEventListener('click', async () => {

@@ -76,6 +76,7 @@ const isMobileQuery = window.matchMedia('(max-width: 768px)');
 function openMobileChatView() {
   if (!isMobileQuery.matches) return;
   document.body.classList.add('chat-m-open');
+  history.pushState({ chatOpen: true }, '');
   const input = document.getElementById('message-input');
   if (input) input.focus();
 }
@@ -302,7 +303,11 @@ async function bootstrap() {
 
     // 모바일 뒤로가기: 채팅창 → 대화목록
     document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
-      closeMobileChatView();
+      if (history.state?.chatOpen) history.back();
+      else closeMobileChatView();
+    });
+    window.addEventListener('popstate', (e) => {
+      if (document.body.classList.contains('chat-m-open')) closeMobileChatView();
     });
 
     // 상세패널 버튼 이벤트
