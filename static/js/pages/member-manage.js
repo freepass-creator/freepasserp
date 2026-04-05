@@ -278,7 +278,10 @@ async function bootstrap() {
     });
     companyCodeSelect?.addEventListener('change', () => syncCompanyName(companyCodeSelect.value));
     refreshButton?.addEventListener('click', async () => {
+      refreshButton.classList.add('btn-refreshing');
+      refreshButton.disabled = true;
       try { await refreshMembers(); } catch (error) { showToast(`새로고침 실패: ${error.message}`, 'error'); }
+      finally { refreshButton.classList.remove('btn-refreshing'); refreshButton.disabled = false; }
     });
     const onSubmit = createSubmitHandler({
       getFormMode: () => formMode,
