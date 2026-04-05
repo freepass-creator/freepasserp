@@ -146,7 +146,7 @@ function renderDetailContent(product) {
   const actionsHtml = `<div class="md-actions">${inquiryBtn}${contractBtn}${shareBtn}</div>`;
 
   // ── 4. 기간별 대여료 및 보증금 ──
-  const months = ['1','6','12','24','36','48','60'];
+  const months = ['1','12','24','36','48','60'];
   const priceRowsHtml = months.map(m => {
     const rent = Number(product.price[m]?.rent || 0);
     const dep = Number(product.price[m]?.deposit || 0);
@@ -196,7 +196,6 @@ function renderDetailContent(product) {
     ${sectionHead('대여조건')}
     <div class="md-card">
       ${row('결제방식', first(term.payment_method, p.paymentMethod))}
-      ${row('약정주행거리', first(term.annual_mileage, p.annualMileage))}
       ${row('1만Km추가비용', first(term.mileage_upcharge_per_10000km))}
       ${row('보증금분납', first(term.deposit_installment))}
       ${row('보증금카드결제', first(term.deposit_card_payment))}

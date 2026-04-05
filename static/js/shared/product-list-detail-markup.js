@@ -225,7 +225,7 @@ function renderPriceSummarySection(policy) {
 }
 
 function renderPriceSection(product, termFields = {}) {
-  const periods = ['1', '6', '12', '24', '36', '48', '60'];
+  const periods = ['1', '12', '24', '36', '48', '60'];
   const rows = periods
     .filter((month) => Number(product.price?.[month]?.rent || 0) > 0)
     .map((month) => {
@@ -320,7 +320,6 @@ function renderRentalSection(product, termFields = {}) {
   const policy = buildPolicyValues(product, termFields);
   const rows = [
     rowMaybe('결제방식', policy.paymentMethod),
-    rowMaybe('약정주행거리', policy.annualMileage),
     rowMaybe('1만Km추가비용', policy.mileageUpchargePer10000km),
     rowMaybe('보증금분납', policy.depositInstallment),
     rowMaybe('보증금카드결제', policy.depositCardPayment),
@@ -388,7 +387,7 @@ function renderInsuranceSection(product, termFields = {}) {
 }
 
 function renderFeeSection(product, termFields = {}) {
-  const periods = ['1', '6', '12', '24', '36', '48', '60'];
+  const periods = ['1', '12', '24', '36', '48', '60'];
   const rows = periods
     .filter((month) => Number(product.price?.[month]?.rent || 0) > 0)
     .map((month) => `<tr><td>${month}개월</td><td class="price-cell price-cell--disabled">준비중</td></tr>`)
