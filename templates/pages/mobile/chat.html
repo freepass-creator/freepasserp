@@ -1,6 +1,7 @@
 {% extends 'pages/layout/workspace-mobile.html' %}
 {% block workspace_body %}
 <script>document.body.classList.add('page-chat');</script>
+<div class="work-page min-h-work">
 
 <!-- 방 목록 -->
 <div class="chat-m-rooms" id="chatMRooms"></div>
@@ -47,6 +48,7 @@
     <input class="catalog-search" id="chatMFilterSearch" type="search" placeholder="상대방, 상품명 검색...">
   </div>
 </aside>
+</div>
 {% endblock %}
 {% block workspace_page_js %}
 <script type="module" src="{{ url_for('static', filename='js/mobile/chat.js') }}" data-page-script="true"></script>

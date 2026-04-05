@@ -358,6 +358,8 @@ body.chat-m-open .work-page {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .m-chatroom__form {
