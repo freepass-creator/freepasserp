@@ -313,17 +313,26 @@ button, a, [role="button"] {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 6px 16px;
   font-size: 14px;
   color: #334155;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 .catalog-filter-option input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   margin: 0;
   accent-color: #1b2a4a;
+  outline: none !important;
+  box-shadow: none !important;
+  border: 1px solid #cbd5e1;
+  border-radius: 3px;
+  -webkit-appearance: checkbox;
+}
+.catalog-filter-option input[type="checkbox"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
