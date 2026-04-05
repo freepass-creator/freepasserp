@@ -481,15 +481,27 @@ function renderSingleGallery(images) {
 
   updateGallerySlide();
 
-  // 스와이프
-  singleGallery.ontouchstart = (e) => { _sTouchStartX = e.touches[0].clientX; };
-  singleGallery.ontouchend = (e) => {
+  // 스와이프 (스크롤 충돌 방지 + 클릭 오작동 방지)
+  let _sTouchStartY = 0, _sSwiped = false, _sLocked = false;
+  singleGallery.addEventListener('touchstart', (e) => {
+    _sTouchStartX = e.touches[0].clientX; _sTouchStartY = e.touches[0].clientY;
+    _sSwiped = false; _sLocked = false;
+  }, { passive: true });
+  singleGallery.addEventListener('touchmove', (e) => {
+    if (_sLocked) return;
+    const dx = Math.abs(e.touches[0].clientX - _sTouchStartX);
+    const dy = Math.abs(e.touches[0].clientY - _sTouchStartY);
+    if (dx > dy && dx > 10) { _sLocked = true; _sSwiped = true; e.preventDefault(); }
+    else if (dy > dx && dy > 10) { _sLocked = true; }
+  }, { passive: false });
+  singleGallery.addEventListener('touchend', (e) => {
+    if (!_sSwiped || !sGalleryImages.length) return;
     const dx = e.changedTouches[0].clientX - _sTouchStartX;
-    if (Math.abs(dx) < 40 || !sGalleryImages.length) return;
+    if (Math.abs(dx) < 40) return;
     const total = sGalleryImages.length;
     sGalleryIndex = dx < 0 ? (sGalleryIndex + 1) % total : (sGalleryIndex - 1 + total) % total;
     updateGallerySlide();
-  };
+  });
 }
 
 function updateGallerySlide() {
@@ -506,9 +518,10 @@ function updateGallerySlide() {
       ${total > 0 ? `<div class="catalog-gallery__hint">사진을 눌러 ${total}장 모두 보기</div>` : ''}
     </div>`;
 
-  // 사진 클릭 → 풀스크린 뷰어
+  // 사진 클릭 → 풀스크린 뷰어 (스와이프 후 클릭 방지)
   document.getElementById('gallery-track')?.addEventListener('click', (e) => {
-    if (e.target.closest('.catalog-gallery__nav')) return; // 네비 버튼 제외
+    if (e.target.closest('.catalog-gallery__nav')) return;
+    if (_sSwiped) { _sSwiped = false; return; }
     openPhotoViewer(sGalleryIndex);
   });
 

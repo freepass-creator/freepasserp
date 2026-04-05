@@ -156,6 +156,8 @@ async function loadPage(url, options = {}) {
         o.classList.remove('is-open');
         o.setAttribute('aria-hidden', 'true');
       });
+      // 모바일 뷰 클래스 잔류 방지 (iOS 에지 스와이프 등)
+      document.body.classList.remove('chat-m-open', 'contract-m-open');
       clearDirtyCheck();
     }
 

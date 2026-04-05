@@ -13,6 +13,8 @@ import { ensureRoom, watchProducts, resolveTermForProduct } from "../firebase/fi
 import { showConfirm, showToast } from "../core/toast.js";
 import { bindProductDetailPhotoEvents, extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
 import { renderBadgeRow } from "../shared/badge.js";
+
+const _isMobile = window.matchMedia('(max-width: 768px)');
 import {
   esc,
   renderCatalogCard,
@@ -442,6 +444,7 @@ function scheduleRenderList() {
 }
 
 function renderList(){
+  if (_isMobile.matches) return; // 모바일에서는 카드 뷰만 사용
   if ($pageName) $pageName.textContent = `전체 상품 검색 (${state.filteredProducts.length}건)`;
 
   renderTableGrid({
@@ -769,9 +772,8 @@ function applyFilters(){
   renderPeriodsHead();
   if (state.filterOverlayOpen) { renderFilterAccordion(baseSets); _accordionDirty = false; } else { _accordionDirty = true; }
   syncPeriodChips();
-  renderList();
-  renderDetail();
-  renderMobileCatalogGrid();
+  if (!_isMobile.matches) { renderList(); renderDetail(); }
+  if (_isMobile.matches) { renderMobileCatalogGrid(); }
   persistFilterState();
 }
 $openFilterBtn?.addEventListener('click',()=>{ 
@@ -960,15 +962,27 @@ function bindMobileDetailGallery(container) {
     container.querySelector('#plsMGalleryPrev')?.addEventListener('click', (e) => { e.stopPropagation(); idx = (idx - 1 + photos.length) % photos.length; update(); });
     container.querySelector('#plsMGalleryNext')?.addEventListener('click', (e) => { e.stopPropagation(); idx = (idx + 1) % photos.length; update(); });
   }
-  // 사진 클릭 → 풀스크린 뷰어 (카탈로그와 동일)
+  // 사진 클릭 → 풀스크린 뷰어 (스와이프 후 클릭 방지)
   wrap.addEventListener('click', (e) => {
     if (e.target.closest('.catalog-gallery__nav')) return;
+    if (_swiped) { _swiped = false; return; }
     openFullscreenViewer(photos, idx);
   });
-  // 스와이프
-  let _tx = 0;
-  wrap.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; }, { passive: true });
+  // 스와이프 (스크롤 충돌 방지 + 클릭 오작동 방지)
+  let _tx = 0, _ty = 0, _swiped = false, _locked = false;
+  wrap.addEventListener('touchstart', e => {
+    _tx = e.touches[0].clientX; _ty = e.touches[0].clientY;
+    _swiped = false; _locked = false;
+  }, { passive: true });
+  wrap.addEventListener('touchmove', e => {
+    if (_locked) return;
+    const dx = Math.abs(e.touches[0].clientX - _tx);
+    const dy = Math.abs(e.touches[0].clientY - _ty);
+    if (dx > dy && dx > 10) { _locked = true; _swiped = true; e.preventDefault(); }
+    else if (dy > dx && dy > 10) { _locked = true; } // 세로 스크롤 허용
+  }, { passive: false });
   wrap.addEventListener('touchend', e => {
+    if (!_swiped) return;
     const dx = e.changedTouches[0].clientX - _tx;
     if (Math.abs(dx) < 40) return;
     idx = dx < 0 ? (idx + 1) % photos.length : (idx - 1 + photos.length) % photos.length;

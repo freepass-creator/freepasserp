@@ -153,19 +153,39 @@ async function handleMobileBack() {
   return true;
 }
 
-/** visualViewport: 키보드 올라올 때 채팅 패널 bottom 조정 */
+/** visualViewport: 키보드 올라올 때 탭바 숨김 + 채팅/계약 패널 bottom 조정 */
 function initKeyboardAdjust() {
   if (!window.visualViewport) return;
   const TAB_H = 56;
+  const tabBarEl = document.getElementById('mobile-tab-bar');
+  const filterFab = document.getElementById('mobile-filter-btn');
+
   window.visualViewport.addEventListener('resize', () => {
-    if (!document.body.classList.contains('chat-m-open')) return;
-    const panel = document.querySelector('.layout-633');
-    if (!panel) return;
     const kbHeight = window.innerHeight - window.visualViewport.height;
-    panel.style.bottom = kbHeight > 50
-      ? `${kbHeight}px`
-      : `calc(${TAB_H}px + env(safe-area-inset-bottom))`;
+    const kbOpen = kbHeight > 50;
+
+    // 키보드 열림: 탭바 + FAB 숨김
+    if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
+    if (filterFab) filterFab.style.display = kbOpen ? 'none' : '';
+
+    // 채팅 패널 bottom 조정
+    if (document.body.classList.contains('chat-m-open')) {
+      const panel = document.querySelector('.layout-633');
+      if (panel) panel.style.bottom = kbOpen ? `${kbHeight}px` : `calc(${TAB_H}px + env(safe-area-inset-bottom))`;
+    }
+
+    // 계약 폼 패널 bottom 조정
+    if (document.body.classList.contains('contract-m-open')) {
+      const panel = document.querySelector('.layout-66');
+      if (panel) panel.style.paddingBottom = kbOpen ? `${kbHeight}px` : '';
+    }
   });
+}
+
+/** iOS 에지 스와이프 등으로 popstate 발생 시 모바일 뷰 클래스 잔류 방지 */
+function cleanupMobileViewClasses() {
+  const MOBILE_VIEW_CLASSES = ['chat-m-open', 'contract-m-open'];
+  MOBILE_VIEW_CLASSES.forEach(cls => document.body.classList.remove(cls));
 }
 
 function initMobileBackTrap() {
@@ -175,6 +195,8 @@ function initMobileBackTrap() {
   window.addEventListener('popstate', async () => {
     const keepInApp = await handleMobileBack();
     if (keepInApp) {
+      // 핸들러가 처리하지 못한 잔류 클래스 정리
+      cleanupMobileViewClasses();
       history.pushState({ mobileBack: true }, '');
     }
   });
