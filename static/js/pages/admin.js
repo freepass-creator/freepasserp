@@ -121,20 +121,20 @@ function stlCustomer(s) { return s.customer_name || s.customer_name_snapshot || 
 function stlStatus(s)   { return s.settlement_status || s.status || '정산대기'; }
 
 const ADMIN_STL_COLS = [
-  { key: 'code',     label: '계약코드',   align: 'c', searchable: true,  w: 110 },
-  { key: 'status',   label: '정산상태',   align: 'c', filterable: true,  w: 80  },
-  { key: 'partner',  label: '공급사명',   align: 'c', filterable: true,  w: 110 },
-  { key: 'date',     label: '계약완료일', align: 'c', filterable: true,  w: 88  },
-  { key: 'ptype',    label: '상품구분',   align: 'c', filterable: true,  w: 72  },
-  { key: 'car',      label: '차량번호',   align: 'c', searchable: true,  w: 88  },
-  { key: 'model',    label: '모델명',     align: 'c', filterable: true,  w: 110 },
-  { key: 'customer', label: '고객명',     align: 'c', searchable: true,  w: 72  },
-  { key: 'month',    label: '계약기간',   align: 'c', filterable: true,  w: 80  },
-  { key: 'rent',     label: '대여료',     align: 'r',                    w: 80  },
-  { key: 'deposit',  label: '보증금',     align: 'r',                    w: 80  },
-  { key: 'fee',      label: '수수료',     align: 'r',                    w: 80  },
-  { key: 'channel',  label: '영업채널',   align: 'c', filterable: true,  w: 80  },
-  { key: 'agent',    label: '영업자',     align: 'c', filterable: true,  w: 72  },
+  { key: 'code',     label: '계약코드',   align: 'c', searchable: true  },
+  { key: 'status',   label: '정산상태',   align: 'c', filterable: true  },
+  { key: 'partner',  label: '공급사명',   align: 'c', filterable: true  },
+  { key: 'date',     label: '계약완료일', align: 'c', filterable: true  },
+  { key: 'ptype',    label: '상품구분',   align: 'c', filterable: true  },
+  { key: 'car',      label: '차량번호',   align: 'c', searchable: true  },
+  { key: 'model',    label: '모델명',     align: 'c', filterable: true  },
+  { key: 'customer', label: '고객명',     align: 'c', searchable: true  },
+  { key: 'month',    label: '계약기간',   align: 'c', filterable: true  },
+  { key: 'rent',     label: '대여료',     align: 'r'                    },
+  { key: 'deposit',  label: '보증금',     align: 'r'                    },
+  { key: 'fee',      label: '수수료',     align: 'r'                    },
+  { key: 'channel',  label: '영업채널',   align: 'c', filterable: true  },
+  { key: 'agent',    label: '영업자',     align: 'c', filterable: true  },
 ];
 
 
