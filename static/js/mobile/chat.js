@@ -152,6 +152,7 @@ function bindEvents() {
     const text = $msgInput.value.trim();
     if (!text || !currentRoomId) return;
     $msgInput.value = '';
+    $msgInput.focus();
     sendMessage(currentRoomId, {
       sender_uid: currentUser.uid,
       sender_code: currentProfile.user_code || currentProfile.company_code || '-',
