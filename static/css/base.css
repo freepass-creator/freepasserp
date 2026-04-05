@@ -158,15 +158,6 @@ body {
   box-sizing: border-box;
 }
 
-/* 새로고침 버튼 회전 애니메이션 */
-.btn-refreshing svg {
-  animation: spin-refresh 0.6s ease;
-}
-@keyframes spin-refresh {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* 페이지 로드 시 transition 깜빡임 방지 */
 html.no-transition,
 html.no-transition *,
