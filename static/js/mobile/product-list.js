@@ -343,9 +343,9 @@ async function handleInquiry(btnEl, product) {
   }
 }
 
-function handleContract(product) {
+async function handleContract(product) {
   if (!product) return;
-  if (!confirm('이 상품에 대해 계약을 생성하시겠습니까?')) return;
+  if (!await showConfirm('이 상품에 대해 계약을 생성하시겠습니까?')) return;
   const seed = {
     seed_product_key: product.id,
     product_uid: product.id,
