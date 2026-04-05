@@ -84,6 +84,14 @@ function renderGrid() {
 
 function safe(v) { return String(v ?? '').trim() || '-'; }
 function money(v) { const n = Number(v || 0); return n ? n.toLocaleString('ko-KR') + '원' : '-'; }
+function first(...vs) { for (const v of vs) { const s = String(v ?? '').trim(); if (s && s !== '-') return s; } return '-'; }
+function parsePol(raw) {
+  const s = String(raw ?? '').trim();
+  if (!s || s === '-') return { limit: '-', deductible: '-' };
+  const parts = s.split('/').map(x => x.trim()).filter(Boolean);
+  return parts.length >= 2 ? { limit: parts[0], deductible: parts.slice(1).join(' / ') } : { limit: s, deductible: '-' };
+}
+function fmtDate(v) { const d = String(v ?? '').replace(/[^\d]/g, ''); if (!d) return '-'; if (d.length === 8) return `${d.slice(0,4)}.${d.slice(4,6)}.${d.slice(6,8)}`; if (d.length === 6) return `20${d.slice(0,2)}.${d.slice(2,4)}.${d.slice(4,6)}`; return safe(v); }
 const SECTION_ICONS = {
   '차량정보': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8"/><path d="M7 14h.01"/><path d="M17 14h.01"/><rect width="18" height="8" x="3" y="10" rx="2"/><path d="M5 18v2"/><path d="M19 18v2"/></svg>',
   '기간별 대여료 및 보증금 안내': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V7"/><path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/></svg>',
@@ -145,9 +153,9 @@ function renderDetailContent(product) {
     if (!rent && !dep) return '';
     return `<tr><td>${m}개월</td><td><strong>${rent ? rent.toLocaleString('ko-KR') + '원' : '-'}</strong></td><td>${dep ? dep.toLocaleString('ko-KR') + '원' : '-'}</td></tr>`;
   }).join('');
-  const screeningNote = safe(term.screening_criteria || product.reviewStatus);
-  const guideNote = safe(term.rental_guide_note);
-  const insuranceIncluded = safe(term.insurance_included);
+  const guideNote = first(term.rental_guide_note, product.pricingBasis);
+  const screeningNote = first(term.screening_criteria, product.reviewStatus);
+  const insuranceIncluded = first(term.insurance_included, product.insuranceIncluded);
   const priceNote = [
     screeningNote !== '-' ? `* ${esc(screeningNote)}` : '',
     insuranceIncluded !== '-' ? `* 보험포함: ${esc(insuranceIncluded)}` : '',
@@ -160,60 +168,48 @@ function renderDetailContent(product) {
       ${priceNote ? `<div class="md-note">${priceNote}</div>` : ''}
     </div>` : '';
 
-  // ── 5. 차량보험정보 ──
-  const merged = {
-    bodily: safe(p.bodily || term.injury_limit_deductible),
-    property: safe(p.property || term.property_limit_deductible),
-    selfBodily: safe(p.selfBodily || term.personal_injury_limit_deductible),
-    uninsured: safe(p.uninsured || term.uninsured_limit_deductible),
-    ownDamage: safe(p.ownDamage || term.own_damage_limit_deductible),
-    emergency: safe(c.emergency || term.roadside_assistance),
-  };
-  function insRow(label, raw) {
-    const parts = String(raw || '-').split('/').map(s => s.trim());
-    return `<tr><td>${esc(label)}</td><td>${esc(parts[0] || '-')}</td><td>${esc(parts.slice(1).join('/') || '-')}</td></tr>`;
-  }
+  // ── 5. 차량보험정보 (웹과 동일한 term 우선 로직) ──
+  const bodily   = parsePol(first(term.injury_limit_deductible, p.bodily));
+  const property = parsePol(first(term.property_limit_deductible, p.property));
+  const selfB    = parsePol(first(term.personal_injury_limit_deductible, p.selfBodily));
+  const unins    = parsePol(first(term.uninsured_limit_deductible, p.uninsured));
+  const own      = parsePol(first(term.own_damage_limit_deductible, p.ownDamage));
+  const insRows = [
+    ['대인', first(term.injury_compensation_limit, bodily.limit), first(term.injury_deductible, bodily.deductible)],
+    ['대물', first(term.property_compensation_limit, property.limit), first(term.property_deductible, property.deductible)],
+    ['자기신체사고', first(term.personal_injury_compensation_limit, selfB.limit), first(term.personal_injury_deductible, selfB.deductible)],
+    ['무보험차상해', first(term.uninsured_compensation_limit, unins.limit), first(term.uninsured_deductible, unins.deductible)],
+    ['자기차량손해', first(term.own_damage_compensation, own.limit), first(term.own_damage_min_deductible, own.deductible)],
+    ['긴급출동', first(term.roadside_assistance, c.emergency), '-'],
+  ];
   const insSection = `
     ${sectionHead('차량보험정보')}
     <div class="md-card">
       <table class="md-table"><thead><tr><th>항목</th><th>한도</th><th>면책금</th></tr></thead><tbody>
-        ${insRow('대인', merged.bodily)}
-        ${insRow('대물', merged.property)}
-        ${insRow('자기신체사고', merged.selfBodily)}
-        ${insRow('무보험차상해', merged.uninsured)}
-        ${insRow('자기차량손해', merged.ownDamage)}
+        ${insRows.map(([label, limit, ded]) => `<tr><td>${esc(label)}</td><td>${esc(limit)}</td><td>${esc(ded)}</td></tr>`).join('')}
       </tbody></table>
-      ${row('긴급출동', merged.emergency)}
     </div>`;
 
-  // ── 6. 대여조건 ──
-  const mg = {
-    ageText: safe(product.ageText || term.basic_driver_age),
-    ageLowering: safe(p.ageLowering || term.driver_age_lowering),
-    ageLoweringCost: safe(p.ageLoweringCost || term.age_lowering_cost),
-    annualMileage: safe(p.annualMileage || term.annual_mileage),
-    paymentMethod: safe(p.paymentMethod || term.payment_method),
-  };
+  // ── 6. 대여조건 (웹과 동일 — first(term, product) 패턴) ──
   const rentalTerms = `
     ${sectionHead('대여조건')}
     <div class="md-card">
-      ${row('1만Km추가비용', term.mileage_upcharge_per_10000km || '대여료의 10%')}
-      ${row('보증금분납', term.deposit_installment || '가능')}
-      ${row('보증금카드결제', term.deposit_card_payment || '가능')}
-      ${row('대여지역', term.rental_region || c.rentalRegion || '전국')}
-      ${row('최소운전자연령', mg.ageText)}
-      ${row('운전연령하향', mg.ageLowering)}
-      ${row('운전연령하향비용', mg.ageLoweringCost)}
-      ${row('개인운전자범위', term.personal_driver_scope || '계약자 본인+직계가족')}
-      ${row('사업자운전자범위', term.business_driver_scope || '계약사업자 임직원 및 관계자')}
-      ${row('추가운전자수', term.additional_driver_allowance_count || '불가')}
-      ${row('추가운전자비용', term.additional_driver_cost || '불가')}
-      ${row('연간약정주행거리', mg.annualMileage)}
-      ${row('결제방식', mg.paymentMethod)}
-      ${row('정비서비스', c.maintenance || term.maintenance_service || '불포함')}
-      ${row('탁송가능', c.delivery)}
-      ${row('탁송비용', c.deliveryFee || term.delivery_fee)}
-      ${row('위약금조건', term.penalty_condition || c.penaltyRate)}
+      ${row('1만Km추가비용', first(term.mileage_upcharge_per_10000km))}
+      ${row('보증금분납', first(term.deposit_installment))}
+      ${row('보증금카드결제', first(term.deposit_card_payment))}
+      ${row('대여지역', first(term.rental_region, c.rentalRegion))}
+      ${row('최소운전연령', first(term.basic_driver_age, product.ageText))}
+      ${row('운전연령하향', first(term.driver_age_lowering, p.ageLowering))}
+      ${row('운전연령하향비용', first(term.age_lowering_cost, p.ageLoweringCost))}
+      ${row('개인운전자범위', first(term.personal_driver_scope))}
+      ${row('사업자운전자범위', first(term.business_driver_scope))}
+      ${row('추가운전자수', first(term.additional_driver_allowance_count))}
+      ${row('추가운전자비용', first(term.additional_driver_cost))}
+      ${row('연간약정주행거리', first(term.annual_mileage, p.annualMileage))}
+      ${row('결제방식', first(term.payment_method, p.paymentMethod))}
+      ${row('정비서비스', first(term.maintenance_service, c.maintenance))}
+      ${row('탁송비', first(term.delivery_fee, c.deliveryFee))}
+      ${row('위약금', first(term.penalty_condition, c.penaltyRate))}
     </div>`;
 
   // ── 7. 추가정보 ──
@@ -224,17 +220,11 @@ function renderDetailContent(product) {
     <div class="md-card">
       ${row('차량번호', product.carNo)}
       ${row('차종구분', product.vehicleClass)}
+      ${row('최초등록일', fmtDate(product.firstRegistrationDate))}
+      ${row('차령만료일', fmtDate(product.vehicleAgeExpiryDate))}
       ${row('차량가격', money(product.vehiclePrice))}
-      ${row('배기량', product.engineCc ? product.engineCc + 'cc' : '-')}
-      ${row('최초등록일', product.firstRegistrationDate)}
-      ${row('차령만료일', product.vehicleAgeExpiryDate)}
-      ${row('심사여부', product.reviewStatus)}
-      ${row('신용등급', product.creditGrade)}
-      ${row('차량세부상태', c.detailStatus)}
-      ${row('사고여부', c.accident)}
-      ${row('즉시출고', c.immediate)}
-      ${row('특이사항', c.note || product.partnerMemo)}
-      ${row('공급코드', product.partnerCode)}
+      ${row('특이사항', first(c.note, product.partnerMemo))}
+      ${row('공급코드', first(product.providerCompanyCode, product.partnerCode))}
       ${photoLinkHtml}
     </div>`;
 
@@ -244,7 +234,7 @@ function renderDetailContent(product) {
     if (!fee && fee !== 0) return '';
     return `<tr><td>${m}개월</td><td>${Number(fee || 0) ? Number(fee).toLocaleString('ko-KR') + '원' : '준비중'}</td></tr>`;
   }).join('');
-  const clawback = safe(term.commission_clawback_condition);
+  const clawback = first(term.commission_clawback_condition);
   const feeSection = feeRowsHtml ? `
     ${sectionHead('기간별 수수료')}
     <div class="md-card">
