@@ -167,7 +167,7 @@ function renderDetailContent(product) {
   const priceSection = priceRowsHtml ? `
     ${sectionHead('기간별 대여료 및 보증금 안내')}
     <div class="md-card">
-      <table class="md-table"><thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead><tbody>${priceRowsHtml}</tbody></table>
+      <table class="md-table md-table--price"><thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead><tbody>${priceRowsHtml}</tbody></table>
       ${priceNote ? `<div class="md-note">${priceNote}</div>` : ''}
     </div>` : '';
 
@@ -248,7 +248,7 @@ function renderDetailContent(product) {
   const feeSection = feeRowsHtml ? `
     ${sectionHead('기간별 수수료')}
     <div class="md-card">
-      <table class="md-table"><thead><tr><th>기간</th><th>수수료</th></tr></thead><tbody>${feeRowsHtml}</tbody></table>
+      <table class="md-table md-table--price"><thead><tr><th>기간</th><th>수수료</th></tr></thead><tbody>${feeRowsHtml}</tbody></table>
       ${clawback !== '-' ? `<div class="md-note">* ${esc(clawback)}</div>` : ''}
     </div>` : '';
 

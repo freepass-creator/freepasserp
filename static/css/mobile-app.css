@@ -587,7 +587,7 @@ body.chat-m-open .work-page {
 }
 .md-table th {
   padding: 10px 16px;
-  text-align: left;
+  text-align: center;
   font-weight: 600;
   color: #64748b;
   background: #f8fafc;
@@ -596,11 +596,15 @@ body.chat-m-open .work-page {
 .md-table td {
   padding: 10px 16px;
   color: #0f172a;
+  text-align: center;
   border-bottom: 1px solid #f1f5f9;
 }
 .md-table td strong {
   font-weight: 700;
 }
+/* 금액 우측 정렬, 텍스트 가운데 */
+.md-table--price td:nth-child(n+2) { text-align: right; }
+.md-table--price th:nth-child(n+2) { text-align: right; }
 .md-note {
   padding: 10px 16px;
   font-size: 12px;
