@@ -154,6 +154,14 @@ function initTabNavigation() {
     const nextPathname = new URL(href, window.location.origin).pathname;
     if (nextPathname === currentPageKey || nextPathname === pendingNavigationPath) {
       event.preventDefault();
+      // 같은 탭 다시 누르면 상세/채팅방 등 닫고 메인으로
+      const detail = document.getElementById('plsMDetail');
+      if (detail && !detail.hidden) { detail.hidden = true; return; }
+      const contractDetail = document.getElementById('contract-m-detail');
+      if (contractDetail && !contractDetail.hidden) { contractDetail.hidden = true; return; }
+      if (document.body.classList.contains('chat-m-open')) {
+        document.body.classList.remove('chat-m-open'); return;
+      }
       return;
     }
     event.preventDefault();
