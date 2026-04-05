@@ -14,7 +14,7 @@
 
 
 .policy-form-grid .field-helper {
-  margin-top: 4px;
+  margin-top: var(--space-1);
   font-size: var(--font-size-sub);
   color: var(--text-subtle);
   line-height: 1.35;

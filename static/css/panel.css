@@ -2,8 +2,8 @@
   --panel-bg: var(--surface-base);
   --panel-head-bg: var(--new-bg-panel-head, var(--surface-base));
   --panel-border: var(--border-main);
-  --panel-head-px: 12px;
-  --panel-head-gap: 12px;
+  --panel-head-px: var(--space-3);
+  --panel-head-gap: var(--space-3);
   --panel-title-size: var(--font-size-main);
   --panel-title-weight: var(--font-weight-strong);
   --panel-subtitle-size: var(--font-size-sub);
@@ -53,7 +53,7 @@
 .panel-head-title-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .panel-head-actions--compact {
-  gap: 6px;
+  gap: var(--space-2);
   flex-wrap: nowrap;
 }
 

@@ -6,7 +6,7 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   min-height: 52px;
-  padding: 0 12px;
+  padding: 0 var(--space-3);
   border-bottom: none;
   margin-bottom: 0;
 }
@@ -20,7 +20,7 @@
 }
 
 .top-bar-user-item {
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: var(--new-text-subtle, var(--text-subtle));
   white-space: nowrap;
   overflow: hidden;
@@ -37,29 +37,29 @@
 }
 
 .top-bar-page-name {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-strong);
   color: var(--new-text-main, var(--text-main));
   letter-spacing: -0.03em;
 }
 
 .top-bar-identity {
-  font-size: 11px;
-  font-weight: 400;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-base);
   color: var(--new-text-sub, #64748b);
   letter-spacing: -0.02em;
 }
 
 .top-bar-state-sep {
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: var(--new-text-subtle, #94a3b8);
-  font-weight: 400;
+  font-weight: var(--font-weight-base);
   user-select: none;
 }
 
 .top-bar-work-badge {
-  font-size: 11px;
-  font-weight: 400;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-base);
   color: var(--new-text-sub, #64748b);
   letter-spacing: -0.02em;
 }
@@ -69,7 +69,7 @@
 }
 
 .top-bar-identity {
-  font-size: 12px;
+  font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--new-text-main, var(--text-main));
   letter-spacing: -0.03em;

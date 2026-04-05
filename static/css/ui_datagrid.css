@@ -42,10 +42,10 @@
 
 .pls-th {
   position: relative;
-  padding: 0 4px;
-  height: 40px;
-  font-size: 10px;
-  font-weight: 500;
+  padding: 0 var(--space-1);
+  height: var(--height-lg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-strong);
   color: #041e49;
   white-space: nowrap;
   user-select: none;
@@ -85,10 +85,10 @@
 /* ─── 데이터 셀 (td) ─────────────────────────────────────────────────────── */
 
 .pls-cell {
-  padding: 0 4px;
+  padding: 0 var(--space-1);
   height: 34px;
   vertical-align: middle;
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: var(--text-main, #1f1f1f);
   white-space: nowrap;
   letter-spacing: -0.03em;
@@ -104,7 +104,7 @@
   position: sticky;
   left: 0;
   z-index: 2;
-  font-weight: 500;
+  font-weight: var(--font-weight-strong);
   color: var(--text-main, #1f1f1f);
   background: inherit;
 }
@@ -140,11 +140,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: var(--height-xs);
+  height: var(--height-xs);
   padding: 0;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: #80868b;
   cursor: pointer;
@@ -174,14 +174,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 52px;
-  height: 20px;
-  padding: 0 6px;
+  min-width: var(--badge-min-width);
+  height: var(--badge-height);
+  padding: 0 var(--badge-padding-x);
   margin: 0;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: var(--list-badge-radius, var(--radius-ui, 8px));
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-strong);
   line-height: 1;
   letter-spacing: -0.05em;
   white-space: nowrap;
@@ -194,15 +194,15 @@
 /* ─── 빈 목록 ─────────────────────────────────────────────────────────────── */
 
 .pls-table .list-empty {
-  padding: 48px 16px;
+  padding: var(--height-2xl) var(--space-4);
   text-align: center;
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: #94a3b8;
 }
 
 /* ─── 색상 배지 (호환) ────────────────────────────────────────────────────── */
 
-.color-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: var(--list-badge-radius, var(--radius-ui, 8px)); font-size: 10px; font-weight: 600; line-height: 1; border: 1px solid rgba(0,0,0,0.08); }
+.color-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 var(--space-1); border-radius: var(--list-badge-radius, var(--radius-ui, 8px)); font-size: var(--font-size-xs); font-weight: var(--font-weight-heavy); line-height: 1; border: 1px solid rgba(0,0,0,0.08); }
 .color-badge--on-dark { color: #fff; }
 .color-badge--on-light { color: #333; }
 .color-badge--empty { background: transparent; border: 1px dashed #cbd5e1; color: #94a3b8; }
@@ -215,7 +215,7 @@
 .pls-th--filterable.is-filtering { background: #e2e8f0; color: #1e293b; }
 
 .pls-th--has-filter { background: #e2e8f0; }
-.pls-th--has-filter .pls-th__label { color: #1e293b; font-weight: 700; }
+.pls-th--has-filter .pls-th__label { color: #1e293b; font-weight: var(--font-weight-heavy); }
 .pls-th--has-filter::after {
   content: '';
   position: absolute;
@@ -246,11 +246,11 @@
 .pls-filter-dd label {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 4px;
-  height: 28px;
-  font-size: 10px;
-  font-weight: 400;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
+  height: var(--height-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-base);
   color: #1e293b;
   cursor: pointer;
   letter-spacing: -0.03em;
@@ -268,17 +268,17 @@
 
 .pls-fdd__section { padding: 2px 0; }
 .pls-fdd__section + .pls-fdd__section { border-top: 1px solid #e2e8f0; }
-.pls-fdd__title { padding: 2px 6px 1px; font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+.pls-fdd__title { padding: 2px 6px 1px; font-size: 9px; font-weight: var(--font-weight-heavy); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
 
 .pls-fdd__sort-row { display: flex; gap: 3px; padding: 3px 6px; border-bottom: 1px solid #e2e8f0; }
-.pls-fdd__sort-btn { flex: 1; height: 22px; border: 1px solid #e2e8f0; border-radius: 2px; background: #fff; font-size: 10px; color: #64748b; cursor: pointer; letter-spacing: -0.02em; }
+.pls-fdd__sort-btn { flex: 1; height: 22px; border: 1px solid #e2e8f0; border-radius: var(--radius-xs); background: #fff; font-size: var(--font-size-xs); color: #64748b; cursor: pointer; letter-spacing: -0.02em; }
 .pls-fdd__sort-btn:hover { background: #f1f5f9; color: #1e293b; }
-.pls-fdd__sort-btn.is-active { background: #eef2ff; border-color: #a5b4fc; color: #4338ca; font-weight: 700; }
+.pls-fdd__sort-btn.is-active { background: #eef2ff; border-color: #a5b4fc; color: #4338ca; font-weight: var(--font-weight-heavy); }
 
 .pls-fdd__count { margin-left: auto; font-size: 9px; color: #94a3b8; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 
 .pls-fdd__actions { display: flex; gap: 3px; padding: 3px 6px; border-top: 1px solid #e2e8f0; position: sticky; bottom: 0; background: #fff; }
-.pls-fdd__action-btn { flex: 1; height: 22px; border: 1px solid #e2e8f0; border-radius: 2px; background: #fff; font-size: 10px; font-weight: 600; cursor: pointer; letter-spacing: -0.02em; }
+.pls-fdd__action-btn { flex: 1; height: 22px; border: 1px solid #e2e8f0; border-radius: var(--radius-xs); background: #fff; font-size: var(--font-size-xs); font-weight: var(--font-weight-heavy); cursor: pointer; letter-spacing: -0.02em; }
 .pls-fdd__action-btn--reset { color: #64748b; }
 .pls-fdd__action-btn--reset:hover { background: #f1f5f9; }
 .pls-fdd__action-btn--apply { background: #1e293b; border-color: #1e293b; color: #fff; }
@@ -288,8 +288,8 @@
 
 .pls-fdd__match-count {
   flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-heavy);
   color: #475569;
   font-variant-numeric: tabular-nums;
 }
@@ -297,7 +297,7 @@
 .pls-fdd__match-count:empty { display: none; }
 
 .pls-fdd__match-count--zero { color: #94a3b8; }
-.pls-fdd__search { width: 100%; height: 24px; padding: 0 6px; border: 1px solid #cbd5e1; border-radius: 2px; background: #fff; font-size: 10px; color: #1e293b; outline: none; letter-spacing: -0.02em; }
+.pls-fdd__search { width: 100%; height: var(--height-xs); padding: 0 6px; border: 1px solid #cbd5e1; border-radius: var(--radius-xs); background: #fff; font-size: var(--font-size-xs); color: #1e293b; outline: none; letter-spacing: -0.02em; }
 .pls-fdd__search:focus { border-color: #94a3b8; box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.06); }
 
 .pls-filter-dd label.is-checked { background: #f1f5f9; }

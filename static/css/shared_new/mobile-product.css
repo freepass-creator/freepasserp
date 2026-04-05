@@ -15,7 +15,7 @@
   flex-direction: column;
   position: fixed;
   top: 0; left: 0; right: 0;
-  bottom: calc(56px + env(safe-area-inset-bottom));
+  bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
   z-index: 250;
   background: #fff;
   overflow: hidden;
@@ -25,8 +25,8 @@
 .pls-m-detail__head {
   display: flex;
   align-items: center;
-  gap: 4px;
-  height: 46px;
+  gap: var(--space-1);
+  height: var(--mobile-topbar-height);
   padding: 0 10px;
   border-bottom: 1px solid #f1f5f9;
   flex-shrink: 0;
@@ -34,13 +34,13 @@
 }
 .pls-m-detail__title {
   margin-left: auto;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-strong);
   color: #64748b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 0 4px;
+  padding: 0 var(--space-1);
   text-align: right;
 }
 .pls-m-detail__actions {
@@ -82,8 +82,8 @@
   border: none;
   background: transparent;
   color: #94a3b8;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-strong);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.12s, background 0.12s;
@@ -97,7 +97,7 @@
   flex: 1;
   display: flex;
   gap: 6px;
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   align-items: center;
 }
 
@@ -133,15 +133,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--space-1);
   height: 54px;
   border: none;
   border-radius: 14px;
-  font-size: 12px;
+  font-size: var(--font-size-base);
   font-weight: 600;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.12s;
+  transition: opacity var(--transition-fast);
 }
 .pls-m-action-btn:active { opacity: 0.75; }
 .pls-m-action-btn svg { flex-shrink: 0; }
@@ -179,12 +179,12 @@
 
   /* 카탈로그 그리드 패딩 (탭바 높이 확보) */
   .pls-m-catalog-wrap .catalog-content {
-    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
   }
 
   /* catalog.css의 80px 하단 패딩 중복 제거 (catalog-content가 이미 탭바 여백 확보) */
   .pls-m-catalog-wrap .catalog-grid {
-    padding-bottom: 8px;
+    padding-bottom: var(--space-2);
   }
 
   /* 모바일 뷰 */
@@ -206,12 +206,12 @@
   }
   .pls-mobile-search {
     width: 100%;
-    height: 40px;
+    height: var(--height-lg);
     padding: 0 14px 0 36px;
     border: 1px solid #e2e8f0;
     border-radius: 10px;
     background: #fff;
-    font-size: 14px !important;
+    font-size: var(--font-size-lg) !important;
     color: #0f172a;
     outline: none;
     box-sizing: border-box;
@@ -235,12 +235,12 @@
   .pls-mobile-chip {
     display: inline-flex;
     align-items: center;
-    height: 28px;
-    padding: 0 12px;
+    height: var(--height-sm);
+    padding: 0 var(--space-3);
     border: 1px solid #e2e8f0;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: #fff;
-    font-size: 12px;
+    font-size: var(--font-size-base);
     color: #64748b;
     white-space: nowrap;
     cursor: pointer;
@@ -257,7 +257,7 @@
   /* 카운트 */
   .pls-mobile-count {
     padding: 2px 14px 6px;
-    font-size: 12px;
+    font-size: var(--font-size-base);
     color: #94a3b8;
     flex-shrink: 0;
   }
@@ -276,7 +276,7 @@
 
   /* 카드 */
   .pls-mobile-card {
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     background: #fff;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(15,23,42,0.05), 0 0 0 1px rgba(15,23,42,0.07);
@@ -302,28 +302,28 @@
   .pls-mobile-card__badge {
     position: absolute; top: 6px; left: 6px;
     height: 20px; padding: 0 6px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     background: rgba(15,23,42,0.6);
-    color: #fff; font-size: 10px; font-weight: 600;
+    color: #fff; font-size: var(--font-size-xs); font-weight: 600;
     display: inline-flex; align-items: center;
   }
   .pls-mobile-card__body {
-    padding: 8px 10px 10px;
+    padding: var(--space-2) 10px 10px;
     display: flex; flex-direction: column; gap: 3px;
   }
   .pls-mobile-card__model {
-    font-size: 13px; font-weight: 600; color: #0f172a;
+    font-size: var(--font-size-md); font-weight: 600; color: #0f172a;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .pls-mobile-card__sub {
-    font-size: 11px; color: #64748b;
+    font-size: var(--font-size-sm); color: #64748b;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .pls-mobile-card__price {
-    font-size: 13px; font-weight: 700; color: #1b2a4a; margin-top: 2px;
+    font-size: var(--font-size-md); font-weight: var(--font-weight-heavy); color: #1b2a4a; margin-top: 2px;
   }
   .pls-mobile-card__price-inquiry {
-    font-size: 12px; font-weight: 600; color: #3b82f6; margin-top: 2px;
+    font-size: var(--font-size-base); font-weight: 600; color: #3b82f6; margin-top: 2px;
   }
 
   /* 스켈레톤 */
@@ -334,7 +334,7 @@
     gap: 10px;
   }
   .pls-mobile-skeleton-card {
-    height: 200px; border-radius: 12px;
+    height: 200px; border-radius: var(--radius-lg);
     background: linear-gradient(90deg, #f1f5f9 25%, #e9eef5 50%, #f1f5f9 75%);
     background-size: 400% 100%;
     animation: pls-shimmer 1.4s ease infinite;
@@ -349,7 +349,7 @@
     grid-column: 1/-1;
     padding: 48px 0;
     text-align: center;
-    font-size: 14px; color: #94a3b8;
+    font-size: var(--font-size-lg); color: #94a3b8;
   }
 
   /* ─── 바텀시트 (필터) ────────────────────────────────────────────────────── */
@@ -373,7 +373,7 @@
   .pls-mobile-sheet[hidden] { display: none !important; }
 
   .pls-mobile-sheet__handle {
-    width: 36px; height: 4px; border-radius: 2px;
+    width: 36px; height: 4px; border-radius: var(--radius-xs);
     background: #e2e8f0; margin: 10px auto 0; flex-shrink: 0;
   }
 
@@ -383,10 +383,10 @@
     border-bottom: 1px solid #f1f5f9;
   }
   .pls-mobile-sheet__title {
-    flex: 1; font-size: 15px; font-weight: 700; color: #0f172a;
+    flex: 1; font-size: 15px; font-weight: var(--font-weight-heavy); color: #0f172a;
   }
   .pls-mobile-sheet__close {
-    width: 30px; height: 30px; border: none; border-radius: 50%;
+    width: 30px; height: 30px; border: none; border-radius: var(--radius-circle);
     background: #f1f5f9; color: #64748b; cursor: pointer;
     display: flex; align-items: center; justify-content: center; padding: 0;
   }
@@ -407,7 +407,7 @@
   }
   .pls-mobile-detail-gallery__nav {
     position: absolute; top: 50%; transform: translateY(-50%);
-    width: 32px; height: 32px; border: none; border-radius: 50%;
+    width: 32px; height: 32px; border: none; border-radius: var(--radius-circle);
     background: rgba(255,255,255,0.8); color: #1e293b;
     cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
   }
@@ -415,21 +415,21 @@
   .pls-mobile-detail-gallery__nav--next { right: 8px; }
   .pls-mobile-detail-gallery__counter {
     position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-    height: 20px; padding: 0 8px; border-radius: 999px;
-    background: rgba(15,23,42,0.55); color: #fff; font-size: 11px;
+    height: 20px; padding: 0 var(--space-2); border-radius: var(--radius-pill);
+    background: rgba(15,23,42,0.55); color: #fff; font-size: var(--font-size-sm);
     display: inline-flex; align-items: center;
   }
 
   .pls-mobile-detail-row {
     display: flex; justify-content: space-between; align-items: baseline;
-    gap: 8px; padding: 8px 0; border-bottom: 1px solid #f8fafc; font-size: 13px;
+    gap: var(--space-2); padding: var(--space-2) 0; border-bottom: 1px solid #f8fafc; font-size: var(--font-size-md);
   }
   .pls-mobile-detail-label { color: #64748b; flex-shrink: 0; }
-  .pls-mobile-detail-value { color: #0f172a; font-weight: 500; text-align: right; }
+  .pls-mobile-detail-value { color: #0f172a; font-weight: var(--font-weight-strong); text-align: right; }
 
   .pls-mobile-detail-section { margin-top: 14px; }
   .pls-mobile-detail-section-title {
-    font-size: 11px; font-weight: 700; color: #94a3b8;
+    font-size: var(--font-size-sm); font-weight: var(--font-weight-heavy); color: #94a3b8;
     text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;
   }
 
@@ -437,14 +437,14 @@
   .pls-mobile-price-table__head {
     display: grid; grid-template-columns: 70px 1fr 1fr;
     padding: 5px 8px; background: #f8fafc; border-radius: 6px;
-    font-size: 11px; color: #94a3b8; font-weight: 600; margin-bottom: 2px;
+    font-size: var(--font-size-sm); color: #94a3b8; font-weight: 600; margin-bottom: 2px;
   }
   .pls-mobile-price-table__row {
     display: grid; grid-template-columns: 70px 1fr 1fr;
-    padding: 8px 8px; border-bottom: 1px solid #f1f5f9; font-size: 13px;
+    padding: var(--space-2) var(--space-2); border-bottom: 1px solid #f1f5f9; font-size: var(--font-size-md);
   }
   .pls-mobile-price-table__period { font-weight: 600; color: #475569; }
-  .pls-mobile-price-table__rent   { font-weight: 700; color: #1b2a4a; }
+  .pls-mobile-price-table__rent   { font-weight: var(--font-weight-heavy); color: #1b2a4a; }
   .pls-mobile-price-table__dep    { color: #64748b; }
 
   /* 하단 액션 버튼 */
@@ -455,8 +455,8 @@
     border-top: 1px solid #f1f5f9; flex-shrink: 0;
   }
   .pls-mobile-sheet__btn {
-    flex: 1; height: 46px; border: none; border-radius: 12px;
-    font-size: 14px; font-weight: 600; cursor: pointer;
+    flex: 1; height: var(--mobile-topbar-height); border: none; border-radius: var(--radius-lg);
+    font-size: var(--font-size-lg); font-weight: 600; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 6px;
     -webkit-tap-highlight-color: transparent;
   }

@@ -2,9 +2,9 @@
 /* 실제 summary/product/chat 목록 selector 는 이 파일에서만 관리한다. */
 
 :root {
-  --list-row-px: 12px;
-  --list-row-py: 8px;
-  --list-row-min-h: 40px;
+  --list-row-px: var(--space-3);
+  --list-row-py: var(--space-2);
+  --list-row-min-h: var(--height-lg);
   --list-product-row-py: var(--list-row-py);
   --list-product-row-min-h: var(--list-row-min-h);
   --list-main-font: var(--font-size-main);
@@ -14,11 +14,11 @@
   --list-hover: var(--interactive-hover-bg);
   --list-selected: var(--interactive-selected-bg);
   --list-bar: var(--text-main);
-  --list-dot-gap: 4px;
-  --list-badge-gap-x: 6px;
-  --list-badge-gap-y: 4px;
+  --list-dot-gap: var(--space-1);
+  --list-badge-gap-x: var(--space-2);
+  --list-badge-gap-y: var(--space-1);
   --list-badge-h: 20px;
-  --list-badge-px: 8px;
+  --list-badge-px: var(--space-2);
   --list-badge-radius: var(--radius-ui);
   --list-chat-badge-h: var(--list-badge-h);
 
@@ -205,8 +205,8 @@
   padding: 0 2px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: var(--list-badge-radius);
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--font-size-sub);
+  font-weight: var(--font-weight-strong);
   line-height: 1;
   letter-spacing: -0.05em;
   white-space: nowrap;
@@ -307,7 +307,7 @@
 
 .summary-inline-date {
   margin-left: auto;
-  padding-left: 12px;
+  padding-left: var(--space-3);
   color: var(--text-subtle);
   font-variant-numeric: tabular-nums;
   flex: 0 0 auto;
@@ -331,7 +331,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .product-main-line + .product-sub-line,
@@ -355,7 +355,7 @@
 .pl-line {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
@@ -422,8 +422,8 @@
   height: 18px;
   padding: 0 5px;
   border-radius: var(--list-badge-radius);
-  font-size: 9px;
-  font-weight: 700;
+  font-size: calc(var(--font-size-xs) - 1px);
+  font-weight: var(--font-weight-heavy);
   letter-spacing: 0;
   line-height: 1;
   border: 1px solid rgba(0,0,0,0.18);
@@ -520,7 +520,7 @@
   color: var(--text-main);
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-left: 10px;
+  padding-left: var(--space-3);
 }
 
 #room-list .room-maker,
@@ -560,19 +560,19 @@
 }
 
 .room-list .empty-block {
-  padding: 16px 12px;
+  padding: var(--space-4) var(--space-3);
 }
 
 @media (max-width: 900px) {
   .product-row-line {
     grid-template-columns: 1fr;
-    gap: 4px;
+    gap: var(--space-1);
   }
 
   .product-right-grid {
     justify-content: start;
     text-align: left;
-    gap: 8px;
+    gap: var(--space-2);
   }
 }
 

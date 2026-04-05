@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0);
-  transition: background 0.15s ease;
+  transition: background var(--transition-normal);
 }
 
 .fp-modal-overlay.is-visible {
@@ -32,8 +32,8 @@
 /* ── 카드 박스 (공통) ── */
 .fp-modal-box {
   width: min(320px, calc(100vw - 40px));
-  padding: 28px 24px;
-  border-radius: 12px;
+  padding: 28px var(--space-6);
+  border-radius: var(--radius-lg);
   background: #fff;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
   display: flex;
@@ -56,9 +56,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  width: var(--height-2xl);
+  height: var(--height-2xl);
+  border-radius: var(--radius-circle);
 }
 
 .fp-modal-icon--success { color: #16a34a; }
@@ -73,11 +73,11 @@
 /* ── 스피너 (progress) ── */
 .fp-modal-spinner {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: var(--height-xs);
+  height: var(--height-xs);
   border: 2.5px solid #e5e7eb;
   border-top-color: #1b2a4a;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   animation: fp-modal-spin 0.7s linear infinite;
 }
 
@@ -87,7 +87,7 @@
 
 /* ── 텍스트 ── */
 .fp-modal-text {
-  font-size: 13px;
+  font-size: var(--font-size-md);
   line-height: 1.6;
   color: #1f1f1f;
   text-align: center;
@@ -98,20 +98,20 @@
 /* ── 버튼 (confirm용) ── */
 .fp-modal-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   width: 100%;
-  margin-top: 4px;
+  margin-top: var(--space-1);
 }
 
 .fp-modal-btn {
   flex: 1;
   height: 38px;
   border: 1px solid #dadce0;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-strong);
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .fp-modal-btn--cancel {
@@ -135,14 +135,14 @@
 
 /* ── confirm 박스 ── */
 .fp-modal-box--confirm {
-  padding: 24px;
-  gap: 16px;
+  padding: var(--space-6);
+  gap: var(--space-4);
 }
 
 /* ── 반응형 ── */
 @media (max-width: 480px) {
   .fp-modal-box {
     width: calc(100vw - 32px);
-    padding: 24px 20px;
+    padding: var(--space-6) var(--space-5);
   }
 }

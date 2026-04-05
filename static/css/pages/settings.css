@@ -20,7 +20,7 @@
 .settings-right-panel-body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .settings-section-block {
@@ -36,11 +36,11 @@
 }
 
 .settings-subsection-title.is-small {
-  font-size: 12px;
+  font-size: var(--font-size-base);
 }
 
 .settings-helper {
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--text-subtle);
 }
@@ -62,7 +62,7 @@
 .settings-card-stack {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .settings-grid--master {
@@ -84,7 +84,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px;
+  padding: var(--space-3);
   border: 1px solid var(--border-soft);
   background: var(--surface-base);
 }
@@ -94,7 +94,7 @@
 .settings-subsection-head {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .settings-subsection-head {
@@ -108,7 +108,7 @@
 .settings-code-layout {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .settings-code-list {
@@ -147,15 +147,15 @@
 .settings-account-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .settings-account-action-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px 0;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
   border-bottom: 1px solid var(--border-soft);
   cursor: pointer;
   font-size: var(--font-size-main);
@@ -170,7 +170,7 @@
 .settings-account-action-row svg {
   flex-shrink: 0;
   color: var(--text-subtle);
-  transition: transform 0.15s;
+  transition: transform var(--transition-normal);
 }
 
 .settings-account-action-row.is-open svg {
@@ -189,8 +189,8 @@
 .settings-account-action-expand {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: var(--space-2);
+  padding: 10px var(--space-3);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-ui);
   background: var(--surface-subtle, #f8fafc);

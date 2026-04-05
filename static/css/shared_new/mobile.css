@@ -82,11 +82,11 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   input[type="email"],
   input[type="date"],
   textarea {
-    font-size: 16px !important;
+    font-size: var(--font-size-xl) !important;
   }
   /* select는 14px — 주변 텍스트와 통일 (iOS는 zoom 없음) */
   select {
-    font-size: 14px !important;
+    font-size: var(--font-size-lg) !important;
   }
 
   /* ─── 패널 레이아웃 조정 ────────────────────────────────────────────────── */
@@ -155,7 +155,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   z-index: 100;
   align-items: center;
   justify-content: space-between;
-  height: 46px;
+  height: var(--mobile-topbar-height);
   padding: 0 10px;
   background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
@@ -178,13 +178,13 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   width: 34px;
   height: 34px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: transparent;
   color: #64748b;
   cursor: pointer;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.12s, color 0.12s;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 .mobile-topbar__icon-btn:hover,
 .mobile-topbar__icon-btn:active {
@@ -197,7 +197,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: #64748b;
   max-width: 180px;
   overflow: hidden;
@@ -233,7 +233,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   z-index: 200;
   align-items: stretch;
   justify-content: space-around;
-  height: calc(56px + env(safe-area-inset-bottom));
+  height: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
@@ -251,20 +251,20 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   background: transparent;
   text-decoration: none;
   color: #94a3b8;
-  font-size: 10px;
-  font-weight: 500;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-strong);
   cursor: pointer;
   position: relative;
   padding: 6px 0 0;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.12s;
+  transition: color var(--transition-fast);
 }
 
 .mobile-tab.is-active { color: #1b2a4a; }
 .mobile-tab svg { width: 22px; height: 22px; stroke-width: 1.5; }
 .mobile-tab.is-active svg { stroke-width: 2; }
 
-.mobile-tab__label { font-size: 10px; line-height: 1; }
+.mobile-tab__label { font-size: var(--font-size-xs); line-height: 1; }
 
 .mobile-tab__badge {
   position: absolute;
@@ -272,12 +272,12 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   left: calc(50% + 4px);
   min-width: 16px;
   height: 16px;
-  padding: 0 4px;
-  border-radius: 999px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-pill);
   background: #ef4444;
   color: #fff;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-heavy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -304,7 +304,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   right: 0;
   bottom: 0;
   z-index: 301;
-  width: 260px;
+  width: var(--mobile-drawer-width);
   background: #fff;
   box-shadow: -4px 0 24px rgba(15, 23, 42, 0.12);
   display: flex;
@@ -316,7 +316,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 20px 14px 16px 18px;
+  padding: var(--space-5) 14px var(--space-4) 18px;
   padding-top: max(20px, env(safe-area-inset-top));
 }
 
@@ -333,7 +333,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: #f1f5f9;
   color: #64748b;
   cursor: pointer;
@@ -344,22 +344,22 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 .mobile-drawer__close:active { background: #e2e8f0; }
 
 .mobile-drawer__company {
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: #64748b;
-  font-weight: 500;
+  font-weight: var(--font-weight-strong);
   line-height: 1.4;
 }
 
 .mobile-drawer__name {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-heavy);
   color: #0f172a;
-  margin-top: 4px;
+  margin-top: var(--space-1);
   line-height: 1.3;
 }
 
 .mobile-drawer__role {
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: #94a3b8;
   margin-top: 3px;
   line-height: 1.4;
@@ -368,12 +368,12 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 .mobile-drawer__section-divider {
   height: 1px;
   background: #f1f5f9;
-  margin: 4px 0;
+  margin: var(--space-1) 0;
 }
 
 .mobile-drawer__body {
   flex: 1;
-  padding: 8px 0;
+  padding: var(--space-2) 0;
   overflow-y: auto;
 }
 
@@ -382,13 +382,13 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   align-items: center;
   gap: 10px;
   width: 100%;
-  height: 48px;
-  padding: 0 16px;
+  height: var(--height-2xl);
+  padding: 0 var(--space-4);
   border: none;
   background: transparent;
   color: #1e293b;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-strong);
   text-decoration: none;
   cursor: pointer;
   text-align: left;
@@ -396,21 +396,21 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 }
 .mobile-drawer__item:active { background: #f8fafc; }
 .mobile-drawer__item svg { color: #64748b; flex-shrink: 0; }
-.mobile-drawer__item.is-active { color: #1b2a4a; font-weight: 700; background: #f0f4ff; }
+.mobile-drawer__item.is-active { color: #1b2a4a; font-weight: var(--font-weight-heavy); background: #f0f4ff; }
 .mobile-drawer__item.is-active svg { color: #1b2a4a; }
 .mobile-drawer__item--danger { color: #ef4444; }
 .mobile-drawer__item--danger svg { color: #ef4444; }
 
 .mobile-drawer__foot {
-  padding: 8px 0;
+  padding: var(--space-2) 0;
   padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
 .mobile-drawer__version {
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: #cbd5e1;
   text-align: center;
-  padding: 8px 0 4px;
+  padding: var(--space-2) 0 var(--space-1);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -420,8 +420,8 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 .m-list-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: var(--space-3);
+  padding: 14px var(--space-4);
   border-bottom: 1px solid #f1f5f9;
   background: #fff;
   cursor: pointer;
@@ -432,7 +432,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 .m-list-card.is-active { background: #f0f4ff; }
 
 .m-list-card__avatar {
-  width: 40px; height: 40px;
+  width: var(--height-lg); height: var(--height-lg);
   border-radius: 10px;
   background: #f1f5f9;
   display: flex; align-items: center; justify-content: center;
@@ -442,7 +442,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 
 .m-list-card__body {
   flex: 1; min-width: 0;
-  display: flex; flex-direction: column; gap: 4px;
+  display: flex; flex-direction: column; gap: var(--space-1);
 }
 
 .m-list-card__main {
@@ -450,7 +450,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 }
 .m-list-card__name {
   flex: 1; min-width: 0;
-  font-size: 14px; font-weight: 600; color: #0f172a;
+  font-size: var(--font-size-lg); font-weight: 600; color: #0f172a;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
@@ -459,19 +459,19 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 }
 .m-list-card__info {
   flex: 1; min-width: 0;
-  font-size: 12px; color: #64748b;
+  font-size: var(--font-size-base); color: #64748b;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .m-list-card__date {
   flex-shrink: 0;
-  font-size: 11px; color: #94a3b8;
+  font-size: var(--font-size-sm); color: #94a3b8;
 }
 
 /* 뱃지 공통 */
 .m-list-badge {
   flex-shrink: 0;
-  height: 20px; padding: 0 7px; border-radius: 999px;
-  font-size: 11px; font-weight: 600;
+  height: 20px; padding: 0 7px; border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm); font-weight: 600;
   display: inline-flex; align-items: center;
   white-space: nowrap;
 }
@@ -483,7 +483,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 
 /* 빈 목록 */
 .m-list-empty {
-  padding: 60px 20px;
+  padding: 60px var(--space-5);
   text-align: center;
-  font-size: 14px; color: #94a3b8;
+  font-size: var(--font-size-lg); color: #94a3b8;
 }

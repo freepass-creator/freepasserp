@@ -60,15 +60,15 @@
 .skeleton-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 4px;
-  height: 36px;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+  height: var(--height-md);
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .skeleton-cell {
   height: 14px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s ease infinite;
@@ -81,13 +81,13 @@
 .skeleton-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 4px 0;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
 }
 
 .skeleton-form-field {
-  height: 36px;
-  border-radius: 2px;
+  height: var(--height-md);
+  border-radius: var(--radius-xs);
   background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s ease infinite;

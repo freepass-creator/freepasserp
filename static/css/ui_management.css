@@ -29,7 +29,7 @@
 .panel--form .field,
 .panel--detail .field {
   display: grid;
-  gap: 4px;
+  gap: var(--space-1);
   align-content: start;
 }
 
@@ -131,7 +131,7 @@
 .management-summary-row .fp-badge-row {
   flex: 0 0 auto;
   flex-wrap: nowrap;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .panel--filter .empty-block,
@@ -232,7 +232,7 @@
 .panel--detail .field.field--checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .panel--form .field.field--checkbox > label,
@@ -308,7 +308,7 @@
   flex: 1 1 0;
   min-height: 0;
   height: 100%;
-  padding: 24px;
+  padding: var(--space-6);
   color: var(--text-muted, #9ca3af);
   font-size: var(--font-size-main, 12px);
   text-align: center;
@@ -345,7 +345,7 @@
   padding: 1px 7px;
   border-radius: 10px;
   font-size: var(--font-size-sub);
-  font-weight: 600;
+  font-weight: var(--font-weight-heavy);
   line-height: 18px;
   background: var(--badge-status-info-bg, #E7F1FF);
   color: var(--badge-status-info-text, #1C63D5);
@@ -360,7 +360,7 @@
   padding: 1px 7px;
   border-radius: 10px;
   font-size: var(--font-size-sub);
-  font-weight: 600;
+  font-weight: var(--font-weight-heavy);
   line-height: 18px;
   background: var(--badge-status-warning-bg, #FFF8E1);
   color: var(--badge-status-warning-text, #B78103);

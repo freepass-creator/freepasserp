@@ -1,22 +1,22 @@
 :root {
-  --form-gap: 16px;
-  --form-section-gap: 24px;
-  --form-section-inner-gap: 8px;
+  --form-gap: var(--space-4);
+  --form-section-gap: var(--space-6);
+  --form-section-inner-gap: var(--space-2);
   --form-label-size: var(--font-size-sub);
   --form-label-color: var(--text-subtle);
-  --form-label-min-h: 16px;
-  --form-field-gap: 8px;
-  --form-control-height: 40px;
-  --form-control-px: 12px;
+  --form-label-min-h: var(--space-4);
+  --form-field-gap: var(--space-2);
+  --form-control-height: var(--height-lg);
+  --form-control-px: var(--space-3);
   --form-control-textarea-min-h: 96px;
-  --form-control-select-pr: 28px;
+  --form-control-select-pr: var(--height-sm);
   --form-control-border: var(--border-main);
   --form-control-bg: var(--surface-base);
   --form-control-text: var(--text-main);
   --form-control-radius: var(--radius-ui);
-  --form-checkbox-size: 16px;
-  --form-check-gap: 8px;
-  --form-check-px: 12px;
+  --form-checkbox-size: var(--space-4);
+  --form-check-gap: var(--space-2);
+  --form-check-px: var(--space-3);
   --form-focus-border: var(--interactive-active-border);
   --form-focus-bg: var(--surface-base);
   --form-focus-shadow: var(--interactive-shadow-focus);
@@ -159,7 +159,7 @@ select,
 textarea {
   outline: none;
   box-shadow: none;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
 
@@ -202,7 +202,7 @@ textarea:focus {
 .action-row-between {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .action-row {
@@ -216,7 +216,7 @@ textarea:focus {
 .action-group-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .helper-row {
@@ -231,7 +231,7 @@ textarea:focus {
   color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-2);
 }
 
 .section-title::before {
@@ -239,7 +239,7 @@ textarea:focus {
   flex: 0 0 3px;
   height: 13px;
   background: currentColor;
-  border-radius: 2px;
+  border-radius: var(--radius-ui);
   opacity: 0.35;
 }
 
@@ -264,10 +264,10 @@ textarea:focus {
   z-index: 4;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  margin-bottom: 12px;
-  padding: 8px 10px;
+  gap: var(--space-2);
+  min-height: var(--height-md);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-soft);
   background: var(--surface-muted);
   color: var(--text-main);
@@ -287,12 +287,12 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 40px;
+  gap: var(--space-2);
+  min-height: var(--height-lg);
   min-width: 180px;
   max-width: min(320px, calc(100% - 32px));
   margin: 0;
-  padding: 10px 14px;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid rgba(15, 23, 42, 0.12);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
@@ -325,7 +325,7 @@ textarea:focus {
   width: 12px;
   height: 12px;
   flex: 0 0 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1.5px solid var(--border-strong);
   border-top-color: transparent;
   opacity: 0;
@@ -358,27 +358,27 @@ textarea:focus {
 
 .settings-grid {
   display: grid;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .setting-row {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border-soft);
 }
 
 .top-gap {
-  margin-top: 12px;
+  margin-top: var(--space-3);
 }
 
 .form-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .form-mode {
@@ -389,13 +389,13 @@ textarea:focus {
 .rent-plan-field,
 .rent-plan-grid {
   display: grid;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .rent-plan-row {
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr) minmax(0, 1fr);
-  gap: 8px;
+  gap: var(--space-2);
   align-items: center;
 }
 
@@ -502,7 +502,7 @@ textarea:focus {
 .sheet-apply-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 @media (max-width: 900px) {
@@ -542,7 +542,7 @@ textarea:focus {
 .field.is-required label::after {
   content: ' *';
   color: var(--form-required-color);
-  font-weight: 400;
+  font-weight: var(--font-weight-base);
 }
 
 .field input[list] {
@@ -568,7 +568,7 @@ select {
 .price-manage-grid {
   display: grid;
   grid-template-columns: 96px repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: var(--space-2);
   align-items: center;
 }
 
@@ -605,15 +605,15 @@ select {
 .doc-preview-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .doc-preview-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   min-height: var(--form-control-height);
-  padding: 8px 10px;
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--form-control-border);
   border-radius: var(--form-control-radius);
   background: var(--surface-base);
@@ -621,8 +621,8 @@ select {
 }
 
 .doc-preview-thumb {
-  width: 40px;
-  height: 40px;
+  width: var(--height-lg);
+  height: var(--height-lg);
   overflow: hidden;
   border: 1px solid var(--form-control-border);
   border-radius: var(--form-control-radius);
@@ -648,9 +648,9 @@ select {
 .check-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   min-height: var(--form-control-height);
-  padding: 0 12px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--form-control-border);
   border-radius: var(--form-control-radius);
   background: var(--surface-base);
@@ -668,18 +668,18 @@ select {
 .product-manage-filter-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .product-manage-filter-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 
 .product-manage-filter-empty {
-  padding: 12px;
+  padding: var(--space-3);
   border: 1px solid var(--form-control-border);
   border-radius: var(--form-control-radius);
   background: var(--surface-subtle);
@@ -755,7 +755,7 @@ select {
 }
 
 .manage-form-shell .field > label {
-  min-height: 16px;
+  min-height: var(--space-4);
   color: var(--form-label-color);
 }
 

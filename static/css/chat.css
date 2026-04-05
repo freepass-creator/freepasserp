@@ -33,7 +33,7 @@
 .message-list {
   border: 0;
   background: #f0f2f5;
-  padding: 16px 14px;
+  padding: var(--space-4) 14px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -66,12 +66,12 @@
 /* ─── 보낸 사람 정보 ─────────────────────────────────────────────────────── */
 
 .message-sender {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--text-subtle, #64748b);
   white-space: nowrap;
   flex-shrink: 0;
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .message-sender.sender-provider { background: rgba(59, 130, 246, 0.08); }
@@ -95,8 +95,8 @@
 
 .message-bubble {
   position: relative;
-  padding: 8px 12px;
-  border-radius: 12px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
   font-size: 12.5px;
   line-height: 1.55;
   word-break: break-word;
@@ -145,10 +145,10 @@
 .message-role-badge {
   display: inline-block;
   font-size: 9px;
-  font-weight: 600;
-  padding: 1px 4px;
+  font-weight: var(--font-weight-heavy);
+  padding: 1px var(--space-1);
   border-radius: var(--list-badge-radius, var(--radius-ui, 8px));
-  margin-left: 4px;
+  margin-left: var(--space-1);
   vertical-align: middle;
 }
 
@@ -170,12 +170,12 @@
 
 .message-date-divider {
   align-self: center;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: #5f6368;
   background: rgba(0, 0, 0, 0.06);
-  padding: 3px 12px;
-  border-radius: 12px;
-  margin: 8px 0;
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-lg);
+  margin: var(--space-2) 0;
 }
 
 /* ─── 입력폼 ─────────────────────────────────────────────────────────────── */
@@ -184,7 +184,7 @@
   display: flex;
   align-items: center;
   gap: 0;
-  padding: 8px 10px;
+  padding: var(--space-2) 10px;
   margin-top: auto;
   background: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
@@ -196,7 +196,7 @@
   right: 60px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: rgba(0, 0, 0, 0.12);
   pointer-events: none;
   user-select: none;
@@ -204,15 +204,15 @@
 
 .message-form input {
   flex: 1 1 0;
-  min-height: 40px;
+  min-height: var(--height-lg);
   border: 1px solid #dadce0;
-  border-radius: 20px;
-  padding: 0 16px;
+  border-radius: var(--space-5);
+  padding: 0 var(--space-4);
   background: #f8f9fa;
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: #1f1f1f;
   outline: none;
-  transition: border-color 0.12s;
+  transition: border-color var(--transition-fast);
 }
 
 .message-form input::placeholder { color: #80868b; }
@@ -223,15 +223,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--height-lg);
+  height: var(--height-lg);
   margin-left: 6px;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: #1b2a4a;
   color: #ffffff;
   cursor: pointer;
-  transition: background 0.12s, box-shadow 0.12s;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .message-send-btn:hover {
@@ -273,15 +273,15 @@
 
 @media (max-width: 768px) {
   /* 말풍선 */
-  .message-bubble { font-size: 14px; line-height: 1.6; padding: 10px 14px; }
+  .message-bubble { font-size: var(--font-size-lg); line-height: 1.6; padding: 10px 14px; }
   /* 보낸사람 · 역할뱃지 · 시간 */
-  .message-sender { font-size: 11px; }
-  .message-role-badge { font-size: 10px; }
-  .message-time { font-size: 11px; }
+  .message-sender { font-size: var(--font-size-sm); }
+  .message-role-badge { font-size: var(--font-size-xs); }
+  .message-time { font-size: var(--font-size-sm); }
   /* 날짜 구분선 */
-  .message-date-divider { font-size: 12px; }
+  .message-date-divider { font-size: var(--font-size-base); }
   /* 입력란: iOS 줌 방지 + 터치 타겟 */
-  .message-form input { font-size: 16px; min-height: 44px; }
-  .message-send-btn { width: 44px; height: 44px; }
-  .message-form { padding: 10px 12px; }
+  .message-form input { font-size: var(--font-size-xl); min-height: var(--height-xl); }
+  .message-send-btn { width: var(--height-xl); height: var(--height-xl); }
+  .message-form { padding: 10px var(--space-3); }
 }

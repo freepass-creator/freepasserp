@@ -1,6 +1,6 @@
 .code-detail-grid {
   display: grid;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .code-detail-block {
@@ -11,12 +11,12 @@
 }
 
 .code-detail-title {
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: #6b7280;
 }
 
 .code-detail-value {
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: #111827;
   word-break: break-all;
 }

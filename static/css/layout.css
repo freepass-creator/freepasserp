@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: var(--space-6);
 }
 
 .dashboard-shell {
@@ -29,17 +29,17 @@
 .sidebar-menu {
   display: flex;
   flex-direction: column;
-  padding: 10px 8px;
-  gap: 6px;
+  padding: var(--space-3) var(--space-2);
+  gap: var(--space-2);
 }
 
 .sidebar-link {
   position: relative;
-  min-height: 34px;
+  min-height: var(--height-md);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 12px;
+  gap: var(--space-3);
+  padding: 0 var(--space-3);
   font-size: var(--font-size-main);
   font-weight: var(--font-weight-base);
   color: var(--text-main);
@@ -49,7 +49,7 @@
   background: transparent;
   cursor: pointer;
   box-shadow: none;
-  transition: background-color .12s ease, color .12s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .sidebar-link-icon {
@@ -125,13 +125,13 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0 14px 14px;
-  gap: 14px;
+  padding: 0 var(--space-4) var(--space-4);
+  gap: var(--space-4);
 }
 
 .page-header {
   flex: 0 0 auto;
-  min-height: 32px;
+  min-height: var(--space-8);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -151,7 +151,7 @@
   align-items: center;
   justify-self: end;
   align-self: center;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .work-page {

@@ -12,13 +12,13 @@
 
 .fp-photo-viewer__close {
   position: fixed;
-  top: 12px;
-  right: 12px;
+  top: var(--space-3);
+  right: var(--space-3);
   z-index: 2001;
-  width: 40px;
-  height: 40px;
+  width: var(--height-lg);
+  height: var(--height-lg);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   cursor: pointer;
@@ -32,10 +32,10 @@
 
 .fp-photo-viewer__counter {
   position: fixed;
-  top: 16px;
-  left: 16px;
+  top: var(--space-4);
+  left: var(--space-4);
   z-index: 2001;
-  font-size: 13px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
 }
@@ -48,9 +48,9 @@
 
 .fp-photo-viewer__hint {
   text-align: center;
-  font-size: 12px;
+  font-size: var(--font-size-base);
   color: rgba(255, 255, 255, 0.5);
-  padding: 16px 0 8px;
+  padding: var(--space-4) 0 var(--space-2);
 }
 
 .fp-photo-viewer__img {

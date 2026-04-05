@@ -140,7 +140,7 @@ body[data-page] img {
   display: flex;
   align-items: center;
   height: 56px;
-  padding: 0 0 0 16px;
+  padding: 0 0 0 var(--space-4);
   flex: 0 0 auto;
 }
 
@@ -148,16 +148,16 @@ body[data-page] img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  width: 36px;
-  height: 36px;
+  gap: var(--space-2);
+  width: var(--height-md);
+  height: var(--height-md);
   background: none;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: var(--new-sidebar-icon);
   cursor: pointer;
   padding: 0;
-  transition: background .12s ease, color .12s ease;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .sidebar-toggle-btn:hover {
@@ -173,20 +173,20 @@ body[data-page] img {
 }
 
 .sidebar-toggle-label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-strong);
   color: var(--new-sidebar-text);
   letter-spacing: -0.01em;
   white-space: nowrap;
   opacity: 1;
-  transition: opacity 0.15s ease, width 0.15s ease;
+  transition: opacity var(--transition-normal), width var(--transition-normal);
   overflow: hidden;
 }
 
 /* ── 메뉴 ── */
 
 .dashboard-shell--new .sidebar-menu {
-  padding: 4px 8px 16px;
+  padding: var(--space-1) var(--space-2) var(--space-4);
   gap: 0;
   flex: 1 1 0;
   min-height: 0;
@@ -201,17 +201,17 @@ body[data-page] img {
 .sidebar-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 0 4px;
+  gap: var(--space-1);
+  padding: 0 var(--space-1);
 }
 
 .sidebar-group + .sidebar-group {
-  margin-top: 32px;
+  margin-top: var(--space-8);
 }
 
 .sidebar-bottom {
   flex: 0 0 auto;
-  padding: 8px 12px 16px;
+  padding: var(--space-2) var(--space-3) var(--space-4);
 }
 
 /* ── 링크 ── */
@@ -220,17 +220,17 @@ body[data-page] img {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 36px;
-  padding: 0 12px 0 12px;
-  border-radius: 4px;
+  min-height: var(--height-md);
+  padding: 0 var(--space-3) 0 var(--space-3);
+  border-radius: var(--radius-sm);
   background: transparent;
   border: none;
   color: var(--new-sidebar-text);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-strong);
   letter-spacing: -0.03em;
-  transition: background-color .12s ease, color .12s ease;
-  gap: 12px;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  gap: var(--space-3);
 }
 
 .dashboard-shell--new .sidebar-link-label {
@@ -239,7 +239,7 @@ body[data-page] img {
   white-space: nowrap;
   text-overflow: ellipsis;
   opacity: 1;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--transition-normal);
 }
 
 .dashboard-shell--new .sidebar-link-icon {
@@ -247,7 +247,7 @@ body[data-page] img {
   flex: 0 0 20px;
   width: 20px;
   height: 20px;
-  transition: color .12s ease;
+  transition: color var(--transition-fast);
 }
 
 .dashboard-shell--new .sidebar-link-svg {
@@ -286,15 +286,15 @@ body[data-page] img {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: #dc2626;
   color: #fff;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   flex: 0 0 auto;
   box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3);
   font-variant-numeric: tabular-nums;
-  transition: transform 0.12s ease;
+  transition: transform var(--transition-fast);
 }
 .sidebar-nav-badge[hidden] { display: none !important; }
 .sidebar-nav-badge:hover { transform: scale(1.08); }
@@ -303,8 +303,8 @@ body[data-page] img {
 
 .dashboard-shell--new .main-shell {
   background: var(--new-bg-main);
-  padding: 4px 12px 12px;
-  gap: 8px;
+  padding: var(--space-1) var(--space-3) var(--space-3);
+  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -317,7 +317,7 @@ body[data-page] img {
 }
 
 .dashboard-shell--new .page-header {
-  min-height: 36px;
+  min-height: var(--height-md);
 }
 
 .dashboard-shell--new .page-title {
@@ -370,8 +370,8 @@ body[data-page] img {
 }
 
 .dashboard-shell--new .panel-head-title {
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-strong);
   color: #1f1f1f;
   letter-spacing: -0.03em;
   text-transform: none;
@@ -445,7 +445,7 @@ body[data-page] img {
   width: 8px;
   height: 8px;
   background: #dc2626;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   border: 1.5px solid var(--new-bg-sidebar, #fff);
   box-shadow: 0 1px 2px rgba(220, 38, 38, 0.3);
 }
@@ -464,7 +464,7 @@ body[data-page] img {
 .panel-head-badges {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
   flex-shrink: 0;
 }
 .panel-head-badges:empty { display: none; }
@@ -500,7 +500,7 @@ body[data-page] img {
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 4px 0;
-  padding: 6px 12px;
+  padding: 6px var(--space-3);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   background: rgba(0, 0, 0, 0.015);
 }
@@ -515,7 +515,7 @@ body[data-page] img {
 }
 
 .facet-label {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--text-muted, #94a3b8);
   white-space: nowrap;
   padding-right: 2px;
@@ -534,9 +534,9 @@ body[data-page] img {
   height: 20px;
   padding: 0 7px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: transparent;
-  font-size: 11px;
+  font-size: var(--font-size-sm);
   color: var(--text-subtle, #5f6368);
   cursor: pointer;
   white-space: nowrap;
@@ -554,7 +554,7 @@ body[data-page] img {
 }
 
 .facet-count {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: inherit;
   opacity: 0.6;
   font-variant-numeric: tabular-nums;
@@ -563,11 +563,11 @@ body[data-page] img {
 
 .facet-reset {
   height: 20px;
-  padding: 0 8px;
+  padding: 0 var(--space-2);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--text-muted, #94a3b8);
   cursor: pointer;
   margin-left: auto;
