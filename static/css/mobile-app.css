@@ -602,9 +602,10 @@ body.chat-m-open .work-page {
 .md-table td strong {
   font-weight: 700;
 }
-/* 금액 우측 정렬, 텍스트 가운데 */
+/* 대여료/수수료: 전체 가운데, 금액만 우측 */
+.md-table--price td { text-align: center; }
+.md-table--price th { text-align: center; }
 .md-table--price td:nth-child(n+2) { text-align: right; }
-.md-table--price th:nth-child(n+2) { text-align: right; }
 .md-note {
   padding: 10px 16px;
   font-size: 12px;
