@@ -215,8 +215,8 @@ function updateFilterIcon(open) {
   const svg = btn.querySelector('svg');
   if (!svg) return;
   svg.innerHTML = open
-    ? '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'
-    : '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>';
+    ? '<path d="m9 18 6-6-6-6"/>'
+    : '<path d="m15 18-6-6 6-6"/>';
 }
 
 function initMobileFilterToggle() {
