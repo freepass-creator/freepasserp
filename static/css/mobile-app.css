@@ -462,17 +462,24 @@ body.chat-m-open .work-page {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .md-section-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: #94a3b8;
-  padding: 16px 16px 8px;
+  color: #64748b;
+  padding: 20px 16px 8px;
+}
+.md-section-head svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  stroke: #94a3b8;
 }
 .md-card {
   background: #fff;
   padding: 0;
-}
-.md-card + .md-section-head {
-  margin-top: 8px;
+  margin-bottom: 4px;
 }
 .md-row {
   display: flex;
@@ -499,8 +506,8 @@ body.chat-m-open .work-page {
   flex-wrap: wrap;
 }
 .md-vehicle-carno {
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 700;
   color: #0f172a;
 }
 .md-vehicle-model {
