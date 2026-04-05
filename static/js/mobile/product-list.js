@@ -153,14 +153,17 @@ function renderDetailContent(product) {
     if (!rent && !dep) return '';
     return `<tr><td>${m}개월</td><td><strong>${rent ? rent.toLocaleString('ko-KR') + '원' : '-'}</strong></td><td>${dep ? dep.toLocaleString('ko-KR') + '원' : '-'}</td></tr>`;
   }).join('');
-  const guideNote = first(term.rental_guide_note, product.pricingBasis);
-  const screeningNote = first(term.screening_criteria, product.reviewStatus);
+  const screeningNote = first(term.screening_criteria, product.reviewStatus, product.creditGrade);
+  const basicAge = first(term.basic_driver_age, product.ageText);
+  const annualMileage = first(term.annual_mileage, p.annualMileage);
   const insuranceIncluded = first(term.insurance_included, product.insuranceIncluded);
-  const priceNote = [
-    screeningNote !== '-' ? `* ${esc(screeningNote)}` : '',
-    insuranceIncluded !== '-' ? `* 보험포함: ${esc(insuranceIncluded)}` : '',
-    guideNote !== '-' ? `* ${esc(guideNote)}` : '',
-  ].filter(Boolean).join('<br>');
+  const criteriaItems = [
+    screeningNote !== '-' ? screeningNote : '',
+    basicAge !== '-' ? `만 ${basicAge}` : '',
+    annualMileage !== '-' ? annualMileage : '',
+    insuranceIncluded !== '-' ? `보험료 ${insuranceIncluded}` : '',
+  ].filter(Boolean);
+  const priceNote = criteriaItems.length ? `* [${esc(criteriaItems[0])}] ${esc(criteriaItems.slice(1).join(', '))}` : '';
   const priceSection = priceRowsHtml ? `
     ${sectionHead('기간별 대여료 및 보증금 안내')}
     <div class="md-card">
