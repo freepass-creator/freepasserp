@@ -276,7 +276,14 @@ async function ensureTermLoaded(product) {
     });
     state.termCache[key] = term ? extractTermFields(term) : {};
   } catch { state.termCache[key] = {}; }
-  finally { delete state.termLoading[key]; }
+  finally {
+    delete state.termLoading[key];
+    // 상세 열려있으면 term 데이터 반영하여 재렌더
+    if ($detail && !$detail.hidden && state.selectedId === product.id) {
+      $detailContent.innerHTML = renderDetailContent(product);
+      bindGallery($detailContent);
+    }
+  }
 }
 
 function openDetail(id) {

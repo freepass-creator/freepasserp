@@ -481,7 +481,7 @@ body.chat-m-open .work-page {
   font-size: 13px;
   font-weight: 600;
   color: #64748b;
-  padding: 20px 16px 8px;
+  padding: 16px 16px 8px;
 }
 .md-section-head svg {
   width: 14px;
@@ -492,13 +492,16 @@ body.chat-m-open .work-page {
 .md-card {
   background: #fff;
   padding: 0;
-  margin-bottom: 4px;
+  margin-bottom: 0;
+}
+.md-card + .md-section-head {
+  padding-top: 16px;
 }
 .md-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 11px 16px;
+  padding: 10px 16px;
   border-bottom: 1px solid #f1f5f9;
   gap: 12px;
 }
@@ -587,7 +590,7 @@ body.chat-m-open .work-page {
   border-bottom: 1px solid #e2e8f0;
 }
 .md-table td {
-  padding: 11px 16px;
+  padding: 10px 16px;
   color: #0f172a;
   border-bottom: 1px solid #f1f5f9;
 }
