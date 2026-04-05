@@ -18,7 +18,8 @@ import io, re, zipfile
 
 app = Flask(__name__)
 
-APP_VERSION = '20260405v3'
+import os
+APP_VERSION = '0.6.0'
 
 @app.context_processor
 def inject_app_version():
@@ -263,4 +264,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=7000)
+    app.run(debug=os.environ.get('FLASK_DEBUG', '1') == '1', port=int(os.environ.get('PORT', 7000)))
