@@ -29,7 +29,7 @@ const state = {
 
 // DOM refs
 let $grid, $sidebar, $overlay, $close, $count, $search, $reset, $filterSections;
-let $detail, $detailBack, $detailTitle, $detailContent;
+let $detail, $detailContent;
 
 function bindDOM() {
   $grid = document.getElementById('plsMCatalogGrid');
@@ -41,8 +41,6 @@ function bindDOM() {
   $reset = document.getElementById('plsMCatalogReset');
   $filterSections = document.getElementById('plsMCatalogFilterSections');
   $detail = document.getElementById('plsMDetail');
-  $detailBack = document.getElementById('plsMDetailBack');
-  $detailTitle = document.getElementById('plsMDetailTitle');
   $detailContent = document.getElementById('plsMDetailContent');
 }
 
@@ -166,14 +164,12 @@ function openDetail(id) {
   const product = state.filteredProducts.find(p => p.id === id);
   if (!product || !$detail || !$detailContent) return;
   state.selectedId = id;
-  if ($detailTitle) {
-    const p = state.profile || {};
-    $detailTitle.textContent = [p.company_name, p.name, p.position].filter(Boolean).join(' ') || '상세정보';
-  }
   $detailContent.innerHTML = renderDetailContent(product);
   bindGallery($detailContent);
   $detailContent.querySelector('#plsMDetailShare')?.addEventListener('click', () => handleShare(product));
   $detail.hidden = false;
+  // 핸드폰 뒤로가기로 상세 닫기
+  history.pushState({ detail: true }, '');
 }
 
 function closeDetail() {
@@ -279,8 +275,12 @@ function bindEvents() {
     if (card) openDetail(card.dataset.id);
   });
 
-  // 상세 뒤로가기
-  $detailBack?.addEventListener('click', closeDetail);
+  // 핸드폰 뒤로가기 → 상세 닫기
+  window.addEventListener('popstate', (e) => {
+    if ($detail && !$detail.hidden) {
+      closeDetail();
+    }
+  });
 }
 
 // ─── 초기화 ──────────────────────────────────────────────────────────────────

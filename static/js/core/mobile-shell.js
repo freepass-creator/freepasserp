@@ -128,7 +128,11 @@ function navigateToProductList() {
 }
 
 async function handleMobileBack() {
-  // 1. 페이지별 핸들러 (채팅방 닫기, 계약폼 닫기)
+  // 0. 상세 패널 등 오버레이가 열려있으면 먼저 닫기
+  const detailPanel = document.getElementById('plsMDetail');
+  if (detailPanel && !detailPanel.hidden) return true; // product-list.js popstate에서 처리
+
+  // 1. 페이지별 핸들러 (채팅방 닫기)
   if (_mobileBackHandler) {
     const handled = await _mobileBackHandler();
     if (handled) return true;
