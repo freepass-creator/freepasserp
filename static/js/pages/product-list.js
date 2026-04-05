@@ -776,9 +776,9 @@ function applyFilters(){
   if (_isMobile.matches) { renderMobileCatalogGrid(); }
   persistFilterState();
 }
-$openFilterBtn?.addEventListener('click',()=>{ 
+$openFilterBtn?.addEventListener('click',()=>{
   syncFilterOverlayWidth();
-  setFilterOverlay(!$overlay.classList.contains('is-open'));
+  setFilterOverlay(!$overlay?.classList.contains('is-open'));
 });
 $closeFilterBtn?.addEventListener('click',()=>{
   setFilterOverlay(false);
@@ -1147,7 +1147,7 @@ function bindMobile() {
 }
 
 async function init(){ 
-  const { user, profile } = await requireAuth({ roles: ['provider','agent','admin'] }); 
+  const { user, profile } = await requireAuth({ roles: ['provider','agent','admin'] });
   state.user = user;
   state.profile = profile;
   state.role = profile.role;
@@ -1157,10 +1157,12 @@ async function init(){
   renderRoleMenu(menu, profile.role);
   applyRoleActions();
   bindMobile();
-  syncFilterOverlayWidth();
-  setFilterOverlay(state.filterOverlayOpen);
-  bindFilterAccordion();
-  bindPeriodSelector();
+  if (!_isMobile.matches) {
+    syncFilterOverlayWidth();
+    setFilterOverlay(state.filterOverlayOpen);
+    bindFilterAccordion();
+    bindPeriodSelector();
+  }
 
   // 스켈레톤 로딩 표시
   if ($list) {
@@ -1195,7 +1197,7 @@ export async function mount() {
   _mounted = false;
   await init().catch((error) => {
     console.error('[product-list] init failed', error);
-    $list.innerHTML = '<div class="list-empty">상품목록을 불러오지 못했습니다.</div>';
+    if ($list) $list.innerHTML = '<div class="list-empty">상품목록을 불러오지 못했습니다.</div>';
   });
   _mounted = true;
 }

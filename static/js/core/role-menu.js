@@ -163,6 +163,7 @@ function createLink(item) {
 }
 
 export function renderRoleMenu(container, role) {
+  if (!container) return;
   if (container.dataset.renderedRole === role) {
     setMenuActive(container.closest('.sidebar') || container);
     return;
