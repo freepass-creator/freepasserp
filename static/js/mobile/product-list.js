@@ -224,7 +224,6 @@ function renderDetailContent(product) {
 
   // ── 7. 추가정보 ──
   const photoLink = String(product.photoLink || '').trim();
-  const photoLinkHtml = photoLink ? `<div class="md-row"><span>사진링크</span><a href="${esc(photoLink)}" target="_blank" rel="noopener" class="md-link">사진보기</a></div>` : '';
   const extraInfo = `
     ${sectionHead('추가정보')}
     <div class="md-card">
@@ -235,7 +234,7 @@ function renderDetailContent(product) {
       ${row('차량가격', money(product.vehiclePrice))}
       ${row('특이사항', first(c.note, product.partnerMemo))}
       ${row('공급코드', first(product.providerCompanyCode, product.partnerCode))}
-      ${photoLinkHtml}
+      ${photoLink ? `<div class="md-row"><span>사진링크</span><strong><a href="${esc(photoLink)}" target="_blank" rel="noopener" class="md-link">사진보기</a></strong></div>` : ''}
     </div>`;
 
   // ── 8. 기간별 수수료 ──
