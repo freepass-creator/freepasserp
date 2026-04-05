@@ -21,11 +21,10 @@ const ROUTE_REGISTRY = [
   // 재고 · 정책
   { href: '/product-new',  label: '재고 관리',      pageTitle: '재고관리',   icon: 'package',   roles: ['provider', 'admin'],          group: 'g3' },
   { href: '/terms',        label: '운영 정책',      pageTitle: '정책관리',   icon: 'shield',    roles: ['provider', 'admin'],          group: 'g3' },
-  // 파트너 · 사용자
-  { href: '/partner',      label: '파트너사 관리',  pageTitle: '파트너관리', icon: 'building',  roles: ['admin'],                      group: 'g4' },
-  { href: '/member',       label: '사용자 관리',    pageTitle: '사용자관리', icon: 'users',     roles: ['admin'],                      group: 'g4' },
-  // 관리자
-  { href: '/admin',        label: '관리자 페이지',   pageTitle: '관리자',     icon: 'lock-keyhole', roles: ['admin'],                      group: 'g5' },
+  // 파트너 · 사용자 · 관리자
+  { href: '/partner',      label: '파트너사 관리',  pageTitle: '파트너관리', icon: 'building',    roles: ['admin'],                      group: 'g4' },
+  { href: '/member',       label: '사용자 관리',    pageTitle: '사용자관리', icon: 'users',       roles: ['admin'],                      group: 'g4' },
+  { href: '/admin',        label: '관리자 페이지',  pageTitle: '관리자',     icon: 'lock-keyhole', roles: ['admin'],                     group: 'g4' },
   // 환경설정 (맨 하단)
   { href: '/settings',     label: '설정',           pageTitle: '설정',       icon: 'settings',  roles: ['provider', 'agent', 'admin'], group: 'bottom' },
 ];
