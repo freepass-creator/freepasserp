@@ -83,6 +83,7 @@
   flex-direction: column;
   flex: 1 1 0;
   min-height: 0;
+  overflow: auto;
 }
 .admin-tab-panel[hidden] { display: none; }
 .admin-tab-panel--padded { padding: var(--panel-body-pad, 16px); overflow-y: auto; }
@@ -271,18 +272,8 @@
 .admin-stl-col-bar[hidden] { display: none; }
 #adminWorkspaceHead[hidden] { display: none; }
 
-/* 테이블 최소 너비 + 고정 레이아웃 (thead/tbody 컬럼 정렬) */
-.admin-stl-table { min-width: 1100px; table-layout: fixed; }
-
-/* 열 너비 */
-.admin-stl-table .col-code     { width: 110px; }
-.admin-stl-table .col-status   { width: 72px; }
-.admin-stl-table .col-partner  { width: 110px; }
-.admin-stl-table .col-date     { width: 84px; }
-.admin-stl-table .col-ptype    { width: 72px; }
-.admin-stl-table .col-car      { width: 88px; }
-.admin-stl-table .col-model    { width: 110px; }
-.admin-stl-table .col-customer { width: 72px; }
+/* renderTableGrid의 인라인 스타일로 컬럼 너비 제어 */
+.admin-stl-table { min-width: 1100px; }
 .admin-stl-table .col-month    { width: 60px; }
 .admin-stl-table .col-rent     { width: 80px; }
 .admin-stl-table .col-deposit  { width: 80px; }
