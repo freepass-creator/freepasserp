@@ -95,6 +95,9 @@ function switchTab(tabKey) {
   if (headTools)     headTools.hidden     = !isStl;
   if (colBar)        colBar.hidden        = !isStl;
   if (workspaceHead) workspaceHead.hidden =  isStl;
+  // 정산 탭: panel-head가 숨겨지면 grid 첫 행을 0으로
+  const panel = workspaceHead?.closest('.panel');
+  if (panel) panel.style.gridTemplateRows = isStl ? 'minmax(0, 1fr)' : '';
   if (!isStl) setNoticeMode('idle');
   // setNoticeMode가 panel head title을 덮어쓰므로 이후에 복원
   if (workspaceTitle && !isStl) workspaceTitle.textContent = title;

@@ -261,9 +261,6 @@
 }
 
 #adminWorkspaceHead[hidden] { display: none; }
-.admin-workspace-panel:has(#adminWorkspaceHead[hidden]) {
-  grid-template-rows: 0 minmax(0, 1fr);
-}
 
 
 /* ─── 안내사항 관리 ────────────────────────────────────────────────────────────── */
