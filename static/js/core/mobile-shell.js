@@ -137,8 +137,13 @@ async function handleMobileBack() {
     return true;
   }
 
-  // 2. 채팅창 → 채팅 목록
+  // 2. 채팅창 → 채팅 목록 (입력 중이면 확인)
   if (document.body.classList.contains('chat-m-open')) {
+    const msgInput = document.getElementById('message-input');
+    if (msgInput && msgInput.value.trim()) {
+      const ok = await showConfirm('작성 중인 메시지가 있습니다.\n대화목록으로 돌아가시겠습니까?');
+      if (!ok) return true;
+    }
     document.body.classList.remove('chat-m-open');
     return true;
   }
