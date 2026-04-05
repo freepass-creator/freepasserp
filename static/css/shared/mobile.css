@@ -66,7 +66,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
   }
 
   /* ─── 모바일 요소 표시 ──────────────────────────────────────────────────── */
@@ -111,6 +111,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 
   /* ─── 탭바 필터 버튼: 기본 숨김, 페이지별 표시 ───────────────────────── */
   .mobile-tab--filter { display: none !important; }
+  .mobile-tab--filter.is-active { color: #1b2a4a; }
 
   /* ─── 설정 페이지 ───────────────────────────────────────────────────────── */
   .settings-page-shell {
@@ -304,8 +305,8 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: var(--radius-md);
   background: #f1f5f9;
