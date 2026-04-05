@@ -5,9 +5,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { watchProducts, resolveTermForProduct, ensureRoom } from '../firebase/firebase-db.js';
 import { normalizeProduct, extractTermFields } from '../shared/product-list-detail-view.js';
-import { renderCatalogCard, renderCatalogDetailHero, renderCatalogPriceTable,
-  renderCatalogInsuranceTable, renderCatalogConditions, renderCatalogExtra,
-  renderCatalogClawback, esc } from '../shared/catalog-card.js';
+import { renderCatalogCard, esc } from '../shared/catalog-card.js';
 import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { escapeHtml } from '../core/management-format.js';
@@ -84,68 +82,143 @@ function renderGrid() {
 
 // ─── 상세 ────────────────────────────────────────────────────────────────────
 
+function safe(v) { return String(v ?? '').trim() || '-'; }
+function money(v) { const n = Number(v || 0); return n ? n.toLocaleString('ko-KR') + '원' : '-'; }
+function sectionHead(title) { return `<div class="md-section-head">${esc(title)}</div>`; }
+function row(label, value) { return `<div class="md-row"><span>${esc(label)}</span><strong>${esc(safe(value))}</strong></div>`; }
+
 function renderDetailContent(product) {
   const photos = product.photos || [];
   const total = photos.length;
+  const term = state.termCache[getTermCacheKey(product)] || {};
+  const p = product.policy || {};
+  const c = product.condition || {};
+  const role = state.role;
+
+  // ── 1. 차량사진 ──
   const galleryHtml = total
     ? `<div class="pls-mobile-detail-gallery" id="plsMGallery" data-photos='${JSON.stringify(photos).replace(/'/g,"&#39;")}'>
-        <img class="pls-mobile-detail-gallery__img" id="plsMGalleryImg" src="${esc(photos[0])}" alt="차량 사진" loading="eager" decoding="async">
+        <img class="pls-mobile-detail-gallery__img" id="plsMGalleryImg" src="${esc(photos[0])}" alt="" loading="eager" decoding="async">
         ${total > 1 ? `<button class="pls-mobile-detail-gallery__nav pls-mobile-detail-gallery__nav--prev" id="plsMGalleryPrev" type="button" aria-label="이전"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><button class="pls-mobile-detail-gallery__nav pls-mobile-detail-gallery__nav--next" id="plsMGalleryNext" type="button" aria-label="다음"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>` : ''}
         <span class="pls-mobile-detail-gallery__counter" id="plsMGalleryCtr">1 / ${total}</span>
-      </div>` : '';
+      </div>`
+    : `<div class="md-no-photo">등록된 사진이 없습니다.</div>`;
 
-  const priceRows = ['1','12','24','36','48','60'].map(m => ({
-    m, rent: product.price[m]?.rent, dep: product.price[m]?.deposit, fee: product.price[m]?.fee
-  })).filter(r => r.rent || r.dep);
+  // ── 2. 차량정보 ──
+  const badges = [product.vehicleStatus, product.productType].filter(v => v && v !== '-').map(v =>
+    `<span class="md-badge">${esc(v)}</span>`).join('');
+  const vehicleInfo = `
+    ${sectionHead('차량정보')}
+    <div class="md-card">
+      <div class="md-vehicle-head">
+        <div class="md-vehicle-carno">${esc(safe(product.carNo))}</div>
+        <div class="md-vehicle-model">${esc(safe(product.maker))} ${esc(safe(product.model))}</div>
+        ${badges ? `<div class="md-badges">${badges}</div>` : ''}
+      </div>
+      <div class="md-vehicle-sub">${esc(safe(product.subModel))} ${esc(safe(product.trim))}</div>
+      ${product.optionSummary && product.optionSummary !== '-' ? `<div class="md-vehicle-sub">${esc(product.optionSummary)}</div>` : ''}
+      <div class="md-vehicle-meta">${esc(safe(product.fuel))} · ${esc(safe(product.year))}년식 · ${esc(safe(product.mileageDisplay))}</div>
+      <div class="md-vehicle-meta">${esc(safe(product.extColor))} / ${esc(safe(product.intColor))}</div>
+    </div>`;
 
-  const term = state.termCache[getTermCacheKey(product)] || {};
+  // ── 3. 액션 버튼 ──
+  const inquiryBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailInquiry"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> 문의</button>` : '';
+  const contractBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailContract"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg> 계약</button>` : '';
+  const shareBtn = `<button class="md-action-btn" id="plsMDetailShare"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg> 공유</button>`;
+  const actionsHtml = `<div class="md-actions">${inquiryBtn}${contractBtn}${shareBtn}</div>`;
+
+  // ── 4. 기간별 대여료 및 보증금 ──
+  const months = ['1','12','24','36','48','60'];
+  const priceRowsHtml = months.map(m => {
+    const rent = Number(product.price[m]?.rent || 0);
+    const dep = Number(product.price[m]?.deposit || 0);
+    if (!rent && !dep) return '';
+    return `<tr><td>${m}개월</td><td><strong>${rent ? rent.toLocaleString('ko-KR') + '원' : '-'}</strong></td><td>${dep ? dep.toLocaleString('ko-KR') + '원' : '-'}</td></tr>`;
+  }).join('');
+  const reviewNote = safe(product.reviewStatus) !== '-' ? `<div class="md-note">* ${esc(safe(product.reviewStatus))}</div>` : '';
+  const priceSection = priceRowsHtml ? `
+    ${sectionHead('기간별 대여료 및 보증금 안내')}
+    <div class="md-card">
+      <table class="md-table"><thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead><tbody>${priceRowsHtml}</tbody></table>
+      ${reviewNote}
+    </div>` : '';
+
+  // ── 5. 차량보험정보 ──
   const merged = {
-    ageText: product.ageText || term.basic_driver_age || '-',
-    ageLowering: product.policy?.ageLowering || term.driver_age_lowering || '-',
-    annualMileage: product.policy?.annualMileage || term.annual_mileage || '-',
-    paymentMethod: product.policy?.paymentMethod || term.payment_method || '-',
-    bodily: product.policy?.bodily || term.injury_limit_deductible || '-',
-    property: product.policy?.property || term.property_limit_deductible || '-',
-    selfBodily: product.policy?.selfBodily || term.personal_injury_limit_deductible || '-',
-    uninsured: product.policy?.uninsured || term.uninsured_limit_deductible || '-',
-    ownDamage: product.policy?.ownDamage || term.own_damage_limit_deductible || '-',
+    bodily: safe(p.bodily || term.injury_limit_deductible),
+    property: safe(p.property || term.property_limit_deductible),
+    selfBodily: safe(p.selfBodily || term.personal_injury_limit_deductible),
+    uninsured: safe(p.uninsured || term.uninsured_limit_deductible),
+    ownDamage: safe(p.ownDamage || term.own_damage_limit_deductible),
+    emergency: safe(c.emergency || term.roadside_assistance),
   };
-
-  const insRows = [
-    ['대인배상', merged.bodily], ['대물배상', merged.property],
-    ['자기신체사고', merged.selfBodily], ['무보험차상해', merged.uninsured],
-    ['자기차량손해', merged.ownDamage]
-  ].map(([label, raw]) => {
+  function insRow(label, raw) {
     const parts = String(raw || '-').split('/').map(s => s.trim());
-    return [label, parts[0] || '-', parts.slice(1).join('/') || '-'];
-  });
+    return `<tr><td>${esc(label)}</td><td>${esc(parts[0] || '-')}</td><td>${esc(parts.slice(1).join('/') || '-')}</td></tr>`;
+  }
+  const insSection = `
+    ${sectionHead('차량보험정보')}
+    <div class="md-card">
+      <table class="md-table"><thead><tr><th>항목</th><th>한도</th><th>면책금</th></tr></thead><tbody>
+        ${insRow('대인', merged.bodily)}
+        ${insRow('대물', merged.property)}
+        ${insRow('무보험차상해', merged.uninsured)}
+        ${insRow('자기차량손해', merged.ownDamage)}
+      </tbody></table>
+      ${row('긴급출동', merged.emergency)}
+    </div>`;
 
-  const condRows = [
-    ['차량상태', product.condition?.detailStatus],
-    ['사고여부', product.condition?.accident],
-    ['즉시출고', product.condition?.immediate],
-    ['탁송가능', product.condition?.delivery],
-    ['정비서비스', product.condition?.maintenance],
-  ].filter(([, v]) => v && v !== '-');
+  // ── 6. 대여조건 ──
+  const mg = {
+    ageText: safe(product.ageText || term.basic_driver_age),
+    ageLowering: safe(p.ageLowering || term.driver_age_lowering),
+    ageLoweringCost: safe(p.ageLoweringCost || term.age_lowering_cost),
+    annualMileage: safe(p.annualMileage || term.annual_mileage),
+    paymentMethod: safe(p.paymentMethod || term.payment_method),
+  };
+  const rentalTerms = `
+    ${sectionHead('대여조건')}
+    <div class="md-card">
+      ${row('연간약정주행거리', mg.annualMileage)}
+      ${row('결제방식', mg.paymentMethod)}
+      ${row('대여지역', c.rentalRegion || term.rental_region)}
+      ${row('최소운전자연령', mg.ageText)}
+      ${row('운전연령하향', mg.ageLowering)}
+      ${row('운전연령하향비용', mg.ageLoweringCost)}
+      ${row('정비서비스', c.maintenance)}
+      ${row('탁송가능', c.delivery)}
+      ${row('탁송비용', c.deliveryFee)}
+    </div>`;
 
-  const extraRows = [
-    ['특이사항', product.condition?.note],
-  ].filter(([, v]) => v && v !== '-');
+  // ── 7. 추가정보 ──
+  const photoLink = String(product.photoLink || '').trim();
+  const photoLinkHtml = photoLink ? `<div class="md-row"><span>사진링크</span><a href="${esc(photoLink)}" target="_blank" rel="noopener" class="md-link">사진보기</a></div>` : '';
+  const extraInfo = `
+    ${sectionHead('추가정보')}
+    <div class="md-card">
+      ${row('차량번호', product.carNo)}
+      ${row('차종구분', product.vehicleClass)}
+      ${row('차량가격', money(product.vehiclePrice))}
+      ${row('특이사항', c.note || product.partnerMemo)}
+      ${row('공급코드', product.partnerCode)}
+      ${photoLinkHtml}
+    </div>`;
 
-  const role = state.role;
-  const inquiryBtn = role === 'agent'
-    ? `<button class="cat-share-btn" id="plsMDetailInquiry" title="문의"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>` : '';
-  const contractBtn = role === 'agent'
-    ? `<button class="cat-share-btn" id="plsMDetailContract" title="계약"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></button>` : '';
-  const shareBtn = `<button class="cat-share-btn" id="plsMDetailShare" title="공유"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>`;
-  const actionsHtml = `${inquiryBtn}${contractBtn}${shareBtn}`;
+  // ── 8. 기간별 수수료 ──
+  const feeRowsHtml = months.map(m => {
+    const fee = product.price[m]?.fee;
+    if (!fee && fee !== 0) return '';
+    return `<tr><td>${m}개월</td><td>${Number(fee || 0) ? Number(fee).toLocaleString('ko-KR') + '원' : '준비중'}</td></tr>`;
+  }).join('');
+  const clawback = safe(term.commission_clawback_condition);
+  const feeSection = feeRowsHtml ? `
+    ${sectionHead('기간별 수수료')}
+    <div class="md-card">
+      <table class="md-table"><thead><tr><th>기간</th><th>수수료</th></tr></thead><tbody>${feeRowsHtml}</tbody></table>
+      ${clawback !== '-' ? `<div class="md-note">* ${esc(clawback)}</div>` : ''}
+    </div>` : '';
 
-  return galleryHtml
-    + renderCatalogDetailHero(product, actionsHtml)
-    + renderCatalogPriceTable(priceRows)
-    + renderCatalogInsuranceTable(insRows)
-    + renderCatalogConditions(condRows)
-    + renderCatalogExtra(extraRows);
+  return galleryHtml + vehicleInfo + actionsHtml + priceSection + insSection + rentalTerms + extraInfo + feeSection;
 }
 
 function getTermCacheKey(product) {
