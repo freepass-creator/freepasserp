@@ -113,6 +113,9 @@
   box-shadow: -4px 0 16px rgba(15, 23, 42, 0.1);
 }
 
+/* 상품 목록 여백 — 좌우와 상단 통일 */
+.catalog-grid { padding-top: var(--space-4) !important; }
+
 /* 데스크탑 전용 요소 숨김 */
 .pls-grid-panel { display: none !important; }
 .pls-detail-panel { display: none !important; }
