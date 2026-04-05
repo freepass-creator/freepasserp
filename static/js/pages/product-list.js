@@ -2,6 +2,7 @@ function moneyText(value){ const n = Number(value || 0); return n ? n.toLocaleSt
 function safeText(value){ return String(value ?? '').trim() || '-'; }
 
 import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
+import { renderTableGrid } from '../core/management-list.js';
 import { renderColorBadge } from "../core/product-colors.js";
 import { requireAuth } from "../core/auth-guard.js";
 import { qs, registerPageCleanup, runPageCleanup } from "../core/utils.js";
@@ -486,36 +487,15 @@ function openHeaderFilter(colDef, thEl) {
   });
 }
 
-function renderGridHeader() {
-  if (!$gridHeader) return;
-  const visibleCols = getVisibleGridCols();
-  const ths = visibleCols.map(col => {
-    const cls = col.sticky ? ' pls-th--sticky' : '';
-    const filterable = (col.filterKey || col.filterType === 'search') ? ' pls-th--filterable' : '';
-    const cnt1 = col.filterKey ? (state.filters[col.filterKey]?.length || 0) : 0;
-    const cnt2 = col.filterKey2 ? (state.filters[col.filterKey2]?.length || 0) : 0;
-    const hasColSearch = state._colSearch?.[col.key] ? 1 : 0;
-    const totalActive = cnt1 + cnt2 + hasColSearch;
-    const hasFilter = totalActive > 0 ? ' pls-th--has-filter' : '';
-    const isSorted = col.sortField && gridSortField === col.sortField;
-    const sortIndicator = isSorted ? `<span class="pls-th__sort">${gridSortDir === 1 ? '▲' : '▼'}</span>` : '';
-    const styles = [];
-    if (col.w) { styles.push(`width:${col.w}px`); styles.push(`min-width:${col.w}px`); styles.push(`max-width:${col.w}px`); }
-    else if (col.wCh) styles.push(`width:${col.wCh.length + 1}ch`);
-    if (col.maxW) styles.push(`max-width:${col.maxW}px`);
-    const wAttr = styles.length ? ` style="${styles.join(';')}"` : '';
-    const alignCls = col.align === 'r' ? ' pls--right' : ' pls--center';
-    return `<th class="pls-th${cls}${filterable}${hasFilter}${alignCls}" data-col-key="${col.key}"${wAttr}><span class="pls-th__label">${escapeHtml(col.label)}</span>${sortIndicator}</th>`;
-  }).join('');
-  $gridHeader.innerHTML = `<tr>${ths}</tr>`;
-}
+/* renderGridHeader removed — renderTableGrid handles header rendering */
 
 $gridHeader?.addEventListener('click', (e) => {
   if (e.target.closest('.pls-filter-dd')) return;
-  const th = e.target.closest('.pls-th--filterable');
+  const th = e.target.closest('.pls-th[data-col-key]');
   if (!th) return;
   const colKey = th.dataset.colKey;
   const col = getVisibleGridCols().find(c => c.key === colKey);
+  if (!col?.filterKey && col?.filterType !== 'search') return;
   if (activeHeaderFilter === colKey) { closeHeaderFilter(); return; }
   openHeaderFilter(col, th);
 });
@@ -697,68 +677,73 @@ function scheduleRenderList() {
   _renderListRaf = requestAnimationFrame(() => { _renderListRaf = 0; renderList(); });
 }
 
-function renderList(){
+function renderList({ bodyOnly = false } = {}){
   if ($pageName) $pageName.textContent = `전체 상품 검색 (${state.filteredProducts.length}건)`;
 
-  const visiblePriceCols = getVisiblePriceCols();
-  if(!state.filteredProducts.length){
-    const colSpan = INFO_COLS.length + visiblePriceCols.length;
-    $list.innerHTML=`<tr><td colspan="${colSpan}" class="list-empty">조건에 맞는 상품이 없습니다.</td></tr>`;
-    return;
-  }
-
-  $list.innerHTML = state.filteredProducts.map(item => {
-    const active = item.id === state.selectedId ? ' is-active' : '';
-
-    // 정보 컬럼 셀들
-    const infoCells = INFO_COLS.map(col => {
-      const stickyClass = col.sticky ? ' pls-cell--sticky' : '';
-      const numClass = col.num ? ' pls-cell--num' : '';
-      const alignCls = col.align === 'c' ? ' pls--center' : col.align === 'r' || col.num ? ' pls--right' : '';
+  renderTableGrid({
+    _bodyOnly: bodyOnly,
+    thead: $gridHeader,
+    tbody: $list,
+    columns: getVisibleGridCols(),
+    items: state.filteredProducts,
+    selectedKey: state.selectedId,
+    getKey: (item) => item.id,
+    onSelect: (item) => {
+      if (state.selectedId === item.id && $detailPanel && !$detailPanel.hidden) {
+        hideDetailPanel();
+        return;
+      }
+      state.selectedId = item.id;
+      state.activePhotoIndex = 0;
+      renderList();
+      renderDetail();
+      if ($detailPanel && !$detailPanel.hidden) {
+        $detailPanel.classList.remove('is-open');
+        $detailPanel.hidden = true;
+        setTimeout(() => showDetailPanel(), 0);
+      } else {
+        showDetailPanel();
+      }
+    },
+    getCellValue: (col, item) => {
+      if (col.priceMonth) {
+        const rent = fmtPrice(item.price[col.priceMonth]?.rent);
+        const depNum = moneyToNumber(item.price[col.priceMonth]?.deposit);
+        const dep = depNum ? depNum.toLocaleString('ko-KR') : '0';
+        return `<span class="pls-price-rent">${rent}</span><span class="pls-price-dep">${dep}</span>`;
+      }
       const cv = cellValue(col, item);
-      const inner = cv.html || escapeHtml(cv.text || '');
-      const cellStyles = [];
-      if (col.maxW) cellStyles.push(`max-width:${col.maxW}px`);
-      const sAttr = cellStyles.length ? ` style="${cellStyles.join(';')}"` : '';
-      return `<td class="pls-cell${stickyClass}${numClass}${alignCls}"${sAttr}>${inner}</td>`;
-    }).join('');
+      return cv.html || escapeHtml(cv.text || '');
+    },
+    emptyText: '조건에 맞는 상품이 없습니다.'
+  });
 
-    // 기간별 대여료 셀들 (2줄: 대여료 + 보증금)
-    const priceCells = visiblePriceCols.map(col => {
-      const rent = fmtPrice(item.price[col.priceMonth]?.rent);
-      const depNum = moneyToNumber(item.price[col.priceMonth]?.deposit);
-      const dep = depNum ? depNum.toLocaleString('ko-KR') : '0';
-      return `<td class="pls-cell pls-cell--num pls-cell--price">`
-        + `<span class="pls-price-rent">${rent}</span>`
-        + `<span class="pls-price-dep">${dep}</span>`
-        + `</td>`;
-    }).join('');
-
-    return `<tr class="pls-row${active}" data-id="${item.id}">${infoCells}${priceCells}</tr>`;
-  }).join('');
-}
-
-// 행 클릭 — 이벤트 위임 (renderList 호출마다 리스너 누적 방지)
-function _handleRowClick(e) {
-  const row = e.target.closest('.pls-row');
-  if (!row) return;
-  const clickedId = row.dataset.id;
-  if (state.selectedId === clickedId && $detailPanel && !$detailPanel.hidden) {
-    hideDetailPanel();
-    return;
-  }
-  state.selectedId = clickedId;
-  state.activePhotoIndex = 0;
-  renderList();
-  renderDetail();
-  if ($detailPanel && !$detailPanel.hidden) {
-    $detailPanel.classList.remove('is-open');
-    $detailPanel.hidden = true;
-    setTimeout(() => showDetailPanel(), 0);
-  } else {
-    showDetailPanel();
+  // Post-render: apply filterable/has-filter classes (page uses its own filter system, not renderTableGrid's built-in one)
+  if ($gridHeader && !bodyOnly) {
+    const visibleCols = getVisibleGridCols();
+    $gridHeader.querySelectorAll('.pls-th[data-col-key]').forEach(th => {
+      const colKey = th.dataset.colKey;
+      const col = visibleCols.find(c => c.key === colKey);
+      if (!col) return;
+      const isFilterable = col.filterKey || col.filterType === 'search';
+      th.classList.toggle('pls-th--filterable', !!isFilterable);
+      const cnt1 = col.filterKey ? (state.filters[col.filterKey]?.length || 0) : 0;
+      const cnt2 = col.filterKey2 ? (state.filters[col.filterKey2]?.length || 0) : 0;
+      const hasColSearch = state._colSearch?.[col.key] ? 1 : 0;
+      th.classList.toggle('pls-th--has-filter', (cnt1 + cnt2 + hasColSearch) > 0);
+      if (col.sticky) th.classList.add('pls-th--sticky');
+      // Sort indicator
+      if (col.sortField && gridSortField === col.sortField && gridSortDir) {
+        const label = th.querySelector('.pls-th__label');
+        if (label && !th.querySelector('.pls-th__sort')) {
+          label.insertAdjacentHTML('afterend', `<span class="pls-th__sort">${gridSortDir === 1 ? '▲' : '▼'}</span>`);
+        }
+      }
+    });
   }
 }
+
+/* Row click handling is now managed by renderTableGrid's onSelect callback */
 function hasContent(value){ return String(value ?? '').trim() !== '' && String(value ?? '').trim() !== '-'; }
 function escapeHtml(value){ return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function formatYearShort(value){ const digits=String(value ?? '').replace(/[^\d]/g,''); if(!digits) return '-'; return `${digits.length >= 4 ? digits.slice(-2) : digits}년식`; }
@@ -994,7 +979,7 @@ function applyFiltersKeepDropdown(){
     state.selectedId = null;
     state.activePhotoIndex = 0;
   }
-  renderList();
+  renderList({ bodyOnly: true });
   renderDetail();
   persistFilterState();
 }
@@ -1077,7 +1062,6 @@ function applyFilters(){
     state.activePhotoIndex = 0;
   }
   renderPeriodsHead();
-  renderGridHeader();
   if (state.filterOverlayOpen) { renderFilterAccordion(baseSets); _accordionDirty = false; } else { _accordionDirty = true; }
   syncPeriodChips();
   renderList();
@@ -1445,7 +1429,6 @@ async function init(){
   setFilterOverlay(state.filterOverlayOpen);
   bindFilterAccordion();
   bindPeriodSelector();
-  renderGridHeader();
 
   // 스켈레톤 로딩 표시
   if ($list) {
@@ -1477,7 +1460,6 @@ async function init(){
 let _mounted = false;
 export async function mount() {
   bindDOM();
-  $list?.addEventListener('click', _handleRowClick);
   _mounted = false;
   await init().catch((error) => {
     console.error('[product-list] init failed', error);
