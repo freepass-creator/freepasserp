@@ -395,25 +395,36 @@ body.chat-m-open .work-page {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   채팅 메시지 정렬 보정 (색깔/스타일은 기존 chat.css 유지)
+   채팅 메시지 정렬 (모바일 전용 — 기존 chat.css 오버라이드)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .m-chatroom__messages .message-wrap {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 4px;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  margin-bottom: 4px !important;
+  padding: 0 !important;
 }
 .m-chatroom__messages .message-wrap.out {
-  align-items: flex-end;
-}
-.m-chatroom__messages .message-wrap.in {
-  align-items: flex-start;
+  align-items: flex-end !important;
 }
 .m-chatroom__messages .message-content {
-  max-width: 75%;
+  max-width: 75% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.m-chatroom__messages .message-wrap.out .message-content {
+  align-items: flex-end !important;
+}
+.m-chatroom__messages .message-wrap.in .message-content {
+  align-items: flex-start !important;
 }
 .m-chatroom__messages .message-bubble {
-  word-break: break-word;
+  word-break: break-word !important;
+  display: inline-block !important;
+}
+.m-chatroom__messages .message-time {
+  font-size: 10px !important;
 }
 
 /* 가로 모드 대응 — 채팅 입력창 가려짐 방지 */
