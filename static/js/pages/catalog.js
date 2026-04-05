@@ -25,8 +25,6 @@ import {
   renderCatalogExtra,
 } from '../shared/catalog-card.js';
 
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-
 // ─── DOM refs ──────────────────────────────────────────────────────────────
 
 const qs = (id) => document.getElementById(id);

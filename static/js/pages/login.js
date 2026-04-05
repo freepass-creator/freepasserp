@@ -2,8 +2,6 @@ import { loginWithEmail, watchAuth, isMasterAdminEmail, logoutCurrentUser } from
 import { getUserProfile, upsertUserProfile } from '../firebase/firebase-db.js';
 import { qs } from '../core/utils.js';
 
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-
 const form = qs('#login-form');
 const message = qs('#login-message');
 

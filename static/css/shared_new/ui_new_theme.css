@@ -107,21 +107,9 @@ input[type="checkbox"]:focus-visible {
   box-shadow: 0 0 0 2px rgba(27, 42, 74, 0.15) !important;
 }
 
-/* ── 드래그·선택·우클릭 방지 ── */
-body[data-page] {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-user-drag: none;
-}
+/* ── 이미지 드래그 방지 ── */
 body[data-page] img {
   -webkit-user-drag: none;
-  pointer-events: none;
-}
-body[data-page] input,
-body[data-page] textarea,
-body[data-page] [contenteditable="true"] {
-  -webkit-user-select: text;
-  user-select: text;
 }
 
 .dashboard-shell--new {

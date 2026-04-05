@@ -3,8 +3,6 @@ import { saveUserProfile, getPartnerByBusinessNumber } from '../firebase/firebas
 import { qs } from '../core/utils.js';
 import { formatPhone, formatBizNumber, bindAutoFormat } from '../core/management-format.js';
 
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-
 const form = qs('#signup-form');
 const message = qs('#signup-message');
 const businessNumberInput = qs('#business_number');

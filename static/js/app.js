@@ -35,9 +35,6 @@ const PAGE_MODULE_PATHS = {
 const pageCache = new Map();
 let currentPageKey = '';
 
-// ─── 우클릭 방지 ────────────────────────────────────────────────────────────
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-
 // ─── 작업 중 이탈 방지 ──────────────────────────────────────────────────────
 let _dirtyCheck = null;
 
