@@ -581,6 +581,15 @@ body.chat-m-open .work-page {
 
 /* 카탈로그 갤러리 네비 버튼 — 상세 밖에서 안 보이게 */
 .catalog-gallery__nav { display: none !important; }
+
+/* 상세 갤러리 — 화면 꽉 채움, 라운드 없음 */
+.pls-mobile-detail-gallery {
+  width: 100% !important;
+  aspect-ratio: 4/3 !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  background: #0f172a !important;
+}
 .pls-mobile-detail-gallery .pls-mobile-detail-gallery__nav { display: flex !important; }
 
 /* 터치 스크롤 최적화 */
