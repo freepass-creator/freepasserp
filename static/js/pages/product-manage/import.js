@@ -250,23 +250,55 @@ export function createGoogleSheetImporter(config) {
     return payload;
   }
 
-  return async function applyGoogleSheet(url) {
-    const normalizedUrl = String(url || '').trim();
-    if (!normalizedUrl) throw new Error('구글시트 주소를 입력하세요.');
-    const csvUrl = convertGoogleSheetUrlToCsv(normalizedUrl);
+  const REQUIRED_HEADERS = ['car_number', 'maker', 'model_name'];
+
+  function validateHeaders(headers) {
+    const missing = REQUIRED_HEADERS.filter(req => !headers.includes(req));
+    if (missing.length > 0) {
+      const labels = missing.map(k => {
+        const label = Object.entries(SHEET_HEADER_ALIASES).find(([, v]) => v === k);
+        return label ? label[0] : k;
+      });
+      throw new Error(`필수 컬럼이 없습니다: ${labels.join(', ')}\n구글시트 규격을 확인하세요.`);
+    }
+  }
+
+  async function fetchAndParseSheet(url) {
+    const csvUrl = convertGoogleSheetUrlToCsv(url);
     const response = await fetch(csvUrl);
-    if (!response.ok) throw new Error('구글시트 데이터를 가져오지 못했습니다.');
+    if (!response.ok) throw new Error(`구글시트 데이터를 가져오지 못했습니다: ${url}`);
     const text = await response.text();
     const rows = parseCsv(text).filter((row) => row.some((cell) => String(cell || '').trim() !== ''));
     if (rows.length < 2) throw new Error('반영할 데이터가 없습니다.');
-
     const headers = rows[0].map(parseHeaderKey);
-    const dataRows = rows.slice(1);
+    validateHeaders(headers);
+    return { headers, dataRows: rows.slice(1) };
+  }
+
+  return async function applyGoogleSheet(url) {
+    const normalizedUrl = String(url || '').trim();
+    if (!normalizedUrl) throw new Error('구글시트 주소를 입력하세요.');
+
+    // 여러 URL 지원 (줄바꿈 또는 쉼표로 구분)
+    const urls = normalizedUrl.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
+    let allHeaders = null;
+    let allDataRows = [];
+
+    for (const sheetUrl of urls) {
+      const { headers, dataRows } = await fetchAndParseSheet(sheetUrl);
+      if (!allHeaders) allHeaders = headers;
+      allDataRows = allDataRows.concat(dataRows.map(row => ({ headers, row })));
+    }
+
+    const headers = allHeaders;
+    const dataRows = allDataRows;
 
     let importedCount = 0;
-    for (const row of dataRows) {
+    for (const entry of dataRows) {
+      const rowHeaders = entry.headers || headers;
+      const row = entry.row || entry;
       const rowObj = {};
-      headers.forEach((header, idx) => {
+      rowHeaders.forEach((header, idx) => {
         rowObj[header] = row[idx] ?? '';
       });
 
