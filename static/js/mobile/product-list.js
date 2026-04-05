@@ -109,12 +109,10 @@ function row(label, value) { return `<div class="md-row"><span>${esc(label)}</sp
 function renderDetailContent(product) {
   const photos = product.photos || [];
   const total = photos.length;
-  const termKey = getTermCacheKey(product);
-  const term = state.termCache[termKey] || {};
+  const term = state.termCache[getTermCacheKey(product)] || {};
   const p = product.policy || {};
   const c = product.condition || {};
   const role = state.role;
-  console.log('[mobile-detail] termKey:', termKey, 'term keys:', Object.keys(term), 'policy:', p);
 
   // ── 1. 차량사진 ──
   const galleryHtml = total
