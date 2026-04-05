@@ -62,22 +62,18 @@
         </button>
       </div>
     </div>
-    <!-- 정산 컬럼 헤더 (스크롤 밖 고정, 패널헤드 역할) -->
-    <div class="admin-stl-col-bar" id="adminStlColBar" hidden>
-      <table class="pls-table admin-stl-table">
-        <thead id="adminStlHead"></thead>
-      </table>
-    </div>
-
     <div class="panel-body admin-workspace-body">
 
       <!-- 정산서 관리 -->
       <div class="admin-tab-panel" data-tab-panel="settlement">
-        <div class="pls-grid-scroll">
-          <table class="pls-table admin-stl-table">
-            <tbody id="adminStlList"></tbody>
-          </table>
-        </div>
+        <section class="pls-grid-panel" style="flex:1;min-height:0;box-shadow:none;border-radius:0">
+          <div class="pls-grid-scroll">
+            <table class="pls-table">
+              <thead id="adminStlHead"></thead>
+              <tbody id="adminStlList"></tbody>
+            </table>
+          </div>
+        </section>
       </div>
 
       <!-- 안내사항 관리 -->
