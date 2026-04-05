@@ -146,7 +146,7 @@ function renderDetailContent(product) {
   const actionsHtml = `<div class="md-actions">${inquiryBtn}${contractBtn}${shareBtn}</div>`;
 
   // ── 4. 기간별 대여료 및 보증금 ──
-  const months = ['1','12','24','36','48','60'];
+  const months = ['1','6','12','24','36','48','60'];
   const priceRowsHtml = months.map(m => {
     const rent = Number(product.price[m]?.rent || 0);
     const dep = Number(product.price[m]?.deposit || 0);
