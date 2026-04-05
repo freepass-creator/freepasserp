@@ -60,10 +60,10 @@
 .pls-th:last-child { border-right: none; }
 
 /* 첫/끝 셀 여백을 패널 헤더와 정렬 */
-.pls-th:first-child,
-.pls-row td:first-child { padding-left: var(--panel-head-px); text-align: left; }
-.pls-th:last-child,
-.pls-row td:last-child { padding-right: var(--panel-head-px); }
+.pls-table th:first-child,
+.pls-table td:first-child { padding-left: var(--panel-head-px) !important; text-align: left !important; }
+.pls-table th:last-child,
+.pls-table td:last-child { padding-right: var(--panel-head-px) !important; }
 
 .pls-th--sticky {
   position: sticky;
