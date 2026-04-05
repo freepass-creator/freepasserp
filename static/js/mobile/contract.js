@@ -15,6 +15,10 @@ const STATUS_COLORS = {
   '계약대기': 'yellow', '계약요청': 'blue', '계약발송': 'blue',
   '계약완료': 'green', '계약철회': 'gray',
 };
+const STATUS_SHORT = {
+  '계약대기': '대기', '계약요청': '요청', '계약발송': '발송',
+  '계약완료': '완료', '계약철회': '철회',
+};
 
 function formatDate(ts) {
   if (!ts) return '';
@@ -26,6 +30,9 @@ function formatMoney(v) {
   const n = Number(v || 0);
   return n ? n.toLocaleString('ko-KR') + '원' : '-';
 }
+
+function formatMonth(v) { return v ? `${v}개월` : '-'; }
+function safe(v) { return String(v || '').trim() || '-'; }
 
 // ─── 목록 렌더링 ─────────────────────────────────────────────────────────────
 
@@ -46,7 +53,7 @@ function renderList(contracts) {
     const month = c.rent_month ? `${c.rent_month}개월` : '';
 
     return `<div class="m-list-card" data-id="${escapeHtml(c.id || c.contract_code || '')}">
-      <div class="m-list-card__avatar" style="background:#f0f4ff;color:#1b2a4a;font-size:11px;font-weight:700">${escapeHtml(status.slice(0,2))}</div>
+      <div class="m-list-card__avatar" style="background:#f0f4ff;color:#1b2a4a;font-size:11px;font-weight:700">${escapeHtml(STATUS_SHORT[status] || status.slice(0,2))}</div>
       <div class="m-list-card__body">
         <div class="m-list-card__main">
           <span class="m-list-card__name">${escapeHtml(carNo || vehicle || '계약')}</span>
@@ -116,6 +123,68 @@ async function init() {
     renderList(allContracts);
     updateCount();
   });
+
+  // 카드 클릭 → 상세
+  $list?.addEventListener('click', (e) => {
+    const card = e.target.closest('.m-list-card[data-id]');
+    if (card) openDetail(card.dataset.id);
+  });
+
+  // 핸드폰 뒤로가기 → 상세 닫기
+  window.addEventListener('popstate', () => {
+    const $detail = document.getElementById('contract-m-detail');
+    if ($detail && !$detail.hidden) closeDetail();
+  });
+}
+
+// ─── 상세 보기 ───────────────────────────────────────────────────────────────
+
+function openDetail(id) {
+  const c = allContracts.find(x => (x.id || x.contract_code) === id);
+  if (!c) return;
+  const $detail = document.getElementById('contract-m-detail');
+  if (!$detail) return;
+
+  const checks = [
+    ['계약금', c.deposit_confirmed], ['서류', c.docs_confirmed],
+    ['승인', c.approval_confirmed], ['계약서', c.contract_confirmed],
+    ['잔금', c.balance_confirmed], ['인도', c.delivery_confirmed],
+  ];
+  const checksHtml = checks.map(([label, done]) =>
+    `<span class="m-detail-check ${done ? 'is-done' : ''}">${done ? '✓' : '○'} ${escapeHtml(label)}</span>`
+  ).join('');
+
+  const status = c.contract_status || '계약대기';
+  const color = STATUS_COLORS[status] || 'gray';
+
+  $detail.innerHTML = `
+    <div class="m-detail-card">
+      <div class="m-detail-header">
+        <span class="m-list-badge m-list-badge--${color}">${escapeHtml(status)}</span>
+        <span class="m-detail-code">${escapeHtml(c.contract_code || '')}</span>
+      </div>
+      <div class="m-detail-checks">${checksHtml}</div>
+      <div class="m-detail-section">
+        <div class="m-detail-row"><span>차량번호</span><strong>${escapeHtml(safe(c.car_number))}</strong></div>
+        <div class="m-detail-row"><span>차량</span><strong>${escapeHtml(safe(c.vehicle_name || c.model_name))}</strong></div>
+        <div class="m-detail-row"><span>대여기간</span><strong>${escapeHtml(formatMonth(c.rent_month))}</strong></div>
+        <div class="m-detail-row"><span>대여료</span><strong>${escapeHtml(formatMoney(c.rent_amount))}</strong></div>
+        <div class="m-detail-row"><span>보증금</span><strong>${escapeHtml(formatMoney(c.deposit_amount))}</strong></div>
+      </div>
+      <div class="m-detail-section">
+        <div class="m-detail-row"><span>고객명</span><strong>${escapeHtml(safe(c.customer_name))}</strong></div>
+        <div class="m-detail-row"><span>공급사</span><strong>${escapeHtml(safe(c.partner_code))}</strong></div>
+        <div class="m-detail-row"><span>영업채널</span><strong>${escapeHtml(safe(c.agent_code))}</strong></div>
+        <div class="m-detail-row"><span>계약일</span><strong>${escapeHtml(formatDate(c.created_at))}</strong></div>
+      </div>
+    </div>`;
+  $detail.hidden = false;
+  history.pushState({ contractDetail: true }, '');
+}
+
+function closeDetail() {
+  const $detail = document.getElementById('contract-m-detail');
+  if ($detail) $detail.hidden = true;
 }
 
 export function onHide() {

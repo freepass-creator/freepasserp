@@ -34,7 +34,10 @@ function renderRooms(rooms) {
     const product = productMap.get(room.product_uid);
     const carNo = room.vehicle_number || product?.carNo || '';
     const model = room.model_name || product?.model || '';
-    const lastMsg = truncate(room.last_message || '', 30);
+    const partner = currentProfile?.role === 'agent'
+      ? (room.provider_name || room.provider_company_code || '')
+      : (room.agent_name || room.agent_code || '');
+    const lastMsg = truncate(room.last_message || '', 25);
     const date = formatDate(room.last_message_at);
     const unread = currentProfile?.role === 'agent'
       ? (room.unread_for_agent || 0)
@@ -50,7 +53,7 @@ function renderRooms(rooms) {
           ${badge}
         </div>
         <div class="m-list-card__sub">
-          <span class="m-list-card__info">${escapeHtml(lastMsg)}</span>
+          <span class="m-list-card__info">${escapeHtml(partner ? partner + ' · ' : '')}${escapeHtml(lastMsg)}</span>
           <span class="m-list-card__date">${escapeHtml(date)}</span>
         </div>
       </div>
