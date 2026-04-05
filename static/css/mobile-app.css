@@ -115,7 +115,7 @@
 
 /* 상품 목록 여백 통일 */
 .catalog-content { padding-top: 0 !important; }
-.catalog-grid { padding: var(--space-3) var(--space-4) var(--space-3) !important; }
+.catalog-grid { padding: var(--space-3) !important; }
 
 /* 데스크탑 전용 요소 숨김 */
 .pls-grid-panel { display: none !important; }
