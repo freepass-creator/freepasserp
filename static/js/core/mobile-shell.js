@@ -169,28 +169,25 @@ async function handleMobileBack() {
   return true;
 }
 
-/** visualViewport: 키보드 올라올 때 탭바 숨김 + 채팅/계약 패널 bottom 조정 */
+/** visualViewport: 키보드 올라올 때 채팅방 위치 조정 */
 function initKeyboardAdjust() {
   if (!window.visualViewport) return;
-  const TAB_H = 56;
   const tabBarEl = document.getElementById('mobile-tab-bar');
 
-  window.visualViewport.addEventListener('resize', () => {
-    const kbHeight = window.innerHeight - window.visualViewport.height;
-    const kbOpen = kbHeight > 100; // 키보드 최소 높이
+  function adjust() {
+    const vv = window.visualViewport;
+    const kbHeight = window.innerHeight - vv.height - vv.offsetTop;
+    const kbOpen = kbHeight > 100;
 
     if (document.body.classList.contains('chat-m-open')) {
       if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
       const chatroom = document.getElementById('mChatroom');
       if (chatroom) chatroom.style.bottom = kbOpen ? `${kbHeight}px` : '';
     }
+  }
 
-    // 계약 폼 패널 bottom 조정
-    if (document.body.classList.contains('contract-m-open')) {
-      const panel = document.querySelector('.layout-66');
-      if (panel) panel.style.paddingBottom = kbOpen ? `${kbHeight}px` : '';
-    }
-  });
+  window.visualViewport.addEventListener('resize', adjust);
+  window.visualViewport.addEventListener('scroll', adjust);
 }
 
 /** iOS 에지 스와이프 등으로 popstate 발생 시 모바일 뷰 클래스 잔류 방지 */
