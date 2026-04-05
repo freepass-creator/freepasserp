@@ -158,15 +158,13 @@ function initKeyboardAdjust() {
   if (!window.visualViewport) return;
   const TAB_H = 56;
   const tabBarEl = document.getElementById('mobile-tab-bar');
-  const filterFab = document.getElementById('mobile-filter-btn');
 
   window.visualViewport.addEventListener('resize', () => {
     const kbHeight = window.innerHeight - window.visualViewport.height;
     const kbOpen = kbHeight > 50;
 
-    // 키보드 열림: 탭바 + FAB 숨김
+    // 키보드 열림: 탭바 숨김
     if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
-    if (filterFab) filterFab.style.display = kbOpen ? 'none' : '';
 
     // 채팅 패널 bottom 조정
     if (document.body.classList.contains('chat-m-open')) {

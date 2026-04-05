@@ -845,18 +845,26 @@ function applyRoleActions() {
 // 카탈로그와 동일한 순서
 const MOBILE_FILTER_KEYS = ['rent','deposit','periods','productType','maker','model','subModel','fuel','extColor','year','mileage','vehicleClass','basicDriverAge','reviewStatus'];
 
+function _updateFilterIcon(open) {
+  const btn = document.getElementById('mobile-filter-btn');
+  if (!btn) return;
+  const svg = btn.querySelector('svg');
+  if (!svg) return;
+  // 열림: < (접기), 닫힘: > (펼치기)
+  svg.innerHTML = open
+    ? '<path d="m15 18-6-6 6-6"/>'
+    : '<path d="m9 18 6-6-6-6"/>';
+}
 function openMobileSidebar() {
   renderMobileSidebarFilters();
   $plsMSidebar?.classList.add('is-open');
   $plsMOverlay?.classList.add('is-open');
-  const fab = document.getElementById('mobile-filter-btn');
-  if (fab) fab.style.display = 'none';
+  _updateFilterIcon(true);
 }
 function closeMobileSidebar() {
   $plsMSidebar?.classList.remove('is-open');
   $plsMOverlay?.classList.remove('is-open');
-  const fab = document.getElementById('mobile-filter-btn');
-  if (fab) fab.style.display = '';
+  _updateFilterIcon(false);
 }
 
 // ── 모바일 상세: 카탈로그 스타일 렌더링 ────────────────────────────────────
@@ -1028,9 +1036,6 @@ function openMobileDetail(id) {
   if ($plsMDetailBack) $plsMDetailBack.onclick = closeMobileDetail;
   if ($plsMDetailHeadActions) $plsMDetailHeadActions.innerHTML = '';
   $plsMDetail.hidden = false;
-  // 상세 열면 FAB 숨김
-  const fab = document.getElementById('mobile-filter-btn');
-  if (fab) fab.style.display = 'none';
 }
 
 
@@ -1038,9 +1043,6 @@ function closeMobileDetail() {
   if ($plsMDetail) $plsMDetail.hidden = true;
   if ($plsMDetailBack) $plsMDetailBack.onclick = null;
   state.selectedId = null;
-  // 상세 닫으면 FAB 복원
-  const fab = document.getElementById('mobile-filter-btn');
-  if (fab) fab.style.display = '';
 }
 
 function renderMobileSidebarFilters() {
@@ -1088,84 +1090,13 @@ function renderMobileCatalogGrid() {
 }
 
 function bindMobile() {
-  // 모바일 플로팅 필터 버튼 — 좌/우 끝 스냅 + 상하 자유 이동
-  const fab = document.getElementById('mobile-filter-btn');
-  if (fab) {
-    const STORAGE_KEY = 'fp.filter-fab-pos';
-    const TAB_H = 56;
-    const FAB_SIZE = 52;
-    const EDGE_GAP = 0; // 화면 끝에 딱 붙임
-    let dragging = false, moved = false;
-    let startX = 0, startY = 0, fabX = 0, fabY = 0;
-    let fabOnRight = true; // FAB이 우측에 있는지
-
-    function savePos(onRight, bottom) {
-      fabOnRight = onRight;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ onRight, bottom }));
-    }
-
-    function snapFab(onRight, bottom) {
-      fab.style.transition = 'left 0.2s, right 0.2s';
-      fab.style.top = '';
-      if (onRight) {
-        fab.style.left = ''; fab.style.right = EDGE_GAP + 'px';
-      } else {
-        fab.style.right = ''; fab.style.left = EDGE_GAP + 'px';
-      }
-      fab.style.bottom = bottom + 'px';
-      savePos(onRight, bottom);
-      setTimeout(() => { fab.style.transition = ''; }, 200);
-    }
-
-    // 저장된 위치 복원 또는 기본 위치
-    (function applyDefaultPos() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const pos = JSON.parse(saved);
-          fabOnRight = pos.onRight !== false;
-          snapFab(fabOnRight, pos.bottom || TAB_H + 16);
-          return;
-        } catch (_) {}
-      }
-      snapFab(true, TAB_H + 16);
-    })();
-
-    function onStart(cx, cy) {
-      dragging = true; moved = false;
-      const rect = fab.getBoundingClientRect();
-      startX = cx; startY = cy;
-      fabX = rect.left; fabY = rect.top;
-      fab.style.transition = 'none';
-    }
-    function onMove(cx, cy) {
-      if (!dragging) return;
-      const dx = cx - startX, dy = cy - startY;
-      if (!moved && Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-      moved = true;
-      const x = Math.max(0, Math.min(fabX + dx, window.innerWidth - FAB_SIZE));
-      const y = Math.max(0, Math.min(fabY + dy, window.innerHeight - FAB_SIZE));
-      fab.style.right = ''; fab.style.bottom = '';
-      fab.style.left = x + 'px'; fab.style.top = y + 'px';
-    }
-    function onEnd() {
-      if (!dragging) return;
-      dragging = false;
-      fab.style.transition = '';
-      if (!moved) { openMobileSidebar(); return; }
-      // 좌/우 끝에 스냅, 상하는 자유
-      const rect = fab.getBoundingClientRect();
-      const onRight = (rect.left + FAB_SIZE / 2) > window.innerWidth / 2;
-      const bottom = Math.max(TAB_H + 8, window.innerHeight - rect.bottom);
-      fab.style.left = ''; fab.style.top = '';
-      snapFab(onRight, Math.min(bottom, window.innerHeight - FAB_SIZE - 8));
-    }
-
-    fab.addEventListener('touchstart', (e) => { const t = e.touches[0]; onStart(t.clientX, t.clientY); }, { passive: true });
-    fab.addEventListener('touchmove', (e) => { if (moved) e.preventDefault(); const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: false });
-    fab.addEventListener('touchend', onEnd);
-    fab.addEventListener('touchcancel', onEnd);
-
+  // 모바일 필터 버튼 — 토글 (우측 상단)
+  const filterBtn = document.getElementById('mobile-filter-btn');
+  if (filterBtn) {
+    filterBtn.addEventListener('click', () => {
+      const isOpen = $plsMSidebar?.classList.contains('is-open');
+      if (isOpen) closeMobileSidebar(); else openMobileSidebar();
+    });
   }
   // 사이드바 닫기
   $plsMClose?.addEventListener('click', closeMobileSidebar);
