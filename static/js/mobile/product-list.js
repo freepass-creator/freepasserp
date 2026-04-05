@@ -134,12 +134,19 @@ function renderDetailContent(product) {
     if (!rent && !dep) return '';
     return `<tr><td>${m}개월</td><td><strong>${rent ? rent.toLocaleString('ko-KR') + '원' : '-'}</strong></td><td>${dep ? dep.toLocaleString('ko-KR') + '원' : '-'}</td></tr>`;
   }).join('');
-  const reviewNote = safe(product.reviewStatus) !== '-' ? `<div class="md-note">* ${esc(safe(product.reviewStatus))}</div>` : '';
+  const screeningNote = safe(term.screening_criteria || product.reviewStatus);
+  const guideNote = safe(term.rental_guide_note);
+  const insuranceIncluded = safe(term.insurance_included);
+  const priceNote = [
+    screeningNote !== '-' ? `* ${esc(screeningNote)}` : '',
+    insuranceIncluded !== '-' ? `* 보험포함: ${esc(insuranceIncluded)}` : '',
+    guideNote !== '-' ? `* ${esc(guideNote)}` : '',
+  ].filter(Boolean).join('<br>');
   const priceSection = priceRowsHtml ? `
     ${sectionHead('기간별 대여료 및 보증금 안내')}
     <div class="md-card">
       <table class="md-table"><thead><tr><th>기간</th><th>대여료</th><th>보증금</th></tr></thead><tbody>${priceRowsHtml}</tbody></table>
-      ${reviewNote}
+      ${priceNote ? `<div class="md-note">${priceNote}</div>` : ''}
     </div>` : '';
 
   // ── 5. 차량보험정보 ──
@@ -195,6 +202,7 @@ function renderDetailContent(product) {
       ${row('정비서비스', c.maintenance)}
       ${row('탁송가능', c.delivery)}
       ${row('탁송비용', c.deliveryFee || term.delivery_fee)}
+      ${row('위약금조건', term.penalty_condition)}
     </div>`;
 
   // ── 7. 추가정보 ──
@@ -207,6 +215,8 @@ function renderDetailContent(product) {
       ${row('차종구분', product.vehicleClass)}
       ${row('차량가격', money(product.vehiclePrice))}
       ${row('배기량', product.engineCc ? product.engineCc + 'cc' : '-')}
+      ${row('최초등록일', product.firstRegistrationDate)}
+      ${row('차령만료일', product.vehicleAgeExpiryDate)}
       ${row('심사여부', product.reviewStatus)}
       ${row('신용등급', product.creditGrade)}
       ${row('차량세부상태', c.detailStatus)}

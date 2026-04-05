@@ -78,7 +78,7 @@
 }
 
 /* 모바일 요소 항상 표시 */
-.mobile-topbar { display: flex !important; z-index: 999 !important; }
+.mobile-topbar { display: flex !important; z-index: 999 !important; background: #fff !important; position: sticky !important; }
 .mobile-tab-bar { display: flex !important; }
 .pls-m-catalog-wrap { display: block !important; }
 .chat-m-rooms { display: block !important; }
@@ -145,7 +145,7 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
 html.is-mobile body.chat-m-open .mobile-topbar__filter-btn,
 html.is-mobile body.detail-open .mobile-topbar__filter-btn { display: none !important; }
 
-/* 상품 상세: 상단바 아래부터 화면 꽉 채움 */
+/* 상품 상세: 상단바 아래부터 탭바 위까지 꽉 채움 */
 .pls-m-detail {
   display: flex !important;
   flex-direction: column !important;
@@ -162,8 +162,10 @@ html.is-mobile body.detail-open .mobile-topbar__filter-btn { display: none !impo
 .pls-m-detail__body {
   flex: 1 !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch;
   padding: 0 !important;
+  overscroll-behavior: contain;
 }
 
 /* 패널 레이아웃: 세로 스택 */
@@ -576,6 +578,10 @@ body.chat-m-open .work-page {
   color: #94a3b8;
   font-size: 14px;
 }
+
+/* 카탈로그 갤러리 네비 버튼 — 상세 밖에서 안 보이게 */
+.catalog-gallery__nav { display: none !important; }
+.pls-mobile-detail-gallery .pls-mobile-detail-gallery__nav { display: flex !important; }
 
 /* 터치 스크롤 최적화 */
 .main-shell--new,
