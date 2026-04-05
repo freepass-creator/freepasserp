@@ -96,6 +96,9 @@ function openRoom(roomId) {
   currentRoomId = roomId;
   if ($chatroom) $chatroom.hidden = false;
   document.body.classList.add('chat-m-open');
+  // 현재 높이 고정 → 키보드 올라와도 레이아웃 안 흔들림
+  const mainShell = document.querySelector('.main-shell--new');
+  if (mainShell) mainShell.style.height = `${mainShell.offsetHeight}px`;
   history.pushState({ chatRoom: true }, '');
 
   // 읽음 처리
@@ -121,6 +124,9 @@ function openRoom(roomId) {
 function closeRoom() {
   if ($chatroom) $chatroom.hidden = true;
   document.body.classList.remove('chat-m-open');
+  // 고정 높이 해제
+  const mainShell = document.querySelector('.main-shell--new');
+  if (mainShell) mainShell.style.height = '';
   if (unsubMessages) { unsubMessages(); unsubMessages = null; }
   currentRoomId = null;
 }

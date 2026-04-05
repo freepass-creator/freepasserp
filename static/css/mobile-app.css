@@ -318,7 +318,7 @@ body.chat-m-open .chat-m-rooms { display: none !important; }
 body.chat-m-open .mobile-tab-bar { display: none !important; }
 body.chat-m-open .main-shell--new {
   padding-bottom: 0 !important;
-  height: calc(100dvh - var(--mobile-topbar-height)) !important;
+  /* height는 JS에서 고정값 설정 (키보드 올라와도 안 변함) */
   overflow: hidden !important;
 }
 body.chat-m-open .page-tab {
