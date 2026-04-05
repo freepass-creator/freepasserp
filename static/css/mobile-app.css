@@ -481,7 +481,7 @@ body.chat-m-open .work-page {
   font-size: 13px;
   font-weight: 600;
   color: #64748b;
-  padding: 16px 16px 0;
+  padding: 16px 16px 2px;
 }
 .md-section-head svg {
   width: 14px;
@@ -495,7 +495,11 @@ body.chat-m-open .work-page {
   margin-bottom: 0;
 }
 .md-card + .md-section-head {
-  padding-top: 16px;
+  padding-top: 20px;
+}
+.md-table + .md-note + .md-section-head,
+.md-table + .md-section-head {
+  padding-top: 20px;
 }
 .md-row {
   display: flex;
