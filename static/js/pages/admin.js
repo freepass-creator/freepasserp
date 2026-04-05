@@ -124,8 +124,8 @@ function stlCustomer(s) { return s.customer_name || s.customer_name_snapshot || 
 function stlStatus(s)   { return s.settlement_status || s.status || '정산대기'; }
 
 const ADMIN_STL_COLS = [
-  { key: 'code',     label: '계약코드',   align: 'c', searchable: true  },
   { key: 'status',   label: '정산상태',   align: 'c', filterable: true, w: 80 },
+  { key: 'code',     label: '정산코드',   align: 'c', searchable: true  },
   { key: 'partner',  label: '공급사명',   align: 'c', filterable: true  },
   { key: 'date',     label: '계약완료일', align: 'c', filterable: true  },
   { key: 'ptype',    label: '상품구분',   align: 'c', filterable: true, w: 80 },
