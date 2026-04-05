@@ -181,8 +181,8 @@
 @media (max-width: 768px) {
   .auth-shell {
     align-items: stretch;
-    justify-content: flex-start;
-    padding: max(48px, env(safe-area-inset-top)) 0 max(32px, env(safe-area-inset-bottom));
+    justify-content: center;
+    padding: max(24px, env(safe-area-inset-top)) 0 max(24px, env(safe-area-inset-bottom));
     background: #fff;
     gap: var(--space-5);
   }

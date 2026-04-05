@@ -38,9 +38,8 @@ watchAuth(async (user) => {
     return;
   }
 
-  const landingPage = profile.settings?.landing_page || '/product-list';
-  localStorage.setItem('fp.landing_target', landingPage);
-  window.location.href = landingPage;
+  localStorage.setItem('fp.landing_target', '/product-list');
+  window.location.href = '/product-list';
 });
 
 form?.addEventListener('submit', async (event) => {

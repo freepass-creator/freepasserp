@@ -10,7 +10,7 @@
  */
 
 const ROUTE_REGISTRY = [
-  // Top — 대시보드
+  // 대시보드
   { href: '/home',         label: '대시보드',       pageTitle: '홈',         icon: 'home',      roles: ['provider', 'agent', 'admin'], group: 'top' },
   // 상품 · 대화
   { href: '/product-list', label: '전체 상품 검색', pageTitle: '상품목록',   icon: 'car-front', roles: ['provider', 'agent', 'admin'], group: 'g1' },
@@ -114,8 +114,7 @@ export function getPageTitle(pathname = window.location.pathname) {
  * - 없으면 현재 pathname이 href로 시작하는 항목(prefix 매칭)으로 fallback
  */
 export function setMenuActive(container, pathname = window.location.pathname) {
-  // 루트 경로는 홈으로 처리
-  const normalizedPathname = pathname === '/' ? '/home' : pathname.split('?')[0];
+  const normalizedPathname = pathname === '/' ? '/product-list' : pathname.split('?')[0];
 
   // 정확 일치 우선
   const exactMatch = [...container.querySelectorAll('.sidebar-link')]

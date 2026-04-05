@@ -408,9 +408,7 @@ initShellNavigation();
 initSidebarCollapse();
 registerInitialPage();
 const _initialPath = window.location.pathname;
-if (_initialPath !== '/') {
-  history.replaceState({ page: _initialPath }, '', '/');
-}
+history.replaceState({ page: _initialPath }, '', _initialPath);
 
 // 로그인 후 랜딩: 사이드바 버튼 클릭으로 SPA 네비게이션
 const _landingTarget = localStorage.getItem('fp.landing_target');

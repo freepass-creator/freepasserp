@@ -248,3 +248,71 @@ a {
   color: var(--text-main);
   font-weight: var(--font-weight-strong);
 }
+
+/* ═════ PWA 설치 배너 ═════ */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -4px 12px rgba(0,0,0,.08);
+}
+.pwa-install-banner__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.pwa-install-banner__icon {
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.pwa-install-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pwa-install-banner__text strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.pwa-install-banner__text span {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pwa-install-banner__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.pwa-install-banner__btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pwa-install-banner__btn--dismiss {
+  background: transparent;
+  color: #64748b;
+}
+.pwa-install-banner__btn--accept {
+  background: #1b2a4a;
+  color: #fff;
+}

@@ -272,7 +272,8 @@ app.register_blueprint(api_bp)
 
 @app.route('/')
 def index():
-    return redirect(url_for('auth.login'))
+    return redirect('/product-list')
+
 
 
 if __name__ == '__main__':
