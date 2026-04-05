@@ -9,6 +9,7 @@ import { requireAuth } from './auth-guard.js';
 import { logoutCurrentUser } from '../firebase/firebase-auth.js';
 import { getPageTitle } from './role-menu.js';
 import { showConfirm } from './toast.js';
+import { isPageDirty } from '../app.js';
 
 const mq = window.matchMedia('(max-width: 768px)');
 if (!mq.matches) { /* 데스크탑 — 아무 작업 없음 */ }
@@ -139,7 +140,11 @@ async function handleMobileBack() {
     return true; // 취소: 트랩 유지
   }
 
-  // 3. 나머지 페이지 → 상품목록으로
+  // 3. 나머지 페이지 → 편집 중이면 확인 후 상품목록으로
+  if (isPageDirty()) {
+    const ok = await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.');
+    if (!ok) return true;
+  }
   navigateToProductList();
   return true;
 }

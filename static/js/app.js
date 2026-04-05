@@ -45,7 +45,7 @@ let _dirtyCheck = null;
 export function setDirtyCheck(fn) { _dirtyCheck = typeof fn === 'function' ? fn : null; }
 export function clearDirtyCheck() { _dirtyCheck = null; }
 
-function isPageDirty() { return typeof _dirtyCheck === 'function' && _dirtyCheck(); }
+export function isPageDirty() { return typeof _dirtyCheck === 'function' && _dirtyCheck(); }
 
 async function confirmLeave() {
   if (!isPageDirty()) return true;
@@ -53,7 +53,6 @@ async function confirmLeave() {
 }
 
 window.addEventListener('beforeunload', (e) => {
-  if (window.matchMedia('(max-width: 768px)').matches) return;
   if (isPageDirty()) { e.preventDefault(); e.returnValue = ''; }
 });
 

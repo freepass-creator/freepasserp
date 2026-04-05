@@ -862,8 +862,12 @@ async function bootstrap() {
 
 function _registerMobileBack() {
   if (!window.setMobileBackHandler) return;
-  window.setMobileBackHandler(() => {
+  window.setMobileBackHandler(async () => {
     if (document.body.classList.contains('contract-m-open')) {
+      if (mode === 'edit') {
+        const ok = await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.');
+        if (!ok) return true;
+      }
       closeMobileContractFormView();
       return true;
     }

@@ -305,7 +305,12 @@ async function bootstrap() {
     registerPageCleanup(() => roomSelectionController.cleanup());
 
     // 모바일 뒤로가기: 채팅창 → 대화목록
-    document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
+    document.getElementById('mobile-back-btn')?.addEventListener('click', async () => {
+      const messageInput = document.getElementById('message-input');
+      if (messageInput && messageInput.value.trim()) {
+        const ok = await showConfirm('작성 중인 메시지가 있습니다.\n대화목록으로 돌아가시겠습니까?');
+        if (!ok) return;
+      }
       closeMobileChatView();
     });
 
@@ -558,8 +563,13 @@ async function bootstrap() {
 
 function _registerMobileBack() {
   if (!window.setMobileBackHandler) return;
-  window.setMobileBackHandler(() => {
+  window.setMobileBackHandler(async () => {
     if (document.body.classList.contains('chat-m-open')) {
+      const messageInput = document.getElementById('message-input');
+      if (messageInput && messageInput.value.trim()) {
+        const ok = await showConfirm('작성 중인 메시지가 있습니다.\n대화목록으로 돌아가시겠습니까?');
+        if (!ok) return true;
+      }
       closeMobileChatView();
       return true;
     }
