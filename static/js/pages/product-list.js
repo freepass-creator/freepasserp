@@ -507,6 +507,21 @@ document.addEventListener('click', (e) => {
 /* ── 상세 패널 열기/닫기 (우측 오버레이) ── */
 let detailEscId = null;
 
+function _syncTopBar(item) {
+  const sep = document.getElementById('topBarStateSep');
+  const identEl = document.getElementById('topBarIdentity');
+  if (!sep || !identEl) return;
+  if (item) {
+    identEl.textContent = [item.carNo, item.model].filter(Boolean).join(' · ');
+    identEl.hidden = false;
+    sep.hidden = false;
+  } else {
+    identEl.textContent = '';
+    identEl.hidden = true;
+    sep.hidden = true;
+  }
+}
+
 function showDetailPanel() {
   if (!$detailPanel) return;
   $detailPanel.hidden = false;
@@ -514,6 +529,9 @@ function showDetailPanel() {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     $detailPanel.classList.add('is-open');
   }));
+  // 상단바에 선택 항목 표시
+  const selected = state.filteredProducts.find(p => p.id === state.selectedId);
+  _syncTopBar(selected);
   // ESC 스택에 등록
   if (detailEscId) removeEsc(detailEscId);
   detailEscId = pushEsc(() => hideDetailPanel());
@@ -524,6 +542,7 @@ function hideDetailPanel() {
   $detailPanel.classList.remove('is-open');
   $detailPanel.hidden = true;
   state.selectedId = null;
+  _syncTopBar(null);
   if (detailEscId) { removeEsc(detailEscId); detailEscId = null; }
   renderList();
 }
