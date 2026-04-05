@@ -125,7 +125,7 @@ const ADMIN_STL_COLS = [
   { key: 'status',   label: '정산상태',   align: 'c', filterable: true,  w: 80  },
   { key: 'partner',  label: '공급사명',   align: 'c', filterable: true,  w: 110 },
   { key: 'date',     label: '계약완료일', align: 'c', filterable: true,  w: 88  },
-  { key: 'ptype',    label: '상품구분',   align: 'c', filterable: true,  w: 80  },
+  { key: 'ptype',    label: '상품구분',   align: 'c', filterable: true,  w: 72  },
   { key: 'car',      label: '차량번호',   align: 'c', searchable: true,  w: 88  },
   { key: 'model',    label: '모델명',     align: 'c', filterable: true,  w: 110 },
   { key: 'customer', label: '고객명',     align: 'c', searchable: true,  w: 72  },
