@@ -4,30 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FREEPASS ERP</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_tokens.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/filter.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/list.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_states.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_primitives.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_management.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_datagrid.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_upload.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_tokens.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/button.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/filter.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/list.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_states.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_primitives.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_management.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_datagrid.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_upload.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}?v={{ app_version }}">
   {% block page_css %}{% endblock %}
 </head>
 <body data-page="{{ page_title }}">
   {% block body %}{% endblock %}
   <script>window.APP_VER='{{ app_version }}';requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove('no-transition')));</script>
-  <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/app.js') }}?v={{ app_version }}"></script>
   {% block page_js %}{% endblock %}
 </body>
 </html>
