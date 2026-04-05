@@ -136,8 +136,9 @@ textarea {
   font-size: 16px !important;
 }
 
-/* 필터 버튼: 기본 숨김, 대화·계약에서만 표시 */
+/* 필터 버튼: 기본 숨김, 상품목록·대화·계약에서 표시 */
 .mobile-topbar__filter-btn { display: none !important; }
+html.is-mobile body[data-page="상품목록"] .mobile-topbar__filter-btn,
 html.is-mobile body[data-page="대화"] .mobile-topbar__filter-btn,
 html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: inline-flex !important; }
 
