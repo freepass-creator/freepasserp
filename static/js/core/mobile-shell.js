@@ -134,6 +134,7 @@ async function handleMobileBack() {
   const productDetail = document.getElementById('plsMDetail');
   if (productDetail && !productDetail.hidden) {
     productDetail.hidden = true;
+    document.body.classList.remove('detail-open');
     return true;
   }
 
@@ -152,6 +153,7 @@ async function handleMobileBack() {
   const contractDetail = document.getElementById('contract-m-detail');
   if (contractDetail && !contractDetail.hidden) {
     contractDetail.hidden = true;
+    document.body.classList.remove('detail-open');
     return true;
   }
 

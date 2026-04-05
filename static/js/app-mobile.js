@@ -156,9 +156,9 @@ function initTabNavigation() {
       event.preventDefault();
       // 같은 탭 다시 누르면 상세/채팅방 등 닫고 메인으로
       const detail = document.getElementById('plsMDetail');
-      if (detail && !detail.hidden) { detail.hidden = true; return; }
+      if (detail && !detail.hidden) { detail.hidden = true; document.body.classList.remove('detail-open'); return; }
       const contractDetail = document.getElementById('contract-m-detail');
-      if (contractDetail && !contractDetail.hidden) { contractDetail.hidden = true; return; }
+      if (contractDetail && !contractDetail.hidden) { contractDetail.hidden = true; document.body.classList.remove('detail-open'); return; }
       if (document.body.classList.contains('chat-m-open')) {
         document.body.classList.remove('chat-m-open'); return;
       }

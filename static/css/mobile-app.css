@@ -136,11 +136,14 @@ textarea {
   font-size: 16px !important;
 }
 
-/* 필터 버튼: 기본 숨김, 상품목록·대화·계약에서 표시 */
+/* 필터 버튼: 기본 숨김, 목록에서만 표시 (상세/채팅방 들어가면 숨김) */
 .mobile-topbar__filter-btn { display: none !important; }
 html.is-mobile body[data-page="상품목록"] .mobile-topbar__filter-btn,
 html.is-mobile body[data-page="대화"] .mobile-topbar__filter-btn,
 html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: inline-flex !important; }
+/* 상세/채팅방 열리면 필터 숨김 */
+html.is-mobile body.chat-m-open .mobile-topbar__filter-btn,
+html.is-mobile body.detail-open .mobile-topbar__filter-btn { display: none !important; }
 
 /* 상품 상세: 상단바 아래부터 시작 */
 .pls-m-detail {

@@ -179,6 +179,7 @@ function openDetail(id) {
       </div>
     </div>`;
   $detail.hidden = false;
+  document.body.classList.add('detail-open');
   history.pushState({ contractDetail: true }, '');
 }
 

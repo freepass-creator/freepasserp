@@ -175,7 +175,7 @@ function openDetail(id) {
   bindGallery($detailContent);
   $detailContent.querySelector('#plsMDetailShare')?.addEventListener('click', () => handleShare(product));
   $detail.hidden = false;
-  // 핸드폰 뒤로가기로 상세 닫기
+  document.body.classList.add('detail-open');
   history.pushState({ detail: true }, '');
 }
 
