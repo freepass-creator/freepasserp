@@ -78,7 +78,7 @@
 }
 
 /* 모바일 요소 항상 표시 */
-.mobile-topbar { display: flex !important; z-index: 999 !important; background: #fff !important; position: sticky !important; }
+.mobile-topbar { display: flex !important; z-index: 999 !important; background: #fff !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; }
 .mobile-tab-bar { display: flex !important; }
 .pls-m-catalog-wrap { display: block !important; }
 .chat-m-rooms { display: block !important; }
@@ -122,6 +122,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  padding-top: var(--mobile-topbar-height) !important;
   padding-bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
 }
 
