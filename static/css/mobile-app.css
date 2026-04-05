@@ -441,6 +441,9 @@ body.chat-m-open .work-page {
    모바일 설정 페이지
    ═══════════════════════════════════════════════════════════════════════════ */
 
+.m-settings-page {
+  padding: 16px;
+}
 .m-settings-section {
   margin-bottom: 24px;
 }

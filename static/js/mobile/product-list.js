@@ -181,6 +181,7 @@ function openDetail(id) {
 
 function closeDetail() {
   if ($detail) $detail.hidden = true;
+  document.body.classList.remove('detail-open');
   state.selectedId = null;
 }
 
@@ -356,7 +357,7 @@ async function init() {
   });
 }
 
-export function onHide() { document.body.classList.remove('page-product'); }
+export function onHide() { document.body.classList.remove('page-product', 'detail-open'); }
 export function onShow() { document.body.classList.add('page-product'); }
 
 init().catch(e => console.error('[mobile/product-list]', e));

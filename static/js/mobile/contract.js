@@ -186,10 +186,11 @@ function openDetail(id) {
 function closeDetail() {
   const $detail = document.getElementById('contract-m-detail');
   if ($detail) $detail.hidden = true;
+  document.body.classList.remove('detail-open');
 }
 
 export function onHide() {
-  document.body.classList.remove('page-contract', 'contract-m-open');
+  document.body.classList.remove('page-contract', 'detail-open');
   window._mobileFilterConfig = null;
 }
 export function onShow() {
