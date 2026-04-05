@@ -145,9 +145,25 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
 html.is-mobile body.chat-m-open .mobile-topbar__filter-btn,
 html.is-mobile body.detail-open .mobile-topbar__filter-btn { display: none !important; }
 
-/* 상품 상세: 상단바 아래부터 시작 */
+/* 상품 상세: 상단바 아래부터 화면 꽉 채움 */
 .pls-m-detail {
+  display: flex !important;
+  flex-direction: column !important;
+  position: fixed !important;
   top: var(--mobile-topbar-height) !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
+  z-index: 250 !important;
+  background: #fff !important;
+  overflow: hidden !important;
+}
+.pls-m-detail[hidden] { display: none !important; }
+.pls-m-detail__body {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 !important;
 }
 
 /* 패널 레이아웃: 세로 스택 */
