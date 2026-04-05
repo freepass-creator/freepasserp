@@ -381,6 +381,7 @@ body.chat-m-open .work-page {
   outline: none;
 }
 .m-chatroom__form input::placeholder { color: #94a3b8; }
+.m-chatroom__form input:focus { outline: none !important; box-shadow: none !important; border-color: transparent !important; }
 .m-chatroom__form button[type="submit"] {
   flex-shrink: 0;
   width: 48px;
