@@ -241,8 +241,9 @@ function renderDetailContent(product) {
   // ── 8. 기간별 수수료 ──
   const feeRowsHtml = months.map(m => {
     const fee = product.price[m]?.fee;
-    if (!fee && fee !== 0) return '';
-    return `<tr><td>${m}개월</td><td>${Number(fee || 0) ? Number(fee).toLocaleString('ko-KR') + '원' : '준비중'}</td></tr>`;
+    const feeNum = Number(fee || 0);
+    if (!feeNum) return '';
+    return `<tr><td>${m}개월</td><td>${feeNum.toLocaleString('ko-KR')}원</td></tr>`;
   }).join('');
   const clawback = first(term.commission_clawback_condition);
   const feeSection = feeRowsHtml ? `
