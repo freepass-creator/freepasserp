@@ -275,22 +275,39 @@ export function createGoogleSheetImporter(config) {
     return { headers, dataRows: rows.slice(1) };
   }
 
-  return async function applyGoogleSheet(url) {
+  /** 검증만 수행 — 규격 확인 + 미리보기 데이터 반환 */
+  async function validateGoogleSheet(url) {
     const normalizedUrl = String(url || '').trim();
     if (!normalizedUrl) throw new Error('구글시트 주소를 입력하세요.');
 
-    // 여러 URL 지원 (줄바꿈 또는 쉼표로 구분)
     const urls = normalizedUrl.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
-    let allHeaders = null;
-    let allDataRows = [];
+    const results = [];
 
     for (const sheetUrl of urls) {
+      if (!/docs\.google\.com\/spreadsheets/.test(sheetUrl)) {
+        throw new Error(`구글시트 링크 형식이 아닙니다:\n${sheetUrl}`);
+      }
       const { headers, dataRows } = await fetchAndParseSheet(sheetUrl);
-      if (!allHeaders) allHeaders = headers;
-      allDataRows = allDataRows.concat(dataRows.map(row => ({ headers, row })));
+      const carNumbers = dataRows.map(row => {
+        const idx = headers.indexOf('car_number');
+        return idx >= 0 ? String(row[idx] || '').trim() : '';
+      }).filter(Boolean);
+      results.push({ url: sheetUrl, headers, rowCount: dataRows.length, carNumbers, dataRows });
     }
 
-    const headers = allHeaders;
+    return results;
+  }
+
+  /** 검증된 데이터로 실제 반영 */
+  async function applyValidatedData(validatedResults) {
+    let allDataRows = [];
+    let headers = null;
+
+    for (const result of validatedResults) {
+      if (!headers) headers = result.headers;
+      allDataRows = allDataRows.concat(result.dataRows.map(row => ({ headers: result.headers, row })));
+    }
+
     const dataRows = allDataRows;
 
     let importedCount = 0;
@@ -363,5 +380,7 @@ export function createGoogleSheetImporter(config) {
     }
 
     setStatus(`구글시트 반영 완료: ${importedCount}건`, 'success');
-  };
+  }
+
+  return { validate: validateGoogleSheet, apply: applyValidatedData };
 }

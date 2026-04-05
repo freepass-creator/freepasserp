@@ -245,7 +245,7 @@ const {
 } = imageManager || {};
 
 let adapterContext = null;
-let applyGoogleSheetImport = null;
+let sheetImporter = null;
 
 let productFormModeController = null;
 
@@ -448,7 +448,7 @@ adapterContext = {
   applyFormMode
 };
 
-applyGoogleSheetImport = createGoogleSheetImporter({
+sheetImporter = createGoogleSheetImporter({
   importAllowedFields: IMPORT_ALLOWED_FIELDS,
   fieldNumbers: FIELD_NUMBERS,
   getLinkedVehicleClass,
@@ -767,8 +767,22 @@ async function bootstrap() {
     previewClearButton?.addEventListener('click', clearAllImages);
     sheetApplyButton?.addEventListener('click', async () => {
       try {
-        if (typeof applyGoogleSheetImport !== 'function') throw new Error('시트 반영 모듈이 아직 준비되지 않았습니다.');
-        await applyGoogleSheetImport(sheetUrlInput?.value || '');
+        if (!sheetImporter) throw new Error('시트 반영 모듈이 아직 준비되지 않았습니다.');
+
+        // 1단계: 검증
+        setStatus('구글시트 검증 중...', 'progress');
+        const results = await sheetImporter.validate(sheetUrlInput?.value || '');
+
+        // 2단계: 미리보기
+        const totalRows = results.reduce((sum, r) => sum + r.rowCount, 0);
+        const sheetCount = results.length;
+        const preview = results.map(r => `• ${r.rowCount}건 (${r.carNumbers.slice(0, 3).join(', ')}${r.rowCount > 3 ? ' ...' : ''})`).join('\n');
+        const confirmed = await showConfirm(`구글시트 ${sheetCount}개, 총 ${totalRows}건을 반영할까요?\n\n${preview}`);
+        if (!confirmed) { setStatus('반영 취소', 'info'); return; }
+
+        // 3단계: 반영
+        setStatus('구글시트 반영 중...', 'progress');
+        await sheetImporter.apply(results);
       } catch (error) {
         setStatus(`반영 실패: ${error.message}`, 'error');
       }
