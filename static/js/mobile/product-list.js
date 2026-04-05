@@ -276,18 +276,29 @@ async function ensureTermLoaded(product) {
   }
 }
 
-function openDetail(id) {
-  const product = state.filteredProducts.find(p => p.id === id);
-  if (!product || !$detail || !$detailContent) return;
-  state.selectedId = id;
+function renderAndBindDetail(product) {
   $detailContent.innerHTML = renderDetailContent(product);
   bindGallery($detailContent);
   $detailContent.querySelector('#plsMDetailInquiry')?.addEventListener('click', (e) => handleInquiry(e.currentTarget, product));
   $detailContent.querySelector('#plsMDetailContract')?.addEventListener('click', () => handleContract(product));
   $detailContent.querySelector('#plsMDetailShare')?.addEventListener('click', () => handleShare(product));
+}
+
+async function openDetail(id) {
+  const product = state.filteredProducts.find(p => p.id === id);
+  if (!product || !$detail || !$detailContent) return;
+  state.selectedId = id;
+  // 먼저 있는 데이터로 렌더
+  renderAndBindDetail(product);
   $detail.hidden = false;
   document.body.classList.add('detail-open');
   history.pushState({ detail: true }, '');
+  // term 아직 없으면 로드 후 재렌더
+  const key = getTermCacheKey(product);
+  if (key && !state.termCache[key]) {
+    await ensureTermLoaded(product);
+    if (state.selectedId === id) renderAndBindDetail(product);
+  }
 }
 
 function closeDetail() {
