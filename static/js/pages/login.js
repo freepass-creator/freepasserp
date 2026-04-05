@@ -1,15 +1,20 @@
 import { loginWithEmail, watchAuth, isMasterAdminEmail, logoutCurrentUser } from '../firebase/firebase-auth.js';
 import { getUserProfile, upsertUserProfile } from '../firebase/firebase-db.js';
-import { qs } from '../core/utils.js';
 
-const form = qs('#login-form');
-const message = qs('#login-message');
+const form = document.querySelector('#login-new-form');
+const emailInput = document.querySelector('#login-new-email');
+const passwordInput = document.querySelector('#login-new-password');
+const message = document.querySelector('#login-new-message');
+
+function setMessage(text = '') {
+  if (message) message.textContent = text;
+}
 
 watchAuth(async (user) => {
   if (!user) return;
 
   if (isMasterAdminEmail(user.email)) {
-    // 마스터관리자: 최초 생성 시에만 기본값 설정, 이후 DB 값 유지
+    // 최초 생성 시에만 기본값 설정, 이후 DB 값 유지
     const existing = await getUserProfile(user.uid);
     if (!existing) {
       await upsertUserProfile(user.uid, {
@@ -22,7 +27,6 @@ watchAuth(async (user) => {
         status: 'active'
       });
     }
-    // 기존 계정은 DB 값을 그대로 유지 (클라이언트에서 role 덮어쓰기 금지)
   }
 
   const profile = await getUserProfile(user.uid);
@@ -30,7 +34,7 @@ watchAuth(async (user) => {
 
   if (profile.role !== 'admin' && profile.status !== 'active') {
     await logoutCurrentUser();
-    message.textContent = `현재 계정 상태는 ${profile.status || 'pending'} 입니다. 관리자 승인 후 로그인할 수 있습니다.`;
+    setMessage(`현재 계정 상태는 ${profile.status || 'pending'} 입니다. 관리자 승인 후 로그인할 수 있습니다.`);
     return;
   }
 
@@ -39,12 +43,19 @@ watchAuth(async (user) => {
 
 form?.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const email = qs('#login-email').value.trim();
-  const password = qs('#login-password').value.trim();
+  const email = String(emailInput?.value || '').trim();
+  const password = String(passwordInput?.value || '').trim();
+
+  if (!email || !password) {
+    setMessage('이메일과 비밀번호를 입력하세요.');
+    return;
+  }
+
   try {
+    setMessage('로그인 중...');
     await loginWithEmail(email, password);
-    message.textContent = '로그인 완료';
+    setMessage('로그인 완료');
   } catch (error) {
-    message.textContent = `로그인 실패: ${error.message}`;
+    setMessage(`로그인 실패: ${error.message}`);
   }
 });

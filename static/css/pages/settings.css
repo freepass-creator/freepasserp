@@ -21,12 +21,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  padding: var(--panel-body-pad, 16px);
+}
+.settings-left-panel-body .form-section {
+  gap: var(--space-2);
 }
 
 .settings-section-block {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--form-section-inner-gap, 8px);
 }
 
 .settings-subsection-title {
@@ -40,11 +44,65 @@
 }
 
 .settings-helper {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-sub, 10px);
   line-height: 1.5;
   color: var(--text-subtle);
 }
 
+/* 섹션 타이틀 + 설명 한 줄 */
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.section-title-row .section-title { margin: 0; }
+.section-desc {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted, #94a3b8);
+}
+
+.settings-save-msg {
+  font-size: var(--font-size-xs);
+  color: var(--text-subtle, #64748b);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.settings-save-msg.is-show { opacity: 1; }
+
+/* 토글 스위치 */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-switch-track {
+  position: absolute;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--transition-normal);
+}
+.toggle-switch-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: var(--radius-circle);
+  transition: transform var(--transition-normal);
+}
+.toggle-switch input:checked + .toggle-switch-track {
+  background: #1b2a4a;
+}
+.toggle-switch input:checked + .toggle-switch-track::after {
+  transform: translateX(14px);
+}
 .settings-empty-state {
   min-height: 100%;
 }
@@ -141,7 +199,7 @@
 }
 
 .settings-profile-form .form-grid {
-  gap: var(--form-field-gap, 4px);
+  gap: var(--form-gap, 16px);
 }
 
 .settings-account-actions {
@@ -202,6 +260,120 @@
 
 .settings-account-action-expand .field {
   margin: 0;
+}
+
+.settings-period-checks { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); }
+.settings-period-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--font-size-main);
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+}
+.settings-period-check input { cursor: pointer; }
+
+.settings-doc-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.settings-doc-link { font-size: var(--font-size-base); color: var(--text-subtle); text-decoration: underline; }
+
+/* 보기 모드에서 업로드 버튼 숨김 */
+.panel[data-panel-mode="view"] .settings-doc-actions .inline-button {
+  display: none;
+}
+
+.settings-badge-list { display: flex; flex-direction: column; }
+.settings-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 32px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+.settings-badge-row:last-child { border-bottom: none; }
+.settings-badge-label { font-size: var(--font-size-base); color: var(--text-main); }
+
+.settings-download-list { display: flex; flex-direction: column; }
+.settings-download-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 32px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+.settings-download-row:last-child { border-bottom: none; }
+.settings-download-label { font-size: var(--font-size-base); color: var(--text-main); }
+.settings-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--height-xs);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-soft, #e1e5ea);
+  border-radius: var(--radius-ui, 6px);
+  background: var(--surface-base, #fff);
+  font-size: var(--font-size-xs);
+  color: var(--text-main);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.settings-download-btn:hover { background: #fafaf9; }
+.settings-download-btn svg { flex-shrink: 0; }
+
+/* 카탈로그 링크 */
+.settings-catalog-link-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.settings-catalog-link-input {
+  flex: 1;
+  height: var(--space-8);
+  padding: 0 10px;
+  border: 1px solid var(--border-soft, #e1e5ea);
+  border-radius: var(--radius-ui, 6px);
+  background: var(--surface-subtle, #f8fafc);
+  font-size: var(--font-size-base);
+  color: var(--text-main);
+  outline: none;
+  min-width: 0;
+}
+.settings-catalog-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border-soft, #e1e5ea);
+  border-radius: var(--radius-ui, 6px);
+  background: var(--surface-base, #fff);
+  font-size: var(--font-size-sm);
+  color: var(--text-main);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition-fast);
+}
+.settings-catalog-copy-btn:hover { background: #fafaf9; }
+.settings-catalog-copy-btn svg { flex-shrink: 0; }
+
+.settings-catalog-provider-select {
+  flex: 1;
+  height: 32px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-soft, #e1e5ea);
+  border-radius: var(--radius-ui, 6px);
+  background: var(--surface-base, #fff);
+  font-size: var(--font-size-base);
+  color: var(--text-main);
+  min-width: 0;
 }
 
 @media (max-width: 900px) {

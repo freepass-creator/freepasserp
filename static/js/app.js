@@ -2,7 +2,7 @@ import { runPageCleanup } from './core/utils.js'; // logout/unload 시 사용
 import { savePageState } from './core/page-state.js';
 import { showToast, showConfirm } from './core/toast.js';
 
-const PAGE_STYLE_SELECTOR = 'link[data-page-style], link[href*="/static/css/pages/"], link[href*="/static/css/shared_new/"]';
+const PAGE_STYLE_SELECTOR = 'link[data-page-style], link[href*="/static/css/pages/"], link[href*="/static/css/shared/"]';
 const DASHBOARD_SELECTOR = '.dashboard-shell';
 const MAIN_SHELL_SELECTOR = '.main-shell';
 let pendingNavigationPath = '';
