@@ -1020,17 +1020,33 @@ html {
 
   .catalog-sidebar {
     position: fixed;
-    left: 0;
     top: 0;
     bottom: 0;
     z-index: 501;
     width: 280px;
-    transform: translateX(-100%);
     transition: transform 0.25s ease;
-    border-right: 1px solid #e2e8f0;
     border-radius: 0;
     box-shadow: none;
     padding: 0;
+    /* 기본: 좌측에서 열림 */
+    left: 0; right: auto;
+    transform: translateX(-100%);
+    border-right: 1px solid #e2e8f0;
+    border-left: none;
+  }
+  /* FAB 우측 → 사이드바 좌측에서 슬라이드 */
+  .catalog-sidebar.from-left {
+    left: 0; right: auto;
+    transform: translateX(-100%);
+    border-right: 1px solid #e2e8f0;
+    border-left: none;
+  }
+  /* FAB 좌측 → 사이드바 우측에서 슬라이드 */
+  .catalog-sidebar.from-right {
+    left: auto; right: 0;
+    transform: translateX(100%);
+    border-left: 1px solid #e2e8f0;
+    border-right: none;
   }
   .catalog-sidebar.is-open {
     transform: translateX(0);

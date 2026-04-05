@@ -847,12 +847,23 @@ const MOBILE_FILTER_KEYS = ['rent','deposit','periods','productType','maker','mo
 
 function openMobileSidebar() {
   renderMobileSidebarFilters();
-  $plsMSidebar?.classList.add('is-open');
+  if (!$plsMSidebar) return;
+  // FAB 위치 반대쪽에서 사이드바 열기
+  const fabRight = window._isFabOnRight ? window._isFabOnRight() : true;
+  $plsMSidebar.classList.toggle('from-left', fabRight);   // FAB 우측 → 사이드바 좌측
+  $plsMSidebar.classList.toggle('from-right', !fabRight);  // FAB 좌측 → 사이드바 우측
+  $plsMSidebar.classList.add('is-open');
   $plsMOverlay?.classList.add('is-open');
+  // FAB 숨김
+  const fab = document.getElementById('mobile-filter-btn');
+  if (fab) fab.style.display = 'none';
 }
 function closeMobileSidebar() {
   $plsMSidebar?.classList.remove('is-open');
   $plsMOverlay?.classList.remove('is-open');
+  // FAB 복원
+  const fab = document.getElementById('mobile-filter-btn');
+  if (fab) fab.style.display = '';
 }
 
 // ── 모바일 상세: 카탈로그 스타일 렌더링 ────────────────────────────────────
@@ -1024,6 +1035,9 @@ function openMobileDetail(id) {
   if ($plsMDetailBack) $plsMDetailBack.onclick = closeMobileDetail;
   if ($plsMDetailHeadActions) $plsMDetailHeadActions.innerHTML = '';
   $plsMDetail.hidden = false;
+  // 상세 열면 FAB 숨김
+  const fab = document.getElementById('mobile-filter-btn');
+  if (fab) fab.style.display = 'none';
 }
 
 
@@ -1031,6 +1045,9 @@ function closeMobileDetail() {
   if ($plsMDetail) $plsMDetail.hidden = true;
   if ($plsMDetailBack) $plsMDetailBack.onclick = null;
   state.selectedId = null;
+  // 상세 닫으면 FAB 복원
+  const fab = document.getElementById('mobile-filter-btn');
+  if (fab) fab.style.display = '';
 }
 
 function renderMobileSidebarFilters() {
@@ -1078,30 +1095,48 @@ function renderMobileCatalogGrid() {
 }
 
 function bindMobile() {
-  // 모바일 플로팅 필터 버튼 — 드래그 + 탭
+  // 모바일 플로팅 필터 버튼 — 좌/우 끝 스냅 + 상하 자유 이동
   const fab = document.getElementById('mobile-filter-btn');
   if (fab) {
     const STORAGE_KEY = 'fp.filter-fab-pos';
-    const TAB_H = 56; // --mobile-tabbar-height
-    let dragging = false;
-    let startX = 0, startY = 0, fabX = 0, fabY = 0, moved = false;
+    const TAB_H = 56;
+    const FAB_SIZE = 52;
+    const EDGE_GAP = 0; // 화면 끝에 딱 붙임
+    let dragging = false, moved = false;
+    let startX = 0, startY = 0, fabX = 0, fabY = 0;
+    let fabOnRight = true; // FAB이 우측에 있는지
 
-    // 저장된 위치 복원 또는 기본 위치 (우측 하단)
-    function applyDefaultPos() {
+    function savePos(onRight, bottom) {
+      fabOnRight = onRight;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ onRight, bottom }));
+    }
+
+    function snapFab(onRight, bottom) {
+      fab.style.transition = 'left 0.2s, right 0.2s';
+      fab.style.top = '';
+      if (onRight) {
+        fab.style.left = ''; fab.style.right = EDGE_GAP + 'px';
+      } else {
+        fab.style.right = ''; fab.style.left = EDGE_GAP + 'px';
+      }
+      fab.style.bottom = bottom + 'px';
+      savePos(onRight, bottom);
+      setTimeout(() => { fab.style.transition = ''; }, 200);
+    }
+
+    // 저장된 위치 복원 또는 기본 위치
+    (function applyDefaultPos() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
           const pos = JSON.parse(saved);
-          fab.style.left = ''; fab.style.top = '';
-          fab.style.right = pos.right + 'px';
-          fab.style.bottom = pos.bottom + 'px';
+          fabOnRight = pos.onRight !== false;
+          snapFab(fabOnRight, pos.bottom || TAB_H + 16);
           return;
         } catch (_) {}
       }
-      fab.style.right = '16px';
-      fab.style.bottom = (TAB_H + 16) + 'px';
-    }
-    applyDefaultPos();
+      snapFab(true, TAB_H + 16);
+    })();
 
     function onStart(cx, cy) {
       dragging = true; moved = false;
@@ -1115,9 +1150,8 @@ function bindMobile() {
       const dx = cx - startX, dy = cy - startY;
       if (!moved && Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
       moved = true;
-      const size = 52;
-      let x = Math.max(0, Math.min(fabX + dx, window.innerWidth - size));
-      let y = Math.max(0, Math.min(fabY + dy, window.innerHeight - size));
+      const x = Math.max(0, Math.min(fabX + dx, window.innerWidth - FAB_SIZE));
+      const y = Math.max(0, Math.min(fabY + dy, window.innerHeight - FAB_SIZE));
       fab.style.right = ''; fab.style.bottom = '';
       fab.style.left = x + 'px'; fab.style.top = y + 'px';
     }
@@ -1126,31 +1160,21 @@ function bindMobile() {
       dragging = false;
       fab.style.transition = '';
       if (!moved) { openMobileSidebar(); return; }
-      // 가장자리에 붙이기 (우측 or 좌측)
+      // 좌/우 끝에 스냅, 상하는 자유
       const rect = fab.getBoundingClientRect();
-      const snapRight = rect.left > window.innerWidth / 2;
-      const right = snapRight ? (window.innerWidth - rect.right) : -(rect.left);
-      const bottom = window.innerHeight - rect.bottom;
-      const clampedRight = Math.max(8, snapRight ? right : 8);
-      const clampedBottom = Math.max(TAB_H + 8, Math.min(bottom, window.innerHeight - 100));
+      const onRight = (rect.left + FAB_SIZE / 2) > window.innerWidth / 2;
+      const bottom = Math.max(TAB_H + 8, window.innerHeight - rect.bottom);
       fab.style.left = ''; fab.style.top = '';
-      fab.style.right = clampedRight + 'px';
-      fab.style.bottom = clampedBottom + 'px';
-      if (snapRight) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ right: clampedRight, bottom: clampedBottom }));
-      } else {
-        // 좌측이면 left→right 변환
-        const finalRight = window.innerWidth - rect.width - 8;
-        fab.style.right = ''; fab.style.left = '8px';
-        fab.style.bottom = clampedBottom + 'px';
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ right: finalRight, bottom: clampedBottom }));
-      }
+      snapFab(onRight, Math.min(bottom, window.innerHeight - FAB_SIZE - 8));
     }
 
     fab.addEventListener('touchstart', (e) => { const t = e.touches[0]; onStart(t.clientX, t.clientY); }, { passive: true });
     fab.addEventListener('touchmove', (e) => { if (moved) e.preventDefault(); const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: false });
     fab.addEventListener('touchend', onEnd);
     fab.addEventListener('touchcancel', onEnd);
+
+    // FAB 위치에 따라 사이드바를 알려주는 함수
+    window._isFabOnRight = () => fabOnRight;
   }
   // 사이드바 닫기
   $plsMClose?.addEventListener('click', closeMobileSidebar);
