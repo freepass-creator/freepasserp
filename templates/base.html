@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1b2a4a">
+  <meta name="description" content="FREEPASS ERP — 렌터카 장기렌트 B2B 관리 시스템">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>{{ page_title }} — FREEPASS ERP</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/icon.svg') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon.svg') }}">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_tokens.css') }}?v={{ app_version }}">
@@ -26,7 +35,11 @@
 </head>
 <body data-page="{{ page_title }}">
   {% block body %}{% endblock %}
-  <script>window.APP_VER='{{ app_version }}';requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove('no-transition')));</script>
+  <script>
+    window.APP_VER='{{ app_version }}';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove('no-transition')));
+    if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/sw.js').catch(()=>{});}
+  </script>
   <script type="module" src="{{ url_for('static', filename='js/app.js') }}?v={{ app_version }}"></script>
   {% block page_js %}{% endblock %}
 </body>

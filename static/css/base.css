@@ -1,4 +1,4 @@
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+/* 폰트는 base.html에서 <link>로 로드 (렌더 블로킹 방지) */
 
 :root {
   /* ═════ FREEPASS ERP — Unified Design Tokens ═════ */
@@ -156,6 +156,58 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+/* ── 다크 모드 ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-main: #e2e8f0;
+    --text-subtle: #94a3b8;
+    --text-muted: #64748b;
+    --border-main: #334155;
+    --border-soft: #1e293b;
+    --border-strong: #475569;
+    --surface-base: #0f172a;
+    --surface-subtle: #1e293b;
+    --surface-hover: #334155;
+    --surface-selected: #1e3a5f;
+    --surface-sidebar: #0f172a;
+    --surface-muted: #1e293b;
+    --interactive-hover-bg: #334155;
+    --interactive-hover-border: #475569;
+    --interactive-active-bg: #475569;
+    --interactive-active-border: #64748b;
+    --interactive-selected-bg: #1e3a5f;
+    --interactive-selected-border: #3b82f6;
+  }
+  body {
+    background: #020617;
+  }
+}
+
+/* 수동 다크 모드 토글 지원 */
+html[data-theme="dark"] {
+  --text-main: #e2e8f0;
+  --text-subtle: #94a3b8;
+  --text-muted: #64748b;
+  --border-main: #334155;
+  --border-soft: #1e293b;
+  --border-strong: #475569;
+  --surface-base: #0f172a;
+  --surface-subtle: #1e293b;
+  --surface-hover: #334155;
+  --surface-selected: #1e3a5f;
+  --surface-sidebar: #0f172a;
+  --surface-muted: #1e293b;
+  --interactive-hover-bg: #334155;
+  --interactive-hover-border: #475569;
+  --interactive-active-bg: #475569;
+  --interactive-active-border: #64748b;
+  --interactive-selected-bg: #1e3a5f;
+  --interactive-selected-border: #3b82f6;
+}
+html[data-theme="dark"] body {
+  background: #020617;
 }
 
 /* 페이지 로드 시 transition 깜빡임 방지 */

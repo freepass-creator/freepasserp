@@ -1,0 +1,18 @@
+{
+  "name": "FREEPASS ERP",
+  "short_name": "FREEPASS",
+  "description": "렌터카 장기렌트 B2B ERP 시스템",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#1b2a4a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
