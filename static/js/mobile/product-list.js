@@ -171,20 +171,28 @@ function renderDetailContent(product) {
       ${priceNote ? `<div class="md-note">${priceNote}</div>` : ''}
     </div>` : '';
 
-  // ── 5. 차량보험정보 (웹과 동일한 term 우선 로직) ──
-  const bodily   = parsePol(first(term.injury_limit_deductible, p.bodily));
-  const property = parsePol(first(term.property_limit_deductible, p.property));
-  const selfB    = parsePol(first(term.personal_injury_limit_deductible, p.selfBodily));
-  const unins    = parsePol(first(term.uninsured_limit_deductible, p.uninsured));
-  const own      = parsePol(first(term.own_damage_limit_deductible, p.ownDamage));
-  const emergency = first(term.roadside_assistance, term.emergency_service, c.emergency);
+  // ── 5. 차량보험정보 (웹 buildPolicyValues와 동일) ──
+  const bodilyLeg   = parsePol(first(term.injury_limit_deductible, p.bodily));
+  const propertyLeg = parsePol(first(term.property_limit_deductible, p.property));
+  const selfLeg     = parsePol(first(term.personal_injury_limit_deductible, p.selfBodily));
+  const uninsLeg    = parsePol(first(term.uninsured_limit_deductible, p.uninsured));
+  const ownLeg      = parsePol(first(term.own_damage_limit_deductible, p.ownDamage));
+
+  const ins = {
+    injury:   [first(term.injury_compensation_limit, bodilyLeg.limit),     first(term.injury_deductible, bodilyLeg.deductible)],
+    property: [first(term.property_compensation_limit, propertyLeg.limit), first(term.property_deductible, propertyLeg.deductible)],
+    self:     [first(term.personal_injury_compensation_limit, selfLeg.limit), first(term.personal_injury_deductible, selfLeg.deductible)],
+    unins:    [first(term.uninsured_compensation_limit, uninsLeg.limit),    first(term.uninsured_deductible, uninsLeg.deductible)],
+    own:      [first(term.own_damage_compensation, ownLeg.limit),          first(term.own_damage_min_deductible, ownLeg.deductible)],
+    emergency: first(term.roadside_assistance, term.emergency_service, c.emergency),
+  };
   const insRows = [
-    ['대인', first(term.injury_compensation_limit, bodily.limit), first(term.injury_deductible, bodily.deductible)],
-    ['대물', first(term.property_compensation_limit, property.limit), first(term.property_deductible, property.deductible)],
-    ['자기신체사고', first(term.personal_injury_compensation_limit, selfB.limit), first(term.personal_injury_deductible, selfB.deductible)],
-    ['무보험차상해', first(term.uninsured_compensation_limit, unins.limit), first(term.uninsured_deductible, unins.deductible)],
-    ['자기차량손해', first(term.own_damage_compensation, own.limit), first(term.own_damage_min_deductible, own.deductible)],
-    ['긴급출동', emergency, '-'],
+    ['대인', ins.injury[0], ins.injury[1]],
+    ['대물', ins.property[0], ins.property[1]],
+    ['자기신체사고', ins.self[0], ins.self[1]],
+    ['무보험차상해', ins.unins[0], ins.unins[1]],
+    ['자기차량손해', ins.own[0], ins.own[1]],
+    ['긴급출동', ins.emergency, '-'],
   ];
   const insSection = `
     ${sectionHead('차량보험정보')}
