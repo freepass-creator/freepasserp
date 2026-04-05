@@ -1,7 +1,7 @@
 /**
  * chat-badge.js
  * 사이드바 채팅 메뉴 옆 미처리/안읽은 건수 뱃지.
- * workspace_new.html 에서 한 번 로드되며 SPA 네비게이션에도 살아있음.
+ * workspace.html 에서 한 번 로드되며 SPA 네비게이션에도 살아있음.
  */
 
 import { requireAuth } from './auth-guard.js';

@@ -1,7 +1,7 @@
 /**
  * sidebar-alerts.js
  * 사이드바 메뉴별 실시간 알림 뱃지 + 축소 모드 Notification Dot.
- * workspace_new.html 에서 한 번 로드, SPA 네비게이션에도 유지.
+ * workspace.html 에서 한 번 로드, SPA 네비게이션에도 유지.
  */
 
 import { requireAuth } from './auth-guard.js';

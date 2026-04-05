@@ -1,5 +1,6 @@
-{% extends 'pages/layout/workspace_new.html' %}
+{% extends 'pages/layout/workspace.html' %}
 {% block workspace_page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/detail-view.css') }}" data-page-style="true">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/product.css') }}" data-page-style="true">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}?v={{ app_version }}" data-page-style="true">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile-product.css') }}" data-page-style="true">
