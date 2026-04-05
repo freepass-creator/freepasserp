@@ -145,23 +145,20 @@ function bindEvents() {
     if (card) openRoom(card.getAttribute('data-room-id'));
   });
 
-  // 메시지 전송
-  $msgForm?.addEventListener('submit', async (e) => {
+  // 메시지 전송 — 포커스 유지, 비동기 대기 안 함
+  $msgForm?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const text = $msgInput?.value.trim();
+    if (!$msgInput) return;
+    const text = $msgInput.value.trim();
     if (!text || !currentRoomId) return;
-    try {
-      await sendMessage(currentRoomId, {
-        sender_uid: currentUser.uid,
-        sender_code: currentProfile.user_code || currentProfile.company_code || '-',
-        sender_role: currentProfile.role,
-        sender_partner_code: currentProfile.company_code || '',
-        text
-      });
-      if ($msgInput) { $msgInput.value = ''; $msgInput.focus(); }
-    } catch (err) {
-      showToast('메시지 전송에 실패했습니다.', 'error');
-    }
+    $msgInput.value = '';
+    sendMessage(currentRoomId, {
+      sender_uid: currentUser.uid,
+      sender_code: currentProfile.user_code || currentProfile.company_code || '-',
+      sender_role: currentProfile.role,
+      sender_partner_code: currentProfile.company_code || '',
+      text
+    }).catch(() => showToast('메시지 전송에 실패했습니다.', 'error'));
   });
 
   // 핸드폰 뒤로가기 → 채팅방 닫기
