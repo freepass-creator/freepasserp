@@ -169,25 +169,8 @@ async function handleMobileBack() {
   return true;
 }
 
-/** visualViewport: 키보드 올라올 때 채팅방 위치 조정 */
 function initKeyboardAdjust() {
-  if (!window.visualViewport) return;
-  const tabBarEl = document.getElementById('mobile-tab-bar');
-
-  function adjust() {
-    const vv = window.visualViewport;
-    const kbHeight = window.innerHeight - vv.height - vv.offsetTop;
-    const kbOpen = kbHeight > 100;
-
-    if (document.body.classList.contains('chat-m-open')) {
-      if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
-      const chatroom = document.getElementById('mChatroom');
-      if (chatroom) chatroom.style.bottom = kbOpen ? `${kbHeight}px` : '';
-    }
-  }
-
-  window.visualViewport.addEventListener('resize', adjust);
-  window.visualViewport.addEventListener('scroll', adjust);
+  // 키보드 대응은 CSS(100dvh)와 브라우저 기본 동작에 맡김
 }
 
 /** iOS 에지 스와이프 등으로 popstate 발생 시 모바일 뷰 클래스 잔류 방지 */

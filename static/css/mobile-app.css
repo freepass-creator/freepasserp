@@ -307,15 +307,18 @@ button, a, [role="button"] {
 .m-chatroom {
   display: flex;
   flex-direction: column;
-  position: fixed;
-  top: var(--mobile-topbar-height);
-  left: 0;
-  right: 0;
-  bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
-  z-index: 200;
+  height: 100%;
   background: #f8fafc;
 }
 .m-chatroom[hidden] { display: none !important; }
+
+body.chat-m-open .chat-m-rooms { display: none !important; }
+body.chat-m-open .mobile-tab-bar { display: none !important; }
+body.chat-m-open .main-shell--new {
+  padding-bottom: 0 !important;
+  height: calc(100dvh - var(--mobile-topbar-height)) !important;
+  overflow: hidden !important;
+}
 
 .m-chatroom__head {
   display: flex;
@@ -341,6 +344,7 @@ button, a, [role="button"] {
 
 .m-chatroom__messages {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 8px 12px;
@@ -378,14 +382,6 @@ button, a, [role="button"] {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-}
-
-/* 키보드 올라오면: 채팅방 바닥까지 확장 (JS에서 처리) */
-body.chat-m-open .m-chatroom {
-  bottom: 0;
-}
-body.chat-m-open .mobile-tab-bar {
-  display: none !important;
 }
 
 /* 가로 모드 대응 — 채팅 입력창 가려짐 방지 */
