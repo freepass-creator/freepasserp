@@ -117,8 +117,7 @@ function renderDetailContent(product) {
       </div>
       <div class="md-vehicle-sub">${esc(safe(product.subModel))} ${esc(safe(product.trim))}</div>
       ${product.optionSummary && product.optionSummary !== '-' ? `<div class="md-vehicle-sub">${esc(product.optionSummary)}</div>` : ''}
-      <div class="md-vehicle-meta">${esc(safe(product.fuel))} · ${esc(safe(product.year))}년식 · ${esc(safe(product.mileageDisplay))}</div>
-      <div class="md-vehicle-meta">${esc(safe(product.extColor))} / ${esc(safe(product.intColor))}</div>
+      <div class="md-vehicle-meta">${esc(safe(product.fuel))} · ${esc(safe(product.year))}년식 · ${esc(safe(product.mileageDisplay))} · ${esc(safe(product.extColor))}/${esc(safe(product.intColor))}</div>
     </div>`;
 
   // ── 3. 액션 버튼 ──

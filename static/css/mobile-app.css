@@ -78,7 +78,7 @@
 }
 
 /* 모바일 요소 항상 표시 */
-.mobile-topbar { display: flex !important; }
+.mobile-topbar { display: flex !important; z-index: 999 !important; }
 .mobile-tab-bar { display: flex !important; }
 .pls-m-catalog-wrap { display: block !important; }
 .chat-m-rooms { display: block !important; }
