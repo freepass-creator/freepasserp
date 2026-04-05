@@ -114,8 +114,6 @@ function openRoom(roomId) {
     el.classList.toggle('is-active', el.getAttribute('data-room-id') === roomId);
   });
 
-  // 입력 포커스
-  setTimeout(() => $msgInput?.focus(), 300);
 }
 
 function closeRoom() {
