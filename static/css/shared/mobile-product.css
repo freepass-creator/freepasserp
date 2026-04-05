@@ -169,9 +169,6 @@
   /* 상세 패널 표시 허용 */
   .pls-m-detail:not([hidden]) { display: flex !important; }
 
-  /* 필터 버튼: 상품목록 페이지에서 탭바에 표시 */
-  body[data-page="상품목록"] .mobile-tab--filter { display: flex !important; }
-
   /* 상품목록: 외부 패딩 제거 → 내부 그리드 패딩으로만 여백 관리 */
   body[data-page="상품목록"] .main-shell--new {
     padding: 0 !important;

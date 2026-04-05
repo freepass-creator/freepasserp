@@ -109,9 +109,6 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
     flex: none !important;
   }
 
-  /* ─── 탭바 필터 버튼: 기본 숨김, 페이지별 표시 ───────────────────────── */
-  .mobile-tab--filter { display: none !important; }
-  .mobile-tab--filter.is-active { color: #1b2a4a; }
 
   /* ─── 설정 페이지 ───────────────────────────────────────────────────────── */
   .settings-page-shell {
@@ -461,4 +458,45 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   padding: 60px var(--space-5);
   text-align: center;
   font-size: var(--font-size-lg); color: #94a3b8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE FLOATING FILTER FAB
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mobile-filter-fab {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-filter-fab {
+    display: none;
+    position: fixed;
+    z-index: 250;
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: #1b2a4a;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .mobile-filter-fab:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4);
+  }
+  .mobile-filter-fab svg {
+    pointer-events: none;
+  }
+
+  /* 상품목록 페이지에서만 표시 */
+  body[data-page="상품목록"] .mobile-filter-fab {
+    display: flex;
+  }
 }

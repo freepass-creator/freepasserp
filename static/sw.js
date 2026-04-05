@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (오프라인 기본 지원)
-const CACHE_NAME = 'freepass-v4';
+const CACHE_NAME = 'freepass-v5';
 
 // 설치: 기본 셸 캐시
 self.addEventListener('install', (event) => {

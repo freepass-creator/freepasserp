@@ -1064,10 +1064,79 @@ function renderMobileCatalogGrid() {
 }
 
 function bindMobile() {
-  // 모바일 필터 버튼 클릭 (표시는 CSS data-page 셀렉터로 제어)
-  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
-  if (mobileFilterBtn) {
-    mobileFilterBtn.addEventListener('click', openMobileSidebar);
+  // 모바일 플로팅 필터 버튼 — 드래그 + 탭
+  const fab = document.getElementById('mobile-filter-btn');
+  if (fab) {
+    const STORAGE_KEY = 'fp.filter-fab-pos';
+    const TAB_H = 56; // --mobile-tabbar-height
+    let dragging = false;
+    let startX = 0, startY = 0, fabX = 0, fabY = 0, moved = false;
+
+    // 저장된 위치 복원 또는 기본 위치 (우측 하단)
+    function applyDefaultPos() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const pos = JSON.parse(saved);
+          fab.style.left = ''; fab.style.top = '';
+          fab.style.right = pos.right + 'px';
+          fab.style.bottom = pos.bottom + 'px';
+          return;
+        } catch (_) {}
+      }
+      fab.style.right = '16px';
+      fab.style.bottom = (TAB_H + 16) + 'px';
+    }
+    applyDefaultPos();
+
+    function onStart(cx, cy) {
+      dragging = true; moved = false;
+      const rect = fab.getBoundingClientRect();
+      startX = cx; startY = cy;
+      fabX = rect.left; fabY = rect.top;
+      fab.style.transition = 'none';
+    }
+    function onMove(cx, cy) {
+      if (!dragging) return;
+      const dx = cx - startX, dy = cy - startY;
+      if (!moved && Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      moved = true;
+      const size = 52;
+      let x = Math.max(0, Math.min(fabX + dx, window.innerWidth - size));
+      let y = Math.max(0, Math.min(fabY + dy, window.innerHeight - size));
+      fab.style.right = ''; fab.style.bottom = '';
+      fab.style.left = x + 'px'; fab.style.top = y + 'px';
+    }
+    function onEnd() {
+      if (!dragging) return;
+      dragging = false;
+      fab.style.transition = '';
+      if (!moved) { openMobileSidebar(); return; }
+      // 가장자리에 붙이기 (우측 or 좌측)
+      const rect = fab.getBoundingClientRect();
+      const snapRight = rect.left > window.innerWidth / 2;
+      const right = snapRight ? (window.innerWidth - rect.right) : -(rect.left);
+      const bottom = window.innerHeight - rect.bottom;
+      const clampedRight = Math.max(8, snapRight ? right : 8);
+      const clampedBottom = Math.max(TAB_H + 8, Math.min(bottom, window.innerHeight - 100));
+      fab.style.left = ''; fab.style.top = '';
+      fab.style.right = clampedRight + 'px';
+      fab.style.bottom = clampedBottom + 'px';
+      if (snapRight) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ right: clampedRight, bottom: clampedBottom }));
+      } else {
+        // 좌측이면 left→right 변환
+        const finalRight = window.innerWidth - rect.width - 8;
+        fab.style.right = ''; fab.style.left = '8px';
+        fab.style.bottom = clampedBottom + 'px';
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ right: finalRight, bottom: clampedBottom }));
+      }
+    }
+
+    fab.addEventListener('touchstart', (e) => { const t = e.touches[0]; onStart(t.clientX, t.clientY); }, { passive: true });
+    fab.addEventListener('touchmove', (e) => { if (moved) e.preventDefault(); const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: false });
+    fab.addEventListener('touchend', onEnd);
+    fab.addEventListener('touchcancel', onEnd);
   }
   // 사이드바 닫기
   $plsMClose?.addEventListener('click', closeMobileSidebar);
