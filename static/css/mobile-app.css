@@ -329,13 +329,32 @@ button, a, [role="button"] {
   min-width: 48px !important;
   min-height: 48px !important;
   border: none !important;
+  border-left: 1px solid #e2e8f0 !important;
   border-radius: 0 !important;
   background: #1b2a4a !important;
   color: #fff !important;
   padding: 0 !important;
+  margin: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+
+/* 채팅 열린 상태: 하단 여백 제거, 입력창 키보드에 딱 붙음 */
+body.chat-m-open .main-shell--new {
+  padding-bottom: 0 !important;
+}
+body.chat-m-open .panel-body,
+body.chat-m-open .chat-panel-body {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+body.chat-m-open #message-form {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+body.chat-m-open .layout-633 {
+  bottom: 0 !important;
 }
 
 /* 가로 모드 대응 — 채팅 입력창 가려짐 방지 */
