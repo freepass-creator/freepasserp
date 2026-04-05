@@ -20,11 +20,9 @@ const PAGE_MODULE_PATHS = {
 const pageCache = new Map();
 let currentPageKey = '';
 
-// ─── 작업 중 이탈 방지 ──────────────────────────────────────────────────────
-let _dirtyCheck = null;
-export function setDirtyCheck(fn) { _dirtyCheck = typeof fn === 'function' ? fn : null; }
-export function clearDirtyCheck() { _dirtyCheck = null; }
-export function isPageDirty() { return typeof _dirtyCheck === 'function' && _dirtyCheck(); }
+// ─── 작업 중 이탈 방지 (공통 모듈에서 가져옴) ────────────────────────────────
+import { setDirtyCheck, clearDirtyCheck, isPageDirty } from './core/dirty-check.js';
+export { setDirtyCheck, clearDirtyCheck, isPageDirty };
 
 async function confirmLeave() {
   if (!isPageDirty()) return true;

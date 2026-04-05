@@ -13,10 +13,15 @@
 @import url('/static/css/shared/mobile-contract.css');
 @import url('/static/css/shared/mobile-product.css');
 
-/* ── 데스크탑 요소가 아예 없으므로 폼/리스트 등 공통 스타일 필요 시 ── */
+/* ── 공통 스타일 (폼/버튼/필터 사이드바 등) ── */
 @import url('/static/css/form.css');
 @import url('/static/css/button.css');
 @import url('/static/css/ui_upload.css');
+@import url('/static/css/catalog.css');
+@import url('/static/css/list.css');
+@import url('/static/css/panel.css');
+@import url('/static/css/detail.css');
+@import url('/static/css/chat.css');
 
 /* ═══════════════════════════════════════════════════════════════════════════
    성능 최적화 오버라이드
@@ -75,6 +80,16 @@
 /* 모바일 요소 항상 표시 */
 .mobile-topbar { display: flex !important; }
 .mobile-tab-bar { display: flex !important; }
+.pls-m-catalog-wrap { display: block !important; }
+.chat-m-rooms { display: block !important; }
+#contract-m-list { display: block !important; }
+.m-filter-overlay { display: none; }
+.m-filter-sidebar { display: block; transform: translateX(100%); transition: transform 0.25s ease; }
+.m-filter-sidebar.is-open { transform: translateX(0); }
+
+/* 데스크탑 전용 요소 숨김 */
+.pls-grid-panel { display: none !important; }
+.pls-detail-panel { display: none !important; }
 
 /* 스크롤 영역 */
 .main-shell--new {

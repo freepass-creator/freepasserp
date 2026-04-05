@@ -7,7 +7,7 @@
 
 import { requireAuth } from './auth-guard.js';
 import { showConfirm } from './toast.js';
-import { isPageDirty } from '../app.js';
+import { isPageDirty } from './dirty-check.js';
 
 const isMobile = document.documentElement.classList.contains('is-mobile');
 const mq = window.matchMedia('(max-width: 768px)');
