@@ -53,6 +53,7 @@ async function confirmLeave() {
 }
 
 window.addEventListener('beforeunload', (e) => {
+  if (window.matchMedia('(max-width: 768px)').matches) return;
   if (isPageDirty()) { e.preventDefault(); e.returnValue = ''; }
 });
 

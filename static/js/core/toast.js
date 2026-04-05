@@ -77,6 +77,7 @@ export function dismissAllToasts() {
 // ─── showConfirm ────────────────────────────────────────────────────────────
 
 export function showConfirm(text) {
+  if (window.matchMedia('(max-width: 768px)').matches) return Promise.resolve(true);
   return new Promise((resolve) => {
     const overlay = makeOverlay(false);
     const box = document.createElement('div');
