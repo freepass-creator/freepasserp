@@ -297,7 +297,7 @@
   margin-top: 0;
 }
 .plist-detail__section-title {
-  margin-bottom: 3px;
+  margin-bottom: var(--space-1);
 }
 
 /* section spacing tuning */

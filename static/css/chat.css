@@ -33,11 +33,11 @@
 .message-list {
   border: 0;
   background: #f0f2f5;
-  padding: var(--space-4) 14px;
+  padding: var(--space-4) var(--space-4);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
   min-height: 0;
   margin: 0;
   border-radius: 0;
@@ -47,7 +47,7 @@
 
 .message-wrap {
   display: flex;
-  gap: 3px;
+  gap: var(--space-1);
   max-width: 72%;
 }
 
@@ -70,7 +70,7 @@
   color: var(--text-subtle, #64748b);
   white-space: nowrap;
   flex-shrink: 0;
-  padding: 1px 6px;
+  padding: 1px var(--space-2);
   border-radius: var(--radius-sm);
 }
 
@@ -82,7 +82,7 @@
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .message-wrap.out .message-content { flex-direction: row-reverse; }
@@ -173,7 +173,7 @@
   font-size: var(--font-size-xs);
   color: #5f6368;
   background: rgba(0, 0, 0, 0.06);
-  padding: 3px var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-lg);
   margin: var(--space-2) 0;
 }
@@ -184,7 +184,7 @@
   display: flex;
   align-items: center;
   gap: 0;
-  padding: var(--space-2) 10px;
+  padding: var(--space-2) var(--space-3);
   margin-top: auto;
   background: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
@@ -225,7 +225,7 @@
   justify-content: center;
   width: var(--height-lg);
   height: var(--height-lg);
-  margin-left: 6px;
+  margin-left: var(--space-2);
   border: none;
   border-radius: var(--radius-circle);
   background: #1b2a4a;
@@ -273,7 +273,7 @@
 
 @media (max-width: 768px) {
   /* 말풍선 */
-  .message-bubble { font-size: var(--font-size-lg); line-height: 1.6; padding: 10px 14px; }
+  .message-bubble { font-size: var(--font-size-lg); line-height: 1.6; padding: var(--space-3) var(--space-4); }
   /* 보낸사람 · 역할뱃지 · 시간 */
   .message-sender { font-size: var(--font-size-sm); }
   .message-role-badge { font-size: var(--font-size-xs); }
@@ -283,5 +283,5 @@
   /* 입력란: iOS 줌 방지 + 터치 타겟 */
   .message-form input { font-size: var(--font-size-xl); min-height: var(--height-xl); }
   .message-send-btn { width: var(--height-xl); height: var(--height-xl); }
-  .message-form { padding: 10px var(--space-3); }
+  .message-form { padding: var(--space-3) var(--space-3); }
 }

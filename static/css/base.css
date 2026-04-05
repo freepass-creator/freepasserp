@@ -184,7 +184,7 @@ a {
   justify-content: center;
   flex: 1 1 0;
   min-height: 0;
-  padding: 24px;
+  padding: var(--space-6);
   font-size: var(--font-size-main, 12px);
   font-weight: 400;
   line-height: 1.5;

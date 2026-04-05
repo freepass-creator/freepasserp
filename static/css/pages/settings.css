@@ -141,7 +141,7 @@
 .settings-code-form-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-3);
   padding: var(--space-3);
   border: 1px solid var(--border-soft);
   background: var(--surface-base);
@@ -248,7 +248,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: 10px var(--space-3);
+  padding: var(--space-3) var(--space-3);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-ui);
   background: var(--surface-subtle, #f8fafc);
@@ -266,7 +266,7 @@
 .settings-period-check {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-1);
   font-size: var(--font-size-main);
   color: var(--text-main);
   cursor: pointer;
@@ -332,12 +332,12 @@
 .settings-catalog-link-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
 }
 .settings-catalog-link-input {
   flex: 1;
   height: var(--space-8);
-  padding: 0 10px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--border-soft, #e1e5ea);
   border-radius: var(--radius-ui, 6px);
   background: var(--surface-subtle, #f8fafc);
@@ -351,7 +351,7 @@
   align-items: center;
   gap: var(--space-1);
   height: 32px;
-  padding: 0 10px;
+  padding: 0 var(--space-3);
   border: 1px solid var(--border-soft, #e1e5ea);
   border-radius: var(--radius-ui, 6px);
   background: var(--surface-base, #fff);
