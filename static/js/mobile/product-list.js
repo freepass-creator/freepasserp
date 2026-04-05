@@ -174,13 +174,14 @@ function renderDetailContent(product) {
   const selfB    = parsePol(first(term.personal_injury_limit_deductible, p.selfBodily));
   const unins    = parsePol(first(term.uninsured_limit_deductible, p.uninsured));
   const own      = parsePol(first(term.own_damage_limit_deductible, p.ownDamage));
+  const emergency = first(term.roadside_assistance, term.emergency_service, c.emergency);
   const insRows = [
     ['대인', first(term.injury_compensation_limit, bodily.limit), first(term.injury_deductible, bodily.deductible)],
     ['대물', first(term.property_compensation_limit, property.limit), first(term.property_deductible, property.deductible)],
     ['자기신체사고', first(term.personal_injury_compensation_limit, selfB.limit), first(term.personal_injury_deductible, selfB.deductible)],
     ['무보험차상해', first(term.uninsured_compensation_limit, unins.limit), first(term.uninsured_deductible, unins.deductible)],
     ['자기차량손해', first(term.own_damage_compensation, own.limit), first(term.own_damage_min_deductible, own.deductible)],
-    ['긴급출동', first(term.roadside_assistance, c.emergency), '-'],
+    ['긴급출동', emergency, '-'],
   ];
   const insSection = `
     ${sectionHead('차량보험정보')}
