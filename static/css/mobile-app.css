@@ -300,90 +300,91 @@ button, a, [role="button"] {
   accent-color: #1b2a4a;
 }
 
-/* 채팅 입력폼 — 타이트하게 */
-.message-form {
-  display: flex !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  padding: 0 !important;
-  gap: 0 !important;
-  border-top: 1px solid #e2e8f0;
+/* ═══════════════════════════════════════════════════════════════════════════
+   모바일 채팅방 (데스크탑 CSS와 완전 독립)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.m-chatroom {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: var(--mobile-topbar-height);
+  left: 0;
+  right: 0;
+  bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
+  z-index: 200;
+  background: #f8fafc;
 }
-.message-form input {
-  flex: 1 !important;
-  min-width: 0 !important;
-  width: auto !important;
-  height: 48px !important;
-  padding: 0 12px !important;
-  border: none !important;
-  border-radius: 0 !important;
-  background: #fff !important;
-  font-size: 16px !important;
-  outline: none !important;
+.m-chatroom[hidden] { display: none !important; }
+
+.m-chatroom__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 12px;
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
 }
-.message-form .message-send-btn {
-  flex-shrink: 0 !important;
-  width: 48px !important;
-  height: 48px !important;
-  min-width: 48px !important;
-  min-height: 48px !important;
-  border: none !important;
-  border-left: 1px solid #e2e8f0 !important;
-  border-radius: 0 !important;
-  background: #1b2a4a !important;
-  color: #fff !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+.m-chatroom__title {
+  font-size: 13px;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.m-chatroom__actions {
+  display: flex;
+  gap: 0;
 }
 
-/* 채팅 열린 상태 — 탭바 위, 입력창 포함 */
-body.chat-m-open .layout-633 {
-  position: fixed !important;
-  top: var(--mobile-topbar-height) !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  height: auto !important;
-  padding: 0 !important;
-  padding-bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
-  margin: 0 !important;
-  z-index: 200;
-  background: #fff;
-  box-sizing: border-box !important;
-}
-body.chat-m-open .main-shell--new {
-  padding-bottom: 0 !important;
-}
-body.chat-m-open .panel--chat {
-  height: 100% !important;
-  padding: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-}
-body.chat-m-open .chat-panel-body {
-  flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  gap: 0 !important;
-}
-body.chat-m-open #message-list {
-  flex: 1 !important;
-  overflow-y: auto !important;
+.m-chatroom__messages {
+  flex: 1;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 8px 12px !important;
+  padding: 8px 12px;
 }
-body.chat-m-open #message-form {
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
+
+.m-chatroom__form {
+  display: flex;
+  flex-shrink: 0;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
 }
-body.chat-m-open #chat-message {
+.m-chatroom__form input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 0;
+  background: #fff;
+  font-size: 16px !important;
+  outline: none;
+}
+.m-chatroom__form input::placeholder { color: #94a3b8; }
+.m-chatroom__form button[type="submit"] {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 0;
+  background: #1b2a4a;
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 키보드 올라오면: 채팅방 바닥까지 확장 (JS에서 처리) */
+body.chat-m-open .m-chatroom {
+  bottom: 0;
+}
+body.chat-m-open .mobile-tab-bar {
   display: none !important;
 }
 

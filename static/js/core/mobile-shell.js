@@ -180,9 +180,10 @@ function initKeyboardAdjust() {
     const kbOpen = kbHeight > 100; // 키보드 최소 높이
 
     if (document.body.classList.contains('chat-m-open')) {
+      // 키보드 올라오면 탭바 숨기고 채팅방 바닥까지 확장
       if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
-      const panel = document.querySelector('.layout-633');
-      if (panel) panel.style.paddingBottom = kbOpen ? '0px' : '';
+      const chatroom = document.getElementById('mChatroom');
+      if (chatroom) chatroom.style.bottom = kbOpen ? '0px' : '';
     }
 
     // 계약 폼 패널 bottom 조정

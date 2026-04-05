@@ -17,6 +17,7 @@ let unsubMessages = null;
 
 // DOM
 const $rooms = document.getElementById('chatMRooms');
+const $chatroom = document.getElementById('mChatroom');
 const $msgList = document.getElementById('message-list');
 const $msgForm = document.getElementById('message-form');
 const $msgInput = document.getElementById('message-input');
@@ -93,6 +94,7 @@ function renderMessages(messages) {
 
 function openRoom(roomId) {
   currentRoomId = roomId;
+  if ($chatroom) $chatroom.hidden = false;
   document.body.classList.add('chat-m-open');
   history.pushState({ chatRoom: true }, '');
 
@@ -117,6 +119,7 @@ function openRoom(roomId) {
 }
 
 function closeRoom() {
+  if ($chatroom) $chatroom.hidden = true;
   document.body.classList.remove('chat-m-open');
   if (unsubMessages) { unsubMessages(); unsubMessages = null; }
   currentRoomId = null;
