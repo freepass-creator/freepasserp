@@ -28,18 +28,13 @@ const state = {
 };
 
 // DOM refs
-let $grid, $sidebar, $overlay, $close, $count, $search, $reset, $filterSections;
+let $grid, $count, $search;
 let $detail, $detailContent;
 
 function bindDOM() {
   $grid = document.getElementById('plsMCatalogGrid');
-  $sidebar = document.getElementById('plsMCatalogSidebar');
-  $overlay = document.getElementById('plsMCatalogOverlay');
-  $close = document.getElementById('plsMCatalogClose');
   $count = document.getElementById('plsMCatalogCount');
   $search = document.getElementById('plsMCatalogSearch');
-  $reset = document.getElementById('plsMCatalogReset');
-  $filterSections = document.getElementById('plsMCatalogFilterSections');
   $detail = document.getElementById('plsMDetail');
   $detailContent = document.getElementById('plsMDetailContent');
 }
@@ -55,16 +50,8 @@ function passesSearch(item, query) {
 
 function applyFilters() {
   let result = state.allProducts.filter(item => passesSearch(item, state.searchQuery));
-  // 필터 그룹 적용
-  FILTER_GROUPS.forEach(g => {
-    const selected = state.filters[g.key];
-    if (!selected || !selected.length) return;
-    const set = new Set(selected);
-    const filtered = result.filter(item => set.has(String(item[g.key] || '').trim()));
-    if (filtered.length) result = filtered; // 결과가 있으면 적용, 없으면 무시
-  });
   state.filteredProducts = result;
-  if ($count) $count.textContent = result.length;
+  if ($count) $count.textContent = `${result.length}대`;
   renderGrid();
 }
 
@@ -236,83 +223,9 @@ function bindGallery(container) {
 
 // ─── 필터 사이드바 ───────────────────────────────────────────────────────────
 
-// ─── 필터 섹션 렌더링 ────────────────────────────────────────────────────────
-
-const FILTER_GROUPS = [
-  { key: 'maker',        title: '제조사' },
-  { key: 'model',        title: '모델' },
-  { key: 'fuel',         title: '연료' },
-  { key: 'vehicleClass', title: '차종구분' },
-  { key: 'productType',  title: '상품구분' },
-  { key: 'extColor',     title: '색상' },
-];
-
-function renderFilterSections() {
-  if (!$filterSections) return;
-  const optionSets = {};
-  FILTER_GROUPS.forEach(g => { optionSets[g.key] = new Set(); });
-  state.allProducts.forEach(p => {
-    FILTER_GROUPS.forEach(g => {
-      const v = String(p[g.key] || '').trim();
-      if (v && v !== '-') optionSets[g.key].add(v);
-    });
-  });
-
-  $filterSections.innerHTML = FILTER_GROUPS.map(g => {
-    const options = [...optionSets[g.key]].sort();
-    if (!options.length) return '';
-    const selected = new Set(state.filters[g.key] || []);
-    const body = options.map(opt => {
-      const checked = selected.has(opt) ? ' checked' : '';
-      return `<label class="catalog-filter-option"><input type="checkbox" data-group="${esc(g.key)}" value="${esc(opt)}"${checked}><span>${esc(opt)}</span></label>`;
-    }).join('');
-    return `<div class="catalog-sidebar__section" data-filter-key="${esc(g.key)}">
-      <div class="catalog-sidebar__title">${esc(g.title)}</div>
-      <div class="catalog-filter-body">${body}</div>
-    </div>`;
-  }).join('');
-}
-
-function bindFilterCheckboxes() {
-  $filterSections?.addEventListener('change', (e) => {
-    const input = e.target.closest('input[type="checkbox"][data-group]');
-    if (!input) return;
-    const key = input.dataset.group;
-    if (!state.filters[key]) state.filters[key] = [];
-    const set = new Set(state.filters[key]);
-    if (input.checked) set.add(input.value); else set.delete(input.value);
-    state.filters[key] = [...set];
-    applyFilters();
-  });
-}
-
-function openFilter() {
-  renderFilterSections();
-  $sidebar?.classList.add('is-open');
-  $overlay?.classList.add('is-open');
-  updateFilterIcon(true);
-}
-function closeFilter() {
-  $sidebar?.classList.remove('is-open');
-  $overlay?.classList.remove('is-open');
-  updateFilterIcon(false);
-}
-function updateFilterIcon(open) {
-  const btn = document.getElementById('mobile-filter-btn');
-  const svg = btn?.querySelector('svg');
-  if (svg) svg.innerHTML = open ? '<path d="m9 18 6-6-6-6"/>' : '<path d="m15 18-6-6 6-6"/>';
-}
-
 // ─── 이벤트 바인딩 ───────────────────────────────────────────────────────────
 
 function bindEvents() {
-  // 필터 토글
-  document.getElementById('mobile-filter-btn')?.addEventListener('click', () => {
-    $sidebar?.classList.contains('is-open') ? closeFilter() : openFilter();
-  });
-  $close?.addEventListener('click', closeFilter);
-  $overlay?.addEventListener('click', closeFilter);
-
   // 검색
   let timer;
   $search?.addEventListener('input', () => {
@@ -320,18 +233,6 @@ function bindEvents() {
     clearTimeout(timer);
     timer = setTimeout(applyFilters, 150);
   });
-
-  // 초기화
-  $reset?.addEventListener('click', () => {
-    state.searchQuery = '';
-    state.filters = { periods: DEFAULT_PERIODS.slice() };
-    if ($search) $search.value = '';
-    renderFilterSections();
-    applyFilters();
-  });
-
-  // 필터 체크박스
-  bindFilterCheckboxes();
 
   // 카드 클릭 → 상세
   $grid?.addEventListener('click', (e) => {
