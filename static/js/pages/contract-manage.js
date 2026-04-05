@@ -8,6 +8,7 @@ import { showToast, showConfirm } from '../core/toast.js';
 import { validateContract } from '../core/validators.js';
 import { savePageState, loadPageState } from '../core/page-state.js';
 import { formatPhone, bindAutoFormat } from '../core/management-format.js';
+import { maskName, maskPhone, maskBirth, encryptField, decryptField, requestDecryptPassword } from '../core/crypto.js';
 
 const { uploadContractFilesDetailed, deleteProductImagesByUrls } = await import(`../firebase/firebase-storage.js?v=${window.APP_VER || '1'}`);
 
@@ -622,15 +623,29 @@ async function handleSave() {
     rent_month: String(fields.rent_month.value || '').replace(/[^\d]/g, '') || '',
     rent_amount: parseMoneyValue(fields.rent_amount.value),
     deposit_amount: parseMoneyValue(fields.deposit_amount.value),
-    customer_name: fields.customer_name.value.trim(),
-    customer_birth: fields.customer_birth.value.trim(),
-    customer_phone: fields.customer_phone.value.trim(),
+    customer_name: maskName(fields.customer_name.value.trim()),
+    customer_birth: maskBirth(fields.customer_birth.value.trim()),
+    customer_phone: maskPhone(fields.customer_phone.value.trim()),
     checks: Object.fromEntries(CHECK_FIELD_KEYS.map((key) => [key, !!fields[key]?.checked])),
     docs
   };
 
+  // 원본이 있으면 암호화 저장
+  const rawName = fields.customer_name.value.trim();
+  const rawBirth = fields.customer_birth.value.trim();
+  const rawPhone = fields.customer_phone.value.trim();
+  if (rawName || rawBirth || rawPhone) {
+    const pw = await requestDecryptPassword();
+    if (!pw) throw new Error('비밀번호를 입력해야 저장할 수 있습니다.');
+    payload._secure = {
+      customer_name: rawName ? await encryptField(rawName, pw) : '',
+      customer_birth: rawBirth ? await encryptField(rawBirth, pw) : '',
+      customer_phone: rawPhone ? await encryptField(rawPhone, pw) : '',
+    };
+  }
+
   // 부분 업데이트이므로 payload에 존재하는 필드만 검증
-  if (payload.customer_phone && !/^[\d\-\s]{9,15}$/.test(payload.customer_phone.replace(/[^0-9]/g, ''))) {
+  if (rawPhone && !/^[\d\-\s]{9,15}$/.test(rawPhone.replace(/[^0-9]/g, ''))) {
     throw new Error('고객 연락처 형식이 올바르지 않습니다.');
   }
 
@@ -680,6 +695,42 @@ async function bootstrap() {
     // 모바일 뒤로가기: 계약 입력/수정 → 계약목록
     document.getElementById('mobile-back-btn')?.addEventListener('click', () => {
       closeMobileContractFormView();
+    });
+
+    // 개인정보 원본 열람
+    qs('#contract-reveal-btn')?.addEventListener('click', async () => {
+      if (!currentContract) return;
+      const secure = currentContract._secure;
+      if (!secure) { showToast('암호화된 개인정보가 없습니다.', 'error'); return; }
+      const pw = await requestDecryptPassword();
+      if (!pw) return;
+      const name = await decryptField(secure.customer_name, pw);
+      if (name === null) { showToast('비밀번호가 올바르지 않습니다.', 'error'); return; }
+      const birth = await decryptField(secure.customer_birth, pw);
+      const phone = await decryptField(secure.customer_phone, pw);
+      fields.customer_name.value = name || '';
+      fields.customer_birth.value = birth || '';
+      fields.customer_phone.value = phone || '';
+      showToast('개인정보가 표시됩니다. 30초 후 자동 마스킹됩니다.', 'info');
+      setTimeout(() => {
+        if (currentContract) {
+          fields.customer_name.value = currentContract.customer_name || '';
+          fields.customer_birth.value = currentContract.customer_birth || '';
+          fields.customer_phone.value = currentContract.customer_phone || '';
+        }
+      }, 30000);
+    });
+
+    // 첨부파일 열람 시 비밀번호 확인
+    const docList = qs('#contract-doc-list');
+    docList?.addEventListener('click', async (e) => {
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      e.preventDefault();
+      const pw = await requestDecryptPassword();
+      if (!pw) return;
+      // 비밀번호 확인만 하고 (암호화된 파일이 아니므로) 원본 링크로 이동
+      window.open(link.href, '_blank');
     });
 
     chatButton?.addEventListener('click', async () => {
