@@ -270,4 +270,7 @@ async function init() {
   });
 }
 
+export function onHide() { document.body.classList.remove('page-product'); }
+export function onShow() { document.body.classList.add('page-product'); }
+
 init().catch(e => console.error('[mobile/product-list]', e));

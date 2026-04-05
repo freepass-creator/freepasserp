@@ -72,4 +72,7 @@ async function init() {
   });
 }
 
+export function onHide() { document.body.classList.remove('page-settings'); }
+export function onShow() { document.body.classList.add('page-settings'); }
+
 init().catch((e) => console.error('[mobile/settings]', e));

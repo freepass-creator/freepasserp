@@ -94,6 +94,7 @@ function renderMessages(messages) {
 function openRoom(roomId) {
   currentRoomId = roomId;
   document.body.classList.add('chat-m-open');
+  history.pushState({ chatRoom: true }, '');
 
   // 읽음 처리
   markRoomRead(roomId, currentUser.uid, currentProfile.role).catch(() => {});
@@ -108,7 +109,7 @@ function openRoom(roomId) {
 
   // 목록 active 갱신
   $rooms?.querySelectorAll('.m-list-card').forEach(el => {
-    el.classList.toggle('is-active', el.dataset.roomId === roomId);
+    el.classList.toggle('is-active', el.getAttribute('data-room-id') === roomId);
   });
 
   // 입력 포커스
@@ -138,7 +139,7 @@ function bindEvents() {
   // 방 클릭
   $rooms?.addEventListener('click', (e) => {
     const card = e.target.closest('.m-list-card[data-room-id]');
-    if (card) openRoom(card.dataset.roomId);
+    if (card) openRoom(card.getAttribute('data-room-id'));
   });
 
   // 메시지 전송
@@ -160,20 +161,12 @@ function bindEvents() {
     }
   });
 
-  // 뒤로가기 (popstate)
-  if (window.setMobileBackHandler) {
-    window.setMobileBackHandler(async () => {
-      if (document.body.classList.contains('chat-m-open')) {
-        if ($msgInput?.value.trim()) {
-          const ok = await showConfirm('작성 중인 메시지가 있습니다.\n대화목록으로 돌아가시겠습니까?');
-          if (!ok) return true;
-        }
-        closeRoom();
-        return true;
-      }
-      return false;
-    });
-  }
+  // 핸드폰 뒤로가기 → 채팅방 닫기
+  window.addEventListener('popstate', () => {
+    if (document.body.classList.contains('chat-m-open')) {
+      closeRoom();
+    }
+  });
 }
 
 // ─── 초기화 ──────────────────────────────────────────────────────────────────
