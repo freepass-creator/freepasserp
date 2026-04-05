@@ -929,6 +929,7 @@ function _registerMobileBack() {
 let _mounted = false;
 export async function mount() {
   document.body.classList.add('page-contract');
+  window._mobileFilterConfig = { sidebar: 'contractMFilterSidebar', overlay: 'contractMFilterOverlay', close: 'contractMFilterClose' };
   _registerMobileBack();
   // 상품리스트에서 계약으로 넘어온 경우: 즉시 폼 뷰 표시
   if (localStorage.getItem('freepass_pending_contract_seed') && isMobileQuery.matches) {
@@ -942,6 +943,7 @@ export async function mount() {
 export function onHide() {
   document.body.classList.remove('page-contract');
   document.body.classList.remove('contract-m-open');
+  window._mobileFilterConfig = null;
   if (window.clearMobileBackHandler) window.clearMobileBackHandler();
 }
 export function unmount() {

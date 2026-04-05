@@ -200,6 +200,60 @@ function initMobileBackTrap() {
   });
 }
 
+// ─── 공통 모바일 필터 토글 ───────────────────────────────────────────────────
+// 각 페이지 JS에서 window._mobileFilterConfig = { sidebar, overlay, close } 설정
+// 상품목록은 자체 처리, 대화·계약은 여기서 공통 처리
+
+function updateFilterIcon(open) {
+  const btn = document.getElementById('mobile-filter-btn');
+  if (!btn) return;
+  const svg = btn.querySelector('svg');
+  if (!svg) return;
+  svg.innerHTML = open ? '<path d="m9 18 6-6-6-6"/>' : '<path d="m15 18-6-6 6-6"/>';
+}
+
+function initMobileFilterToggle() {
+  const btn = document.getElementById('mobile-filter-btn');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    // 상품목록은 자체 핸들러가 먼저 바인딩되므로 여기서는 대화·계약만 처리
+    const page = window.__currentPage || '';
+    if (page === '/product-list') return; // product-list.js에서 처리
+
+    const cfg = window._mobileFilterConfig;
+    if (!cfg) return;
+    const sidebar = document.getElementById(cfg.sidebar);
+    const overlay = document.getElementById(cfg.overlay);
+    if (!sidebar) return;
+
+    const isOpen = sidebar.classList.contains('is-open');
+    if (isOpen) {
+      sidebar.classList.remove('is-open');
+      overlay?.classList.remove('is-open');
+      updateFilterIcon(false);
+    } else {
+      sidebar.classList.add('is-open');
+      overlay?.classList.add('is-open');
+      updateFilterIcon(true);
+    }
+  });
+}
+
+// 공통 필터 닫기 (오버레이 클릭, X 버튼)
+document.addEventListener('click', (e) => {
+  const cfg = window._mobileFilterConfig;
+  if (!cfg) return;
+  const closeBtn = e.target.closest(`#${cfg.close}`);
+  const overlayEl = e.target.id === cfg.overlay ? e.target : null;
+  if (!closeBtn && !overlayEl) return;
+  const sidebar = document.getElementById(cfg.sidebar);
+  const overlay = document.getElementById(cfg.overlay);
+  sidebar?.classList.remove('is-open');
+  overlay?.classList.remove('is-open');
+  updateFilterIcon(false);
+});
+
 // ─── 초기화 ──────────────────────────────────────────────────────────────────
 
 requireAuth().then(({ profile }) => {
@@ -208,4 +262,5 @@ requireAuth().then(({ profile }) => {
   updateActiveTab();
   initMobileBackTrap();
   initKeyboardAdjust();
+  initMobileFilterToggle();
 }).catch(() => {});

@@ -173,9 +173,11 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   flex-shrink: 0;
 }
 
-/* 필터 버튼: 상품목록 페이지에서만 표시 */
+/* 필터 버튼: 상품목록·대화·계약 페이지에서 표시 */
 .mobile-topbar__filter-btn { display: none !important; }
-body[data-page="상품목록"] .mobile-topbar__filter-btn { display: inline-flex !important; }
+body[data-page="상품목록"] .mobile-topbar__filter-btn,
+body[data-page="대화"] .mobile-topbar__filter-btn,
+body[data-page="계약관리"] .mobile-topbar__filter-btn { display: inline-flex !important; }
 
 .mobile-topbar__user-info {
   display: flex;
@@ -470,5 +472,50 @@ body[data-page="상품목록"] .mobile-topbar__filter-btn { display: inline-flex
   padding: 60px var(--space-5);
   text-align: center;
   font-size: var(--font-size-lg); color: #94a3b8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   공통 모바일 필터 오버레이/사이드바 (대화·계약 페이지)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.m-filter-overlay {
+  display: none;
+}
+.m-filter-sidebar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .m-filter-overlay {
+    display: none;
+    position: fixed;
+    top: var(--mobile-topbar-height);
+    left: 0;
+    right: 0;
+    bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
+    z-index: 90;
+    background: rgba(15, 23, 42, 0.4);
+  }
+  .m-filter-overlay.is-open { display: block; }
+
+  .m-filter-sidebar {
+    display: block;
+    position: fixed;
+    right: 0;
+    top: var(--mobile-topbar-height);
+    bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
+    z-index: 91;
+    width: 280px;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    border-left: 1px solid #e2e8f0;
+    background: #fff;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .m-filter-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: -4px 0 20px rgba(15, 23, 42, 0.1);
+  }
 }
 

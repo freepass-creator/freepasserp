@@ -851,9 +851,7 @@ function _updateFilterIcon(open) {
   const svg = btn.querySelector('svg');
   if (!svg) return;
   // 열림: > (닫기), 닫힘: < (열기)
-  svg.innerHTML = open
-    ? '<path d="m9 18 6-6-6-6"/>'
-    : '<path d="m15 18-6-6 6-6"/>';
+  svg.innerHTML = open ? '<path d="m9 18 6-6-6-6"/>' : '<path d="m15 18-6-6 6-6"/>';
 }
 function openMobileSidebar() {
   renderMobileSidebarFilters();

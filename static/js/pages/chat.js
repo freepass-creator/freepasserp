@@ -580,6 +580,8 @@ function _registerMobileBack() {
 let _mounted = false;
 export async function mount() {
   document.body.classList.add('page-chat');
+  // 모바일 필터 설정
+  window._mobileFilterConfig = { sidebar: 'chatMFilterSidebar', overlay: 'chatMFilterOverlay', close: 'chatMFilterClose' };
   _registerMobileBack();
   bindDOM();
   _mounted = false;
@@ -589,6 +591,7 @@ export async function mount() {
 export function onHide() {
   document.body.classList.remove('page-chat');
   document.body.classList.remove('chat-m-open');
+  window._mobileFilterConfig = null;
   if (window.clearMobileBackHandler) window.clearMobileBackHandler();
 }
 export function onShow() {
