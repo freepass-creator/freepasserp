@@ -481,7 +481,7 @@ body.chat-m-open .work-page {
   font-size: 13px;
   font-weight: 600;
   color: #64748b;
-  padding: 16px 16px 2px;
+  padding: 16px 16px 0;
 }
 .md-section-head svg {
   width: 14px;
@@ -522,7 +522,7 @@ body.chat-m-open .work-page {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 16px 4px;
+  padding: 0 16px 2px;
   flex-wrap: wrap;
 }
 .md-vehicle-carno {
