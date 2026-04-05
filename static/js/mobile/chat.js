@@ -155,7 +155,7 @@ function bindEvents() {
         sender_partner_code: currentProfile.company_code || '',
         text
       });
-      if ($msgInput) $msgInput.value = '';
+      if ($msgInput) { $msgInput.value = ''; $msgInput.focus(); }
     } catch (err) {
       showToast('메시지 전송에 실패했습니다.', 'error');
     }
