@@ -452,12 +452,10 @@ body.chat-m-open .work-page {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .md-section-head {
-  font-size: 14px;
-  font-weight: 700;
-  color: #0f172a;
-  padding: 16px 16px 8px;
-  border-bottom: 2px solid #1b2a4a;
-  margin: 0 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  padding: 20px 16px 6px;
 }
 .md-card {
   background: #fff;
