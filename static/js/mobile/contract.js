@@ -76,25 +76,13 @@ function applyRoleFilter(contracts) {
 // ─── 필터 사이드바 ───────────────────────────────────────────────────────────
 
 function bindFilter() {
-  const btn = document.getElementById('mobile-filter-btn');
-  const sidebar = document.getElementById('contractMFilterSidebar');
-  const overlay = document.getElementById('contractMFilterOverlay');
-  const close = document.getElementById('contractMFilterClose');
   const countEl = document.getElementById('contractMFilterCount');
   const search = document.getElementById('contractMFilterSearch');
 
   function updateCount() { if (countEl) countEl.textContent = allContracts.length; }
 
-  function toggleFilter() {
-    const open = sidebar?.classList.toggle('is-open');
-    overlay?.classList.toggle('is-open', open);
-    const svg = btn?.querySelector('svg');
-    if (svg) svg.innerHTML = open ? '<path d="m9 18 6-6-6-6"/>' : '<path d="m15 18-6-6 6-6"/>';
-  }
-
-  btn?.addEventListener('click', toggleFilter);
-  close?.addEventListener('click', toggleFilter);
-  overlay?.addEventListener('click', toggleFilter);
+  // 필터 config (mobile-shell.js 공통 핸들러에서 사용)
+  window._mobileFilterConfig = { sidebar: 'contractMFilterSidebar', overlay: 'contractMFilterOverlay', close: 'contractMFilterClose' };
 
   let timer;
   search?.addEventListener('input', () => {
@@ -132,6 +120,7 @@ async function init() {
 
 export function onHide() {
   document.body.classList.remove('page-contract', 'contract-m-open');
+  window._mobileFilterConfig = null;
 }
 export function onShow() {
   document.body.classList.add('page-contract');

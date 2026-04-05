@@ -11,10 +11,10 @@ let pendingNavigationPath = '';
 let isPageNavigating = false;
 
 const PAGE_MODULE_PATHS = {
-  '/product-list': '/static/js/pages/product-list.js',
-  '/chat':         '/static/js/pages/chat.js',
-  '/contract':     '/static/js/pages/contract-manage.js',
-  '/settings':     '/static/js/pages/settings.js',
+  '/product-list': '/static/js/mobile/product-list.js',
+  '/chat':         '/static/js/mobile/chat.js',
+  '/contract':     '/static/js/mobile/contract.js',
+  '/settings':     '/static/js/mobile/settings.js',
 };
 
 const pageCache = new Map();

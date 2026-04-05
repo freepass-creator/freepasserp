@@ -180,6 +180,9 @@ async function init() {
   currentUser = user;
   currentProfile = profile;
 
+  // 필터 config (mobile-shell.js에서 사용)
+  window._mobileFilterConfig = { sidebar: 'chatMFilterSidebar', overlay: 'chatMFilterOverlay', close: 'chatMFilterClose' };
+
   bindEvents();
 
   // 상품 맵 구축 (방 목록에 차량 정보 표시용)
@@ -201,6 +204,7 @@ async function init() {
 
 export function onHide() {
   document.body.classList.remove('page-chat', 'chat-m-open');
+  window._mobileFilterConfig = null;
   if (window.clearMobileBackHandler) window.clearMobileBackHandler();
 }
 export function onShow() {
