@@ -847,21 +847,14 @@ const MOBILE_FILTER_KEYS = ['rent','deposit','periods','productType','maker','mo
 
 function openMobileSidebar() {
   renderMobileSidebarFilters();
-  if (!$plsMSidebar) return;
-  // FAB 위치 반대쪽에서 사이드바 열기
-  const fabRight = window._isFabOnRight ? window._isFabOnRight() : true;
-  $plsMSidebar.classList.toggle('from-left', fabRight);   // FAB 우측 → 사이드바 좌측
-  $plsMSidebar.classList.toggle('from-right', !fabRight);  // FAB 좌측 → 사이드바 우측
-  $plsMSidebar.classList.add('is-open');
+  $plsMSidebar?.classList.add('is-open');
   $plsMOverlay?.classList.add('is-open');
-  // FAB 숨김
   const fab = document.getElementById('mobile-filter-btn');
   if (fab) fab.style.display = 'none';
 }
 function closeMobileSidebar() {
   $plsMSidebar?.classList.remove('is-open');
   $plsMOverlay?.classList.remove('is-open');
-  // FAB 복원
   const fab = document.getElementById('mobile-filter-btn');
   if (fab) fab.style.display = '';
 }
@@ -1173,8 +1166,6 @@ function bindMobile() {
     fab.addEventListener('touchend', onEnd);
     fab.addEventListener('touchcancel', onEnd);
 
-    // FAB 위치에 따라 사이드바를 알려주는 함수
-    window._isFabOnRight = () => fabOnRight;
   }
   // 사이드바 닫기
   $plsMClose?.addEventListener('click', closeMobileSidebar);
