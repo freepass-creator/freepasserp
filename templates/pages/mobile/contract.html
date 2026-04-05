@@ -1,77 +1,9 @@
 {% extends 'pages/layout/workspace-mobile.html' %}
 {% block workspace_body %}
-<div class="work-page min-h-work contract-page-shell">
-<!-- 모바일 계약 목록 -->
-<div class="contract-m-list" id="contract-m-list"></div>
-<!-- 계약 폼 (목록에서 선택 시 전체화면) -->
-<div class="panel-slot">
-<section class="panel panel--form">
-<div class="panel-head panel-head-default">
-<div class="panel-head-title-wrap"><div class="panel-head-title" id="contract-detail-title">계약정보</div></div>
-<div class="panel-head-actions">
-<button class="inline-button btn-icon-only btn-tone-inquiry" id="contract-chat-btn" title="대화" type="button" disabled><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>
-<button class="inline-button btn-icon-only btn-tone-save" id="contract-submit-head" title="저장" type="button"><span class="btn-mode-icon btn-mode-icon--view"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg></span><span class="btn-mode-icon btn-mode-icon--write"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg></span></button>
-<button class="inline-button btn-icon-only btn-danger" disabled id="contract-delete-head" title="삭제" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
-</div>
-</div>
-<div class="panel-body manage-form-body">
-<div class="manage-idle-hint">목록에서 계약을 선택하세요.</div>
-<form class="form-stack manage-form-shell" id="contract-form">
-<input id="contract-form_mode" type="hidden" value="create"/>
-<input id="contract_code_hidden" type="hidden"/>
-<input id="policy_code" type="hidden"/>
-<input id="product_code" type="hidden"/>
-<section class="form-section">
-<div class="section-title">계약체크</div>
-<div class="contract-check-grid">
-<label class="contract-check-item"><input id="deposit_confirmed" type="checkbox"/><span>계약금</span></label>
-<label class="contract-check-item"><input id="docs_confirmed" type="checkbox"/><span>서류</span></label>
-<label class="contract-check-item"><input id="approval_confirmed" type="checkbox"/><span>승인</span></label>
-<label class="contract-check-item"><input id="contract_confirmed" type="checkbox"/><span>계약서</span></label>
-<label class="contract-check-item"><input id="balance_confirmed" type="checkbox"/><span>잔금</span></label>
-<label class="contract-check-item"><input id="delivery_confirmed" type="checkbox"/><span>인도</span></label>
-</div>
-</section>
-<section class="form-section">
-<div class="section-title">계약정보</div>
-<div class="form-grid">
-<div class="field"><label for="contract_status">계약상태</label><select id="contract_status"><option value="계약대기">계약대기</option><option value="계약요청">계약요청</option><option value="계약발송">계약발송</option><option value="계약완료">계약완료</option><option value="계약철회">계약철회</option></select></div>
-<div class="field"><label for="contract_code">계약코드</label><input id="contract_code" readonly/></div>
-<div class="field"><label for="partner_code">공급사코드</label><input id="partner_code" readonly/></div>
-<div class="field"><label for="agent_code">영업채널코드</label><input id="agent_code" readonly/></div>
-<div class="field"><label for="car_number">차량번호</label><input id="car_number" readonly/></div>
-<div class="field"><label for="vehicle_name">세부모델</label><input id="vehicle_name" readonly/></div>
-<div class="field"><label for="rent_month">대여기간</label><select id="rent_month"><option value="">선택</option></select></div>
-<div class="field"><label for="rent_amount">대여료</label><input id="rent_amount" inputmode="numeric" placeholder="자동반영"/></div>
-<div class="field"><label for="deposit_amount">보증금</label><input id="deposit_amount" inputmode="numeric" placeholder="자동반영"/></div>
-<div class="field"><label for="customer_name">고객명</label><input id="customer_name"/></div>
-<div class="field"><label for="customer_birth">생년월일</label><input id="customer_birth" placeholder="900101"/></div>
-<div class="field"><label for="customer_phone">연락처</label><input id="customer_phone" placeholder="010-0000-0000"/></div>
-<div class="field full"><button type="button" class="inline-button btn-tone-edit" id="contract-reveal-btn" style="width:100%"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="16" r="1"/><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg> 개인정보 원본 열람</button></div>
-</div>
-</section>
-<section class="form-section">
-<div class="section-title">요청서류</div>
-<div class="field full" id="contract-doc-editor-field">
-<label for="contract_docs">면허증 및 요청서류</label>
-<div class="upload-dropzone" id="contract-doc-dropzone">
-<input accept="image/*,.pdf,.jpg,.jpeg,.png,.webp,.heic" id="contract_docs" multiple type="file"/>
-<svg class="upload-dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-<div class="upload-dropzone-text">파일을 선택하여 업로드</div>
-</div>
-</div>
-<div class="field full">
-<div class="img-thumb-list" id="contract-doc-list"></div>
-<div class="img-thumb-footer" id="contract-doc-toolbar">
-<span class="img-thumb-summary" id="contract-doc-summary">등록된 서류가 없습니다.</span>
-<button class="inline-button btn-tone-hide" id="contract-doc-clear" type="button">전체 삭제</button>
-</div>
-</div>
-</section>
-</form>
-<p class="message" id="contract-message"></p>
-</div>
-</section>
+<div class="work-page min-h-work">
+<!-- 계약 목록 -->
+<div class="contract-m-list" id="contract-m-list" style="display:block;">
+  <div class="m-list-empty">계약을 불러오는 중...</div>
 </div>
 <!-- 필터 사이드바 -->
 <div class="m-filter-overlay" id="contractMFilterOverlay"></div>
@@ -92,19 +24,9 @@
     <svg class="catalog-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
     <input class="catalog-search" id="contractMFilterSearch" type="search" placeholder="고객명, 차량번호 검색...">
   </div>
-  <div id="contractMFilterSections">
-    <div class="catalog-sidebar__section" data-filter-key="status">
-      <div class="catalog-sidebar__title">계약상태</div>
-      <div class="catalog-filter-body" id="contractMFilterStatus"></div>
-    </div>
-    <div class="catalog-sidebar__section" data-filter-key="provider">
-      <div class="catalog-sidebar__title">공급사</div>
-      <div class="catalog-filter-body" id="contractMFilterProviders"></div>
-    </div>
-  </div>
 </aside>
 </div>
 {% endblock %}
 {% block workspace_page_js %}
-<script type="module" src="{{ url_for('static', filename='js/pages/contract-manage.js') }}" data-page-script="true"></script>
+<script type="module" src="{{ url_for('static', filename='js/mobile/contract.js') }}" data-page-script="true"></script>
 {% endblock %}
