@@ -84,6 +84,11 @@
   flex: 1 1 0;
   min-height: 0;
 }
+.admin-tab-panel .pls-grid-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+}
 .admin-tab-panel[hidden] { display: none; }
 .admin-tab-panel--padded { padding: var(--panel-body-pad, 16px); overflow-y: auto; }
 
