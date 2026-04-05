@@ -362,6 +362,7 @@ function renderInsuranceSection(product, termFields = {}) {
   const rows = [
     ['대인', policy.injuryCompensationLimit, policy.injuryDeductible],
     ['대물', policy.propertyCompensationLimit, policy.propertyDeductible],
+    ['자기신체사고', policy.selfBodyAccident, policy.selfBodyDeductible],
     ['무보험차상해', policy.uninsuredDamage, policy.uninsuredDeductible],
     ['자기차량손해', policy.ownDamageCompensation, formatOwnDamageDeductible(policy)],
     ['긴급출동', policy.annualRoadsideAssistance, '-']
