@@ -169,10 +169,6 @@ async function handleMobileBack() {
   return true;
 }
 
-function initKeyboardAdjust() {
-  // 키보드 대응은 CSS(100dvh)와 브라우저 기본 동작에 맡김
-}
-
 /** iOS 에지 스와이프 등으로 popstate 발생 시 모바일 뷰 클래스 잔류 방지 */
 function cleanupMobileViewClasses() {
   const MOBILE_VIEW_CLASSES = ['chat-m-open', 'contract-m-open'];
@@ -256,7 +252,6 @@ if (isMobile) {
     renderTopbarUser(profile);
     updateActiveTab();
     initMobileBackTrap();
-    initKeyboardAdjust();
     initMobileFilterToggle();
   }).catch(() => {});
 }

@@ -430,16 +430,6 @@ body.chat-m-open .work-page {
   font-size: 10px !important;
 }
 
-/* 가로 모드 대응 — 채팅 입력창 가려짐 방지 */
-@media (orientation: landscape) {
-  body.chat-m-open .layout-633 {
-    bottom: 0 !important;
-  }
-  body.chat-m-open #message-list {
-    max-height: 40vh !important;
-  }
-}
-
 /* 터치 스크롤 최적화 */
 .main-shell--new,
 .chat-m-rooms,
