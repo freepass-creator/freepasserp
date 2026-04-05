@@ -57,6 +57,9 @@
 
     // PWA 설치 프롬프트
     (function(){
+      // 이미 앱으로 실행 중이면 배너 불필요
+      if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone)return;
+
       let deferredPrompt=null;
       const banner=document.getElementById('pwa-install-banner');
       const DISMISS_KEY='fp.pwa.dismissed';
