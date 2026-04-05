@@ -83,9 +83,34 @@
 .pls-m-catalog-wrap { display: block !important; }
 .chat-m-rooms { display: block !important; }
 #contract-m-list { display: block !important; }
-.m-filter-overlay { display: none; }
-.m-filter-sidebar { display: block; transform: translateX(100%); transition: transform 0.25s ease; }
-.m-filter-sidebar.is-open { transform: translateX(0); }
+/* 필터 패널: 상단바 밑 ~ 화면 하단 (탭바 덮기) */
+.m-filter-overlay {
+  display: none;
+  position: fixed;
+  top: var(--mobile-topbar-height);
+  left: 0; right: 0; bottom: 0;
+  z-index: 300;
+  background: rgba(15, 23, 42, 0.4);
+}
+.m-filter-overlay.is-open { display: block; }
+.m-filter-sidebar {
+  display: block;
+  position: fixed;
+  top: var(--mobile-topbar-height);
+  right: 0; bottom: 0;
+  z-index: 301;
+  width: 280px;
+  background: #fff;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-left: 1px solid #e2e8f0;
+}
+.m-filter-sidebar.is-open {
+  transform: translateX(0);
+  box-shadow: -4px 0 16px rgba(15, 23, 42, 0.1);
+}
 
 /* 데스크탑 전용 요소 숨김 */
 .pls-grid-panel { display: none !important; }
