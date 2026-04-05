@@ -1,0 +1,33 @@
+{% extends 'base-mobile.html' %}
+{% block body %}
+<div class="dashboard-shell dashboard-shell--new">
+  <div class="main-area">
+    <!-- 모바일 상단 타이틀바 -->
+    <div class="mobile-topbar" id="mobile-topbar">
+      <div class="mobile-topbar__left">
+        <div class="mobile-topbar__user-info" id="mobile-topbar-user">
+          <span class="mobile-topbar__company" id="mobile-topbar-company"></span>
+          <span class="mobile-topbar__name" id="mobile-topbar-name"></span>
+          <span class="mobile-topbar__rank" id="mobile-topbar-rank"></span>
+        </div>
+      </div>
+      <div class="mobile-topbar__right">
+        <button class="mobile-topbar__icon-btn mobile-topbar__filter-btn" id="mobile-filter-btn" type="button" aria-label="필터">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+      </div>
+    </div>
+    <main class="main-shell main-shell--new">
+      {% block workspace_body %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<!-- 모바일 하단 탭바 -->
+<nav class="mobile-tab-bar" id="mobile-tab-bar" role="tablist"></nav>
+
+{% endblock %}
+{% block page_js %}
+<script type="module" src="{{ url_for('static', filename='js/core/mobile-shell.js') }}"></script>
+{% block workspace_page_js %}{% endblock %}
+{% endblock %}

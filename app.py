@@ -26,6 +26,17 @@ def inject_app_version():
     return {'app_version': APP_VERSION}
 
 
+# ─── 모바일 판별 ─────────────────────────────────────────────────────────────
+
+import functools
+
+_MOBILE_RE = re.compile(r'Mobi|Android|iPhone|iPad|iPod', re.IGNORECASE)
+
+def _is_mobile():
+    ua = request.headers.get('User-Agent', '')
+    return bool(_MOBILE_RE.search(ua))
+
+
 # ─── 구글시트 유틸 ────────────────────────────────────────────────────────────
 
 def _build_google_sheet_csv_url(source_url: str) -> str:
@@ -87,6 +98,11 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login')
 def login():
+    if _is_mobile():
+        try:
+            return render_template('mobile/login.html', page_title='로그인')
+        except Exception:
+            pass
     return render_template('login.html', page_title='로그인')
 
 @auth_bp.route('/signup')
@@ -120,6 +136,13 @@ _NEW_ROUTES = [
 
 def _make_new_view(template: str, title: str):
     def view():
+        if _is_mobile():
+            # 모바일 템플릿이 있으면 사용, 없으면 데스크탑 폴백
+            mobile_tpl = template.replace('pages/', 'pages/mobile/')
+            try:
+                return render_template(mobile_tpl, page_title=title)
+            except Exception:
+                pass
         return render_template(template, page_title=title)
     return view
 

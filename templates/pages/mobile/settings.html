@@ -1,0 +1,7 @@
+{% extends 'pages/layout/workspace-mobile.html' %}
+{% block workspace_body %}
+<div class="work-page min-h-work settings-page-shell">
+{% endblock %}
+{% block workspace_page_js %}
+<script type="module" src="{{ url_for('static', filename='js/pages/settings.js') }}" data-page-script="true"></script>
+{% endblock %}

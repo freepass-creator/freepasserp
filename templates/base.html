@@ -2,12 +2,9 @@
 <html lang="ko" class="no-transition">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#1b2a4a">
   <meta name="description" content="FREEPASS ERP — 렌터카 장기렌트 B2B 관리 시스템">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>{{ page_title }} — FREEPASS ERP</title>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/icon.svg') }}">
@@ -36,72 +33,10 @@
 </head>
 <body data-page="{{ page_title }}">
   {% block body %}{% endblock %}
-  <!-- PWA 설치 배너 -->
-  <div id="pwa-install-banner" class="pwa-install-banner" hidden>
-    <div class="pwa-install-banner__content">
-      <img src="{{ url_for('static', filename='icons/icon-192.png') }}" alt="" width="40" height="40" class="pwa-install-banner__icon">
-      <div class="pwa-install-banner__text">
-        <strong>FREEPASS ERP</strong>
-        <span>앱을 설치하면 더 빠르게 이용할 수 있어요</span>
-      </div>
-    </div>
-    <div class="pwa-install-banner__actions">
-      <button type="button" id="pwa-install-dismiss" class="pwa-install-banner__btn pwa-install-banner__btn--dismiss">닫기</button>
-      <button type="button" id="pwa-install-accept" class="pwa-install-banner__btn pwa-install-banner__btn--accept">설치</button>
-    </div>
-  </div>
   <script>
     window.APP_VER='{{ app_version }}';
-    // 모바일 판별: PWA 설치 앱(standalone) 또는 실제 모바일 기기
-    if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)){
-      document.documentElement.classList.add('is-mobile');
-    }
     requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove('no-transition')));
     if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/sw.js').catch(()=>{});}
-
-    // PWA 설치 프롬프트
-    (function(){
-      var banner=document.getElementById('pwa-install-banner');
-      var DISMISS_KEY='fp.pwa.dismissed';
-      var isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
-
-      // 앱 모드면 배너 DOM 자체를 제거
-      if(isStandalone){banner.remove();return;}
-
-      var deferredPrompt=null;
-
-      // 닫기: 어떤 상황이든 무조건 숨김
-      function hideBanner(){
-        banner.hidden=true;
-        banner.style.display='none';
-        localStorage.setItem(DISMISS_KEY,String(Date.now()));
-      }
-
-      window.addEventListener('beforeinstallprompt',function(e){
-        e.preventDefault();
-        deferredPrompt=e;
-        var dismissed=localStorage.getItem(DISMISS_KEY);
-        if(dismissed&&Date.now()-Number(dismissed)<86400000)return;
-        banner.hidden=false;
-        banner.style.display='';
-      });
-
-      document.getElementById('pwa-install-accept').addEventListener('click',function(){
-        if(!deferredPrompt){hideBanner();return;}
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(){deferredPrompt=null;hideBanner();});
-      });
-
-      document.getElementById('pwa-install-dismiss').addEventListener('click',function(){
-        hideBanner();
-      });
-
-      window.addEventListener('appinstalled',function(){
-        deferredPrompt=null;
-        hideBanner();
-        deferredPrompt=null;
-      });
-    })();
   </script>
   <script type="module" src="{{ url_for('static', filename='js/app.js') }}?v={{ app_version }}"></script>
   {% block page_js %}{% endblock %}

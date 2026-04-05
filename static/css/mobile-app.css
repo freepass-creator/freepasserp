@@ -1,0 +1,135 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   FREEPASS ERP — 모바일 앱 전용 CSS
+   base-mobile.html에서만 로드. 데스크탑 CSS와 완전 분리.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 필요한 데스크탑 공통 토큰/유틸만 가져오기 ── */
+@import url('/static/css/ui_tokens.css');
+@import url('/static/css/ui_toast.css');
+
+/* ── 모바일 전용 CSS ── */
+@import url('/static/css/shared/mobile.css');
+@import url('/static/css/shared/mobile-chat.css');
+@import url('/static/css/shared/mobile-contract.css');
+@import url('/static/css/shared/mobile-product.css');
+
+/* ── 데스크탑 요소가 아예 없으므로 폼/리스트 등 공통 스타일 필요 시 ── */
+@import url('/static/css/form.css');
+@import url('/static/css/button.css');
+@import url('/static/css/ui_upload.css');
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   성능 최적화 오버라이드
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* backdrop-filter 제거 — GPU 부하 감소, 스크롤 프레임 드랍 방지 */
+.mobile-topbar {
+  background: #fff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.mobile-tab-bar {
+  background: #fff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.mobile-drawer-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* box-shadow 경량화 */
+.mobile-drawer {
+  box-shadow: -2px 0 12px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   모바일 앱 전용 레이아웃 (media query 없이 항상 적용)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 사이드바/데스크탑 탑바는 모바일 앱에 존재하지 않지만, 혹시 렌더되면 숨김 */
+.sidebar, .sidebar--new, .top-bar {
+  display: none !important;
+}
+
+/* 대시보드 쉘: 세로 플렉스 */
+.dashboard-shell--new {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* 메인 영역 */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 모바일 요소 항상 표시 */
+.mobile-topbar { display: flex !important; }
+.mobile-tab-bar { display: flex !important; }
+
+/* 스크롤 영역 */
+.main-shell--new {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
+}
+
+/* 입력란 iOS 자동 확대 방지 */
+input[type="text"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="email"],
+input[type="date"],
+textarea {
+  font-size: 16px !important;
+}
+
+/* 필터 버튼: 상품목록·대화·계약에서 표시 */
+.mobile-topbar__filter-btn { display: none !important; }
+body[data-page="상품목록"] .mobile-topbar__filter-btn,
+body[data-page="대화"] .mobile-topbar__filter-btn,
+body[data-page="계약"] .mobile-topbar__filter-btn { display: inline-flex !important; }
+
+/* 패널 레이아웃: 세로 스택 */
+.panel-split, .panel-row { flex-direction: column !important; }
+.panel-left, .panel-right, .panel-main,
+.list-panel, .detail-panel {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   터치 최적화
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 모든 터치 대상 최소 44px */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* 탭 하이라이트 제거 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 터치 스크롤 최적화 */
+.main-shell--new,
+.chat-m-rooms,
+#contract-m-list {
+  overscroll-behavior: contain;
+}

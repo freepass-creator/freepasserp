@@ -1,12 +1,8 @@
-// FREEPASS ERP — Service Worker (오프라인 기본 지원)
-const CACHE_NAME = 'freepass-v15';
+// FREEPASS ERP — Service Worker (stale-while-revalidate)
+const CACHE_NAME = 'freepass-v16';
 
-// 설치: 기본 셸 캐시
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
+self.addEventListener('install', () => self.skipWaiting());
 
-// 활성화: 이전 캐시 정리
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -15,24 +11,25 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 네트워크 우선, 실패 시 캐시 (API 제외)
+// Stale-while-revalidate: 캐시 먼저 반환, 백그라운드에서 네트워크 업데이트
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   // API, Firebase, 외부 요청은 무시
   if (request.url.includes('/api/') || request.url.includes('firebaseio.com') || request.url.includes('googleapis.com')) return;
-  // GET 요청만 캐시
   if (request.method !== 'GET') return;
 
   event.respondWith(
-    fetch(request)
-      .then((response) => {
-        // 정상 응답만 캐시
-        if (response.ok && response.type === 'basic') {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-        }
-        return response;
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(request).then((cached) => {
+        const fetched = fetch(request).then((response) => {
+          if (response.ok && response.type === 'basic') {
+            cache.put(request, response.clone());
+          }
+          return response;
+        }).catch(() => cached);
+
+        return cached || fetched;
       })
-      .catch(() => caches.match(request))
+    )
   );
 });
