@@ -500,7 +500,7 @@ function renderGridHeader() {
     const isSorted = col.sortField && gridSortField === col.sortField;
     const sortIndicator = isSorted ? `<span class="pls-th__sort">${gridSortDir === 1 ? '▲' : '▼'}</span>` : '';
     const styles = [];
-    if (col.w) styles.push(`width:${col.w}px`);
+    if (col.w) { styles.push(`width:${col.w}px`); styles.push(`min-width:${col.w}px`); styles.push(`max-width:${col.w}px`); }
     else if (col.wCh) styles.push(`width:${col.wCh.length + 1}ch`);
     if (col.maxW) styles.push(`max-width:${col.maxW}px`);
     const wAttr = styles.length ? ` style="${styles.join(';')}"` : '';
