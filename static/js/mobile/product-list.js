@@ -264,8 +264,10 @@ async function ensureTermLoaded(product) {
       termName: product?.termName || '',
       providerCompanyCode: product?.providerCompanyCode || product?.partnerCode || ''
     });
-    state.termCache[key] = term ? extractTermFields(term) : {};
-  } catch { state.termCache[key] = {}; }
+    const fields = term ? extractTermFields(term) : {};
+    console.log('[mobile] term loaded:', key, fields);
+    state.termCache[key] = fields;
+  } catch(e) { console.error('[mobile] term error:', e); state.termCache[key] = {}; }
   finally {
     delete state.termLoading[key];
     // 상세 열려있으면 term 데이터 반영하여 재렌더
