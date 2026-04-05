@@ -129,7 +129,7 @@ const ADMIN_STL_COLS = [
   { key: 'car',      label: '차량번호',   align: 'c', searchable: true,  w: 88  },
   { key: 'model',    label: '모델명',     align: 'c', filterable: true,  w: 110 },
   { key: 'customer', label: '고객명',     align: 'c', searchable: true,  w: 72  },
-  { key: 'month',    label: '계약기간',   align: 'c', filterable: true,  w: 60  },
+  { key: 'month',    label: '계약기간',   align: 'c', filterable: true,  w: 80  },
   { key: 'rent',     label: '대여료',     align: 'r',                    w: 80  },
   { key: 'deposit',  label: '보증금',     align: 'r',                    w: 80  },
   { key: 'fee',      label: '수수료',     align: 'r',                    w: 80  },

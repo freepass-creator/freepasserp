@@ -310,7 +310,7 @@ function getSettleProcessStatus(s) {
 
 const SETTLE_COLS = [
   { key: 'status',   label: '정산상태',     align: 'c', filterable: true, w: 80 },
-  { key: 'process',  label: '처리상태',     align: 'c', filterable: true, w: 70 },
+  { key: 'process',  label: '처리상태',     align: 'c', filterable: true, w: 80 },
   { key: 'code',     label: '정산코드',     align: 'c', searchable: true },
   { key: 'partner',  label: '공급사코드',   align: 'c', filterable: true },
   { key: 'channel',  label: '영업채널코드', align: 'c', filterable: true },

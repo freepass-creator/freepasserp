@@ -200,12 +200,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  min-height: 20px;
-  padding: 0 2px;
+  min-width: var(--badge-min-width);
+  min-height: var(--badge-height);
+  padding: 0 var(--badge-padding-x);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: var(--list-badge-radius);
-  font-size: var(--font-size-sub);
+  border-radius: var(--badge-radius);
+  font-size: var(--badge-font-size);
   font-weight: var(--font-weight-strong);
   line-height: 1;
   letter-spacing: -0.05em;
