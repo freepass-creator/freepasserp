@@ -340,20 +340,18 @@ button, a, [role="button"] {
   justify-content: center !important;
 }
 
-/* 채팅 열린 상태 — 카카오톡처럼 고정 */
-body.chat-m-open .mobile-tab-bar {
-  display: none !important;
-}
+/* 채팅 열린 상태 */
 body.chat-m-open .layout-633 {
   position: fixed !important;
   top: var(--mobile-topbar-height) !important;
   left: 0 !important;
   right: 0 !important;
-  bottom: 0 !important;
+  bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
   height: auto !important;
   padding: 0 !important;
   margin: 0 !important;
   z-index: 200;
+  background: #fff;
 }
 body.chat-m-open .main-shell--new {
   padding-bottom: 0 !important;
