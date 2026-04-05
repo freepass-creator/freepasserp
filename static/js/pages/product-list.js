@@ -850,10 +850,10 @@ function _updateFilterIcon(open) {
   if (!btn) return;
   const svg = btn.querySelector('svg');
   if (!svg) return;
-  // 열림: < (접기), 닫힘: > (펼치기)
+  // 열림: > (닫기), 닫힘: < (열기)
   svg.innerHTML = open
-    ? '<path d="m15 18-6-6 6-6"/>'
-    : '<path d="m9 18 6-6-6-6"/>';
+    ? '<path d="m9 18 6-6-6-6"/>'
+    : '<path d="m15 18-6-6 6-6"/>';
 }
 function openMobileSidebar() {
   renderMobileSidebarFilters();
