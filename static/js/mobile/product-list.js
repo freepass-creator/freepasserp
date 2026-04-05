@@ -3,7 +3,7 @@
  * 웹 product-list.js와 완전 분리. Firebase 직접 조회.
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { watchProducts, resolveTermForProduct } from '../firebase/firebase-db.js';
+import { watchProducts, resolveTermForProduct, ensureRoom } from '../firebase/firebase-db.js';
 import { normalizeProduct, extractTermFields } from '../shared/product-list-detail-view.js';
 import { renderCatalogCard, renderCatalogDetailHero, renderCatalogPriceTable,
   renderCatalogInsuranceTable, renderCatalogConditions, renderCatalogExtra,
@@ -133,7 +133,12 @@ function renderDetailContent(product) {
   ].filter(([, v]) => v && v !== '-');
 
   const role = state.role;
-  const actionsHtml = `${role === 'agent' ? `<button class="cat-share-btn" id="plsMDetailShare" title="공유"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>` : ''}`;
+  const inquiryBtn = role === 'agent'
+    ? `<button class="cat-share-btn" id="plsMDetailInquiry" title="문의"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>` : '';
+  const contractBtn = role === 'agent'
+    ? `<button class="cat-share-btn" id="plsMDetailContract" title="계약"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></button>` : '';
+  const shareBtn = `<button class="cat-share-btn" id="plsMDetailShare" title="공유"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>`;
+  const actionsHtml = `${inquiryBtn}${contractBtn}${shareBtn}`;
 
   return galleryHtml
     + renderCatalogDetailHero(product, actionsHtml)
@@ -173,6 +178,8 @@ function openDetail(id) {
   state.selectedId = id;
   $detailContent.innerHTML = renderDetailContent(product);
   bindGallery($detailContent);
+  $detailContent.querySelector('#plsMDetailInquiry')?.addEventListener('click', (e) => handleInquiry(e.currentTarget, product));
+  $detailContent.querySelector('#plsMDetailContract')?.addEventListener('click', () => handleContract(product));
   $detailContent.querySelector('#plsMDetailShare')?.addEventListener('click', () => handleShare(product));
   $detail.hidden = false;
   document.body.classList.add('detail-open');
@@ -183,6 +190,56 @@ function closeDetail() {
   if ($detail) $detail.hidden = true;
   document.body.classList.remove('detail-open');
   state.selectedId = null;
+}
+
+async function handleInquiry(btnEl, product) {
+  if (!product) return;
+  if (state.role !== 'agent') { showToast('영업자 계정에서만 문의할 수 있습니다.', 'error'); return; }
+  if (!await showConfirm('이 상품에 대해 대화를 시작하시겠습니까?')) return;
+  if (btnEl) btnEl.disabled = true;
+  try {
+    const roomId = await ensureRoom({
+      productUid: product.productUid || '',
+      productCode: product.productCode || product.id,
+      providerUid: product.providerUid || '',
+      providerCompanyCode: product.providerCompanyCode || product.partnerCode || '',
+      providerName: product.providerName || '',
+      agentUid: state.profile?.uid || '',
+      agentCode: state.profile?.user_code || '',
+      agentName: state.profile?.name || '',
+      vehicleNumber: product.carNo && product.carNo !== '-' ? product.carNo : '',
+      modelName: [product.maker, product.model, product.subModel, product.trim].filter(v => v && v !== '-').join(' ')
+    });
+    localStorage.setItem('freepass_pending_chat_room', roomId);
+    window.location.href = '/chat';
+  } catch {
+    if (btnEl) btnEl.disabled = false;
+    showToast('채팅 연결에 실패했습니다.', 'error');
+  }
+}
+
+function handleContract(product) {
+  if (!product) return;
+  if (!confirm('이 상품에 대해 계약을 생성하시겠습니까?')) return;
+  const seed = {
+    seed_product_key: product.id,
+    product_uid: product.id,
+    product_code: product.id,
+    product_code_snapshot: product.productCode || product.id,
+    partner_code: product.partnerCode || '',
+    policy_code: product.policyCode || '',
+    car_number: product.carNo || '',
+    vehicle_name: [product.maker, product.model, product.subModel, product.trim].filter(Boolean).join(' '),
+    maker: product.maker || '',
+    model_name: product.model || '',
+    sub_model: product.subModel || '',
+    trim_name: product.trim || '',
+    rent_month: '48',
+    rent_amount: Number(product.price?.['48']?.rent || 0),
+    deposit_amount: Number(product.price?.['48']?.deposit || 0)
+  };
+  localStorage.setItem('freepass_pending_contract_seed', JSON.stringify(seed));
+  window.location.href = '/contract';
 }
 
 function handleShare(product) {
