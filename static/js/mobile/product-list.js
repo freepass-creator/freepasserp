@@ -181,10 +181,10 @@ function renderDetailContent(product) {
   const ins = {
     injury:   [first(term.injury_compensation_limit, bodilyLeg.limit),     first(term.injury_deductible, bodilyLeg.deductible)],
     property: [first(term.property_compensation_limit, propertyLeg.limit), first(term.property_deductible, propertyLeg.deductible)],
-    self:     [first(term.personal_injury_compensation_limit, selfLeg.limit), first(term.personal_injury_deductible, selfLeg.deductible)],
-    unins:    [first(term.uninsured_compensation_limit, uninsLeg.limit),    first(term.uninsured_deductible, uninsLeg.deductible)],
+    self:     [first(term.self_body_accident, selfLeg.limit),              first(term.self_body_deductible, selfLeg.deductible)],
+    unins:    [first(term.uninsured_damage, uninsLeg.limit),               first(term.uninsured_deductible, uninsLeg.deductible)],
     own:      [first(term.own_damage_compensation, ownLeg.limit),          first(term.own_damage_min_deductible, ownLeg.deductible)],
-    emergency: first(term.roadside_assistance, term.emergency_service, c.emergency),
+    emergency: first(term.annual_roadside_assistance, term.roadside_assistance, c.emergency),
   };
   const insRows = [
     ['대인', ins.injury[0], ins.injury[1]],
