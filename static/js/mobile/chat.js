@@ -114,6 +114,7 @@ function openRoom(roomId) {
     el.classList.toggle('is-active', el.getAttribute('data-room-id') === roomId);
   });
 
+  setTimeout(() => $msgInput?.focus(), 300);
 }
 
 function closeRoom() {
