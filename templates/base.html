@@ -52,6 +52,10 @@
   </div>
   <script>
     window.APP_VER='{{ app_version }}';
+    // 모바일 판별: PWA 설치 앱(standalone) 또는 실제 모바일 기기
+    if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)){
+      document.documentElement.classList.add('is-mobile');
+    }
     requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove('no-transition')));
     if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/sw.js').catch(()=>{});}
 

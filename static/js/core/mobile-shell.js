@@ -9,8 +9,9 @@ import { requireAuth } from './auth-guard.js';
 import { showConfirm } from './toast.js';
 import { isPageDirty } from '../app.js';
 
+const isMobile = document.documentElement.classList.contains('is-mobile');
 const mq = window.matchMedia('(max-width: 768px)');
-if (!mq.matches) { /* 데스크탑 — 아무 작업 없음 */ }
+if (!isMobile) { /* 데스크탑/웹 브라우저 — 모바일 쉘 비활성화 */ }
 
 // ─── 탭 정의 ──────────────────────────────────────────────────────────────────
 
@@ -256,11 +257,13 @@ document.addEventListener('click', (e) => {
 
 // ─── 초기화 ──────────────────────────────────────────────────────────────────
 
-requireAuth().then(({ profile }) => {
-  renderTabBar();
-  renderTopbarUser(profile);
-  updateActiveTab();
-  initMobileBackTrap();
-  initKeyboardAdjust();
-  initMobileFilterToggle();
-}).catch(() => {});
+if (isMobile) {
+  requireAuth().then(({ profile }) => {
+    renderTabBar();
+    renderTopbarUser(profile);
+    updateActiveTab();
+    initMobileBackTrap();
+    initKeyboardAdjust();
+    initMobileFilterToggle();
+  }).catch(() => {});
+}
