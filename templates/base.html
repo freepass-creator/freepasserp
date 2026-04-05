@@ -57,39 +57,44 @@
 
     // PWA 설치 프롬프트
     (function(){
-      // 이미 앱으로 실행 중이면 배너 불필요
-      if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone)return;
+      var banner=document.getElementById('pwa-install-banner');
+      var DISMISS_KEY='fp.pwa.dismissed';
+      var isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
 
-      let deferredPrompt=null;
-      const banner=document.getElementById('pwa-install-banner');
-      const DISMISS_KEY='fp.pwa.dismissed';
+      // 앱 모드면 배너 DOM 자체를 제거
+      if(isStandalone){banner.remove();return;}
+
+      var deferredPrompt=null;
+
+      // 닫기: 어떤 상황이든 무조건 숨김
+      function hideBanner(){
+        banner.hidden=true;
+        banner.style.display='none';
+        localStorage.setItem(DISMISS_KEY,String(Date.now()));
+      }
 
       window.addEventListener('beforeinstallprompt',function(e){
         e.preventDefault();
         deferredPrompt=e;
-        // 24시간 내 닫은 적 있으면 표시 안 함
-        const dismissed=localStorage.getItem(DISMISS_KEY);
+        var dismissed=localStorage.getItem(DISMISS_KEY);
         if(dismissed&&Date.now()-Number(dismissed)<86400000)return;
         banner.hidden=false;
+        banner.style.display='';
       });
 
       document.getElementById('pwa-install-accept').addEventListener('click',function(){
-        if(!deferredPrompt)return;
+        if(!deferredPrompt){hideBanner();return;}
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(){
-          deferredPrompt=null;
-          banner.hidden=true;
-        });
+        deferredPrompt.userChoice.then(function(){deferredPrompt=null;hideBanner();});
       });
 
       document.getElementById('pwa-install-dismiss').addEventListener('click',function(){
-        banner.hidden=true;
-        localStorage.setItem(DISMISS_KEY,String(Date.now()));
+        hideBanner();
       });
 
-      // 이미 설치된 경우 배너 숨김
       window.addEventListener('appinstalled',function(){
-        banner.hidden=true;
+        deferredPrompt=null;
+        hideBanner();
         deferredPrompt=null;
       });
     })();

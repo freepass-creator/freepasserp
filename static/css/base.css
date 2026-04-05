@@ -255,19 +255,19 @@ a {
 }
 .pwa-install-banner {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: calc(56px + env(safe-area-inset-bottom));
+  left: 8px;
+  right: 8px;
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
   background: #fff;
-  border-top: 1px solid #e2e8f0;
-  box-shadow: 0 -4px 12px rgba(0,0,0,.08);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 -4px 16px rgba(0,0,0,.12);
 }
 .pwa-install-banner__content {
   display: flex;
