@@ -263,12 +263,7 @@
 }
 
 /* 컬럼 헤더 바 (스크롤 밖 고정) */
-.admin-stl-col-bar {
-  flex-shrink: 0;
-  overflow: hidden;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-}
-.admin-stl-col-bar[hidden] { display: none; }
+/* admin-stl-col-bar 제거됨 — thead가 pls-grid-scroll 안에 통합 */
 #adminWorkspaceHead[hidden] { display: none; }
 
 /* 테이블 최소 너비 + 고정 레이아웃 (thead/tbody 컬럼 정렬) */
