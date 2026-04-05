@@ -65,15 +65,11 @@
     <div class="panel-body admin-workspace-body">
 
       <!-- 정산서 관리 -->
-      <div class="admin-tab-panel" data-tab-panel="settlement">
-        <section class="pls-grid-panel" style="flex:1;min-height:0;box-shadow:none;border-radius:0">
-          <div class="pls-grid-scroll">
-            <table class="pls-table">
-              <thead id="adminStlHead"></thead>
-              <tbody id="adminStlList"></tbody>
-            </table>
-          </div>
-        </section>
+      <div class="admin-tab-panel" data-tab-panel="settlement" style="overflow:auto">
+        <table class="pls-table" style="min-width:1100px">
+          <thead id="adminStlHead"></thead>
+          <tbody id="adminStlList"></tbody>
+        </table>
       </div>
 
       <!-- 안내사항 관리 -->
