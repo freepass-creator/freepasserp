@@ -158,6 +158,15 @@ body {
   box-sizing: border-box;
 }
 
+/* 페이지 로드 시 transition 깜빡임 방지 */
+html.no-transition,
+html.no-transition *,
+html.no-transition *::before,
+html.no-transition *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
 button, input, select, textarea {
   font: inherit;
 }

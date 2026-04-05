@@ -151,6 +151,11 @@ async function loadPage(url, options = {}) {
       if (cur?.module && typeof cur.module.onHide === 'function') {
         try { cur.module.onHide(); } catch (_) {}
       }
+      // 열려있는 필터 오버레이 닫기
+      document.querySelectorAll('.filter-overlay.is-open').forEach((o) => {
+        o.classList.remove('is-open');
+        o.setAttribute('aria-hidden', 'true');
+      });
       clearDirtyCheck();
     }
 
@@ -405,7 +410,6 @@ registerInitialPage();
 const _initialPath = window.location.pathname;
 if (_initialPath !== '/') {
   history.replaceState({ page: _initialPath }, '', '/');
-  currentPageKey = '/';
 }
 
 // 로그인 후 랜딩: 사이드바 버튼 클릭으로 SPA 네비게이션
