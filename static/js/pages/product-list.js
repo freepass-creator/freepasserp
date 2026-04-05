@@ -510,15 +510,18 @@ let detailEscId = null;
 function _syncTopBar(item) {
   const sep = document.getElementById('topBarStateSep');
   const identEl = document.getElementById('topBarIdentity');
+  const badge = document.getElementById('topBarWorkBadge');
   if (!sep || !identEl) return;
   if (item) {
     identEl.textContent = [item.carNo, item.model].filter(Boolean).join(' · ');
     identEl.hidden = false;
     sep.hidden = false;
+    if (badge) badge.textContent = '상세정보';
   } else {
     identEl.textContent = '';
     identEl.hidden = true;
     sep.hidden = true;
+    if (badge) badge.textContent = '';
   }
 }
 
