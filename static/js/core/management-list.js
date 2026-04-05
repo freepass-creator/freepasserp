@@ -344,7 +344,7 @@ export function renderTableGrid(options = {}) {
   if (thead && !_bodyOnly) {
     const ths = columns.map(col => {
       const styles = [];
-      if (col.w) styles.push(`width:${col.w}px`);
+      if (col.w) { styles.push(`width:${col.w}px`); styles.push(`max-width:${col.w}px`); }
       else if (col.wCh) styles.push(`width:${col.wCh.length + 1}ch`);
       if (col.maxW) styles.push(`max-width:${col.maxW}px`);
       const sAttr = styles.length ? ` style="${styles.join(';')}"` : '';
