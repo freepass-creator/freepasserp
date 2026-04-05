@@ -222,6 +222,7 @@ function formatMessageTime(ts) {
 function formatRoleBadge() { return ''; }
 
 function renderMessages(messages) {
+  if (!messageList) return;
   if (!messages.length) {
     messageList.innerHTML = '<div class="empty-block">아직 메시지가 없습니다.</div>';
     return;
@@ -444,7 +445,7 @@ async function bootstrap() {
 
       visibleRoomsCache = visibleRooms;
       roomMap = new Map(visibleRooms.map((room) => [room.room_id, room]));
-      roomList.innerHTML = '';
+      if (roomList) roomList.innerHTML = '';
 
       if (!visibleRooms.length) {
         // preferredRoomId 대기 중이면 clearRoomSelection 하지 않음 (currentRoomId 보존)

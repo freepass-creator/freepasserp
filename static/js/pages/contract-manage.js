@@ -894,7 +894,7 @@ async function bootstrap() {
       if (restoreTarget) fillForm(restoreTarget);
     }
     if (restoredState?.scrollTop && listBody) {
-      requestAnimationFrame(() => { listBody.scrollTop = restoredState.scrollTop; });
+      requestAnimationFrame(() => { if (listBody) listBody.scrollTop = restoredState.scrollTop; });
     }
 
     try {

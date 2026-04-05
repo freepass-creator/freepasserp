@@ -738,6 +738,7 @@ function syncDetailBadges(product) {
 }
 
 function renderDetail(){
+  if (_isMobile.matches) return; // 모바일은 모바일 상세 사용
   const product=state.filteredProducts.find(i=>i.id===state.selectedId);
   if(!product){
     $title.textContent='상세정보';
