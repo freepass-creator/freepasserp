@@ -1,9 +1,9 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
 :root {
-  /* ═════ FREEPASS ERP — Industrial-Plus Design Tokens ═════ */
+  /* ═════ FREEPASS ERP — Unified Design Tokens ═════ */
 
-  /* ── 간격 (4pt 기반 고밀도) ── */
+  /* ── 간격 (4pt 기반) ── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -12,33 +12,56 @@
   --space-6: 24px;
   --space-8: 32px;
 
-  /* ── 곡률: Subtly Rounded (2px) ── */
-  --radius-ui: 2px;
+  /* ── 곡률 ── */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+  --radius-ui: var(--radius-xs);
 
-  /* ── 타이포그래피: 12px 고밀도 ── */
+  /* ── 타이포그래피 ── */
+  --font-size-xs: 10px;
+  --font-size-sm: 11px;
+  --font-size-base: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 18px;
+  --font-size-3xl: 28px;
   --font-weight-base: 400;
   --font-weight-strong: 500;
-  --font-size-main: 12px;
-  --font-size-sub: 10px;
-  --font-size-title: 12px;
   --font-weight-heavy: 700;
   --letter-spacing-base: -0.03em;
+  /* 하위 호환 별칭 */
+  --font-size-main: var(--font-size-base);
+  --font-size-sub: var(--font-size-xs);
+  --font-size-title: var(--font-size-base);
+
+  /* ── 높이 (컨트롤) ── */
+  --height-xs: 24px;
+  --height-sm: 28px;
+  --height-md: 36px;
+  --height-lg: 40px;
+  --height-xl: 44px;
+  --height-2xl: 48px;
 
   /* ── 텍스트 컬러: Slate 계열 ── */
-  --text-main: #1e293b;       /* Slate-800 */
-  --text-subtle: #64748b;     /* Slate-500 */
-  --text-muted: #94a3b8;      /* Slate-400 */
+  --text-main: #1e293b;
+  --text-subtle: #64748b;
+  --text-muted: #94a3b8;
 
   /* ── 보더 / 표면 ── */
   --border-main: #cbd5e1;
   --border-soft: #e2e8f0;
+  --border-strong: #94a3b8;
   --surface-base: #ffffff;
   --surface-subtle: #f8fafc;
   --surface-hover: #f1f5f9;
   --surface-selected: #eff6ff;
   --surface-sidebar: #f6f7f9;
   --surface-muted: #f1f5f9;
-  --border-strong: #94a3b8;
 
   /* ── 인터랙션 ── */
   --interactive-hover-bg: #f1f5f9;
@@ -49,47 +72,70 @@
   --interactive-selected-border: #93c5fd;
   --interactive-shadow-hover: 0 1px 2px rgba(15, 23, 42, 0.05);
   --interactive-shadow-focus: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  --transition-fast: 0.12s ease;
+  --transition-normal: 0.15s ease;
 
-  /* ── 버튼 (컴팩트) ── */
-  --btn-height: 28px;
+  /* ── 버튼 ── */
+  --btn-height: var(--height-sm);
+  --btn-min-width: 58px;
   --btn-padding-x: 10px;
   --btn-font-size: var(--font-size-main);
   --btn-border-width: 1px;
-  --btn-panel-height: 24px;
+  --btn-panel-height: var(--height-xs);
+  --btn-gap: 4px;
 
-  /* ── 패널 헤더: 슬림 고밀도 ── */
-  --panel-gap: 8px;
-  --panel-head-height: 36px;
-  --panel-head-py: 8px;
-  --panel-head-px: 12px;
-  --panel-body-pad: 12px;
+  /* ── 패널 헤더 ── */
+  --panel-gap: var(--space-2);
+  --panel-head-height: var(--height-md);
+  --panel-head-py: var(--space-2);
+  --panel-head-px: var(--space-3);
+  --panel-body-pad: var(--space-3);
   --panel-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
   --right-panel-width: 360px;
   --sidebar-width: 132px;
 
   /* ── 상세(Detail) ── */
-  --detail-section-py: 12px;
-  --detail-section-gap: 24px;
+  --detail-section-py: var(--space-3);
+  --detail-section-gap: var(--space-6);
   --detail-row-gap: 6px;
-  --detail-item-gap: 16px;
+  --detail-item-gap: var(--space-4);
   --detail-photo-gap: 6px;
   --detail-thumb-w: 56px;
   --detail-thumb-h: 42px;
 
   /* ── 테이블 ── */
   --table-cell-py: 6px;
-  --table-cell-px: 8px;
+  --table-cell-px: var(--space-2);
   --table-head-bg: var(--surface-subtle);
   --table-head-color: var(--text-muted);
 
   /* ── 리스트 / 데이터 행 ── */
-  --list-row-min-h: 40px;
-  --list-row-px: 12px;
+  --list-row-min-h: var(--height-lg);
+  --list-row-px: var(--panel-head-px);
+  --list-row-py: var(--space-2);
   --list-line-gap: 0;
+
+  /* ── 배지 ── */
+  --badge-height: 20px;
+  --badge-padding-x: 6px;
+  --badge-font-size: var(--font-size-xs);
+  --badge-radius: var(--radius-xs);
+  --badge-min-width: 52px;
 
   /* ── 폼 ── */
   --form-label-line-height: 1.35;
   --form-control-py: 6px;
+
+  /* ── 필터 ── */
+  --filter-head-height: var(--height-md);
+  --filter-option-height: var(--height-sm);
+  --filter-search-height: var(--height-md);
+
+  /* ── 모바일 ── */
+  --mobile-topbar-height: 46px;
+  --mobile-tabbar-height: 56px;
+  --mobile-input-font-size: var(--font-size-xl);
+  --mobile-drawer-width: 260px;
 }
 
 html, body {
