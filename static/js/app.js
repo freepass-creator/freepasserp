@@ -134,7 +134,7 @@ async function loadPage(url, options = {}) {
   const { pushState = true } = options;
   const nextPathname = new URL(url, window.location.origin).pathname;
   if (isPageNavigating && pendingNavigationPath === nextPathname) return;
-  if (nextPathname === window.location.pathname && pushState) return;
+  if (nextPathname === currentPageKey) return;
 
   isPageNavigating = true;
   pendingNavigationPath = nextPathname;
@@ -233,6 +233,8 @@ async function loadPage(url, options = {}) {
     setActiveSidebar(nextPathname);
     currentPageKey = nextPathname;
     window.__currentPage = nextPathname;
+
+    if (pushState) history.pushState({ page: nextPathname }, '', nextPathname);
 
   } finally {
     isPageNavigating = false;
@@ -343,6 +345,21 @@ function initShellNavigation() {
     }
   });
 
+  window.addEventListener('popstate', async (event) => {
+    const target = event.state?.page || window.location.pathname;
+    if (!target || target === currentPageKey) return;
+    if (!await confirmLeave()) {
+      history.pushState({ page: currentPageKey }, '', currentPageKey);
+      return;
+    }
+    try {
+      await loadPage(target, { pushState: false });
+      setActiveSidebar(target);
+    } catch (error) {
+      console.error(error);
+      window.location.href = target;
+    }
+  });
 }
 
 function initKeyboardListNavigation() {
@@ -389,7 +406,10 @@ initShellNavigation();
 initSidebarCollapse();
 registerInitialPage();
 const _initialPath = window.location.pathname;
-if (_initialPath !== '/') history.replaceState(null, '', '/');
+if (_initialPath !== '/') {
+  history.replaceState({ page: _initialPath }, '', '/');
+  currentPageKey = '/';
+}
 
 // 로그인 후 랜딩: 사이드바 버튼 클릭으로 SPA 네비게이션
 const _landingTarget = localStorage.getItem('fp.landing_target');

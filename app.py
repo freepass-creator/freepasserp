@@ -34,7 +34,7 @@ def _build_google_sheet_csv_url(source_url: str) -> str:
 
     parsed = urlparse(text)
     if 'docs.google.com' not in (parsed.netloc or ''):
-        return text
+        raise ValueError('구글시트 링크만 사용할 수 있습니다.')
 
     match = re.search(r'/spreadsheets/d/([a-zA-Z0-9-_]+)', parsed.path or '')
     if not match:
