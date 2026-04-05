@@ -167,6 +167,13 @@ html.is-mobile body.detail-open .mobile-topbar__filter-btn { display: none !impo
   padding: 0 !important;
   overscroll-behavior: contain;
 }
+/* 상세 열렸을 때 뒤 목록 스크롤 차단 */
+body.detail-open .main-shell--new {
+  overflow: hidden !important;
+}
+body.detail-open .pls-m-catalog-wrap {
+  display: none !important;
+}
 
 /* 패널 레이아웃: 세로 스택 */
 .panel-split, .panel-row { flex-direction: column !important; }
