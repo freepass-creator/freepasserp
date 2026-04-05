@@ -84,11 +84,6 @@
   flex: 1 1 0;
   min-height: 0;
 }
-.admin-tab-panel .pls-grid-scroll {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow: auto;
-}
 .admin-tab-panel[hidden] { display: none; }
 .admin-tab-panel--padded { padding: var(--panel-body-pad, 16px); overflow-y: auto; }
 
@@ -268,27 +263,35 @@
 }
 
 /* 컬럼 헤더 바 (스크롤 밖 고정) */
-/* admin-stl-col-bar 제거됨 — thead가 pls-grid-scroll 안에 통합 */
+.admin-stl-col-bar {
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  scrollbar-width: none;
+}
+.admin-stl-col-bar::-webkit-scrollbar { display: none; }
+.admin-stl-col-bar[hidden] { display: none; }
 #adminWorkspaceHead[hidden] { display: none; }
 
 /* 테이블 최소 너비 + 고정 레이아웃 (thead/tbody 컬럼 정렬) */
 .admin-stl-table { min-width: 1100px; table-layout: fixed; }
 
-/* 열 너비 — nth-child로 thead/tbody 두 테이블 동기화 */
-.admin-stl-table th:nth-child(1),  .admin-stl-table td:nth-child(1)  { width: 110px; } /* 계약코드 */
-.admin-stl-table th:nth-child(2),  .admin-stl-table td:nth-child(2)  { width: 72px; }  /* 정산상태 */
-.admin-stl-table th:nth-child(3),  .admin-stl-table td:nth-child(3)  { width: 110px; } /* 공급사명 */
-.admin-stl-table th:nth-child(4),  .admin-stl-table td:nth-child(4)  { width: 84px; }  /* 계약완료일 */
-.admin-stl-table th:nth-child(5),  .admin-stl-table td:nth-child(5)  { width: 72px; }  /* 상품구분 */
-.admin-stl-table th:nth-child(6),  .admin-stl-table td:nth-child(6)  { width: 88px; }  /* 차량번호 */
-.admin-stl-table th:nth-child(7),  .admin-stl-table td:nth-child(7)  { width: 110px; } /* 모델명 */
-.admin-stl-table th:nth-child(8),  .admin-stl-table td:nth-child(8)  { width: 72px; }  /* 고객명 */
-.admin-stl-table th:nth-child(9),  .admin-stl-table td:nth-child(9)  { width: 80px; }  /* 계약기간 */
-.admin-stl-table th:nth-child(10), .admin-stl-table td:nth-child(10) { width: 80px; }  /* 대여료 */
-.admin-stl-table th:nth-child(11), .admin-stl-table td:nth-child(11) { width: 80px; }  /* 보증금 */
-.admin-stl-table th:nth-child(12), .admin-stl-table td:nth-child(12) { width: 80px; }  /* 수수료 */
-.admin-stl-table th:nth-child(13), .admin-stl-table td:nth-child(13) { width: 80px; }  /* 영업채널 */
-.admin-stl-table th:nth-child(14), .admin-stl-table td:nth-child(14) { width: 72px; }  /* 영업자 */
+/* 열 너비 */
+.admin-stl-table .col-code     { width: 110px; }
+.admin-stl-table .col-status   { width: 72px; }
+.admin-stl-table .col-partner  { width: 110px; }
+.admin-stl-table .col-date     { width: 84px; }
+.admin-stl-table .col-ptype    { width: 72px; }
+.admin-stl-table .col-car      { width: 88px; }
+.admin-stl-table .col-model    { width: 110px; }
+.admin-stl-table .col-customer { width: 72px; }
+.admin-stl-table .col-month    { width: 60px; }
+.admin-stl-table .col-rent     { width: 80px; }
+.admin-stl-table .col-deposit  { width: 80px; }
+.admin-stl-table .col-fee      { width: 80px; }
+.admin-stl-table .col-channel  { width: 80px; }
+.admin-stl-table .col-agent    { width: 72px; }
 
 
 /* ─── 안내사항 관리 ────────────────────────────────────────────────────────────── */
