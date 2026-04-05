@@ -2,6 +2,7 @@ function moneyText(value){ const n = Number(value || 0); return n ? n.toLocaleSt
 function safeText(value){ return String(value ?? '').trim() || '-'; }
 
 import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
+import { escapeHtml } from '../core/management-format.js';
 import { renderTableGrid } from '../core/management-list.js';
 import { renderColorBadge } from "../core/product-colors.js";
 import { requireAuth } from "../core/auth-guard.js";
@@ -492,7 +493,6 @@ function renderList(){
 
 /* Row click handling is now managed by renderTableGrid's onSelect callback */
 function hasContent(value){ return String(value ?? '').trim() !== '' && String(value ?? '').trim() !== '-'; }
-function escapeHtml(value){ return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function formatYearShort(value){ const digits=String(value ?? '').replace(/[^\d]/g,''); if(!digits) return '-'; return `${digits.length >= 4 ? digits.slice(-2) : digits}년식`; }
 function formatEngineCc(value){ const digits=String(value ?? '').replace(/[^\d]/g,''); return digits ? `${Number(digits).toLocaleString('ko-KR')}cc` : '-'; }
 function inlineValue(left, right){ return `${safe(left)} / ${safe(right)}`; }

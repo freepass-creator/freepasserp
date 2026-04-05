@@ -1,6 +1,6 @@
 import { renderBadgeRow } from './badge.js';
 import { renderColorBadge } from '../core/product-colors.js';
-import { safeText } from '../core/management-format.js';
+import { safeText, escapeHtml } from '../core/management-format.js';
 
 function ensurePercentSuffix(value) {
   const text = String(value ?? '').trim();
@@ -22,15 +22,6 @@ function formatDeductibleAmount(value) {
 
 function hasContent(value) {
   return String(value ?? '').trim() !== '' && String(value ?? '').trim() !== '-';
-}
-
-function escapeHtml(value = '') {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
 
 function formatMoneyShort(value) {

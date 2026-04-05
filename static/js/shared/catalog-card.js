@@ -12,11 +12,8 @@
 
 // ─── 유틸 ─────────────────────────────────────────────────────────────────
 
-export function esc(s) {
-  const d = document.createElement('div');
-  d.textContent = String(s ?? '');
-  return d.innerHTML;
-}
+import { escapeHtml as esc } from '../core/management-format.js';
+export { esc };
 
 export function has(v) {
   const s = String(v ?? '').trim();

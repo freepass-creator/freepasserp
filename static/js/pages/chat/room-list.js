@@ -1,4 +1,6 @@
 import { renderTableGrid } from '../../core/management-list.js';
+import { escapeHtml } from '../../core/management-format.js';
+export { escapeHtml };
 import { renderBadgeRow } from '../../shared/badge.js';
 
 export function normalizeLookupKey(value = '') {
@@ -23,10 +25,6 @@ export function truncate(text = '', max = 26) {
   const source = String(text || '').trim();
   if (!source) return '-';
   return source.length > max ? `${source.slice(0, max)}...` : source;
-}
-
-export function escapeHtml(value = '') {
-  return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 }
 
 export function deriveStatusLabel(room, myUid) {

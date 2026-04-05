@@ -3,13 +3,9 @@
  * 카탈로그 + ERP 공통
  */
 
-let viewerEl = null;
+import { escapeHtml as esc } from '../core/management-format.js';
 
-function esc(text) {
-  const d = document.createElement('div');
-  d.textContent = String(text ?? '');
-  return d.innerHTML;
-}
+let viewerEl = null;
 
 function ensureViewer() {
   if (viewerEl) return viewerEl;

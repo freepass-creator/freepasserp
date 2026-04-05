@@ -1,16 +1,9 @@
+import { escapeHtml } from '../core/management-format.js';
+
 let imageViewerRoot = null;
 let imageViewerPhotos = [];
 let imageViewerCurrentIndex = 0;
 let imageViewerKeydownBound = false;
-
-function escapeHtml(value = '') {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 function ensureImageViewer() {
   if (imageViewerRoot) return imageViewerRoot;

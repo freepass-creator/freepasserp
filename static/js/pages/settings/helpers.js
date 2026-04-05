@@ -1,4 +1,5 @@
 import { qs, roleLabel } from '../../core/utils.js';
+import { escapeHtml } from '../../core/management-format.js';
 
 const DOMESTIC_MAKER_ORDER = ['현대', '기아', '제네시스', 'KG모빌리티', '르노코리아', '쉐보레'];
 const IMPORT_MAKER_ORDER = ['벤츠', 'BMW', '아우디', '렉서스', '테슬라', '볼보', '폭스바겐', '포르쉐', '랜드로버', '토요타', '미니', '포드', '지프', '혼다', '닛산', '푸조', '링컨', '캐딜락', '마세라티', '벤틀리', '롤스로이스', '람보르기니', '페라리', '맥라렌'];
@@ -91,7 +92,6 @@ export function getModelPriority(maker = '', modelName = '') {
   if (!modelMap) return PRIORITY_ORDER_MAX;
   return modelMap.get(String(modelName || '').trim()) || PRIORITY_ORDER_MAX;
 }
-export function escapeHtml(value) { return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
 export function formatDateTime(value) {
   const timestamp = Number(value || 0);
   if (!timestamp) return '-';

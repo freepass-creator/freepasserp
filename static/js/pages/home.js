@@ -442,7 +442,7 @@ function renderNotices(items = []) {
       </button>
       <div class="home-notice-body">
         <div class="home-notice-copy">${String(notice.body || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
-        ${notice.image_url ? `<img class="home-notice-img" src="${String(notice.image_url).replace(/"/g, '')}" alt="" loading="lazy">` : ''}
+        ${notice.image_url && /^https?:\/\//i.test(String(notice.image_url)) ? `<img class="home-notice-img" src="${String(notice.image_url).replace(/["<>]/g, '')}" alt="" loading="lazy">` : ''}
         <div class="home-notice-foot">
           <div class="home-notice-writer">${notice.writer_name || '관리자'}</div>
         </div>

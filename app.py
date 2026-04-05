@@ -74,6 +74,12 @@ def _download_text(url: str) -> str:
 def _api_error(message: str, status: int = 400):
     return jsonify({'ok': False, 'message': message}), status
 
+def _require_json():
+    """POST API에서 Content-Type: application/json 강제"""
+    if not request.is_json:
+        return _api_error('Content-Type must be application/json', 415)
+    return None
+
 
 # ─── Blueprint: 인증 ─────────────────────────────────────────────────────────
 
@@ -149,6 +155,8 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.route('/vehicle-master/fetch', methods=['POST'])
 def fetch_vehicle_master_source():
+    err = _require_json()
+    if err: return err
     payload = request.get_json(silent=True) or {}
     source_url = str(payload.get('source_url') or '').strip()
     if not source_url:
@@ -181,6 +189,8 @@ def check_storage_orphans():
     클라이언트가 두 목록을 body로 전달하면 diff를 계산하여 반환한다.
     (Thin Server이므로 Firebase Admin SDK 없이 클라이언트에서 데이터를 수집하여 전달)
     """
+    err = _require_json()
+    if err: return err
     payload = request.get_json(silent=True) or {}
     db_urls = set(str(u).strip() for u in (payload.get('db_urls') or []) if str(u).strip())
     storage_urls = set(str(u).strip() for u in (payload.get('storage_urls') or []) if str(u).strip())
@@ -204,6 +214,8 @@ def check_storage_orphans():
 
 @api_bp.route('/photos/zip', methods=['POST'])
 def download_photos_zip():
+    err = _require_json()
+    if err: return err
     payload = request.get_json(silent=True) or {}
     urls = [str(u).strip() for u in (payload.get('urls') or []) if str(u).strip()]
     car_no = re.sub(r'[^\w가-힣\-]', '_', str(payload.get('car_no') or 'photos').strip()) or 'photos'
