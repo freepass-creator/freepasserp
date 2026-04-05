@@ -128,32 +128,36 @@ function navigateToProductList() {
 }
 
 async function handleMobileBack() {
-  // 0. 상세 패널 등 오버레이가 열려있으면 먼저 닫기
-  const detailPanel = document.getElementById('plsMDetail');
-  if (detailPanel && !detailPanel.hidden) return true; // product-list.js popstate에서 처리
-
-  // 1. 페이지별 핸들러 (채팅방 닫기)
-  if (_mobileBackHandler) {
-    const handled = await _mobileBackHandler();
-    if (handled) return true;
-  }
-
-  // 2. 상품목록 → 종료 확인
   const page = window.__currentPage || '';
-  if (page === '/product-list') {
-    const exit = await showConfirm('앱을 종료하시겠습니까?');
-    if (exit) {
-      history.go(-1);
-      return false;
-    }
+
+  // 1. 상품 상세 → 상품 목록
+  const productDetail = document.getElementById('plsMDetail');
+  if (productDetail && !productDetail.hidden) {
+    productDetail.hidden = true;
     return true;
   }
 
-  // 3. 나머지 페이지 → 편집 중이면 확인 후 상품목록으로
-  if (isPageDirty()) {
-    const ok = await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.');
-    if (!ok) return true;
+  // 2. 채팅창 → 채팅 목록
+  if (document.body.classList.contains('chat-m-open')) {
+    document.body.classList.remove('chat-m-open');
+    return true;
   }
+
+  // 3. 계약 상세 → 계약 목록
+  const contractDetail = document.getElementById('contract-m-detail');
+  if (contractDetail && !contractDetail.hidden) {
+    contractDetail.hidden = true;
+    return true;
+  }
+
+  // 4. 상품목록(홈) → 종료 확인
+  if (page === '/product-list') {
+    const exit = await showConfirm('앱을 종료하시겠습니까?');
+    if (exit) { history.go(-1); return false; }
+    return true;
+  }
+
+  // 5. 그 외 페이지(대화목록, 계약목록, 설정) → 상품목록(홈)으로
   navigateToProductList();
   return true;
 }
