@@ -161,6 +161,7 @@ function renderDetailContent(product) {
       <table class="md-table"><thead><tr><th>항목</th><th>한도</th><th>면책금</th></tr></thead><tbody>
         ${insRow('대인', merged.bodily)}
         ${insRow('대물', merged.property)}
+        ${insRow('자기신체사고', merged.selfBodily)}
         ${insRow('무보험차상해', merged.uninsured)}
         ${insRow('자기차량손해', merged.ownDamage)}
       </tbody></table>
@@ -178,15 +179,22 @@ function renderDetailContent(product) {
   const rentalTerms = `
     ${sectionHead('대여조건')}
     <div class="md-card">
-      ${row('연간약정주행거리', mg.annualMileage)}
-      ${row('결제방식', mg.paymentMethod)}
+      ${row('1만Km추가비용', term.mileage_upcharge_per_10000km)}
+      ${row('보증금분납', term.deposit_installment)}
+      ${row('보증금카드결제', term.deposit_card_payment)}
       ${row('대여지역', c.rentalRegion || term.rental_region)}
       ${row('최소운전자연령', mg.ageText)}
       ${row('운전연령하향', mg.ageLowering)}
       ${row('운전연령하향비용', mg.ageLoweringCost)}
+      ${row('개인운전자범위', term.personal_driver_scope)}
+      ${row('사업자운전자범위', term.business_driver_scope)}
+      ${row('추가운전자수', term.additional_driver_allowance_count)}
+      ${row('추가운전자비용', term.additional_driver_cost)}
+      ${row('연간약정주행거리', mg.annualMileage)}
+      ${row('결제방식', mg.paymentMethod)}
       ${row('정비서비스', c.maintenance)}
       ${row('탁송가능', c.delivery)}
-      ${row('탁송비용', c.deliveryFee)}
+      ${row('탁송비용', c.deliveryFee || term.delivery_fee)}
     </div>`;
 
   // ── 7. 추가정보 ──
@@ -198,6 +206,12 @@ function renderDetailContent(product) {
       ${row('차량번호', product.carNo)}
       ${row('차종구분', product.vehicleClass)}
       ${row('차량가격', money(product.vehiclePrice))}
+      ${row('배기량', product.engineCc ? product.engineCc + 'cc' : '-')}
+      ${row('심사여부', product.reviewStatus)}
+      ${row('신용등급', product.creditGrade)}
+      ${row('차량세부상태', c.detailStatus)}
+      ${row('사고여부', c.accident)}
+      ${row('즉시출고', c.immediate)}
       ${row('특이사항', c.note || product.partnerMemo)}
       ${row('공급코드', product.partnerCode)}
       ${photoLinkHtml}
