@@ -356,6 +356,21 @@ body.chat-m-open #message-form {
 /* 채팅 패널: 하단바 바로 위까지 */
 body.chat-m-open .layout-633 {
   bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
+  padding-bottom: 0 !important;
+}
+/* 채팅 메시지 폼 아래 safe-area 여백 제거 */
+body.chat-m-open .message-form {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+body.chat-m-open .panel--chat {
+  padding-bottom: 0 !important;
+}
+body.chat-m-open .chat-panel-body {
+  gap: 0 !important;
+}
+body.chat-m-open #chat-message {
+  display: none !important;
 }
 
 /* 가로 모드 대응 — 채팅 입력창 가려짐 방지 */
