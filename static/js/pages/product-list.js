@@ -224,29 +224,27 @@ const PRICE_MONTHS = ['1','12','24','36','48','60'];
 const INFO_COLS = [
   // maxW: 최대폭(px). 넘으면 말줄임. 없으면 auto.
   // maxW 없음 = 텍스트에 맞게 자동. ellipsis = 상한만 제한
-  { key: 'vehicleStatus', label: '차량상태', align: 'c', filterKey: 'vehicleStatus', w: 80 },
-  { key: 'productType',   label: '상품구분', align: 'c', filterKey: 'productType', w: 80 },
-  { key: 'partnerCode',   label: '공급코드', align: 'c', filterKey: 'partnerCode' },
-  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, filterKey: null, filterType: 'search' },
-  { key: 'maker',         label: '제조사',   align: 'c', filterKey: 'maker' },
-  { key: 'model',         label: '모델명',   align: 'c', filterKey: 'model' },
-  { key: 'subModel',      label: '세부모델', maxW: 100, filterKey: 'subModel' },
-  { key: 'trim',          label: '세부트림', maxW: 100, filterKey: null, filterType: 'search' },
-  { key: 'options',       label: '선택옵션', maxW: 120, filterKey: null, filterType: 'search' },
-  { key: 'fuel',          label: '연료',     align: 'c', filterKey: 'fuel' },
-  { key: 'color',         label: '색상',     align: 'c', maxW: 80, filterKey: 'extColor', filterKey2: 'intColor', filterType: 'dual', filterLabel1: '외장', filterLabel2: '내장' },
-  { key: 'year',          label: '연식',     align: 'c', filterKey: 'year', filterType: 'numeric', sortField: 'year' },
-  { key: 'mileage',       label: '주행거리', num: true,  filterKey: 'mileage', filterType: 'numeric', sortField: 'mileageValue', wCh: '999,999km' },
-  { key: 'vehicleClass',  label: '차종구분', align: 'c', filterKey: 'vehicleClass' },
-  { key: 'reviewStatus',  label: '심사기준', align: 'c', filterKey: 'reviewStatus' },
-  { key: 'minAge',        label: '최저연령', align: 'c', filterKey: 'ageLowering' },
+  { key: 'vehicleStatus', label: '차량상태', align: 'c', filterable: true, w: 80 },
+  { key: 'productType',   label: '상품구분', align: 'c', filterable: true, w: 80 },
+  { key: 'partnerCode',   label: '공급코드', align: 'c', filterable: true },
+  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, searchable: true },
+  { key: 'maker',         label: '제조사',   align: 'c', filterable: true },
+  { key: 'model',         label: '모델명',   align: 'c', filterable: true },
+  { key: 'subModel',      label: '세부모델', maxW: 100, filterable: true },
+  { key: 'trim',          label: '세부트림', maxW: 100, searchable: true },
+  { key: 'options',       label: '선택옵션', maxW: 120, searchable: true },
+  { key: 'fuel',          label: '연료',     align: 'c', filterable: true },
+  { key: 'color',         label: '색상',     align: 'c', maxW: 80, filterable: true },
+  { key: 'year',          label: '연식',     align: 'c', filterable: true },
+  { key: 'mileage',       label: '주행거리', num: true,  filterable: true, wCh: '999,999km' },
+  { key: 'vehicleClass',  label: '차종구분', align: 'c', filterable: true },
+  { key: 'reviewStatus',  label: '심사기준', align: 'c', filterable: true },
+  { key: 'minAge',        label: '최저연령', align: 'c', filterable: true },
 ];
 
-// 기간별 대여료 컬럼 — 9,999,999 기준 고정폭, 대여료/보증금 구간 필터
+// 기간별 대여료 컬럼 — 9,999,999 기준 고정폭
 const PRICE_COLS = PRICE_MONTHS.map(m => ({
   key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, wCh: '9,999,999', num: true, priceMonth: m,
-  filterKey: 'rent', filterKey2: 'deposit', filterType: 'dual', filterLabel1: '대여료', filterLabel2: '보증금',
-  sortField: `rent_${m}`
 }));
 
 const GRID_COLS = [...INFO_COLS, ...PRICE_COLS];
@@ -258,251 +256,7 @@ function getVisibleGridCols() {
   return [...INFO_COLS, ...getVisiblePriceCols()];
 }
 
-let activeHeaderFilter = null;
-let headerFilterEscId = null;
-let gridSortField = null;   // 현재 정렬 필드
-let gridSortDir = 0;        // 0=없음, 1=오름차순, -1=내림차순
-
-function closeHeaderFilter() {
-  if (!activeHeaderFilter) return;
-  document.querySelectorAll('.pls-filter-dd').forEach(dd => dd.remove());
-  $gridHeader?.querySelectorAll('.pls-th.is-filtering').forEach(th => th.classList.remove('is-filtering'));
-  activeHeaderFilter = null;
-  if (headerFilterEscId) { removeEsc(headerFilterEscId); headerFilterEscId = null; }
-}
-
-function _positionFilterDD(dd, thEl) {
-  dd.style.position = 'fixed';
-  dd.style.left = '-9999px';
-  dd.style.top = '-9999px';
-  document.body.appendChild(dd);
-
-  requestAnimationFrame(() => {
-    const thRect = thEl.getBoundingClientRect();
-    const ddW = dd.offsetWidth;
-    const ddH = dd.offsetHeight;
-
-    const panel = thEl.closest('.panel, .pls-grid-panel, section');
-    const pr = panel ? panel.getBoundingClientRect() : { left: 0, right: window.innerWidth, top: 0, bottom: window.innerHeight };
-
-    let left = thRect.left;
-    let top = thRect.bottom + 1;
-
-    if (left + ddW > pr.right) {
-      left = thRect.right - ddW;
-    }
-    if (top + ddH > pr.bottom) {
-      top = thRect.top - ddH - 1;
-    }
-
-    dd.style.left = `${Math.max(pr.left, left)}px`;
-    dd.style.top = `${Math.max(0, top)}px`;
-  });
-}
-
-function buildCheckboxSection(title, groupKey, source) {
-  const group = FILTER_SCHEMA.find(g => g.key === groupKey);
-  if (!group) return '';
-  const options = getGroupOptions(group, source);
-  const selected = new Set(state.filters[groupKey] || []);
-
-  // 각 옵션별 매칭 건수 계산
-  const counted = options.map(opt => {
-    const count = source.filter(item => passesAllFilters(item, groupKey) && matchSingle(group, opt.value, item)).length;
-    return { ...opt, count };
-  });
-
-  // range/year 타입은 원래 순서 유지 (구간이 적은→큰), 나머지는 건수 많은 순
-  if (group.type !== 'range' && group.type !== 'year') {
-    counted.sort((a, b) => {
-      const aChecked = selected.has(a.value) ? 1 : 0;
-      const bChecked = selected.has(b.value) ? 1 : 0;
-      if (aChecked !== bChecked) return bChecked - aChecked;
-      return b.count - a.count;
-    });
-  }
-
-  const checks = counted.filter(opt => opt.count > 0).slice(0, 30).map(opt => {
-    const checked = selected.has(opt.value) ? 'checked' : '';
-    return `<label class="${checked ? 'is-checked' : ''}"><input type="checkbox" data-fk="${groupKey}" value="${escapeHtml(opt.value)}" ${checked}><span>${escapeHtml(opt.label)}</span><span class="pls-fdd__count">${opt.count}</span></label>`;
-  }).join('');
-
-  const titleHtml = title ? `<div class="pls-fdd__title">${escapeHtml(title)}</div>` : '';
-  return `<div class="pls-fdd__section">${titleHtml}${checks}</div>`;
-}
-
-function openHeaderFilter(colDef, thEl) {
-  closeHeaderFilter();
-  if (!colDef?.filterKey && colDef?.filterType !== 'search') return;
-
-  activeHeaderFilter = colDef.key;
-  thEl.classList.add('is-filtering');
-  headerFilterEscId = pushEsc(() => { applyFilters(); closeHeaderFilter(); });
-
-  const dd = document.createElement('div');
-  dd.className = 'pls-filter-dd';
-
-  // ── 검색형 필터 (세부트림, 선택옵션) ──
-  if (colDef.filterType === 'search') {
-    const fieldKey = colDef.key;
-    const curQ = state._colSearch?.[fieldKey] || '';
-    dd.innerHTML = `<div class="pls-fdd__search-wrap"><input type="text" class="pls-fdd__search" placeholder="${escapeHtml(colDef.label)} 검색..." data-search-col="${fieldKey}" value="${escapeHtml(curQ)}"><span class="pls-fdd__match-count" data-fdd-count></span></div>`;
-    _positionFilterDD(dd, thEl);
-    const searchInput = dd.querySelector('.pls-fdd__search');
-    const countEl = dd.querySelector('[data-fdd-count]');
-    function updateCount(q) {
-      if (!countEl) return;
-      if (!q) { countEl.textContent = ''; return; }
-      const n = state.allProducts.filter(item => {
-        const val = fieldKey === 'options' ? String(item.optionSummary || '') : fieldKey === 'carNo' ? String(item.carNo || '') : String(item[fieldKey] || '');
-        return val.toLowerCase().includes(q);
-      }).length;
-      countEl.textContent = `${n}건`;
-      countEl.classList.toggle('pls-fdd__match-count--zero', n === 0);
-    }
-    updateCount(curQ);
-    searchInput?.focus();
-    let searchTimer = null;
-    searchInput?.addEventListener('input', () => {
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => {
-        const q = (searchInput.value || '').trim().toLowerCase();
-        state._colSearch = state._colSearch || {};
-        state._colSearch[fieldKey] = q;
-        updateCount(q);
-        applyFiltersKeepDropdown();
-      }, 150);
-    });
-
-    // 적용/초기화
-    const filterKeys = [];
-    const actionBar = document.createElement('div');
-    actionBar.className = 'pls-fdd__actions';
-    actionBar.innerHTML = `<button type="button" class="pls-fdd__action-btn pls-fdd__action-btn--reset" data-fdd-reset>초기화</button>`
-      + `<button type="button" class="pls-fdd__action-btn pls-fdd__action-btn--apply" data-fdd-apply>적용</button>`;
-    dd.appendChild(actionBar);
-    actionBar.addEventListener('click', (e) => {
-      if (e.target.closest('[data-fdd-apply]')) { applyFilters(); closeHeaderFilter(); return; }
-      if (e.target.closest('[data-fdd-reset]')) {
-        if (state._colSearch) delete state._colSearch[fieldKey];
-        applyFilters(); closeHeaderFilter();
-      }
-    });
-    return;
-  }
-
-  // ── 타입별 드롭다운 내용 ──
-  if (colDef.filterType === 'dual') {
-    // 2줄 필터
-    let sortHtml = '';
-    if (colDef.sortField) {
-      const isAsc = gridSortField === colDef.sortField && gridSortDir === 1;
-      const isDesc = gridSortField === colDef.sortField && gridSortDir === -1;
-      sortHtml = `<div class="pls-fdd__sort-row">`
-        + `<button type="button" class="pls-fdd__sort-btn${isAsc?' is-active':''}" data-sort-dir="1">▲ 오름차순</button>`
-        + `<button type="button" class="pls-fdd__sort-btn${isDesc?' is-active':''}" data-sort-dir="-1">▼ 내림차순</button>`
-        + `</div>`;
-    }
-    dd.innerHTML = sortHtml
-                 + buildCheckboxSection(colDef.filterLabel1 || '', colDef.filterKey, state.allProducts)
-                 + buildCheckboxSection(colDef.filterLabel2 || '', colDef.filterKey2, state.allProducts);
-
-  } else if (colDef.filterType === 'numeric') {
-    // 숫자: 정렬 버튼 + 구간 필터
-    const group = FILTER_SCHEMA.find(g => g.key === colDef.filterKey);
-    const isAsc = gridSortField === colDef.sortField && gridSortDir === 1;
-    const isDesc = gridSortField === colDef.sortField && gridSortDir === -1;
-    const sortBtns = `<div class="pls-fdd__sort-row">`
-      + `<button type="button" class="pls-fdd__sort-btn${isAsc?' is-active':''}" data-sort-dir="1">▲ 오름차순</button>`
-      + `<button type="button" class="pls-fdd__sort-btn${isDesc?' is-active':''}" data-sort-dir="-1">▼ 내림차순</button>`
-      + `</div>`;
-    const rangeGroup = FILTER_SCHEMA.find(g => g.key === colDef.filterKey && g.type === 'range');
-    let rangeSection = '';
-    if (rangeGroup) {
-      rangeSection = buildCheckboxSection('구간', colDef.filterKey, state.allProducts);
-    } else {
-      // year 등 range가 아닌 숫자는 체크박스로
-      rangeSection = buildCheckboxSection('선택', colDef.filterKey, state.allProducts);
-    }
-    dd.innerHTML = sortBtns + rangeSection;
-
-  } else {
-    // 일반 체크박스
-    dd.innerHTML = buildCheckboxSection('', colDef.filterKey, state.allProducts);
-  }
-
-  // ── 하단 액션 바: 적용 / 초기화 ──
-  const filterKeys = [colDef.filterKey, colDef.filterKey2].filter(Boolean);
-  const actionBar = document.createElement('div');
-  actionBar.className = 'pls-fdd__actions';
-  actionBar.innerHTML = `<button type="button" class="pls-fdd__action-btn pls-fdd__action-btn--reset" data-fdd-reset>초기화</button>`
-    + `<button type="button" class="pls-fdd__action-btn pls-fdd__action-btn--apply" data-fdd-apply>적용</button>`;
-  dd.appendChild(actionBar);
-
-  _positionFilterDD(dd, thEl);
-
-  // ── 이벤트: 적용/초기화 버튼 ──
-  actionBar.addEventListener('click', (e) => {
-    if (e.target.closest('[data-fdd-apply]')) {
-      applyFilters();
-      closeHeaderFilter();
-      return;
-    }
-    if (e.target.closest('[data-fdd-reset]')) {
-      filterKeys.forEach(fk => { state.filters[fk] = []; });
-      if (colDef.sortField && gridSortField === colDef.sortField) {
-        gridSortField = null;
-        gridSortDir = 0;
-      }
-      applyFilters();
-      closeHeaderFilter();
-    }
-  });
-
-  // ── 이벤트: 체크박스 → 필터 즉시 반영 + 드롭다운 유지 ──
-  dd.addEventListener('change', (e) => {
-    const input = e.target.closest('input[type="checkbox"][data-fk]');
-    if (!input) return;
-    const fk = input.dataset.fk;
-    const cur = new Set(state.filters[fk] || []);
-    if (input.checked) cur.add(input.value); else cur.delete(input.value);
-    state.filters[fk] = [...cur];
-    input.closest('label')?.classList.toggle('is-checked', input.checked);
-    // 목록만 갱신하고 헤더는 건드리지 않음 (드롭다운 유지)
-    applyFiltersKeepDropdown();
-  });
-
-  // ── 이벤트: 정렬 버튼 ──
-  dd.addEventListener('click', (e) => {
-    const sortBtn = e.target.closest('[data-sort-dir]');
-    if (!sortBtn || !colDef.sortField) return;
-    const dir = Number(sortBtn.dataset.sortDir);
-    if (gridSortField === colDef.sortField && gridSortDir === dir) {
-      gridSortField = null; gridSortDir = 0; // 토글 해제
-    } else {
-      gridSortField = colDef.sortField; gridSortDir = dir;
-    }
-    applyFilters();
-    closeHeaderFilter();
-  });
-}
-
-/* renderGridHeader removed — renderTableGrid handles header rendering */
-
-$gridHeader?.addEventListener('click', (e) => {
-  if (e.target.closest('.pls-filter-dd')) return;
-  const th = e.target.closest('.pls-th[data-col-key]');
-  if (!th) return;
-  const colKey = th.dataset.colKey;
-  const col = getVisibleGridCols().find(c => c.key === colKey);
-  if (!col?.filterKey && col?.filterType !== 'search') return;
-  if (activeHeaderFilter === colKey) { closeHeaderFilter(); return; }
-  openHeaderFilter(col, th);
-});
-
-document.addEventListener('click', (e) => {
-  if (activeHeaderFilter && !e.target.closest('.pls-th') && !e.target.closest('.pls-filter-dd')) closeHeaderFilter();
-});
+/* Header column filters are now managed by renderTableGrid's built-in filter system */
 
 /* ── 상세 패널 열기/닫기 (우측 오버레이) ── */
 let detailEscId = null;
@@ -590,19 +344,6 @@ function passesSearch(item, query) {
   }
   return true;
 }
-function passesColSearch(items) {
-  const colSearch = state._colSearch || {};
-  let result = items;
-  for (const [key, q] of Object.entries(colSearch)) {
-    if (!q) continue;
-    const candidate = result.filter(item => {
-      const val = key === 'options' ? String(item.optionSummary || '') : key === 'carNo' ? String(item.carNo || '') : String(item[key] || '');
-      return val.toLowerCase().includes(q);
-    });
-    if (candidate.length) result = candidate;
-  }
-  return result;
-}
 function passesAllFilters(item,skip){ if(!passesSearch(item, state.searchQuery)) return false; return FILTER_SCHEMA.every(group=>{ if(group.key==='periods') return true; if(group.key===skip) return true; return passesGroup(group,item,state.filters[group.key]);}); }
 function safeFilterAll(items) {
   let result = items.filter(item => passesSearch(item, state.searchQuery));
@@ -613,7 +354,7 @@ function safeFilterAll(items) {
     const candidate = result.filter(item => passesGroup(group, item, selected));
     if (candidate.length) result = candidate;
   });
-  return passesColSearch(result);
+  return result;
 }
 function renderPeriodsHead(){ /* 기간 헤더는 그리드 내장으로 이동 — 호환성 유지 */ if($periodHead) $periodHead.innerHTML=''; }
 function summarizeOptionText(text){ const raw=safe(text); if(raw==='-') return raw; return raw.length>18 ? `${raw.slice(0,18)}...` : raw; }
@@ -699,16 +440,16 @@ function scheduleRenderList() {
   _renderListRaf = requestAnimationFrame(() => { _renderListRaf = 0; renderList(); });
 }
 
-function renderList({ bodyOnly = false } = {}){
+function renderList(){
   if ($pageName) $pageName.textContent = `전체 상품 검색 (${state.filteredProducts.length}건)`;
 
   renderTableGrid({
-    _bodyOnly: bodyOnly,
     thead: $gridHeader,
     tbody: $list,
     columns: getVisibleGridCols(),
     items: state.filteredProducts,
     selectedKey: state.selectedId,
+    sortable: true,
     getKey: (item) => item.id,
     onSelect: (item) => {
       if (state.selectedId === item.id && $detailPanel && !$detailPanel.hidden) {
@@ -737,32 +478,16 @@ function renderList({ bodyOnly = false } = {}){
       const cv = cellValue(col, item);
       return cv.html || escapeHtml(cv.text || '');
     },
+    getCellText: (col, item) => {
+      if (col.priceMonth) {
+        const rent = moneyToNumber(item.price[col.priceMonth]?.rent);
+        return rent ? rent.toString() : '';
+      }
+      const cv = cellValue(col, item);
+      return cv.text || '';
+    },
     emptyText: '조건에 맞는 상품이 없습니다.'
   });
-
-  // Post-render: apply filterable/has-filter classes (page uses its own filter system, not renderTableGrid's built-in one)
-  if ($gridHeader && !bodyOnly) {
-    const visibleCols = getVisibleGridCols();
-    $gridHeader.querySelectorAll('.pls-th[data-col-key]').forEach(th => {
-      const colKey = th.dataset.colKey;
-      const col = visibleCols.find(c => c.key === colKey);
-      if (!col) return;
-      const isFilterable = col.filterKey || col.filterType === 'search';
-      th.classList.toggle('pls-th--filterable', !!isFilterable);
-      const cnt1 = col.filterKey ? (state.filters[col.filterKey]?.length || 0) : 0;
-      const cnt2 = col.filterKey2 ? (state.filters[col.filterKey2]?.length || 0) : 0;
-      const hasColSearch = state._colSearch?.[col.key] ? 1 : 0;
-      th.classList.toggle('pls-th--has-filter', (cnt1 + cnt2 + hasColSearch) > 0);
-      if (col.sticky) th.classList.add('pls-th--sticky');
-      // Sort indicator
-      if (col.sortField && gridSortField === col.sortField && gridSortDir) {
-        const label = th.querySelector('.pls-th__label');
-        if (label && !th.querySelector('.pls-th__sort')) {
-          label.insertAdjacentHTML('afterend', `<span class="pls-th__sort">${gridSortDir === 1 ? '▲' : '▼'}</span>`);
-        }
-      }
-    });
-  }
 }
 
 /* Row click handling is now managed by renderTableGrid's onSelect callback */
@@ -979,32 +704,6 @@ function syncSelectionFromPreferredProduct(){
   }
 }
 
-/** 드롭다운을 유지한 채 목록만 갱신 (헤더 재렌더링 안 함) */
-function applyFiltersKeepDropdown(){
-  state.filteredProducts = safeFilterAll(state.allProducts);
-  if (gridSortField && gridSortDir) {
-    state.filteredProducts.sort((a, b) => {
-      let av, bv;
-      const priceMatch = gridSortField.match(/^rent_(\d+)$/);
-      if (priceMatch) {
-        av = moneyToNumber(a.price[priceMatch[1]]?.rent);
-        bv = moneyToNumber(b.price[priceMatch[1]]?.rent);
-      } else {
-        av = Number(a[gridSortField]) || 0;
-        bv = Number(b[gridSortField]) || 0;
-      }
-      return gridSortDir === 1 ? av - bv : bv - av;
-    });
-  }
-  syncSelectionFromPreferredProduct();
-  if (state.selectedId && !state.filteredProducts.find(item => item.id === state.selectedId)) {
-    state.selectedId = null;
-    state.activePhotoIndex = 0;
-  }
-  renderList({ bodyOnly: true });
-  renderDetail();
-  persistFilterState();
-}
 
 function syncTopBarIdentity(product) {
   if (!$stateSep || !$stateIdentity) return;
@@ -1062,22 +761,6 @@ function applyFilters(){
     state.filters[group.key]=state.filters[group.key].filter(v=>available.has(v));
   });
   state.filteredProducts = safeFilterAll(state.allProducts);
-  // 그리드 정렬 적용
-  if (gridSortField && gridSortDir) {
-    state.filteredProducts.sort((a, b) => {
-      let av, bv;
-      // rent_48 → price['48'].rent
-      const priceMatch = gridSortField.match(/^rent_(\d+)$/);
-      if (priceMatch) {
-        av = moneyToNumber(a.price[priceMatch[1]]?.rent);
-        bv = moneyToNumber(b.price[priceMatch[1]]?.rent);
-      } else {
-        av = Number(a[gridSortField]) || 0;
-        bv = Number(b[gridSortField]) || 0;
-      }
-      return gridSortDir === 1 ? av - bv : bv - av;
-    });
-  }
   syncSelectionFromPreferredProduct();
   if (state.selectedId && !state.filteredProducts.find((item) => item.id === state.selectedId)) {
     state.selectedId = null;
