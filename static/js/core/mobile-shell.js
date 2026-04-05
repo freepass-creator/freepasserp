@@ -177,15 +177,15 @@ function initKeyboardAdjust() {
 
   window.visualViewport.addEventListener('resize', () => {
     const kbHeight = window.innerHeight - window.visualViewport.height;
-    const kbOpen = kbHeight > 50;
+    const kbOpen = kbHeight > 0;
 
-    // 키보드 열림: 탭바 숨김
-    if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
-
-    // 채팅 패널 bottom 조정
+    // 키보드/브라우저바 열림: 탭바 숨기고 채팅 패널 조정
     if (document.body.classList.contains('chat-m-open')) {
+      if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
       const panel = document.querySelector('.layout-633');
-      if (panel) panel.style.bottom = kbOpen ? `${kbHeight}px` : `calc(${TAB_H}px + env(safe-area-inset-bottom))`;
+      if (panel) panel.style.bottom = kbOpen ? '0px' : `calc(${TAB_H}px + env(safe-area-inset-bottom))`;
+    } else {
+      if (tabBarEl) tabBarEl.style.display = '';
     }
 
     // 계약 폼 패널 bottom 조정

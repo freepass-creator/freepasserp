@@ -340,7 +340,7 @@ button, a, [role="button"] {
   justify-content: center !important;
 }
 
-/* 채팅 열린 상태: 하단 여백 제거, 입력창 키보드에 딱 붙음 */
+/* 채팅 열린 상태 */
 body.chat-m-open .main-shell--new {
   padding-bottom: 0 !important;
 }
@@ -353,8 +353,9 @@ body.chat-m-open #message-form {
   margin: 0 !important;
   padding: 0 !important;
 }
+/* 채팅 패널: 하단바 바로 위까지 */
 body.chat-m-open .layout-633 {
-  bottom: 0 !important;
+  bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom)) !important;
 }
 
 /* 가로 모드 대응 — 채팅 입력창 가려짐 방지 */
