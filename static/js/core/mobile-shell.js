@@ -179,12 +179,8 @@ function initKeyboardAdjust() {
     const kbHeight = window.innerHeight - window.visualViewport.height;
     const kbOpen = kbHeight > 0;
 
-    // 키보드/브라우저바 열림: 탭바 숨기고 채팅 패널 조정
-    if (document.body.classList.contains('chat-m-open')) {
-      if (tabBarEl) tabBarEl.style.display = kbOpen ? 'none' : '';
-      const panel = document.querySelector('.layout-633');
-      if (panel) panel.style.bottom = kbOpen ? '0px' : `calc(${TAB_H}px + env(safe-area-inset-bottom))`;
-    } else {
+    // 채팅 중에는 조정하지 않음 (CSS로 고정)
+    if (!document.body.classList.contains('chat-m-open')) {
       if (tabBarEl) tabBarEl.style.display = '';
     }
 
