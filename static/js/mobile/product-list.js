@@ -195,21 +195,20 @@ function renderDetailContent(product) {
   const rentalTerms = `
     ${sectionHead('대여조건')}
     <div class="md-card">
+      ${row('결제방식', first(term.payment_method, p.paymentMethod))}
+      ${row('약정주행거리', first(term.annual_mileage, p.annualMileage))}
       ${row('1만Km추가비용', first(term.mileage_upcharge_per_10000km))}
       ${row('보증금분납', first(term.deposit_installment))}
       ${row('보증금카드결제', first(term.deposit_card_payment))}
-      ${row('대여지역', first(term.rental_region, c.rentalRegion))}
-      ${row('최소운전연령', first(term.basic_driver_age, product.ageText))}
-      ${row('운전연령하향', first(term.driver_age_lowering, p.ageLowering))}
-      ${row('운전연령하향비용', first(term.age_lowering_cost, p.ageLoweringCost))}
-      ${row('개인운전자범위', first(term.personal_driver_scope))}
-      ${row('사업자운전자범위', first(term.business_driver_scope))}
+      ${row('연령하향', first(term.driver_age_lowering, p.ageLowering))}
+      ${row('연령하향비용', first(term.age_lowering_cost, p.ageLoweringCost))}
+      ${row('개인운전범위', first(term.personal_driver_scope))}
+      ${row('사업자운전범위', first(term.business_driver_scope))}
       ${row('추가운전자수', first(term.additional_driver_allowance_count))}
       ${row('추가운전자비용', first(term.additional_driver_cost))}
-      ${row('연간약정주행거리', first(term.annual_mileage, p.annualMileage))}
-      ${row('결제방식', first(term.payment_method, p.paymentMethod))}
-      ${row('정비서비스', first(term.maintenance_service, c.maintenance))}
+      ${row('대여지역', first(term.rental_region, c.rentalRegion))}
       ${row('탁송비', first(term.delivery_fee, c.deliveryFee))}
+      ${row('정비서비스', first(term.maintenance_service, c.maintenance))}
       ${row('위약금', first(term.penalty_condition, c.penaltyRate))}
     </div>`;
 

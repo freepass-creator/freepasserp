@@ -319,20 +319,21 @@ function renderVehicleInfoSection(product) {
 function renderRentalSection(product, termFields = {}) {
   const policy = buildPolicyValues(product, termFields);
   const rows = [
+    rowMaybe('결제방식', policy.paymentMethod),
+    rowMaybe('약정주행거리', policy.annualMileage),
     rowMaybe('1만Km추가비용', policy.mileageUpchargePer10000km),
     rowMaybe('보증금분납', policy.depositInstallment),
-    rowMaybe('결제방식', policy.paymentMethod),
-    rowMaybe('위약금', policy.penaltyCondition, { multiline: true }),
     rowMaybe('보증금카드결제', policy.depositCardPayment),
-    rowMaybe('대여지역', policy.rentalRegion),
-    rowMaybe('탁송비', policy.deliveryFee),
-    rowMaybe('운전연령하향', policy.driverAgeLowering),
-    rowMaybe('운전연령하향비용', policy.ageLoweringCost),
-    rowMaybe('개인운전자범위', policy.personalDriverScope, { multiline: true }),
-    rowMaybe('사업자운전자범위', policy.businessDriverScope, { multiline: true }),
+    rowMaybe('연령하향', policy.driverAgeLowering),
+    rowMaybe('연령하향비용', policy.ageLoweringCost),
+    rowMaybe('개인운전범위', policy.personalDriverScope, { multiline: true }),
+    rowMaybe('사업자운전범위', policy.businessDriverScope, { multiline: true }),
     rowMaybe('추가운전자수', policy.additionalDriverAllowanceCount),
     rowMaybe('추가운전자비용', policy.additionalDriverCost),
+    rowMaybe('대여지역', policy.rentalRegion),
+    rowMaybe('탁송비', policy.deliveryFee),
     rowMaybe('정비서비스', policy.maintenanceService),
+    rowMaybe('위약금', policy.penaltyCondition, { multiline: true }),
   ].join('');
 
   if (!rows) return '';
