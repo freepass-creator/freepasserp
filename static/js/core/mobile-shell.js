@@ -124,7 +124,7 @@ function navigateToProductList() {
 async function handleMobileBack() {
   // 1. 페이지별 핸들러 (채팅방 닫기, 계약폼 닫기)
   if (_mobileBackHandler) {
-    const handled = _mobileBackHandler();
+    const handled = await _mobileBackHandler();
     if (handled) return true; // 앱 안에서 처리됨
   }
 

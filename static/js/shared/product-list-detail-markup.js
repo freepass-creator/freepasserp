@@ -312,11 +312,13 @@ function buildPolicyValues(product, termFields = {}) {
 
 function renderVehicleInfoSection(product) {
   const rows = [
+    rowMaybe('차량번호', product.carNo),
     rowMaybe('차종구분', product.vehicleClass),
     rowMaybe('최초등록일', normalizeDate(product.firstRegistrationDate)),
     rowMaybe('차령만료일', normalizeDate(product.vehicleAgeExpiryDate)),
     rowMaybe('차량가격', formatMoney(product.vehiclePrice, { zeroAsDash: true })),
-    rowMaybe('특이사항', product.partnerMemo, { multiline: true })
+    rowMaybe('특이사항', product.partnerMemo, { multiline: true }),
+    rowMaybe('공급코드', product.providerCompanyCode || product.partnerCode)
   ].join('');
 
   if (!rows) return '';
