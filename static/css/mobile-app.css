@@ -346,28 +346,18 @@ button, a, [role="button"] {
 .m-chatroom {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
+  position: fixed;
+  top: var(--mobile-topbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
   background: #f8fafc;
 }
 .m-chatroom[hidden] { display: none !important; }
 
 body.chat-m-open .chat-m-rooms { display: none !important; }
 body.chat-m-open .mobile-tab-bar { display: none !important; }
-body.chat-m-open .main-shell--new {
-  padding-bottom: 0 !important;
-  height: calc(100dvh - var(--mobile-topbar-height)) !important;
-  overflow: hidden !important;
-}
-body.chat-m-open .page-tab {
-  height: 100% !important;
-  overflow: hidden !important;
-}
-body.chat-m-open .work-page {
-  height: 100% !important;
-  overflow: hidden !important;
-}
 
 .m-chatroom__head {
   display: flex;
