@@ -88,11 +88,10 @@
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  margin-top: var(--mobile-topbar-height);
 }
 
 /* 모바일 요소 항상 표시 */
-.mobile-topbar { display: flex !important; z-index: 999 !important; background: #fff !important; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; contain: layout style paint; }
+.mobile-topbar { display: flex !important; z-index: 999 !important; background: #fff !important; position: sticky !important; top: 0 !important; left: 0 !important; right: 0 !important; contain: layout style paint; }
 .mobile-tab-bar { display: flex !important; }
 .pls-m-catalog-wrap { display: block !important; }
 .chat-m-rooms { display: block !important; }
