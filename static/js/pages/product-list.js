@@ -14,7 +14,7 @@ import { showConfirm, showToast } from "../core/toast.js";
 import { bindProductDetailPhotoEvents, extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
 import { renderBadgeRow } from "../shared/badge.js";
 
-const _isMobile = { get matches() { return document.documentElement.classList.contains('is-mobile'); } };
+const _isMobile = { get matches() { return window.matchMedia('(max-width: 768px)').matches; } };
 import {
   esc,
   renderCatalogCard,
