@@ -688,6 +688,54 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
    모바일 설정 페이지
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── 모바일 검색+필터 바 ── */
+.m-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.m-search-bar__input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 14px;
+  background: #f2f4f6;
+  border-radius: 12px;
+  color: #8b95a1;
+}
+.m-search-bar__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px !important;
+  color: #191f28;
+  outline: none;
+  min-width: 0;
+}
+.m-search-bar__input::placeholder { color: #b0b8c1; }
+.m-search-bar__filter-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: #f2f4f6;
+  color: #4e5968;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.m-search-bar__filter-btn:active { background: #e5e8eb; }
+
 .m-settings-page {
   padding: 0 0 32px;
   display: flex;

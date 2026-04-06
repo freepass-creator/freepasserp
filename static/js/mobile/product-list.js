@@ -331,20 +331,29 @@ function closeFilter() {
 // ─── 이벤트 바인딩 ───────────────────────────────────────────────────────────
 
 function bindEvents() {
-  // 필터 토글
+  // 필터 토글 (상단바 버튼 + 검색바 버튼)
   document.getElementById('mobile-filter-btn')?.addEventListener('click', () => {
+    $sidebar?.classList.contains('is-open') ? closeFilter() : openFilter();
+  });
+  document.getElementById('plsMFilterBtn')?.addEventListener('click', () => {
     $sidebar?.classList.contains('is-open') ? closeFilter() : openFilter();
   });
   $close?.addEventListener('click', closeFilter);
   $overlay?.addEventListener('click', closeFilter);
 
-  // 검색
+  // 검색 (사이드바 검색 + 상단 검색바)
   let timer;
-  $search?.addEventListener('input', () => {
-    state.searchQuery = $search.value.trim();
+  const $topSearch = document.getElementById('plsMSearchInput');
+  function onSearchInput(e) {
+    state.searchQuery = e.target.value.trim();
+    // 두 검색창 동기화
+    if ($search && $search !== e.target) $search.value = e.target.value;
+    if ($topSearch && $topSearch !== e.target) $topSearch.value = e.target.value;
     clearTimeout(timer);
     timer = setTimeout(applyFilters, 150);
-  });
+  }
+  $search?.addEventListener('input', onSearchInput);
+  $topSearch?.addEventListener('input', onSearchInput);
 
   // 초기화
   $reset?.addEventListener('click', () => {
