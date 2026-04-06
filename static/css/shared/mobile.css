@@ -93,8 +93,7 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 
   /* ─── 모바일 요소 표시 ──────────────────────────────────────────────────── */
 
-  :root { --mobile-topbar-height: 0px; }
-  .mobile-topbar  { display: none !important; }
+  .mobile-topbar  { display: flex !important; }
   .mobile-tab-bar { display: flex !important; }
 
   /* ─── 입력란 iOS 자동 확대 방지 (font-size < 16px → zoom) ──────────────── */
