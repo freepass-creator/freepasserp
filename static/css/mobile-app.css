@@ -3,6 +3,37 @@
    base-mobile.html에서만 로드. 데스크탑 CSS와 완전 분리.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   모바일 디자인 토큰 — 전 페이지 공통 규격
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --m-topbar-height: 48px;
+  --m-tabbar-height: 56px;
+  --m-page-bg: #f7f8fa;
+  --m-card-bg: #fff;
+  --m-card-radius: 16px;
+  --m-card-padding: 16px;
+  --m-input-height: 48px;
+  --m-input-radius: 12px;
+  --m-input-bg: #f2f4f6;
+  --m-input-bg-focus: #fff;
+  --m-btn-height: 52px;
+  --m-btn-radius: 14px;
+  --m-icon-primary: 18px;
+  --m-icon-secondary: 14px;
+  --m-text-primary: #191f28;
+  --m-text-secondary: #4e5968;
+  --m-text-tertiary: #8b95a1;
+  --m-text-hint: #b0b8c1;
+  --m-accent: #1b2a4a;
+  --m-danger: #f04452;
+  --m-success: #10b981;
+  --m-divider: #f2f4f6;
+  --m-row-height: 54px;
+  --m-section-gap: 8px;
+}
+
 /* 모든 CSS는 base-mobile.html에서 <link>로 병렬 로딩 */
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -372,17 +403,17 @@ button, a, [role="button"] {
 
 /* ── 모바일 폼 (계약 입력/수정) ── */
 .m-form-card {
-  padding: 0 0 16px;
+  padding: 0 0 var(--m-card-padding);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: #f7f8fa;
+  gap: var(--m-section-gap);
+  background: var(--m-page-bg);
 }
 .m-form-section {
-  background: #fff;
-  border-radius: 18px;
+  background: var(--m-card-bg);
+  border-radius: var(--m-card-radius);
   overflow: visible;
-  margin: 0 16px;
+  margin: 0 var(--m-card-padding);
   padding: 20px;
 }
 .m-form-section-head {
@@ -551,12 +582,9 @@ button, a, [role="button"] {
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: var(--mobile-topbar-height);
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 200;
-  background: #f8fafc;
+  background: var(--m-page-bg);
   overflow: hidden;
 }
 .m-chatroom[hidden] { display: none !important; }
@@ -568,16 +596,16 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 40px;
-  padding: 0 12px;
-  background: #fff;
-  border-bottom: none;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  height: var(--m-topbar-height);
+  padding: 0 14px;
+  background: var(--m-card-bg);
+  border-bottom: 1px solid var(--m-divider);
   flex-shrink: 0;
 }
 .m-chatroom__title {
-  font-size: 12px;
-  color: #64748b;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--m-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -692,47 +720,47 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
 .m-search-bar {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: #fff;
+  gap: 8px;
+  padding: 8px var(--m-card-padding);
+  background: var(--m-card-bg);
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
+  border-bottom: 1px solid var(--m-divider);
 }
 .m-search-bar__input-wrap {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 10px;
-  background: #f2f4f6;
-  border-radius: 10px;
-  color: #b0b8c1;
+  gap: 8px;
+  height: 38px;
+  padding: 0 12px;
+  background: var(--m-input-bg);
+  border-radius: var(--m-input-radius);
+  color: var(--m-text-hint);
 }
-.m-search-bar__input-wrap svg { width: 14px; height: 14px; flex-shrink: 0; }
+.m-search-bar__input-wrap svg { width: var(--m-icon-secondary); height: var(--m-icon-secondary); flex-shrink: 0; }
 .m-search-bar__input {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 14px !important;
-  color: #191f28;
+  font-size: 15px !important;
+  color: var(--m-text-primary);
   outline: none;
   min-width: 0;
 }
-.m-search-bar__input::placeholder { color: #b0b8c1; font-size: 13px; }
+.m-search-bar__input::placeholder { color: var(--m-text-hint); font-size: 14px; }
 .m-search-bar__filter-btn {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border: none;
-  border-radius: 10px;
-  background: #f2f4f6;
-  color: #4e5968;
+  border-radius: var(--m-input-radius);
+  background: var(--m-input-bg);
+  color: var(--m-text-secondary);
   cursor: pointer;
   transition: background 0.08s;
 }
@@ -766,8 +794,8 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
 }
 
 .ms-card {
-  background: #fff;
-  margin: 0 0 8px;
+  background: var(--m-card-bg);
+  margin: 0 0 var(--m-section-gap);
 }
 .ms-card-title {
   padding: 20px 24px 8px;
@@ -780,8 +808,8 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 0 24px;
-  min-height: 54px;
+  padding: 0 20px;
+  min-height: var(--m-row-height);
   border: none;
   background: transparent;
   font-size: 16px;

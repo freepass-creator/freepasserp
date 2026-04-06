@@ -9,19 +9,14 @@
   /* 채팅 페이지 기본: 방 목록만 표시, 데스크탑 패널 숨김 */
   body.page-chat .layout-633 { display: none !important; }
 
-  /* 방 목록: 탑바~탭바 사이 고정 */
+  /* 방 목록: 플렉스 스크롤 (fixed 제거) */
   .chat-m-rooms {
     display: flex !important;
     flex-direction: column;
-    position: fixed;
-    top: var(--mobile-topbar-height);
-    left: 0;
-    right: 0;
-    bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
+    flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     background: #fff;
-    z-index: 100;
   }
 
   /* 방 열린 상태: 목록 숨기고 채팅패널만 전체화면 */
