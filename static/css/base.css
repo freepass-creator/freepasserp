@@ -132,7 +132,7 @@
   --filter-search-height: var(--height-md);
 
   /* ── 모바일 ── */
-  --mobile-topbar-height: 46px;
+  --mobile-topbar-height: 48px;
   --mobile-tabbar-height: 56px;
   --mobile-input-font-size: var(--font-size-xl);
   --mobile-drawer-width: 260px;
