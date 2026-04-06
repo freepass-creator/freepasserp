@@ -134,12 +134,14 @@ export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termF
     return `<tr><td>${m}개월</td><td><strong>${rent ? rent.toLocaleString('ko-KR') + '원' : '-'}</strong></td><td>${dep ? dep.toLocaleString('ko-KR') + '원' : '-'}</td></tr>`;
   }).join('');
 
-  const screeningNote = first(termFields.screening_criteria, product.reviewStatus, product.creditGrade);
+  const screeningNote = first(termFields.screening_criteria, product.reviewStatus);
+  const creditGrade = first(termFields.credit_grade, product.creditGrade);
+  const screeningDisplay = [screeningNote, creditGrade].filter(v => v && v !== '-').join('/');
   const basicAge = first(termFields.basic_driver_age, product.ageText);
   const annualMileage = first(termFields.annual_mileage, p.annualMileage);
   const insuranceIncluded = first(termFields.insurance_included, product.insuranceIncluded);
   const criteriaItems = [
-    screeningNote !== '-' ? screeningNote : '',
+    screeningDisplay || '',
     basicAge !== '-' ? `만 ${basicAge}` : '',
     annualMileage !== '-' ? annualMileage : '',
     insuranceIncluded !== '-' ? `보험료 ${insuranceIncluded}` : '',
