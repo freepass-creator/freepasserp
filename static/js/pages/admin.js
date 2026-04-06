@@ -27,7 +27,11 @@ function prevYearMonth() {
   d.setMonth(d.getMonth() - 1);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
-let adminStlMonth = '';
+let stlFilterYear = '';
+let stlFilterMonth = '';
+let stlFilterPartner = '';
+let stlFilterChannel = '';
+let stlFilterAgent = '';
 
 function getStlItemMonth(s) {
   const ts = s.completed_at || s.settled_at || s.created_at || 0;
@@ -36,9 +40,17 @@ function getStlItemMonth(s) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function getAdminMonthFiltered() {
-  if (!adminStlMonth) return allSettlements;
-  return allSettlements.filter(s => getStlItemMonth(s) === adminStlMonth);
+function getStlFiltered() {
+  let items = allSettlements;
+  if (stlFilterYear) items = items.filter(s => getStlItemMonth(s).startsWith(stlFilterYear));
+  if (stlFilterMonth) {
+    const ym = stlFilterYear ? `${stlFilterYear}-${stlFilterMonth}` : '';
+    if (ym) items = items.filter(s => getStlItemMonth(s) === ym);
+  }
+  if (stlFilterPartner) items = items.filter(s => stlPartner(s) === stlFilterPartner);
+  if (stlFilterChannel) items = items.filter(s => stlChannel(s) === stlFilterChannel);
+  if (stlFilterAgent) items = items.filter(s => stlAgent(s) === stlFilterAgent);
+  return items;
 }
 
 function bindDOM() {
@@ -80,10 +92,9 @@ function switchTab(tabKey) {
   });
   const title = TAB_TITLES[tabKey] || '';
 
-  // 정산서 탭 전환 시 전월로 설정
+  // 정산서 탭 전환 시 필터 셀렉트 렌더링
   if (tabKey === 'settlement') {
-    adminStlMonth = prevYearMonth();
-    updateMonthLabel();
+    renderStlFilterSelects();
     renderStlList();
   }
   if (tabKey === 'stock') {
@@ -91,21 +102,15 @@ function switchTab(tabKey) {
     renderStockList();
   }
 
-  // 탭별 헤더 영역 토글
-  const isStl = tabKey === 'settlement';
-  const headTools      = document.getElementById('adminStlHeadTools');
-  const colBar         = document.getElementById('adminStlColBar');
+  // 탭별 헤더 영역 토글 — 안내사항만 패널헤드 사용
+  const isNotice = tabKey === 'notice';
   const workspaceHead  = document.getElementById('adminWorkspaceHead');
   const workspaceTitle = document.getElementById('adminWorkspaceTitle');
-  if (headTools)     headTools.hidden     = !isStl;
-  if (colBar)        colBar.hidden        = !isStl;
-  if (workspaceHead) workspaceHead.hidden =  isStl;
-  // 정산 탭: panel-head가 숨겨지면 grid 첫 행을 0으로
+  if (workspaceHead) workspaceHead.hidden = !isNotice;
   const panel = workspaceHead?.closest('.panel');
-  if (panel) panel.style.gridTemplateRows = isStl ? 'minmax(0, 1fr)' : '';
-  if (!isStl) setNoticeMode('idle');
-  // setNoticeMode가 panel head title을 덮어쓰므로 이후에 복원
-  if (workspaceTitle && !isStl) workspaceTitle.textContent = title;
+  if (panel) panel.style.gridTemplateRows = isNotice ? '' : 'minmax(0, 1fr)';
+  if (isNotice) setNoticeMode('idle');
+  if (workspaceTitle && isNotice) workspaceTitle.textContent = title;
 
   // 상단바: 관리자 페이지 | {탭명}
   const identity = document.getElementById('topBarIdentity');
@@ -151,7 +156,7 @@ function renderStlList() {
   const tbody = document.getElementById('adminStlList');
   const countEl = document.getElementById('adminStlCount');
   if (!tbody) return;
-  const items = getAdminMonthFiltered();
+  const items = getStlFiltered();
   if (countEl) countEl.textContent = items.length ? `${items.length}건` : '';
   renderTableGrid({
     thead,
@@ -197,8 +202,8 @@ function renderStlList() {
 
 
 function exportStlCSV() {
-  const items = getAdminMonthFiltered();
-  if (!items.length) { showToast('해당 월의 정산 내역이 없습니다.', 'error'); return; }
+  const items = getStlFiltered();
+  if (!items.length) { showToast('조건에 맞는 정산 내역이 없습니다.', 'error'); return; }
 
   const headers = ['정산코드', '정산상태', '공급사명', '계약완료일', '상품구분', '차량번호', '세부모델', '고객명', '계약기간', '대여료', '보증금', '수수료', '영업채널', '영업자'];
   const rows = items.map(s => [
@@ -206,7 +211,7 @@ function exportStlCSV() {
     stlStatus(s),
     stlPartnerName(s),
     fmtDate(s.completed_at),
-    '-',
+    stlPtype(s),
     stlCar(s),
     stlModel(s),
     stlCustomer(s),
@@ -224,44 +229,76 @@ function exportStlCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `정산서_${adminStlMonth}.csv`;
+  const label = [stlFilterYear, stlFilterMonth].filter(Boolean).join('-') || '전체';
+  a.download = `정산서_${label}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-function updateMonthLabel() {
-  const label = document.getElementById('adminStlMonthLabel');
-  if (!label) return;
-  if (!adminStlMonth) { label.textContent = '전체'; return; }
-  const [y, m] = adminStlMonth.split('-');
-  label.textContent = `${y.slice(2)}. ${m}`;
-}
+function renderStlFilterSelects() {
+  const yearEl = document.getElementById('adminStlYear');
+  const monthEl = document.getElementById('adminStlMonth');
+  const partnerEl = document.getElementById('adminStlPartner');
+  const channelEl = document.getElementById('adminStlChannel');
+  const agentEl = document.getElementById('adminStlAgent');
 
-function stepMonth(delta) {
-  const base = adminStlMonth || nowYearMonth();
-  const [y, m] = base.split('-').map(Number);
-  const d = new Date(y, m - 1 + delta, 1);
-  adminStlMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-  updateMonthLabel();
-  renderStlList();
+  // 연도
+  if (yearEl) {
+    const years = [...new Set(allSettlements.map(s => getStlItemMonth(s).split('-')[0]).filter(Boolean))].sort().reverse();
+    const prev = yearEl.value;
+    yearEl.innerHTML = '<option value="">전체 연도</option>' + years.map(y => `<option value="${y}">${y}년</option>`).join('');
+    if (prev && years.includes(prev)) yearEl.value = prev;
+    else if (!prev) { yearEl.value = prevYearMonth().split('-')[0]; stlFilterYear = yearEl.value; }
+  }
+  // 월
+  if (monthEl) {
+    const prev = monthEl.value;
+    monthEl.innerHTML = '<option value="">전체 월</option>' + Array.from({ length: 12 }, (_, i) => {
+      const m = String(i + 1).padStart(2, '0');
+      return `<option value="${m}">${i + 1}월</option>`;
+    }).join('');
+    if (prev) monthEl.value = prev;
+    else { monthEl.value = prevYearMonth().split('-')[1]; stlFilterMonth = monthEl.value; }
+  }
+  // 공급사
+  if (partnerEl) {
+    const codes = [...new Set(allSettlements.map(s => stlPartner(s)).filter(v => v && v !== '-'))].sort();
+    const prev = partnerEl.value;
+    partnerEl.innerHTML = '<option value="">전체 공급사</option>' + codes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(partnerNameMap.get(c) || c)}</option>`).join('');
+    if (prev && codes.includes(prev)) partnerEl.value = prev;
+  }
+  // 영업채널
+  if (channelEl) {
+    const codes = [...new Set(allSettlements.map(s => stlChannel(s)).filter(v => v && v !== '-'))].sort();
+    const prev = channelEl.value;
+    channelEl.innerHTML = '<option value="">전체 영업채널</option>' + codes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    if (prev && codes.includes(prev)) channelEl.value = prev;
+  }
+  // 영업자
+  if (agentEl) {
+    const codes = [...new Set(allSettlements.map(s => stlAgent(s)).filter(v => v && v !== '-'))].sort();
+    const prev = agentEl.value;
+    agentEl.innerHTML = '<option value="">전체 영업자</option>' + codes.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    if (prev && codes.includes(prev)) agentEl.value = prev;
+  }
 }
 
 function bindStlEvents() {
-  updateMonthLabel();
-  const prevBtn = document.getElementById('adminStlMonthPrev');
-  const nextBtn = document.getElementById('adminStlMonthNext');
-  const csvBtn  = document.getElementById('adminStlExportCsv');
-  const onPrev = () => stepMonth(-1);
-  const onNext = () => stepMonth(1);
-  prevBtn?.addEventListener('click', onPrev);
-  nextBtn?.addEventListener('click', onNext);
+  const csvBtn = document.getElementById('adminStlExportCsv');
   csvBtn?.addEventListener('click', exportStlCSV);
-  registerPageCleanup(() => {
-    prevBtn?.removeEventListener('click', onPrev);
-    nextBtn?.removeEventListener('click', onNext);
-    csvBtn?.removeEventListener('click', exportStlCSV);
+
+  const onChange = () => {
+    stlFilterYear = document.getElementById('adminStlYear')?.value || '';
+    stlFilterMonth = document.getElementById('adminStlMonth')?.value || '';
+    stlFilterPartner = document.getElementById('adminStlPartner')?.value || '';
+    stlFilterChannel = document.getElementById('adminStlChannel')?.value || '';
+    stlFilterAgent = document.getElementById('adminStlAgent')?.value || '';
+    renderStlList();
+  };
+  ['adminStlYear', 'adminStlMonth', 'adminStlPartner', 'adminStlChannel', 'adminStlAgent'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', onChange);
   });
 }
 
@@ -641,7 +678,8 @@ async function bootstrap() {
   try {
     // 매 마운트마다 상태 초기화
     allSettlements = [];
-    adminStlMonth = '';
+    stlFilterYear = ''; stlFilterMonth = '';
+    stlFilterPartner = ''; stlFilterChannel = ''; stlFilterAgent = '';
 
     const { user, profile } = await requireAuth({ roles: ['admin'] });
     currentProfile = { ...profile, uid: user.uid };
@@ -677,6 +715,7 @@ async function bootstrap() {
     }));
     registerPageCleanup(watchSettlements((items) => {
       allSettlements = (items || []).sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+      renderStlFilterSelects();
       renderStlList();
     }));
 

@@ -15,24 +15,7 @@
     </div>
     <div class="pls-grid-scroll">
       <nav class="admin-menu" id="adminMenu">
-        <div class="admin-menu-row">
-          <button class="admin-menu-item is-active" data-tab="settlement" type="button">정산서 관리</button>
-          <div class="admin-menu-stl-tools" id="adminStlHeadTools">
-            <div class="admin-stl-mpick">
-              <button class="admin-stl-mpick-btn" id="adminStlMonthPrev" type="button" title="이전 달">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-              </button>
-              <span class="admin-stl-mpick-label" id="adminStlMonthLabel"></span>
-              <button class="admin-stl-mpick-btn" id="adminStlMonthNext" type="button" title="다음 달">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
-            <span id="adminStlCount" class="admin-stl-count"></span>
-            <button class="admin-menu-item-btn" id="adminStlExportCsv" type="button" title="엑셀 다운로드">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
-            </button>
-          </div>
-        </div>
+        <button class="admin-menu-item is-active" data-tab="settlement" type="button">정산서 관리</button>
         <button class="admin-menu-item" data-tab="stock" type="button">재고 일괄삭제</button>
         <button class="admin-menu-item" data-tab="notice" type="button">안내사항 관리</button>
       </nav>
@@ -66,11 +49,29 @@
     <div class="panel-body admin-workspace-body">
 
       <!-- 정산서 관리 -->
-      <div class="admin-tab-panel" data-tab-panel="settlement" style="overflow:auto;height:100%">
-        <table class="pls-table" style="min-width:1100px">
-          <thead id="adminStlHead"></thead>
-          <tbody id="adminStlList"></tbody>
-        </table>
+      <div class="admin-tab-panel" data-tab-panel="settlement" style="display:flex;flex-direction:column;height:100%;">
+        <div class="admin-stock-controls" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;">
+          <select id="adminStlYear" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:90px;"></select>
+          <select id="adminStlMonth" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:80px;"></select>
+          <select id="adminStlPartner" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:140px;">
+            <option value="">전체 공급사</option>
+          </select>
+          <select id="adminStlChannel" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:140px;">
+            <option value="">전체 영업채널</option>
+          </select>
+          <select id="adminStlAgent" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:120px;">
+            <option value="">전체 영업자</option>
+          </select>
+          <span id="adminStlCount" style="font-size:13px;color:#64748b;"></span>
+          <span style="flex:1"></span>
+          <button class="inline-button btn-sm" id="adminStlExportCsv" type="button">CSV 다운로드</button>
+        </div>
+        <div style="overflow:auto;flex:1;">
+          <table class="pls-table" style="min-width:1100px">
+            <thead id="adminStlHead"></thead>
+            <tbody id="adminStlList"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- 재고 일괄삭제 -->
