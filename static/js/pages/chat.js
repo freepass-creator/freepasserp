@@ -107,14 +107,16 @@ function renderMobileRooms(rooms) {
     const isActive = room.room_id === currentRoomId;
     const badgeCls = replyStatus === '문의접수' ? 'm-list-badge--red' : 'm-list-badge--green';
     const badge = replyStatus ? `<span class="m-list-badge ${badgeCls}">${escapeHtml(replyStatus)}</span>` : '';
+    const avatarCls = replyStatus === '문의접수' ? 'm-list-card__avatar--pending' : 'm-list-card__avatar--done';
+    const avatarIcon = replyStatus === '문의접수'
+      ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg>';
     const providerCode = room.provider_company_code || '';
     const agentCode = room.agent_code || '';
     const msgText = room.last_message || '대화 시작 전';
     const subInfo = [providerCode, agentCode, truncate(msgText, 20)].filter(Boolean).join(' · ');
     return `<div class="m-list-card${isActive ? ' is-active' : ''}" data-room-id="${escapeHtml(room.room_id || '')}">
-      <div class="m-list-card__avatar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg>
-      </div>
+      <span class="m-list-card__avatar ${avatarCls}">${avatarIcon}</span>
       <div class="m-list-card__body">
         <div class="m-list-card__main">
           <span class="m-list-card__name">${escapeHtml(mainLine)}</span>
