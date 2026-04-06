@@ -27,7 +27,7 @@ async function init() {
   };
   for (const [id, value] of Object.entries(fields)) {
     const el = document.getElementById(id);
-    if (el) el.textContent = value;
+    if (el) el.value = value;
   }
 
   // 카탈로그 링크 생성
