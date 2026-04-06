@@ -158,7 +158,7 @@ function bindEvents() {
       sender_role: currentProfile.role,
       sender_partner_code: currentProfile.company_code || '',
       text
-    }).catch(() => showToast('메시지 전송에 실패했습니다.', 'error'));
+    }).catch((err) => { console.error('[mobile/chat] send failed:', err); showToast('메시지 전송에 실패했습니다.', 'error'); });
   });
 
   // 핸드폰 뒤로가기 → 채팅방 닫기

@@ -329,7 +329,7 @@ async function handleInquiry(btnEl, product) {
       providerUid: product.providerUid || '',
       providerCompanyCode: product.providerCompanyCode || product.partnerCode || '',
       providerName: product.providerName || '',
-      agentUid: state.profile?.uid || '',
+      agentUid: state.user?.uid || '',
       agentCode: state.profile?.user_code || '',
       agentName: state.profile?.name || '',
       vehicleNumber: product.carNo && product.carNo !== '-' ? product.carNo : '',
@@ -521,6 +521,7 @@ function bindEvents() {
 
 async function init() {
   const { user, profile } = await requireAuth({ roles: ['provider','agent','admin'] });
+  state.user = user;
   state.profile = profile;
   state.role = profile.role;
   state.companyCode = profile.company_code || '';
