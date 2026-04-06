@@ -23,72 +23,15 @@
 <body class="mobile-app" data-page="{{ page_title }}">
   {% block body %}{% endblock %}
 
-  <!-- 앱 설치 유도 (브라우저에서만, 설치 후에는 자동 숨김) -->
-  <div id="pwa-install-banner" class="pwa-install-banner" hidden>
-    <div class="pwa-install-banner__content">
-      <img src="{{ url_for('static', filename='icons/icon-192.png') }}" alt="" width="40" height="40" class="pwa-install-banner__icon">
-      <div class="pwa-install-banner__text">
-        <strong>FREEPASS ERP</strong>
-        <span>앱을 설치하면 더 빠르게 이용할 수 있어요</span>
-      </div>
-    </div>
-    <div class="pwa-install-banner__actions">
-      <button type="button" id="pwa-install-dismiss" class="pwa-install-banner__btn pwa-install-banner__btn--dismiss">닫기</button>
-      <button type="button" id="pwa-install-accept" class="pwa-install-banner__btn pwa-install-banner__btn--accept">설치</button>
-    </div>
-  </div>
-
   <script>
     window.APP_VER='{{ app_version }}';
-    // 세로 모드 고정
     try{screen.orientation.lock('portrait').catch(()=>{});}catch(e){}
     if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/sw.js').catch(()=>{});}
-
-    // 앱 설치 프롬프트 (standalone이면 배너 제거)
-    (function(){
-      var banner=document.getElementById('pwa-install-banner');
-      if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
-        banner.remove(); return;
-      }
-      var deferredPrompt=null;
-      var DISMISS_KEY='fp.pwa.dismissed';
-
-      function hide(){
-        banner.hidden=true;
-        banner.style.display='none';
-        localStorage.setItem(DISMISS_KEY,String(Date.now()));
-      }
-
-      window.addEventListener('beforeinstallprompt',function(e){
-        e.preventDefault();
-        deferredPrompt=e;
-        var d=localStorage.getItem(DISMISS_KEY);
-        if(d&&Date.now()-Number(d)<86400000)return;
-        banner.hidden=false;
-        banner.style.display='';
-      });
-
-      document.getElementById('pwa-install-accept').addEventListener('click',function(){
-        if(!deferredPrompt){hide();return;}
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function(){deferredPrompt=null;hide();});
-      });
-
-      document.getElementById('pwa-install-dismiss').addEventListener('click',hide);
-      window.addEventListener('appinstalled',function(){deferredPrompt=null;hide();});
-
-      // iOS는 beforeinstallprompt 미지원 → 직접 안내
-      if(/iPhone|iPad/.test(navigator.userAgent)&&!navigator.standalone){
-        var d=localStorage.getItem(DISMISS_KEY);
-        if(!d||Date.now()-Number(d)>=86400000){
-          banner.querySelector('.pwa-install-banner__text span').textContent='공유 버튼 → 홈 화면에 추가로 설치하세요';
-          banner.querySelector('#pwa-install-accept').textContent='확인';
-          banner.querySelector('#pwa-install-accept').addEventListener('click',hide);
-          banner.hidden=false;
-          banner.style.display='';
-        }
-      }
-    })();
+    // PWA 설치 프롬프트 — 설정 페이지에서 사용
+    window.__pwaPrompt=null;
+    window.__pwaInstalled=window.matchMedia('(display-mode:standalone)').matches||!!navigator.standalone;
+    window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__pwaPrompt=e;});
+    window.addEventListener('appinstalled',function(){window.__pwaPrompt=null;window.__pwaInstalled=true;});
   </script>
   <script type="module" src="{{ url_for('static', filename='js/app-mobile.js') }}?v={{ app_version }}"></script>
   {% block page_js %}{% endblock %}

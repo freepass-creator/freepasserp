@@ -65,6 +65,38 @@ async function init() {
     }
   });
 
+  // 앱 설치
+  const installSection = document.getElementById('ms-install-section');
+  const installBtn = document.getElementById('ms-install-btn');
+  const installHint = document.getElementById('ms-install-hint');
+  if (window.__pwaInstalled) {
+    // 이미 설치됨 — 섹션 숨김
+  } else if (/iPhone|iPad/.test(navigator.userAgent) && !navigator.standalone) {
+    // iOS — 수동 안내
+    if (installSection) installSection.hidden = false;
+    if (installHint) installHint.textContent = 'Safari 하단 공유 버튼 → "홈 화면에 추가"를 눌러주세요.';
+    if (installBtn) installBtn.textContent = '설치 방법 안내';
+    installBtn?.addEventListener('click', () => {
+      showToast('Safari 하단 공유 버튼(□↑)을 누른 후\n"홈 화면에 추가"를 선택하세요.', 'info');
+    });
+  } else {
+    // Android — beforeinstallprompt 사용
+    if (installSection) installSection.hidden = false;
+    installBtn?.addEventListener('click', () => {
+      const prompt = window.__pwaPrompt;
+      if (prompt) {
+        prompt.prompt();
+        prompt.userChoice.then(() => {
+          window.__pwaPrompt = null;
+          if (installSection) installSection.hidden = true;
+          showToast('설치 완료!', 'success');
+        });
+      } else {
+        showToast('브라우저 메뉴에서 "앱 설치" 또는\n"홈 화면에 추가"를 선택하세요.', 'info');
+      }
+    });
+  }
+
   // 로그아웃
   document.getElementById('ms-logout')?.addEventListener('click', async () => {
     await logoutCurrentUser();
