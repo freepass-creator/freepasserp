@@ -32,7 +32,7 @@ function renderRooms(rooms) {
     return;
   }
   $rooms.innerHTML = rooms.map(room => {
-    const product = productMap.get(room.product_uid);
+    const product = productMap.get(room.product_uid) || productMap.get(room.vehicle_number) || productMap.get(room.product_code) || null;
     const carNo = room.vehicle_number || product?.carNo || '';
     const model = product?.subModel || room.sub_model || '';
     const partner = currentProfile?.role === 'agent'
@@ -208,10 +208,13 @@ async function init() {
 
   // 상품 맵 구축 (방 목록에 차량 정보 표시용)
   watchProducts((products) => {
-    productMap = new Map(products.map(p => {
+    productMap = new Map();
+    products.forEach(p => {
       const n = normalizeProduct(p);
-      return [n.id, n];
-    }));
+      if (n.id) productMap.set(n.id, n);
+      if (n.carNo) productMap.set(n.carNo, n);
+      if (n.productCode) productMap.set(n.productCode, n);
+    });
     renderRooms(allRooms); // 상품 정보 갱신 시 방 목록도 재렌더
   });
 
