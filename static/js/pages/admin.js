@@ -58,6 +58,9 @@ function switchTab(tabKey) {
     panel.hidden = panel.dataset.tabPanel !== tabKey;
   });
 
+  const panelTitle = document.getElementById('adminPanelTitle');
+  if (panelTitle) panelTitle.textContent = TAB_TITLES[tabKey] || '';
+
   if (tabKey === 'settlement') settlement.onTabEnter();
   if (tabKey === 'stock') stock.onTabEnter();
   if (tabKey === 'notice') notice.onTabEnter();
