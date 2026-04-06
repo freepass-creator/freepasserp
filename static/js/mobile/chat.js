@@ -34,7 +34,7 @@ function renderRooms(rooms) {
   $rooms.innerHTML = rooms.map(room => {
     const product = productMap.get(room.product_uid);
     const carNo = room.vehicle_number || product?.carNo || '';
-    const model = product?.subModel || '';
+    const model = product?.subModel || room.sub_model || '';
     const partner = currentProfile?.role === 'agent'
       ? (room.provider_name || room.provider_company_code || '')
       : (room.agent_name || room.agent_code || '');
