@@ -360,6 +360,118 @@ button, a, [role="button"] {
 }
 .m-val--pending { color: #f59e0b; }
 .m-val--done { color: #10b981; }
+
+/* ── 모바일 폼 (계약 입력/수정) ── */
+.m-form-card {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.m-form-section {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.m-form-section-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted, #80868b);
+  letter-spacing: 0.03em;
+  padding: 14px 16px 8px;
+}
+.m-form-section-head svg { stroke: currentColor; fill: none; flex-shrink: 0; }
+.m-form-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 14px;
+}
+.m-form-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #334155;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.m-form-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #1b2a4a;
+}
+.m-form-fields {
+  display: flex;
+  flex-direction: column;
+}
+.m-form-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 16px;
+  min-height: 48px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.m-form-field:last-child { border-bottom: none; }
+.m-form-field > span {
+  font-size: 13px;
+  color: var(--text-subtle);
+  flex-shrink: 0;
+}
+.m-form-field > input,
+.m-form-field > select {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: #f2f3f7;
+  font-size: 14px !important;
+  color: #0f172a;
+  text-align: right;
+  padding: 0 12px;
+  outline: none;
+  max-width: 60%;
+}
+.m-form-field > input:focus,
+.m-form-field > select:focus {
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(27, 42, 74, 0.1);
+}
+.m-form-field > input[readonly] {
+  background: transparent;
+  color: #0f172a;
+  font-weight: 600;
+}
+.m-form-field > select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2380868b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+}
+.m-form-actions {
+  padding: 0 0 env(safe-area-inset-bottom);
+}
+.m-form-btn--save {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 14px;
+  background: #1b2a4a;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.m-form-btn--save:active { background: #142038; }
 .m-detail-row {
   display: flex;
   justify-content: space-between;
