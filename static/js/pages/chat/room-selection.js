@@ -1,5 +1,29 @@
 import { bindProductDetailPhotoEvents, renderProductDetailMarkup } from '../../shared/product-list-detail-view.js';
+import { open as openFullscreenViewer } from '../../shared/fullscreen-photo-viewer.js';
 import { escapeHtml } from './room-list.js';
+
+function bindChatDetailGallery(container) {
+  const wrap = container.querySelector('#plsMGallery') || container.querySelector('.pls-mobile-detail-gallery');
+  if (!wrap) return;
+  let photos;
+  try { photos = JSON.parse(wrap.dataset.photos || '[]'); } catch { return; }
+  if (!photos.length) return;
+  let idx = 0;
+  const img = container.querySelector('#plsMGalleryImg');
+  const ctr = container.querySelector('#plsMGalleryCtr');
+  const update = () => {
+    if (img) img.src = photos[idx];
+    if (ctr) ctr.textContent = `${idx + 1} / ${photos.length}`;
+  };
+  if (photos.length > 1) {
+    container.querySelector('#plsMGalleryPrev')?.addEventListener('click', (e) => { e.stopPropagation(); idx = (idx - 1 + photos.length) % photos.length; update(); });
+    container.querySelector('#plsMGalleryNext')?.addEventListener('click', (e) => { e.stopPropagation(); idx = (idx + 1) % photos.length; update(); });
+  }
+  wrap.addEventListener('click', (e) => {
+    if (e.target.closest('.pls-mobile-detail-gallery__nav')) return;
+    openFullscreenViewer(photos, idx);
+  });
+}
 
 export function createChatRoomSelectionController({
   roomList,
@@ -42,6 +66,7 @@ export function createChatRoomSelectionController({
       setActivePhotoIndex(index);
       renderCurrentDetail();
     });
+    bindChatDetailGallery(detailCard);
     ensureChatTermLoaded(product);
   }
 
