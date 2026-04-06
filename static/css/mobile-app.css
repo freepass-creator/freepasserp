@@ -8,6 +8,7 @@
 @import url('/static/css/ui_toast.css');
 
 /* ── 모바일 전용 CSS ── */
+@import url('/static/css/shared/fullscreen-photo-viewer.css');
 @import url('/static/css/shared/detail-common.css');
 @import url('/static/css/shared/mobile.css');
 @import url('/static/css/shared/mobile-chat.css');
