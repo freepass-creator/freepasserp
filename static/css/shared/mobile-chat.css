@@ -19,8 +19,9 @@
     background: #fff;
   }
 
-  /* 방 열린 상태: 목록 숨기고 채팅패널만 전체화면 */
+  /* 방 열린 상태: 목록+상단바 숨기고 채팅패널만 전체화면 */
   body.chat-m-open .chat-m-rooms { display: none !important; }
+  body.chat-m-open .mobile-topbar { display: none !important; }
 
   body.chat-m-open.page-chat .layout-633 {
     display: flex !important;

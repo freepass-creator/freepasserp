@@ -766,6 +766,82 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
 }
 .m-search-bar__filter-btn:active { background: #e5e8eb; }
 
+/* ── 모바일 상세 상단바 (뒤로가기 + 타이틀 + 액션) ── */
+.m-detail-bar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 0 4px;
+  height: 100%;
+}
+.m-detail-bar__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--m-text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+.m-detail-bar__back:active { background: var(--m-input-bg); }
+.m-detail-bar__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--m-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 8px;
+}
+.m-detail-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.m-detail-bar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.m-detail-bar__btn--primary {
+  background: var(--m-accent);
+  color: #fff;
+}
+.m-detail-bar__btn--primary:active { opacity: 0.85; }
+.m-detail-bar__btn--icon {
+  width: 36px;
+  padding: 0;
+  background: transparent;
+  color: var(--m-text-secondary);
+}
+.m-detail-bar__btn--icon:active { background: var(--m-input-bg); }
+
+/* ── 모바일 타이틀 상단바 (설정 등) ── */
+.m-title-bar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  padding: 0 14px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--m-text-primary);
+}
+
 .m-settings-page {
   padding: 0 0 32px;
   display: flex;

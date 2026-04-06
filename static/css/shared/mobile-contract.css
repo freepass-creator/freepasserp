@@ -57,6 +57,7 @@
   }
 
   /* contract-m-open: 폼 전체화면 */
+  body.contract-m-open .mobile-topbar { display: none !important; }
   body.contract-m-open .contract-page-shell .pls-grid-panel { display: none !important; }
   body.contract-m-open #contract-m-list { display: none !important; }
   body.contract-m-open .contract-page-shell .panel-slot {
