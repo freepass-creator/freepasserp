@@ -23,45 +23,17 @@
   </section>
 
   <!-- ━━━ 우측(9): 작업 영역 ━━━ -->
-  <section class="panel admin-workspace-panel">
-    <!-- 일반 탭용 패널헤드 (정산서 탭에서는 숨김) -->
-    <div class="panel-head panel-head-default" id="adminWorkspaceHead" hidden>
-      <div class="panel-head-title-wrap">
-        <div class="panel-head-title" id="adminWorkspaceTitle"></div>
-      </div>
-      <div class="panel-head-actions">
-        <button class="inline-button btn-icon-only btn-tone-neutral" id="adminNoticeNew" title="신규" type="button">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-        </button>
-        <button class="inline-button btn-icon-only btn-tone-save" id="adminNoticeEditSave" title="수정/저장" type="button">
-          <span class="btn-mode-icon btn-mode-icon--view">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
-          </span>
-          <span class="btn-mode-icon btn-mode-icon--write">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
-          </span>
-        </button>
-        <button type="button" class="inline-button btn-icon-only btn-danger" id="adminNoticeDelete" title="삭제">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
-      </div>
-    </div>
+  <section class="panel admin-workspace-panel" style="grid-template-rows:minmax(0,1fr);">
     <div class="panel-body admin-workspace-body">
 
       <!-- 정산서 관리 -->
       <div class="admin-tab-panel" data-tab-panel="settlement" style="display:flex;flex-direction:column;height:100%;">
-        <div class="admin-stock-controls" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;">
-          <select id="adminStlYear" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:90px;"></select>
-          <select id="adminStlMonth" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:80px;"></select>
-          <select id="adminStlPartner" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:140px;">
-            <option value="">전체 공급사</option>
-          </select>
-          <select id="adminStlChannel" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:140px;">
-            <option value="">전체 영업채널</option>
-          </select>
-          <select id="adminStlAgent" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:120px;">
-            <option value="">전체 영업자</option>
-          </select>
+        <div class="admin-tab-bar" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;">
+          <select id="adminStlYear" class="admin-filter-select"></select>
+          <select id="adminStlMonth" class="admin-filter-select"></select>
+          <select id="adminStlPartner" class="admin-filter-select"><option value="">전체 공급사</option></select>
+          <select id="adminStlChannel" class="admin-filter-select"><option value="">전체 영업채널</option></select>
+          <select id="adminStlAgent" class="admin-filter-select"><option value="">전체 영업자</option></select>
           <span id="adminStlCount" style="font-size:13px;color:#64748b;"></span>
           <span style="flex:1"></span>
           <button class="inline-button btn-sm" id="adminStlExportCsv" type="button">CSV 다운로드</button>
@@ -75,40 +47,50 @@
       </div>
 
       <!-- 재고 일괄삭제 -->
-      <div class="admin-tab-panel" data-tab-panel="stock" hidden>
-        <div class="admin-stock-controls" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f5f9;">
-          <select id="adminStockPartner" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:160px;">
-            <option value="">파트너 선택</option>
-          </select>
+      <div class="admin-tab-panel" data-tab-panel="stock" hidden style="display:flex;flex-direction:column;height:100%;">
+        <div class="admin-tab-bar" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;">
+          <select id="adminStockPartner" class="admin-filter-select"><option value="">전체 파트너</option></select>
+          <select id="adminStockStatus" class="admin-filter-select"><option value="">전체 차량상태</option></select>
+          <select id="adminStockType" class="admin-filter-select"><option value="">전체 상품구분</option></select>
+          <select id="adminStockMaker" class="admin-filter-select"><option value="">전체 제조사</option></select>
           <span id="adminStockCount" style="font-size:13px;color:#64748b;"></span>
           <span style="flex:1"></span>
           <button type="button" class="inline-button btn-sm" id="adminStockSelectAll">전체선택</button>
           <button type="button" class="inline-button btn-sm" id="adminStockDeselectAll">전체해제</button>
           <button type="button" class="inline-button btn-sm btn-danger" id="adminStockDeleteSelected">선택 삭제</button>
         </div>
-        <div id="adminStockList" style="overflow:auto;height:calc(100% - 58px);"></div>
+        <div id="adminStockList" style="overflow:auto;flex:1;"></div>
       </div>
 
       <!-- 안내사항 관리 -->
-      <div class="admin-tab-panel" data-tab-panel="notice" hidden>
-        <div class="manage-form-body admin-notice-body">
-          <div class="manage-idle-hint" id="adminNoticeIdleHint">목록에서 안내사항을 선택하거나<br>신규를 눌러주세요.</div>
-          <form class="admin-notice-form" id="adminNoticeForm" hidden>
-            <div class="field full"><label for="admin_notice_title">제목</label>
-              <input id="admin_notice_title" type="text" maxlength="80" placeholder="안내사항 제목" autocomplete="off">
-            </div>
-            <div class="field full"><label for="admin_notice_body">내용</label>
-              <textarea id="admin_notice_body" rows="4" maxlength="2000" placeholder="안내사항 내용을 입력하세요."></textarea>
-            </div>
-            <div class="field full">
-              <label>이미지 첨부 <span class="field-hint">(선택)</span></label>
-              <input type="file" id="admin_notice_img" accept="image/*" style="display:none">
-              <label class="inline-button btn-sm" id="adminNoticeImgPickBtn" for="admin_notice_img">이미지 선택</label>
-              <div class="img-thumb-list" id="adminNoticeThumbList" style="margin-top:8px"></div>
-            </div>
-            <p class="message" id="adminNoticeMessage"></p>
-          </form>
-          <div id="adminNoticeList" class="admin-notice-list"></div>
+      <div class="admin-tab-panel" data-tab-panel="notice" hidden style="display:flex;flex-direction:column;height:100%;">
+        <div class="admin-tab-bar" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f5f9;">
+          <span style="font-size:13px;font-weight:600;color:#1e293b;">안내사항</span>
+          <span style="flex:1"></span>
+          <button class="inline-button btn-sm" id="adminNoticeNew" type="button">신규</button>
+          <button class="inline-button btn-sm" id="adminNoticeEditSave" type="button">수정</button>
+          <button class="inline-button btn-sm btn-danger" id="adminNoticeDelete" type="button">삭제</button>
+        </div>
+        <div style="display:flex;flex:1;overflow:hidden;">
+          <div id="adminNoticeList" class="admin-notice-list" style="width:240px;border-right:1px solid #f1f5f9;overflow-y:auto;flex-shrink:0;"></div>
+          <div style="flex:1;overflow-y:auto;padding:16px;">
+            <div class="manage-idle-hint" id="adminNoticeIdleHint">목록에서 안내사항을 선택하거나<br>신규를 눌러주세요.</div>
+            <form class="admin-notice-form" id="adminNoticeForm" hidden>
+              <div class="field full"><label for="admin_notice_title">제목</label>
+                <input id="admin_notice_title" type="text" maxlength="80" placeholder="안내사항 제목" autocomplete="off">
+              </div>
+              <div class="field full"><label for="admin_notice_body">내용</label>
+                <textarea id="admin_notice_body" rows="6" maxlength="2000" placeholder="안내사항 내용을 입력하세요."></textarea>
+              </div>
+              <div class="field full">
+                <label>이미지 첨부 <span class="field-hint">(선택)</span></label>
+                <input type="file" id="admin_notice_img" accept="image/*" style="display:none">
+                <label class="inline-button btn-sm" id="adminNoticeImgPickBtn" for="admin_notice_img">이미지 선택</label>
+                <div class="img-thumb-list" id="adminNoticeThumbList" style="margin-top:8px"></div>
+              </div>
+              <p class="message" id="adminNoticeMessage"></p>
+            </form>
+          </div>
         </div>
       </div>
 

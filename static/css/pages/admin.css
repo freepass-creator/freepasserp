@@ -1,5 +1,19 @@
 /* ===== ADMIN PAGE ===== */
 
+.admin-filter-select {
+  height: 34px;
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0 10px;
+  min-width: 80px;
+  background: #fff;
+  color: #1e293b;
+}
+.admin-tab-bar {
+  flex-shrink: 0;
+}
+
 /* ─── 좌측 메뉴 ─────────────────────────────────────────────────────────────── */
 
 .admin-menu { display: flex; flex-direction: column; }

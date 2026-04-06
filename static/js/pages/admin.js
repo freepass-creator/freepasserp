@@ -98,19 +98,11 @@ function switchTab(tabKey) {
     renderStlList();
   }
   if (tabKey === 'stock') {
-    renderStockPartnerSelect();
+    renderStockFilterSelects();
     renderStockList();
   }
 
-  // 탭별 헤더 영역 토글 — 안내사항만 패널헤드 사용
-  const isNotice = tabKey === 'notice';
-  const workspaceHead  = document.getElementById('adminWorkspaceHead');
-  const workspaceTitle = document.getElementById('adminWorkspaceTitle');
-  if (workspaceHead) workspaceHead.hidden = !isNotice;
-  const panel = workspaceHead?.closest('.panel');
-  if (panel) panel.style.gridTemplateRows = isNotice ? '' : 'minmax(0, 1fr)';
-  if (isNotice) setNoticeMode('idle');
-  if (workspaceTitle && isNotice) workspaceTitle.textContent = title;
+  if (tabKey === 'notice') setNoticeMode('idle');
 
   // 상단바: 관리자 페이지 | {탭명}
   const identity = document.getElementById('topBarIdentity');
@@ -305,24 +297,54 @@ function bindStlEvents() {
 // ─── 재고 일괄삭제 ──────────────────────────────────────────────────────────
 
 let allStockProducts = [];
-let stockSelectedPartner = '';
+let stockFilterPartner = '';
+let stockFilterStatus = '';
+let stockFilterType = '';
+let stockFilterMaker = '';
 const stockChecked = new Set();
 
-function renderStockPartnerSelect() {
-  const select = document.getElementById('adminStockPartner');
-  if (!select) return;
-  const codes = [...new Set(allStockProducts.map(p => p.provider_company_code || p.partner_code).filter(Boolean))].sort();
-  const prev = select.value;
-  select.innerHTML = '<option value="">전체 파트너</option>' + codes.map(c => {
-    const name = partnerNameMap.get(c) || c;
-    return `<option value="${escapeHtml(c)}">${escapeHtml(c)} / ${escapeHtml(name)}</option>`;
-  }).join('');
-  if (prev && codes.includes(prev)) select.value = prev;
+function renderStockFilterSelects() {
+  const partnerEl = document.getElementById('adminStockPartner');
+  const statusEl = document.getElementById('adminStockStatus');
+  const typeEl = document.getElementById('adminStockType');
+  const makerEl = document.getElementById('adminStockMaker');
+
+  if (partnerEl) {
+    const codes = [...new Set(allStockProducts.map(p => p.provider_company_code || p.partner_code).filter(Boolean))].sort();
+    const prev = partnerEl.value;
+    partnerEl.innerHTML = '<option value="">전체 파트너</option>' + codes.map(c => {
+      const name = partnerNameMap.get(c) || c;
+      return `<option value="${escapeHtml(c)}">${escapeHtml(c)} / ${escapeHtml(name)}</option>`;
+    }).join('');
+    if (prev && codes.includes(prev)) partnerEl.value = prev;
+  }
+  if (statusEl) {
+    const vals = [...new Set(allStockProducts.map(p => p.vehicle_status).filter(Boolean))].sort();
+    const prev = statusEl.value;
+    statusEl.innerHTML = '<option value="">전체 차량상태</option>' + vals.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+    if (prev && vals.includes(prev)) statusEl.value = prev;
+  }
+  if (typeEl) {
+    const vals = [...new Set(allStockProducts.map(p => p.product_type).filter(Boolean))].sort();
+    const prev = typeEl.value;
+    typeEl.innerHTML = '<option value="">전체 상품구분</option>' + vals.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+    if (prev && vals.includes(prev)) typeEl.value = prev;
+  }
+  if (makerEl) {
+    const vals = [...new Set(allStockProducts.map(p => p.maker).filter(Boolean))].sort();
+    const prev = makerEl.value;
+    makerEl.innerHTML = '<option value="">전체 제조사</option>' + vals.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+    if (prev && vals.includes(prev)) makerEl.value = prev;
+  }
 }
 
 function getStockFiltered() {
-  if (!stockSelectedPartner) return allStockProducts;
-  return allStockProducts.filter(p => (p.provider_company_code || p.partner_code) === stockSelectedPartner);
+  let items = allStockProducts;
+  if (stockFilterPartner) items = items.filter(p => (p.provider_company_code || p.partner_code) === stockFilterPartner);
+  if (stockFilterStatus) items = items.filter(p => p.vehicle_status === stockFilterStatus);
+  if (stockFilterType) items = items.filter(p => p.product_type === stockFilterType);
+  if (stockFilterMaker) items = items.filter(p => p.maker === stockFilterMaker);
+  return items;
 }
 
 function renderStockList() {
@@ -358,16 +380,21 @@ function renderStockList() {
 }
 
 function bindStockEvents() {
-  const select = document.getElementById('adminStockPartner');
   const container = document.getElementById('adminStockList');
   const selectAllBtn = document.getElementById('adminStockSelectAll');
   const deselectAllBtn = document.getElementById('adminStockDeselectAll');
   const deleteBtn = document.getElementById('adminStockDeleteSelected');
 
-  select?.addEventListener('change', () => {
-    stockSelectedPartner = select.value;
+  const onStockFilterChange = () => {
+    stockFilterPartner = document.getElementById('adminStockPartner')?.value || '';
+    stockFilterStatus = document.getElementById('adminStockStatus')?.value || '';
+    stockFilterType = document.getElementById('adminStockType')?.value || '';
+    stockFilterMaker = document.getElementById('adminStockMaker')?.value || '';
     stockChecked.clear();
     renderStockList();
+  };
+  ['adminStockPartner', 'adminStockStatus', 'adminStockType', 'adminStockMaker'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', onStockFilterChange);
   });
 
   container?.addEventListener('change', (e) => {
@@ -454,23 +481,23 @@ function clearNoticeImg() {
 }
 
 function setNoticeMode(mode) {
-  // mode: 'idle' | 'view' | 'create' | 'edit'
   noticeFormMode = mode;
   const form    = document.getElementById('adminNoticeForm');
   const hint    = document.getElementById('adminNoticeIdleHint');
   const imgBtn  = document.getElementById('adminNoticeImgPickBtn');
-
-  _applyNoticeMode?.(mode, { deleteEnabled: !!selectedNoticeId });
-
-  // applyManagedFormMode가 .panel-head-title 을 덮어쓰므로 복원
-  const workspaceTitle = document.getElementById('adminWorkspaceTitle');
-  if (workspaceTitle) workspaceTitle.textContent = '안내사항 관리';
+  const editBtn = document.getElementById('adminNoticeEditSave');
+  const delBtn  = document.getElementById('adminNoticeDelete');
 
   if (hint)   hint.hidden   = mode !== 'idle';
   if (form)   form.hidden   = mode === 'idle';
   if (imgBtn) imgBtn.hidden = mode === 'view';
+  if (editBtn) editBtn.textContent = (mode === 'edit' || mode === 'create') ? '저장' : '수정';
+  if (delBtn) delBtn.disabled = !selectedNoticeId || mode === 'create';
 
-  // edit 모드일 때만 dirty 체크 (create는 dirty 체크 불필요)
+  // 폼 필드 읽기전용 제어
+  const fields = form?.querySelectorAll('input, textarea') || [];
+  fields.forEach(f => { if (f.type !== 'file') f.readOnly = mode === 'view'; });
+
   if (mode === 'edit') setDirtyCheck(() => noticeFormMode === 'edit');
   else clearDirtyCheck();
 }
@@ -522,16 +549,7 @@ function bindNoticeEvents() {
   const editSaveBtn = document.getElementById('adminNoticeEditSave');
   const deleteBtn   = document.getElementById('adminNoticeDelete');
 
-  // createManagedFormModeApplier로 폼 모드 관리
-  _applyNoticeMode = createManagedFormModeApplier({
-    form: noticeForm,
-    panelLabel: '안내사항',
-    getIdentity: () => '',
-    isSelected: () => !!selectedNoticeId,
-    submitButtons: [editSaveBtn],
-    deleteButtons: [deleteBtn],
-  });
-  applyManagementButtonTones({ submitButtons: [editSaveBtn], deleteButtons: [deleteBtn] });
+  // 버튼 초기 상태
 
   const onImgChange = () => {
     const file = imgInput.files?.[0];
