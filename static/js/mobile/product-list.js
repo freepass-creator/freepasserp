@@ -320,10 +320,12 @@ function openFilter() {
   renderFilterSections();
   $sidebar?.classList.add('is-open');
   $overlay?.classList.add('is-open');
+  document.body.classList.add('filter-open');
 }
 function closeFilter() {
   $sidebar?.classList.remove('is-open');
   $overlay?.classList.remove('is-open');
+  document.body.classList.remove('filter-open');
 }
 
 // ─── 이벤트 바인딩 ───────────────────────────────────────────────────────────

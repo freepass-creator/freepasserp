@@ -573,16 +573,7 @@ html {
   user-select: none;
 }
 .catalog-sidebar__title::after {
-  content: '';
-  width: 5px; height: 5px;
-  border-right: 1.5px solid #94a3b8;
-  border-bottom: 1.5px solid #94a3b8;
-  transform: rotate(45deg);
-  transition: transform var(--transition-normal);
-  flex-shrink: 0;
-}
-.catalog-sidebar__section:not(.is-collapsed) .catalog-sidebar__title::after {
-  transform: rotate(-135deg);
+  content: none;
 }
 
 .filter-check {

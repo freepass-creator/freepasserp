@@ -102,6 +102,15 @@
 /* 필터 헤더 숨김 */
 .catalog-sidebar__head { display: none !important; }
 
+/* 필터 아이콘 회전 (열림/닫힘) */
+.mobile-filter-icon {
+  transition: transform 0.2s ease;
+}
+.m-filter-sidebar.is-open ~ .main-area .mobile-filter-icon,
+body.filter-open .mobile-filter-icon {
+  transform: rotate(180deg);
+}
+
 /* 필터 건수 */
 .catalog-filter-count {
   margin-left: auto;
