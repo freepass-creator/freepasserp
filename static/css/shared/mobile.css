@@ -415,8 +415,8 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 14px var(--space-4);
-  border-bottom: 1px solid #f1f5f9;
+  padding: 12px var(--space-4);
+  border-bottom: 1px solid var(--m-divider, #f2f4f6);
   background: #fff;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;

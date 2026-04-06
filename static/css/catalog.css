@@ -1099,6 +1099,4 @@ html {
   .catalog-card__tag { flex-shrink: 0; }
 }
 
-@media (max-width: 360px) {
-  .catalog-grid { grid-template-columns: 1fr; }
-}
+/* 360px 이하에서도 2열 유지 — 여백 최소화로 충분히 들어감 */
