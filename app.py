@@ -144,13 +144,6 @@ _NEW_ROUTES = [
 
 def _make_new_view(template: str, title: str):
     def view():
-        if _is_mobile():
-            # 모바일 템플릿이 있으면 사용, 없으면 데스크탑 폴백
-            mobile_tpl = template.replace('pages/', 'pages/mobile/')
-            try:
-                return render_template(mobile_tpl, page_title=title)
-            except Exception:
-                pass
         return render_template(template, page_title=title)
     return view
 

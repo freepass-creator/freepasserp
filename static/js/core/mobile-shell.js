@@ -9,9 +9,8 @@ import { requireAuth } from './auth-guard.js';
 import { showConfirm } from './toast.js';
 import { isPageDirty } from './dirty-check.js';
 
-const isMobile = document.documentElement.classList.contains('is-mobile');
 const mq = window.matchMedia('(max-width: 768px)');
-if (!isMobile) { /* 데스크탑/웹 브라우저 — 모바일 쉘 비활성화 */ }
+const isMobile = document.documentElement.classList.contains('is-mobile') || mq.matches;
 
 // ─── 탭 정의 ──────────────────────────────────────────────────────────────────
 
