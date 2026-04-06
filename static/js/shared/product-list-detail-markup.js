@@ -1,4 +1,3 @@
-import { renderBadgeRow } from './badge.js';
 import { safeText, escapeHtml } from '../core/management-format.js';
 
 function safe(v) { return String(v ?? '').trim() || '-'; }
