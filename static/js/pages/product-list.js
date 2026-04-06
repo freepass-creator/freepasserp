@@ -329,7 +329,6 @@ function safe(v){return v!==null&&v!==undefined&&String(v).trim()!==''?String(v)
 function joinWithMainDot(values){ return values.map((value)=>safe(value)).join('&nbsp;·&nbsp;'); }
 function formatMileage(value){const n=Number(value||0); return n?`${n.toLocaleString('ko-KR')}km`:'-';}
 function applyRoleFilter(products){
-  if (state.role === 'provider') return products.filter(item => String(item.partnerCode||'') === String(state.companyCode||''));
   return products;
 }
 function getSelectedPeriods(){const arr=state.filters.periods.slice().sort((a,b)=>Number(a)-Number(b)); return arr.length?arr:DEFAULT_PERIODS.slice();}

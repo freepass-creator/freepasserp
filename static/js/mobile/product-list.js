@@ -403,10 +403,7 @@ async function init() {
   bindEvents();
 
   watchProducts((products) => {
-    let items = products.map(normalizeProduct).filter(item => item.id);
-    if (state.role === 'provider') {
-      items = items.filter(item => String(item.partnerCode||'') === String(state.companyCode||''));
-    }
+    const items = products.map(normalizeProduct).filter(item => item.id);
     state.allProducts = items;
     items.forEach(item => ensureTermLoaded(item));
     applyFilters();
