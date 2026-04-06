@@ -67,6 +67,7 @@ function fmtDate(v) {
 
 const TAB_TITLES = {
   'settlement': '정산서 관리',
+  'stock':      '재고 일괄삭제',
   'notice':     '안내사항 관리',
 };
 
@@ -84,6 +85,10 @@ function switchTab(tabKey) {
     adminStlMonth = prevYearMonth();
     updateMonthLabel();
     renderStlList();
+  }
+  if (tabKey === 'stock') {
+    renderStockPartnerSelect();
+    renderStockList();
   }
 
   // 탭별 헤더 영역 토글
@@ -257,6 +262,118 @@ function bindStlEvents() {
     prevBtn?.removeEventListener('click', onPrev);
     nextBtn?.removeEventListener('click', onNext);
     csvBtn?.removeEventListener('click', exportStlCSV);
+  });
+}
+
+// ─── 재고 일괄삭제 ──────────────────────────────────────────────────────────
+
+let allStockProducts = [];
+let stockSelectedPartner = '';
+const stockChecked = new Set();
+
+function renderStockPartnerSelect() {
+  const select = document.getElementById('adminStockPartner');
+  if (!select) return;
+  const codes = [...new Set(allStockProducts.map(p => p.provider_company_code || p.partner_code).filter(Boolean))].sort();
+  const prev = select.value;
+  select.innerHTML = '<option value="">전체 파트너</option>' + codes.map(c => {
+    const name = partnerNameMap.get(c) || c;
+    return `<option value="${escapeHtml(c)}">${escapeHtml(c)} / ${escapeHtml(name)}</option>`;
+  }).join('');
+  if (prev && codes.includes(prev)) select.value = prev;
+}
+
+function getStockFiltered() {
+  if (!stockSelectedPartner) return allStockProducts;
+  return allStockProducts.filter(p => (p.provider_company_code || p.partner_code) === stockSelectedPartner);
+}
+
+function renderStockList() {
+  const container = document.getElementById('adminStockList');
+  const countEl = document.getElementById('adminStockCount');
+  if (!container) return;
+  const items = getStockFiltered();
+  if (countEl) countEl.textContent = items.length ? `${items.length}대` : '';
+  if (!items.length) {
+    container.innerHTML = '<div class="list-empty" style="padding:40px;text-align:center;color:#94a3b8;">등록된 재고가 없습니다.</div>';
+    return;
+  }
+  container.innerHTML = `<table class="pls-table" style="min-width:800px;"><thead><tr>
+    <th style="width:40px;text-align:center;"><input type="checkbox" id="adminStockCheckAll"></th>
+    <th>공급사</th><th>차량번호</th><th>제조사</th><th>모델명</th><th>세부모델</th><th>상품구분</th><th>차량상태</th>
+  </tr></thead><tbody>${items.map(p => {
+    const key = p.product_uid || p.product_code || p._key || '';
+    const checked = stockChecked.has(key) ? ' checked' : '';
+    return `<tr data-stock-key="${escapeHtml(key)}">
+      <td style="text-align:center;"><input type="checkbox" class="stock-check" data-key="${escapeHtml(key)}"${checked}></td>
+      <td>${escapeHtml(p.provider_company_code || p.partner_code || '')}</td>
+      <td>${escapeHtml(p.car_number || '')}</td>
+      <td>${escapeHtml(p.maker || '')}</td>
+      <td>${escapeHtml(p.model_name || '')}</td>
+      <td>${escapeHtml(String(p.sub_model || '').replace(/20(\d{2})~/g, '$1~'))}</td>
+      <td>${escapeHtml(p.product_type || '')}</td>
+      <td>${escapeHtml(p.vehicle_status || '')}</td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+  // 헤더 체크박스 동기화
+  const headerCheck = document.getElementById('adminStockCheckAll');
+  if (headerCheck) headerCheck.checked = items.every(p => stockChecked.has(p.product_uid || p.product_code || p._key || ''));
+}
+
+function bindStockEvents() {
+  const select = document.getElementById('adminStockPartner');
+  const container = document.getElementById('adminStockList');
+  const selectAllBtn = document.getElementById('adminStockSelectAll');
+  const deselectAllBtn = document.getElementById('adminStockDeselectAll');
+  const deleteBtn = document.getElementById('adminStockDeleteSelected');
+
+  select?.addEventListener('change', () => {
+    stockSelectedPartner = select.value;
+    stockChecked.clear();
+    renderStockList();
+  });
+
+  container?.addEventListener('change', (e) => {
+    const input = e.target.closest('.stock-check');
+    if (input) {
+      if (input.checked) stockChecked.add(input.dataset.key);
+      else stockChecked.delete(input.dataset.key);
+      // 헤더 체크박스 동기화
+      const items = getStockFiltered();
+      const headerCheck = document.getElementById('adminStockCheckAll');
+      if (headerCheck) headerCheck.checked = items.length > 0 && items.every(p => stockChecked.has(p.product_uid || p.product_code || p._key || ''));
+      return;
+    }
+    // 헤더 체크박스
+    if (e.target.id === 'adminStockCheckAll') {
+      const items = getStockFiltered();
+      if (e.target.checked) items.forEach(p => stockChecked.add(p.product_uid || p.product_code || p._key || ''));
+      else items.forEach(p => stockChecked.delete(p.product_uid || p.product_code || p._key || ''));
+      renderStockList();
+    }
+  });
+
+  selectAllBtn?.addEventListener('click', () => {
+    getStockFiltered().forEach(p => stockChecked.add(p.product_uid || p.product_code || p._key || ''));
+    renderStockList();
+  });
+
+  deselectAllBtn?.addEventListener('click', () => {
+    stockChecked.clear();
+    renderStockList();
+  });
+
+  deleteBtn?.addEventListener('click', async () => {
+    if (!stockChecked.size) { showToast('삭제할 차량을 선택하세요.', 'error'); return; }
+    const ok = await showConfirm(`선택한 ${stockChecked.size}대의 재고를 삭제할까요?\n\n삭제된 재고는 복구할 수 없습니다.`);
+    if (!ok) return;
+    const { deleteProduct } = await import('../firebase/firebase-db.js');
+    let deleted = 0;
+    for (const key of stockChecked) {
+      try { await deleteProduct(key); deleted++; } catch (e) { console.warn('삭제 실패', key, e); }
+    }
+    stockChecked.clear();
+    showToast(`${deleted}대 삭제 완료`, 'success');
   });
 }
 
@@ -553,13 +670,18 @@ async function bootstrap() {
       renderStlList();
     }));
     registerPageCleanup(watchProducts((items) => {
-      productTypeMap = new Map((items || []).filter(p => p.car_number).map(p => [p.car_number, p.product_type || '']));
+      const products = items || [];
+      productTypeMap = new Map(products.filter(p => p.car_number).map(p => [p.car_number, p.product_type || '']));
+      allStockProducts = products.filter(p => p.status !== 'deleted');
       renderStlList();
     }));
     registerPageCleanup(watchSettlements((items) => {
       allSettlements = (items || []).sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
       renderStlList();
     }));
+
+    // 재고 일괄삭제
+    bindStockEvents();
 
     // 안내사항 관리
     bindNoticeEvents();

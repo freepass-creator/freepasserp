@@ -33,6 +33,7 @@
             </button>
           </div>
         </div>
+        <button class="admin-menu-item" data-tab="stock" type="button">재고 일괄삭제</button>
         <button class="admin-menu-item" data-tab="notice" type="button">안내사항 관리</button>
       </nav>
     </div>
@@ -70,6 +71,21 @@
           <thead id="adminStlHead"></thead>
           <tbody id="adminStlList"></tbody>
         </table>
+      </div>
+
+      <!-- 재고 일괄삭제 -->
+      <div class="admin-tab-panel" data-tab-panel="stock" hidden>
+        <div class="admin-stock-controls" style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f5f9;">
+          <select id="adminStockPartner" style="height:34px;font-size:13px;border:1px solid #e2e8f0;border-radius:6px;padding:0 10px;min-width:160px;">
+            <option value="">파트너 선택</option>
+          </select>
+          <span id="adminStockCount" style="font-size:13px;color:#64748b;"></span>
+          <span style="flex:1"></span>
+          <button type="button" class="inline-button btn-sm" id="adminStockSelectAll">전체선택</button>
+          <button type="button" class="inline-button btn-sm" id="adminStockDeselectAll">전체해제</button>
+          <button type="button" class="inline-button btn-sm btn-danger" id="adminStockDeleteSelected">선택 삭제</button>
+        </div>
+        <div id="adminStockList" style="overflow:auto;height:calc(100% - 58px);"></div>
       </div>
 
       <!-- 안내사항 관리 -->
