@@ -173,6 +173,8 @@ async function handleMobileBack() {
       if (!ok) return true;
     }
     document.body.classList.remove('chat-m-open');
+    const chatroom = document.getElementById('mChatroom');
+    if (chatroom) chatroom.hidden = true;
     return true;
   }
 
