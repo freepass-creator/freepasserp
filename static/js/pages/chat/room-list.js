@@ -90,7 +90,7 @@ export function renderChatRoomList({ thead, container, rooms, selectedRoomId, pr
         case 'model': return escapeHtml(String(product?.subModel || room.sub_model || '-').replace(/20(\d{2})~/g, '$1~'));
         case 'partner': return escapeHtml(product?.partnerCode || room.provider_company_code || room.partner_code || '');
         case 'agent': return escapeHtml(room.agent_code || room.agent_uid || '');
-        case 'message': return escapeHtml(truncate(room.last_message || '대화 시작 전', 30));
+        case 'message': return escapeHtml(truncate(room.last_message || '대화 시작 전', 18));
         case 'datetime': return escapeHtml(`${formatDate(at)} ${formatTime(at)}`);
         default: return '';
       }
