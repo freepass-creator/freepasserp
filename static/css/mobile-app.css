@@ -721,7 +721,7 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px var(--m-card-padding);
+  padding: 6px 10px;
   background: var(--m-card-bg);
   position: sticky;
   top: 0;
