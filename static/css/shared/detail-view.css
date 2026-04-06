@@ -30,7 +30,8 @@
 .product-list-page-shell .detail-card { min-width: 0; }
 .product-list-page-shell .detail-empty { display: flex; align-items: center; justify-content: center; min-height: 0; flex: 1 1 0; height: 100%; border: none; background: transparent; font-size: var(--font-size-main, 12px); color: var(--text-muted, #9ca3af); }
 
-.product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: var(--space-2); }
+.product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 0; }
+.product-list-page-shell .panel-body--detail { padding: 0 !important; }
 .product-list-page-shell .plist-detail__summary-top { display: flex; flex-direction: column; gap: var(--space-1); }
 .product-list-page-shell .plist-detail__summary-line { min-width: 0; font-size: var(--font-size-base); line-height: 1.5; color: var(--text-main); word-break: break-word; }
 .product-list-page-shell .plist-detail__summary-line--top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
@@ -45,8 +46,8 @@
 
 .product-list-page-shell .plist-detail__section { display: flex; flex-direction: column; gap: 2px; }
 .product-list-page-shell .plist-detail__section-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-.product-list-page-shell .plist-detail__section-title { font-size: var(--font-size-base); line-height: 1.4; font-weight: var(--font-weight-heavy); color: var(--text-main); display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px; }
-.product-list-page-shell .plist-detail__section-title::before { content: ''; flex: 0 0 3px; height: 12px; background: currentColor; border-radius: 1px; opacity: 0.3; }
+.product-list-page-shell .plist-detail__section-title { font-size: var(--font-size-base); line-height: 1.4; font-weight: var(--font-weight-heavy); color: var(--text-main); display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.product-list-page-shell .plist-detail__section-title svg { width: 14px; height: 14px; flex-shrink: 0; stroke: #94a3b8; }
 
 .product-list-page-shell .plist-detail__photo-download-link { padding: 0; border: none; background: transparent; font-size: var(--font-size-xs); color: var(--text-subtle); text-decoration: underline; cursor: pointer; }
 .product-list-page-shell .plist-detail__photo-download-link:hover { color: var(--text-main); }

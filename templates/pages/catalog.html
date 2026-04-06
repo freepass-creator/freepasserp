@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-theme.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/detail-common.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile.css') }}?v={{ app_version }}">
 </head>
@@ -18,19 +19,19 @@
 
 <!-- 헤더 -->
 <header class="catalog-header" id="catalog-header">
-  <div class="catalog-header-left">
-    <button class="catalog-header-back" id="catalog-back-btn" type="button" hidden>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-    </button>
-    <button class="catalog-header-filter" id="catalog-filter-btn" type="button" hidden>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg>
-    </button>
-  </div>
-  <div class="catalog-header-right" id="catalog-agent-card">
+  <button class="catalog-header-back" id="catalog-back-btn" type="button" hidden>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+  </button>
+  <div class="catalog-header-agent" id="catalog-agent-card">
     <img class="catalog-header-ci" id="catalog-agent-ci" src="" alt="" hidden>
     <span class="catalog-header-company" id="catalog-agent-company"></span>
     <span class="catalog-header-name" id="catalog-agent-name"></span>
     <span class="catalog-header-position" id="catalog-agent-position"></span>
+  </div>
+  <div class="catalog-header-right">
+    <button class="catalog-header-filter" id="catalog-filter-btn" type="button" hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg>
+    </button>
   </div>
 </header>
 

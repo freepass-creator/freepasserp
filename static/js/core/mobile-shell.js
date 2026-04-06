@@ -130,6 +130,17 @@ function navigateToProductList() {
 async function handleMobileBack() {
   const page = window.__currentPage || '';
 
+  // 0. 사진 뷰어 열려있으면 뷰어만 닫기
+  const photoViewer = document.querySelector('.fp-photo-viewer:not([hidden])');
+  if (photoViewer) {
+    photoViewer.hidden = true;
+    document.body.style.overflow = '';
+    // 상세가 열려있으면 history 유지
+    const productDetail = document.getElementById('plsMDetail');
+    if (productDetail && !productDetail.hidden) history.pushState({ detail: true }, '');
+    return true;
+  }
+
   // 1. 상품 상세 → 상품 목록
   const productDetail = document.getElementById('plsMDetail');
   if (productDetail && !productDetail.hidden) {

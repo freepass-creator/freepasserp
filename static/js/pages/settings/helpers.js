@@ -71,6 +71,8 @@ export const HEADER_ALIASES = {
   '모델명': 'model_name', '모델': 'model_name', model: 'model_name', model_name: 'model_name',
   '세부모델명': 'sub_model', '세부모델명(erp등록용최종본)': 'sub_model', '세부모델명 (erp 등록용 최종본)': 'sub_model', '세부모델': 'sub_model', submodel: 'sub_model', sub_model: 'sub_model',
   '생산기간': 'production_period', '생산 기간': 'production_period', production_period: 'production_period',
+  '생산시작': 'production_start', '생산 시작': 'production_start', production_start: 'production_start',
+  '생산종료': 'production_end', '생산 종료': 'production_end', production_end: 'production_end',
   '코드명': 'model_code', model_code: 'model_code',
   '분류': 'vehicle_category', '차종분류': 'vehicle_category', vehicle_category: 'vehicle_category',
   '외부색상': 'exterior_colors', '외장색상': 'exterior_colors', exterior_colors: 'exterior_colors',
@@ -163,6 +165,11 @@ export function buildDisplaySubModelName(row = {}) {
 export function normalizeVehicleMasterRows(rows = []) {
   const uniqueMap = new Map();
   rows.forEach((row, rowIndex) => {
+    if (!row.production_period && (row.production_start || row.production_end)) {
+      const start = String(row.production_start || '').trim();
+      const end = String(row.production_end || '').trim() || '현재';
+      row.production_period = `${start}-${end}`;
+    }
     const maker = String(row.maker || '').trim();
     const modelName = String(row.model_name || '').trim();
     const subModel = buildDisplaySubModelName(row);

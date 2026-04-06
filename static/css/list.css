@@ -200,87 +200,79 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: var(--badge-min-width);
-  min-height: var(--badge-height);
-  padding: 0 var(--badge-padding-x);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: var(--badge-radius);
-  font-size: var(--badge-font-size);
-  font-weight: var(--font-weight-strong);
-  line-height: 1;
-  letter-spacing: -0.05em;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   white-space: nowrap;
-  background: var(--surface-base);
-  color: var(--text-main);
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .fp-badge--solid {
-  background: var(--text-main);
-  border-color: var(--text-main);
+  background: #1b2a4a;
   color: #ffffff;
 }
 
 .fp-badge--soft {
-  background: var(--surface-subtle);
-  border-color: var(--border-main);
-  color: var(--text-main);
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .fp-badge--outline {
-  background: var(--surface-base);
-  border-color: var(--text-subtle);
-  color: var(--text-main);
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
 }
 
 .fp-badge--muted {
-  background: #f9fafb;
-  border-color: var(--border-soft);
-  color: var(--text-muted);
+  background: #f8fafc;
+  color: #94a3b8;
 }
 
-.fp-badge[class*="fp-badge--kind-"] {
-  background: var(--badge-bg, var(--surface-base));
-  border-color: var(--badge-border, var(--border-main));
-  color: var(--badge-text, var(--text-main));
-}
-
-
+/* ── 상태 뱃지 ── */
 .fp-badge--kind-status-info {
-  --badge-bg:     var(--badge-status-info-bg);
-  --badge-border: var(--badge-status-info-border);
-  --badge-text:   var(--badge-status-info-text);
+  background: #eef2ff;
+  color: #1b2a4a;
 }
 
 .fp-badge--kind-status-success {
-  --badge-bg:     var(--badge-status-success-bg);
-  --badge-border: var(--badge-status-success-border);
-  --badge-text:   var(--badge-status-success-text);
+  background: #ecfdf5;
+  color: #065f46;
 }
 
 .fp-badge--kind-status-warning {
-  --badge-bg:     var(--badge-status-warning-bg);
-  --badge-border: var(--badge-status-warning-border);
-  --badge-text:   var(--badge-status-warning-text);
+  background: #fffbeb;
+  color: #92400e;
 }
 
 .fp-badge--kind-status-danger {
-  --badge-bg:     var(--badge-status-danger-bg);
-  --badge-border: var(--badge-status-danger-border);
-  --badge-text:   var(--badge-status-danger-text);
+  background: #fef2f2;
+  color: #991b1b;
 }
 
-.fp-badge--kind-status-neutral,
+.fp-badge--kind-status-neutral {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
 
+/* ── 역할/분류 뱃지 ── */
 .fp-badge--kind-category-sales {
-  --badge-bg:     var(--badge-category-sales-bg);
-  --badge-border: var(--badge-category-sales-border);
-  --badge-text:   var(--badge-category-sales-text);
+  background: #ecfdf5;
+  color: #266f67;
+}
+
+.fp-badge--kind-category-supply {
+  background: #eff6ff;
+  color: #1e40af;
 }
 
 .fp-badge--kind-category-member {
-  --badge-bg:     var(--badge-category-member-bg);
-  --badge-border: var(--badge-category-member-border);
-  --badge-text:   var(--badge-category-member-text);
+  background: #f1f5f9;
+  color: #475569;
 }
 
 .summary-inline-badges {
@@ -577,26 +569,28 @@
 }
 
 
+/* ── 상품구분 뱃지 ── */
 .fp-badge--kind-category-product-rent-new {
-  --badge-bg:     var(--badge-category-rent-new-bg);
-  --badge-border: var(--badge-category-rent-new-border);
-  --badge-text:   var(--badge-category-rent-new-text);
+  background: #eff6ff;
+  color: #1e40af;
 }
 
 .fp-badge--kind-category-product-rent-used {
-  --badge-bg:     var(--badge-category-rent-used-bg);
-  --badge-border: var(--badge-category-rent-used-border);
-  --badge-text:   var(--badge-category-rent-used-text);
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.fp-badge--kind-category-product-lease {
+  background: #faf5ff;
+  color: #7c3aed;
 }
 
 .fp-badge--kind-category-product-subscription-new {
-  --badge-bg:     var(--badge-category-sub-new-bg);
-  --badge-border: var(--badge-category-sub-new-border);
-  --badge-text:   var(--badge-category-sub-new-text);
+  background: #faf5ff;
+  color: #6d28d9;
 }
 
 .fp-badge--kind-category-product-subscription-used {
-  --badge-bg:     var(--badge-category-sub-used-bg);
-  --badge-border: var(--badge-category-sub-used-border);
-  --badge-text:   var(--badge-category-sub-used-text);
+  background: #f5f3ff;
+  color: #6b6080;
 }

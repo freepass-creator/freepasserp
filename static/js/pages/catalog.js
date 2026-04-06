@@ -18,12 +18,9 @@ import { open as openFullscreenViewer, close as closeFullscreenViewer, isOpen as
 import {
   esc, has, fmt,
   renderCatalogCard,
-  renderCatalogDetailHero,
-  renderCatalogPriceTable,
-  renderCatalogInsuranceTable,
-  renderCatalogConditions,
-  renderCatalogExtra,
 } from '../shared/catalog-card.js';
+import { normalizeProduct } from '../shared/product-list-detail-data.js';
+import { renderProductDetailMarkup } from '../shared/product-list-detail-markup.js';
 
 // ─── DOM refs ──────────────────────────────────────────────────────────────
 
@@ -277,56 +274,10 @@ function fmtRentalGuide(pol) {
 // ─── 상세 마크업 생성 ─────────────────────────────────────────────────────
 
 function renderProductDetail(p) {
-  const pol = buildPolicy(p);
-
-  const shareBtn = `<button class="cat-share-btn" id="cat-share-btn" type="button" title="링크 복사"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg></button>`;
-
-  const periods = ['1', '6', '12', '24', '36', '48', '60'];
-  const priceRows = periods
-    .filter(m => getRent(p, Number(m)) > 0)
-    .map(m => ({ m, rent: getRent(p, Number(m)), dep: getDeposit(p, Number(m)), fee: 0 }));
-
-  const insRows = [
-    ['대인',         pol.injuryLimit,        pol.injuryDeductible],
-    ['대물',         pol.propertyLimit,      pol.propertyDeductible],
-    ['자기신체사고', pol.selfBodyLimit,       pol.selfBodyDeductible],
-    ['무보험차상해', pol.uninsuredLimit,      pol.uninsuredDeductible],
-    ['자기차량손해', pol.ownDamageComp,       fmtOwnDamageDeductible(pol)],
-    ['긴급출동',     pol.roadsideAssistance,  '-'],
-  ];
-
-  const condRows = [
-    ['1만Km추가비용',   pol.mileageUpcharge],
-    ['보증금분납',       pol.depositInstallment],
-    ['결제방식',         pol.paymentMethod],
-    ['위약금',           pol.penaltyCondition],
-    ['보증금카드결제',   pol.depositCardPayment],
-    ['대여지역',         pol.rentalRegion],
-    ['탁송비',           pol.deliveryFee],
-    ['운전연령하향',     pol.driverAgeLowering],
-    ['운전연령하향비용', pol.ageLoweringCost],
-    ['개인운전자범위',   pol.personalDriverScope],
-    ['사업자운전자범위', pol.businessDriverScope],
-    ['추가운전자수',     pol.additionalDriverCount],
-    ['추가운전자비용',   pol.additionalDriverCost],
-    ['정비서비스',       pol.maintenanceService],
-  ];
-
-  const extraRows = [
-    ['차량번호',   p.car_number],
-    ['차종구분',   p.vehicle_class],
-    ['최초등록일', fmtDate(p.first_registration_date)],
-    ['차령만료일', fmtDate(p.vehicle_age_expiry_date)],
-    ['차량가격',   fmt(p.vehicle_price)],
-    ['특이사항',   p.partner_memo || p.note],
-    ...(!providerParam ? [['공급코드', p.provider_company_code || p.partner_code]] : []),
-  ];
-
-  return renderCatalogDetailHero(p, shareBtn)
-    + renderCatalogPriceTable(priceRows, { showFee: false, guideNote: fmtRentalGuide(pol) })
-    + renderCatalogInsuranceTable(insRows)
-    + renderCatalogConditions(condRows)
-    + renderCatalogExtra(extraRows);
+  const normalized = normalizeProduct(p);
+  const termFields = getPolicy(p);
+  const shareBtn = `<div class="md-actions"><button class="md-action-btn" id="cat-share-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg> 공유</button></div>`;
+  return renderProductDetailMarkup(normalized, { termFields, actionsHtml: shareBtn, showGallery: false, showFee: false });
 }
 
 // ─── 뷰 전환 ──────────────────────────────────────────────────────────────
@@ -535,7 +486,6 @@ function updateGallerySlide() {
 
 function openPhotoViewer(startIndex = 0) {
   if (!sGalleryImages.length) return;
-  history.pushState({ view: 'photo' }, '');
   openFullscreenViewer(sGalleryImages, startIndex);
 }
 

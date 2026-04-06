@@ -456,7 +456,7 @@ function renderList(){
     sortable: true,
     getKey: (item) => item.id,
     onSelect: (item) => {
-      if (state.selectedId === item.id && $detailPanel && !$detailPanel.hidden) {
+      if ($detailPanel && !$detailPanel.hidden) {
         hideDetailPanel();
         return;
       }
@@ -604,7 +604,7 @@ async function ensureTermLoaded(product){
       renderDetail();
       // 모바일 상세 패널도 재렌더링 (정책 데이터 반영)
       if ($plsMDetailContent && $plsMDetail && !$plsMDetail.hidden) {
-        $plsMDetailContent.innerHTML = renderMobileCatalogDetail(product);
+        $plsMDetailContent.innerHTML = renderProductDetailMarkup(product, { termFields: getTermFields(product) });
         bindMobileDetailGallery($plsMDetailContent);
       }
     }
@@ -727,14 +727,7 @@ function syncTopBarIdentity(product) {
 function syncDetailBadges(product) {
   const el = document.getElementById('productDetailBadges');
   if (!el) return;
-  if (!product) { el.innerHTML = ''; return; }
-  const badges = [
-    product.vehicleStatus && product.vehicleStatus !== '-' && product.vehicleStatus !== '재고'
-      ? { field: 'vehicle_status', value: product.vehicleStatus } : null,
-    product.productType && product.productType !== '-'
-      ? { field: 'product_type', value: product.productType } : null,
-  ].filter(Boolean);
-  el.innerHTML = badges.map(b => renderBadgeRow([b])).join('');
+  el.innerHTML = '';
 }
 
 function renderDetail(){
@@ -754,6 +747,7 @@ function renderDetail(){
   syncTopBarIdentity(product);
   $detail.innerHTML=renderProductDetailMarkup(product,{ activePhotoIndex: state.activePhotoIndex, termFields: getTermFields(product) });
   bindProductDetailPhotoEvents($detail,(index)=>{ state.activePhotoIndex=index; renderDetail(); });
+  bindDetailGallery($detail, product);
   ensureTermLoaded(product);
 }
 function applyFilters(){
@@ -955,6 +949,37 @@ function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
     + renderCatalogExtra(extraRows);
 }
 
+let _detailGalleryState = null;
+function bindDetailGallery(container) {
+  const wrap = container.querySelector('#plsMGallery') || container.querySelector('.pls-mobile-detail-gallery');
+  if (!wrap) { _detailGalleryState = null; return; }
+  let photos;
+  try { photos = JSON.parse(wrap.dataset.photos || '[]'); } catch { _detailGalleryState = null; return; }
+  if (!photos.length) { _detailGalleryState = null; return; }
+  let idx = 0;
+  const img = container.querySelector('#plsMGalleryImg');
+  const ctr = container.querySelector('#plsMGalleryCtr');
+  const update = () => {
+    if (img) img.src = photos[idx];
+    if (ctr) ctr.textContent = `${idx + 1} / ${photos.length}`;
+  };
+  _detailGalleryState = { photos, getIdx: () => idx, prev: () => { idx = (idx - 1 + photos.length) % photos.length; update(); }, next: () => { idx = (idx + 1) % photos.length; update(); } };
+  if (photos.length > 1) {
+    container.querySelector('#plsMGalleryPrev')?.addEventListener('click', (e) => { e.stopPropagation(); _detailGalleryState.prev(); });
+    container.querySelector('#plsMGalleryNext')?.addEventListener('click', (e) => { e.stopPropagation(); _detailGalleryState.next(); });
+  }
+  wrap.addEventListener('click', (e) => {
+    if (e.target.closest('.pls-mobile-detail-gallery__nav')) return;
+    openFullscreenViewer(photos, idx);
+  });
+}
+document.addEventListener('keydown', (e) => {
+  if (!_detailGalleryState) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); _detailGalleryState.prev(); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); _detailGalleryState.next(); }
+});
+
 function bindMobileDetailGallery(container) {
   const wrap = container.querySelector('#plsMGallery');
   if (!wrap) return;
@@ -1015,17 +1040,13 @@ function openMobileDetail(id) {
     const userLabel = [p.company_name || p.company, p.name || p.user_name, p.position || p.rank].filter(Boolean).join(' ');
     $plsMDetailTitle.textContent = userLabel || '상세정보';
   }
-  // 카탈로그 스타일 상세 렌더링 — 액션 버튼 컨텐츠 내부로
-  // 문의: 영업자만 / 계약: 영업자+공급사+관리자 / 공유: 전체
+  // 카탈로그 스타일 상세 렌더링 — 모바일은 액션 버튼 포함
   const role = state.role;
-  const inquiryBtn = role === 'agent'
-    ? `<button class="cat-share-btn" id="plsMDetailInquiry" title="대화" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button>`
-    : '';
-  const contractBtn = role === 'agent'
-    ? `<button class="cat-share-btn" id="plsMDetailContract" title="계약" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></button>`
-    : '';
-  const actionsHtml = `${inquiryBtn}${contractBtn}<button class="cat-share-btn" id="plsMDetailShare" title="공유" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></button>`;
-  $plsMDetailContent.innerHTML = renderMobileCatalogDetail(product, { actionsHtml });
+  const inquiryBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailInquiry"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> 문의</button>` : '';
+  const contractBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailContract"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg> 계약</button>` : '';
+  const shareBtn = `<button class="md-action-btn" id="plsMDetailShare"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg> 공유</button>`;
+  const mobileActionsHtml = `<div class="md-actions">${inquiryBtn}${contractBtn}${shareBtn}</div>`;
+  $plsMDetailContent.innerHTML = renderProductDetailMarkup(product, { termFields: getTermFields(product), actionsHtml: mobileActionsHtml });
   bindMobileDetailGallery($plsMDetailContent);
   $plsMDetailContent.querySelector('#plsMDetailInquiry')?.addEventListener('click', (e) => handleInquiry(e.currentTarget));
   $plsMDetailContent.querySelector('#plsMDetailShare')?.addEventListener('click', handleShare);

@@ -3,7 +3,7 @@
 .catalog-body {
   background: #f8fafc;
   min-height: 100vh;
-  padding-bottom: var(--space-5);
+  padding-bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom) + var(--space-4));
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: var(--font-weight-base);
   color: #1e293b;
@@ -62,7 +62,7 @@ html {
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 6px;
   height: 46px;
   padding: 0 var(--space-3);
   background: #fff;
@@ -70,12 +70,7 @@ html {
   contain: layout style paint;
 }
 
-.catalog-header-left {
-  display: flex;
-  align-items: center;
-  gap: var(--detail-row-gap);
-  flex-shrink: 0;
-}
+/* catalog-header-left 제거됨 — 헤더 좌측 정렬로 변경 */
 
 .catalog-header-back,
 .catalog-header-filter {
@@ -101,19 +96,22 @@ html {
 .catalog-header-filter { display: none; }
 .catalog-header-filter[hidden] { display: none !important; }
 
-.catalog-header-right {
+.catalog-header-agent {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
   min-width: 0;
-  white-space: nowrap;
-}
-
-.catalog-header-agent {
   white-space: nowrap;
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-strong);
   color: #1e293b;
+}
+
+.catalog-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
 }
 
 .catalog-header-sep { display: none; }
@@ -966,14 +964,16 @@ html {
 /* ─── 하단 전화하기 바 (모바일 전용) ─────────────────────────────────────── */
 
 .catalog-bottom-bar {
-  display: none;
+  display: flex;
+  align-items: center;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 300;
-  padding: var(--space-3) var(--space-4);
-  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  height: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
+  padding: 0 var(--space-4);
+  padding-bottom: env(safe-area-inset-bottom);
   background: #fff;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
   contain: layout style paint;
@@ -985,7 +985,7 @@ html {
   justify-content: center;
   gap: var(--space-2);
   width: 100%;
-  height: var(--height-2xl);
+  height: 44px;
   border-radius: 10px;
   background: #1b2a4a;
   color: #ffffff;
@@ -998,6 +998,7 @@ html {
 }
 
 .catalog-bottom-bar__btn:active { background: #0f1a2e; }
+.catalog-bottom-bar[hidden] { display: none !important; }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 
@@ -1007,8 +1008,7 @@ html {
   .catalog-header-filter:not([hidden]) { display: flex; }
   .catalog-header-phone { display: none !important; }
   .catalog-header-divider { display: none !important; }
-  .catalog-bottom-bar:not([hidden]) { display: block; }
-  .catalog-body { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  /* catalog-bottom-bar는 hidden 속성으로 제어 */
 
   .catalog-sidebar-overlay {
     display: none;

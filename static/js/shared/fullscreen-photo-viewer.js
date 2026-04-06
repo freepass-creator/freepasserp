@@ -55,7 +55,7 @@ export function open(photos = [], startIndex = 0) {
 }
 
 export function close() {
-  if (!viewerEl) return;
+  if (!viewerEl || viewerEl.hidden) return;
   viewerEl.hidden = true;
   document.body.style.overflow = '';
 }

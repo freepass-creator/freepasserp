@@ -457,6 +457,7 @@ sheetImporter = createGoogleSheetImporter({
   buildBasePayload: () => buildProductPayload({ ...adapterContext, currentProfile: currentProfile || null }),
   getPartnerNameByCode,
   currentProfile: () => currentProfile,
+  getAllProducts: () => allProducts,
   saveProduct,
   setStatus
 });
@@ -514,7 +515,13 @@ function renderList(products) {
     selectedKey: editingCodeInput?.value || '',
     getKey: (item) => item?.product_uid || item?.product_code || '',
     onSelect: async (product) => {
-      if (mode === 'edit' && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
+      if ((mode === 'edit' || mode === 'create') && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
+      if (mode === 'view' || mode === 'edit' || mode === 'create') {
+        resetForm();
+        applyFormMode('idle');
+        renderFilteredList();
+        return;
+      }
       if (product) fillProductForm(product, { ...adapterContext, currentProfile });
     },
     getCellValue: (col, p) => {
@@ -771,18 +778,34 @@ async function bootstrap() {
 
         // 1단계: 검증
         setStatus('구글시트 검증 중...', 'progress');
-        const results = await sheetImporter.validate(sheetUrlInput?.value || '');
+        const { results, warnings, dupCount, newCount, totalRows } = await sheetImporter.validate(sheetUrlInput?.value || '');
 
-        // 2단계: 미리보기
-        const totalRows = results.reduce((sum, r) => sum + r.rowCount, 0);
+        // 2단계: 미리보기 + 중복 처리
         const sheetCount = results.length;
         const preview = results.map(r => `• ${r.rowCount}건 (${r.carNumbers.slice(0, 3).join(', ')}${r.rowCount > 3 ? ' ...' : ''})`).join('\n');
-        const confirmed = await showConfirm(`구글시트 ${sheetCount}개, 총 ${totalRows}건을 반영할까요?\n\n${preview}`);
-        if (!confirmed) { setStatus('반영 취소', 'info'); return; }
+        let skipDuplicates = false;
+
+        if (dupCount > 0) {
+          const warningText = warnings.length ? '\n\n' + warnings.join('\n') : '';
+          const dupConfirm = await showConfirm(
+            `총 ${totalRows}건 중 ${dupCount}건 중복\n\n` +
+            `중복 제외 ${newCount}건만 반영할까요?\n` +
+            `(취소 시 전체 ${totalRows}건 반영 여부를 다시 묻습니다)${warningText}`
+          );
+          if (dupConfirm) {
+            skipDuplicates = true;
+          } else {
+            const allConfirm = await showConfirm(`중복 포함 전체 ${totalRows}건을 반영할까요?\n\n${preview}`);
+            if (!allConfirm) { setStatus('반영 취소', 'info'); return; }
+          }
+        } else {
+          const confirmed = await showConfirm(`구글시트 ${sheetCount}개, 총 ${totalRows}건을 반영할까요?\n\n${preview}`);
+          if (!confirmed) { setStatus('반영 취소', 'info'); return; }
+        }
 
         // 3단계: 반영
         setStatus('구글시트 반영 중...', 'progress');
-        await sheetImporter.apply(results);
+        await sheetImporter.apply(results, { skipDuplicates });
       } catch (error) {
         setStatus(`반영 실패: ${error.message}`, 'error');
       }

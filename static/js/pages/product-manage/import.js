@@ -38,6 +38,7 @@ const SHEET_HEADER_ALIASES = {
   'vehicle_age_expiry_date': 'vehicle_age_expiry_date',
   '주행거리': 'mileage',
   '주행 거리': 'mileage',
+  '현재주행거리': 'mileage',
   'mileage': 'mileage',
   '연료': 'fuel_type',
   'fuel_type': 'fuel_type',
@@ -88,8 +89,9 @@ const SHEET_HEADER_ALIASES = {
   '중도해지위약금율': 'penalty_rate',
   '중도 해지 위약금율': 'penalty_rate',
   'penalty_rate': 'penalty_rate',
-  '특이사항': 'note',
-  'note': 'note',
+  '특이사항': 'partner_memo',
+  '공급사메모': 'partner_memo',
+  'partner_memo': 'partner_memo',
   '1개월대여료': 'rent_1',
   'rent_1': 'rent_1',
   '1개월보증금': 'deposit_1',
@@ -219,6 +221,7 @@ export function createGoogleSheetImporter(config) {
     buildBasePayload,
     getPartnerNameByCode,
     currentProfile,
+    getAllProducts,
     saveProduct,
     setStatus
   } = config;
@@ -275,6 +278,49 @@ export function createGoogleSheetImporter(config) {
     return { headers, dataRows: rows.slice(1) };
   }
 
+  function buildDuplicateReport(allCarNumbers, headers, allDataRows) {
+    const warnings = [];
+    const existing = typeof getAllProducts === 'function' ? getAllProducts() : [];
+    const existingCarMap = new Map();
+    existing.forEach(p => {
+      const cn = String(p.car_number || '').trim();
+      if (cn) existingCarMap.set(cn, p);
+    });
+
+    // 1. 시트 내 차량번호 중복
+    const sheetCarCount = new Map();
+    allCarNumbers.forEach(cn => sheetCarCount.set(cn, (sheetCarCount.get(cn) || 0) + 1));
+    const sheetDups = [...sheetCarCount.entries()].filter(([, count]) => count > 1);
+    if (sheetDups.length) {
+      warnings.push(`시트 내 차량번호 중복 ${sheetDups.length}건: ${sheetDups.map(([cn, c]) => `${cn}(${c}건)`).join(', ')}`);
+    }
+
+    // 2. 기존 DB 차량번호 중복
+    const dbDups = allCarNumbers.filter(cn => existingCarMap.has(cn));
+    const dbDupsUnique = [...new Set(dbDups)];
+    if (dbDupsUnique.length) {
+      warnings.push(`기존 등록 차량번호와 중복 ${dbDupsUnique.length}건: ${dbDupsUnique.join(', ')}`);
+    }
+
+    // 3. 시트 내 차량번호+제조사+모델 완전일치 중복
+    const carIdx = headers.indexOf('car_number');
+    const makerIdx = headers.indexOf('maker');
+    const modelIdx = headers.indexOf('model_name');
+    if (carIdx >= 0 && makerIdx >= 0 && modelIdx >= 0) {
+      const comboCount = new Map();
+      allDataRows.forEach(row => {
+        const key = [row[carIdx], row[makerIdx], row[modelIdx]].map(v => String(v || '').trim()).join('|');
+        if (key.replace(/\|/g, '')) comboCount.set(key, (comboCount.get(key) || 0) + 1);
+      });
+      const comboDups = [...comboCount.entries()].filter(([, count]) => count > 1);
+      if (comboDups.length) {
+        warnings.push(`차량번호+제조사+모델 완전일치 ${comboDups.length}건: ${comboDups.map(([k, c]) => `${k.split('|')[0]}(${c}건)`).join(', ')}`);
+      }
+    }
+
+    return { warnings, dbDupsUnique };
+  }
+
   /** 검증만 수행 — 규격 확인 + 미리보기 데이터 반환 */
   async function validateGoogleSheet(url) {
     const normalizedUrl = String(url || '').trim();
@@ -282,24 +328,37 @@ export function createGoogleSheetImporter(config) {
 
     const urls = normalizedUrl.split(/[\n,]+/).map(u => u.trim()).filter(Boolean);
     const results = [];
+    const allCarNumbers = [];
+    const allRawRows = [];
+    let mergedHeaders = null;
 
     for (const sheetUrl of urls) {
       if (!/docs\.google\.com\/spreadsheets/.test(sheetUrl)) {
         throw new Error(`구글시트 링크 형식이 아닙니다:\n${sheetUrl}`);
       }
       const { headers, dataRows } = await fetchAndParseSheet(sheetUrl);
+      if (!mergedHeaders) mergedHeaders = headers;
       const carNumbers = dataRows.map(row => {
         const idx = headers.indexOf('car_number');
         return idx >= 0 ? String(row[idx] || '').trim() : '';
       }).filter(Boolean);
+      allCarNumbers.push(...carNumbers);
+      allRawRows.push(...dataRows);
       results.push({ url: sheetUrl, headers, rowCount: dataRows.length, carNumbers, dataRows });
     }
 
-    return results;
+    const report = buildDuplicateReport(allCarNumbers, mergedHeaders || [], allRawRows);
+    const dupCount = report.dbDupsUnique.length;
+    const newCount = allCarNumbers.length - dupCount;
+    return { results, warnings: report.warnings, dupCount, newCount, totalRows: allCarNumbers.length };
   }
 
   /** 검증된 데이터로 실제 반영 */
-  async function applyValidatedData(validatedResults) {
+  async function applyValidatedData(validatedResults, options = {}) {
+    const { skipDuplicates = false } = options;
+    const existing = typeof getAllProducts === 'function' ? getAllProducts() : [];
+    const existingCarSet = new Set(existing.map(p => String(p.car_number || '').trim()).filter(Boolean));
+
     let allDataRows = [];
     let headers = null;
 
@@ -311,6 +370,7 @@ export function createGoogleSheetImporter(config) {
     const dataRows = allDataRows;
 
     let importedCount = 0;
+    let skippedCount = 0;
     for (const entry of dataRows) {
       const rowHeaders = entry.headers || headers;
       const row = entry.row || entry;
@@ -321,6 +381,11 @@ export function createGoogleSheetImporter(config) {
 
       const payload = normalizeImportedRow(rowObj);
       if (!payload.car_number) continue;
+
+      if (skipDuplicates && existingCarSet.has(payload.car_number)) {
+        skippedCount += 1;
+        continue;
+      }
 
       const profile = getCurrentProfile() || null;
 
@@ -379,7 +444,9 @@ export function createGoogleSheetImporter(config) {
       }
     }
 
-    setStatus(`구글시트 반영 완료: ${importedCount}건`, 'success');
+    const statusParts = [`구글시트 반영 완료: ${importedCount}건`];
+    if (skippedCount) statusParts.push(`중복 제외: ${skippedCount}건`);
+    setStatus(statusParts.join(' / '), 'success');
   }
 
   return { validate: validateGoogleSheet, apply: applyValidatedData };

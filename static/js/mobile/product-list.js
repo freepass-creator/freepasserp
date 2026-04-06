@@ -5,8 +5,9 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { watchProducts, resolveTermForProduct, ensureRoom } from '../firebase/firebase-db.js';
 import { normalizeProduct, extractTermFields } from '../shared/product-list-detail-view.js';
+import { renderProductDetailMarkup, esc as escMarkup } from '../shared/product-list-detail-markup.js';
 import { renderCatalogCard, esc } from '../shared/catalog-card.js';
-import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
+import { open as openFullscreenViewer, close as closePhotoViewer, isOpen as isPhotoViewerOpen } from '../shared/fullscreen-photo-viewer.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { escapeHtml } from '../core/management-format.js';
 
@@ -130,13 +131,14 @@ function renderDetailContent(product) {
     ${sectionHead('차량정보')}
     <div class="md-card">
       <div class="md-vehicle-head">
-        <div class="md-vehicle-carno">${esc(safe(product.carNo))}</div>
         <div class="md-vehicle-model">${esc(safe(product.maker))} ${esc(safe(product.model))}</div>
+        <div class="md-vehicle-carno">${esc(safe(product.carNo))}</div>
         ${badges ? `<div class="md-badges">${badges}</div>` : ''}
       </div>
       <div class="md-vehicle-sub">${esc(safe(product.subModel))} ${esc(safe(product.trim))}</div>
       ${product.optionSummary && product.optionSummary !== '-' ? `<div class="md-vehicle-sub">${esc(product.optionSummary)}</div>` : ''}
-      <div class="md-vehicle-meta">${esc(safe(product.fuel))} · ${esc(safe(product.year))}년식 · ${esc(safe(product.mileageDisplay))} · ${esc(safe(product.extColor))}/${esc(safe(product.intColor))}</div>
+      <div class="md-vehicle-sub">${esc(safe(product.mileageDisplay))} · ${esc(safe(product.extColor))}/${esc(safe(product.intColor))}</div>
+      <div class="md-vehicle-meta">${esc(safe(product.fuel))} · ${esc(safe(product.year))}년식</div>
     </div>`;
 
   // ── 3. 액션 버튼 ──
@@ -280,14 +282,26 @@ async function ensureTermLoaded(product) {
     delete state.termLoading[key];
     // 상세 열려있으면 term 데이터 반영하여 재렌더
     if ($detail && !$detail.hidden && state.selectedId === product.id) {
-      $detailContent.innerHTML = renderDetailContent(product);
-      bindGallery($detailContent);
+      renderAndBindDetail(product);
     }
   }
 }
 
+function buildMobileActionsHtml(product) {
+  const role = state.role;
+  const inquiryBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailInquiry"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> 문의</button>` : '';
+  const contractBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailContract"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg> 계약</button>` : '';
+  const shareBtn = `<button class="md-action-btn" id="plsMDetailShare"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg> 공유</button>`;
+  return `<div class="md-actions">${inquiryBtn}${contractBtn}${shareBtn}</div>`;
+}
+
 function renderAndBindDetail(product) {
-  $detailContent.innerHTML = renderDetailContent(product);
+  const term = state.termCache[getTermCacheKey(product)] || {};
+  $detailContent.innerHTML = renderProductDetailMarkup(product, {
+    activePhotoIndex: 0,
+    termFields: term,
+    actionsHtml: buildMobileActionsHtml(product)
+  });
   bindGallery($detailContent);
   $detailContent.querySelector('#plsMDetailInquiry')?.addEventListener('click', (e) => handleInquiry(e.currentTarget, product));
   $detailContent.querySelector('#plsMDetailContract')?.addEventListener('click', () => handleContract(product));
@@ -509,8 +523,13 @@ function bindEvents() {
     if (card) openDetail(card.dataset.id);
   });
 
-  // 핸드폰 뒤로가기 → 상세 닫기
+  // 핸드폰 뒤로가기 → 사진뷰어 열려있으면 뷰어만 닫기, 아니면 상세 닫기
   window.addEventListener('popstate', (e) => {
+    if (isPhotoViewerOpen()) {
+      closePhotoViewer();
+      history.pushState({ detail: true }, '');
+      return;
+    }
     if ($detail && !$detail.hidden) {
       closeDetail();
     }
