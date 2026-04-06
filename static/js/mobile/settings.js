@@ -75,7 +75,7 @@ async function init() {
     // iOS — 수동 안내
     if (installSection) installSection.hidden = false;
     if (installHint) installHint.textContent = 'Safari 하단 공유 버튼 → "홈 화면에 추가"를 눌러주세요.';
-    if (installBtn) installBtn.textContent = '설치 방법 안내';
+    if (installBtn) installBtn.textContent = '설치 안내';
     installBtn?.addEventListener('click', () => {
       showToast('Safari 하단 공유 버튼(□↑)을 누른 후\n"홈 화면에 추가"를 선택하세요.', 'info');
     });
