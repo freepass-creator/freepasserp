@@ -766,6 +766,22 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
 }
 .m-search-bar__filter-btn:active { background: #e5e8eb; }
 
+/* ── 모바일 공통 뒤로가기 버튼 ── */
+.m-back-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--m-text-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+.m-back-btn:active { background: var(--m-input-bg); }
+
 /* ── 모바일 상세 상단바 (뒤로가기 + 타이틀 + 액션) ── */
 .m-detail-bar {
   display: flex;
