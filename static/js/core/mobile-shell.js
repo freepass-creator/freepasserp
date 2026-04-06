@@ -135,13 +135,29 @@ async function handleMobileBack() {
   if (photoViewer) {
     photoViewer.hidden = true;
     document.body.style.overflow = '';
-    // 상세가 열려있으면 history 유지
-    const productDetail = document.getElementById('plsMDetail');
-    if (productDetail && !productDetail.hidden) history.pushState({ detail: true }, '');
     return true;
   }
 
-  // 1. 상품 상세 → 상품 목록
+  // 1. 필터 사이드바 열려있으면 닫기
+  const openFilter = document.querySelector('.m-filter-sidebar.is-open, .catalog-sidebar.is-open');
+  if (openFilter) {
+    openFilter.classList.remove('is-open');
+    const overlay = document.querySelector('.m-filter-overlay.is-open, .catalog-sidebar-overlay.is-open');
+    overlay?.classList.remove('is-open');
+    updateFilterIcon(false);
+    return true;
+  }
+
+  // 2. 모바일 드로어 열려있으면 닫기
+  const drawer = document.querySelector('.mobile-drawer:not([hidden])');
+  const drawerOverlay = document.querySelector('.mobile-drawer-overlay:not([hidden])');
+  if (drawer && !drawer.hidden) {
+    drawer.hidden = true;
+    if (drawerOverlay) drawerOverlay.hidden = true;
+    return true;
+  }
+
+  // 3. 상품 상세 → 상품 목록
   const productDetail = document.getElementById('plsMDetail');
   if (productDetail && !productDetail.hidden) {
     productDetail.hidden = true;
@@ -149,7 +165,7 @@ async function handleMobileBack() {
     return true;
   }
 
-  // 2. 채팅창 → 채팅 목록 (입력 중이면 확인)
+  // 4. 채팅창 → 채팅 목록 (입력 중이면 확인)
   if (document.body.classList.contains('chat-m-open')) {
     const msgInput = document.getElementById('message-input');
     if (msgInput && msgInput.value.trim()) {
@@ -160,7 +176,7 @@ async function handleMobileBack() {
     return true;
   }
 
-  // 3. 계약 상세 → 계약 목록
+  // 5. 계약 상세 → 계약 목록
   const contractDetail = document.getElementById('contract-m-detail');
   if (contractDetail && !contractDetail.hidden) {
     contractDetail.hidden = true;
@@ -168,14 +184,14 @@ async function handleMobileBack() {
     return true;
   }
 
-  // 4. 상품목록(홈) → 종료 확인
+  // 6. 상품목록(홈) → 종료 확인
   if (page === '/product-list') {
     const exit = await showConfirm('앱을 종료하시겠습니까?');
     if (exit) { history.go(-1); return false; }
     return true;
   }
 
-  // 5. 그 외 페이지(대화목록, 계약목록, 설정) → 상품목록(홈)으로
+  // 7. 그 외 페이지(대화목록, 계약목록, 설정) → 상품목록(홈)으로
   navigateToProductList();
   return true;
 }

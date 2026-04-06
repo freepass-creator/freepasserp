@@ -523,17 +523,7 @@ function bindEvents() {
     if (card) openDetail(card.dataset.id);
   });
 
-  // 핸드폰 뒤로가기 → 사진뷰어 열려있으면 뷰어만 닫기, 아니면 상세 닫기
-  window.addEventListener('popstate', (e) => {
-    if (isPhotoViewerOpen()) {
-      closePhotoViewer();
-      history.pushState({ detail: true }, '');
-      return;
-    }
-    if ($detail && !$detail.hidden) {
-      closeDetail();
-    }
-  });
+  // 뒤로가기는 mobile-shell.js에서 통합 관리
 }
 
 // ─── 초기화 ──────────────────────────────────────────────────────────────────
