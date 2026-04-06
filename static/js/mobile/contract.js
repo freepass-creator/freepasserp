@@ -163,6 +163,11 @@ function openDetail(id) {
   const $detail = document.getElementById('contract-m-detail');
   if (!$detail) return;
 
+  const product = productMap.get(c.car_number) || productMap.get(c.product_uid) || productMap.get(c.product_code) || null;
+  const subModel = product?.subModel || String(c.sub_model || c.model_name || '').trim();
+  const status = c.contract_status || '계약대기';
+  const isDone = status === '계약완료';
+
   const checks = [
     ['계약금', c.deposit_confirmed], ['서류', c.docs_confirmed],
     ['승인', c.approval_confirmed], ['계약서', c.contract_confirmed],
@@ -172,28 +177,37 @@ function openDetail(id) {
     `<span class="m-detail-check ${done ? 'is-done' : ''}">${done ? '✓' : '○'} ${escapeHtml(label)}</span>`
   ).join('');
 
-  const status = c.contract_status || '계약대기';
-  const color = STATUS_COLORS[status] || 'gray';
-
   $detail.innerHTML = `
     <div class="m-detail-card">
-      <div class="m-detail-header">
-        <span class="m-list-badge m-list-badge--${color}">${escapeHtml(status)}</span>
-        <span class="m-detail-code">${escapeHtml(c.contract_code || '')}</span>
-      </div>
+      <!-- 섹션1: 계약체크 -->
+      <div class="m-detail-section-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>계약체크</div>
       <div class="m-detail-checks">${checksHtml}</div>
+
+      <!-- 섹션2: 기본정보 -->
+      <div class="m-detail-section-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>기본정보</div>
+      <div class="m-detail-section">
+        <div class="m-detail-row"><span>계약상태</span><strong class="${isDone ? 'm-val--done' : 'm-val--pending'}">${escapeHtml(status)}</strong></div>
+        <div class="m-detail-row"><span>계약코드</span><strong>${escapeHtml(safe(c.contract_code))}</strong></div>
+        <div class="m-detail-row"><span>공급사코드</span><strong>${escapeHtml(safe(c.partner_code || c.provider_company_code))}</strong></div>
+        <div class="m-detail-row"><span>영업채널코드</span><strong>${escapeHtml(safe(c.agent_code))}</strong></div>
+      </div>
+
+      <!-- 섹션3: 차량/대여 -->
+      <div class="m-detail-section-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2.7-3.4A2 2 0 0 0 13.7 6H6.3a2 2 0 0 0-1.6.8L2 10l-1.5 1.1C.2 11.6 0 12.1 0 12.6V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>차량/대여</div>
       <div class="m-detail-section">
         <div class="m-detail-row"><span>차량번호</span><strong>${escapeHtml(safe(c.car_number))}</strong></div>
-        <div class="m-detail-row"><span>차량</span><strong>${escapeHtml(safe(c.vehicle_name || c.model_name))}</strong></div>
+        <div class="m-detail-row"><span>세부모델</span><strong>${escapeHtml(safe(subModel))}</strong></div>
         <div class="m-detail-row"><span>대여기간</span><strong>${escapeHtml(formatMonth(c.rent_month))}</strong></div>
         <div class="m-detail-row"><span>대여료</span><strong>${escapeHtml(formatMoney(c.rent_amount))}</strong></div>
         <div class="m-detail-row"><span>보증금</span><strong>${escapeHtml(formatMoney(c.deposit_amount))}</strong></div>
       </div>
+
+      <!-- 섹션4: 고객정보 -->
+      <div class="m-detail-section-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>고객정보</div>
       <div class="m-detail-section">
         <div class="m-detail-row"><span>고객명</span><strong>${escapeHtml(safe(c.customer_name))}</strong></div>
-        <div class="m-detail-row"><span>공급사</span><strong>${escapeHtml(safe(c.partner_code))}</strong></div>
-        <div class="m-detail-row"><span>영업채널</span><strong>${escapeHtml(safe(c.agent_code))}</strong></div>
-        <div class="m-detail-row"><span>계약일</span><strong>${escapeHtml(formatDate(c.created_at))}</strong></div>
+        <div class="m-detail-row"><span>생년월일</span><strong>${escapeHtml(safe(c.customer_birth))}</strong></div>
+        <div class="m-detail-row"><span>연락처</span><strong>${escapeHtml(safe(c.customer_phone))}</strong></div>
       </div>
     </div>`;
   $detail.hidden = false;

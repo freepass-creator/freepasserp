@@ -321,10 +321,11 @@ button, a, [role="button"] {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin: 0 16px 4px;
   padding: 12px;
-  background: #f8fafc;
-  border-radius: 10px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .m-detail-check {
   font-size: 12px;
@@ -334,14 +335,31 @@ button, a, [role="button"] {
   color: #10b981;
   font-weight: 600;
 }
+.m-detail-section-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted, #80868b);
+  letter-spacing: 0.03em;
+  padding: 16px 16px 6px;
+}
+.m-detail-section-head svg {
+  stroke: currentColor;
+  fill: none;
+  flex-shrink: 0;
+}
 .m-detail-section {
   background: #fff;
   border: none;
   border-radius: 12px;
-  margin-bottom: 12px;
+  margin: 0 16px 4px;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
+.m-val--pending { color: #f59e0b; }
+.m-val--done { color: #10b981; }
 .m-detail-row {
   display: flex;
   justify-content: space-between;
