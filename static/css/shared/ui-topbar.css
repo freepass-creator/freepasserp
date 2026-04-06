@@ -32,6 +32,7 @@
 .top-bar-state {
   display: flex;
   align-items: center;
+  justify-self: center;
   justify-content: center;
   gap: 6px;
   white-space: nowrap;
