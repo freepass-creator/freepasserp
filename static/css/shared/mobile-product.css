@@ -272,22 +272,24 @@
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: var(--space-2) var(--space-3);
+    padding: 6px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-2);
+    gap: 6px;
     align-content: start;
   }
 
   /* 카드 */
   .pls-mobile-card {
-    border-radius: var(--radius-lg);
-    background: #fff;
+    border-radius: var(--m-card-radius, 14px);
+    background: var(--m-card-bg, #fff);
     overflow: hidden;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s ease;
   }
+  .pls-mobile-card:active { transform: scale(0.97); }
   .pls-mobile-card__img-wrap {
     position: relative;
     width: 100%;
@@ -313,22 +315,22 @@
     display: inline-flex; align-items: center;
   }
   .pls-mobile-card__body {
-    padding: var(--space-2) var(--space-2) var(--space-2);
+    padding: 8px 10px 10px;
     display: flex; flex-direction: column; gap: 2px;
   }
   .pls-mobile-card__model {
-    font-size: 12px; font-weight: 600; color: #0f172a;
+    font-size: 13px; font-weight: 600; color: var(--m-text-primary, #0f172a);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .pls-mobile-card__sub {
-    font-size: 10px; color: var(--text-subtle);
+    font-size: 11px; color: var(--m-text-tertiary, #8b95a1);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .pls-mobile-card__price {
-    font-size: 12px; font-weight: 700; color: #1b2a4a; margin-top: 2px;
+    font-size: 13px; font-weight: 700; color: var(--m-accent, #1b2a4a); margin-top: 3px;
   }
   .pls-mobile-card__price-inquiry {
-    font-size: 11px; font-weight: 600; color: #3b82f6; margin-top: 2px;
+    font-size: 12px; font-weight: 600; color: #3b82f6; margin-top: 3px;
   }
 
   /* 스켈레톤 */
