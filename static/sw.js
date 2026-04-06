@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v18';
+const CACHE_NAME = 'freepass-v99';
 
 const PRECACHE_URLS = [
   '/static/css/reset.css',
