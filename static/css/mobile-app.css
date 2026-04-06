@@ -372,10 +372,10 @@ button, a, [role="button"] {
 
 /* ── 모바일 폼 (계약 입력/수정) ── */
 .m-form-card {
-  padding: var(--space-3);
+  padding: 0 0 16px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 0;
 }
 .m-form-section {
   background: #fff;
@@ -391,7 +391,7 @@ button, a, [role="button"] {
   font-weight: 600;
   color: var(--text-muted, #80868b);
   letter-spacing: 0.03em;
-  padding: 14px 16px 8px;
+  padding: 12px 16px 6px;
 }
 .m-form-section-head svg { stroke: currentColor; fill: none; flex-shrink: 0; }
 .m-form-checks {
@@ -680,10 +680,11 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .m-settings-page {
-  padding: var(--space-3);
+  padding: 0 0 16px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 0;
+  background: #f0f4f9;
 }
 .m-settings-section {
   margin: 0;

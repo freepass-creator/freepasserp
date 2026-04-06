@@ -2,6 +2,8 @@
    상품 상세 공통 (md- prefix) — 모바일·데스크탑 공유
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── md- 클래스를 m-form- 규격에 매핑 ── */
+
 .md-section-head {
   display: flex;
   align-items: center;
@@ -10,8 +12,10 @@
   font-weight: 600;
   color: var(--text-muted, #80868b);
   letter-spacing: 0.03em;
-  padding: 16px 16px 6px;
+  padding: 0 16px 6px;
+  margin-top: 12px;
 }
+.md-section-head:first-child { margin-top: 0; }
 .md-section-head svg {
   width: 14px;
   height: 14px;
@@ -28,12 +32,10 @@
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
-.md-card + .md-section-head {
-  padding-top: 20px;
-}
+.md-card + .md-section-head,
 .md-table + .md-note + .md-section-head,
 .md-table + .md-section-head {
-  padding-top: 20px;
+  margin-top: 12px;
 }
 .md-row {
   display: flex;
@@ -138,7 +140,13 @@
 .md-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
+  margin: 0 16px;
+  width: calc(100% - 32px);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  background: #fff;
 }
 .md-table th {
   padding: 0 16px;
