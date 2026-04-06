@@ -107,6 +107,38 @@
   flex-shrink: 0;
 }
 
+/* 필터 섹션 토글 */
+.catalog-sidebar__title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  padding: 10px 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+.catalog-sidebar__chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: #94a3b8;
+  transition: transform 0.15s ease;
+}
+.catalog-sidebar__section.is-collapsed .catalog-sidebar__chevron {
+  transform: rotate(-90deg);
+}
+.catalog-filter-selected {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1b2a4a;
+  background: rgba(27, 42, 74, 0.1);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
 /* 상품 목록 여백 통일 */
 .catalog-content { padding-top: 0 !important; }
 .catalog-grid { padding: var(--space-3) !important; }
@@ -314,7 +346,7 @@ button, a, [role="button"] {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 16px;
+  padding: 4px 16px;
   font-size: 14px;
   color: #334155;
   cursor: pointer;

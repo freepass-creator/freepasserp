@@ -299,7 +299,7 @@ function renderFilterSections() {
   });
   $filterSections.innerHTML = FILTER_GROUPS.map(g => {
     const counts = optionSets[g.key];
-    const options = [...counts.keys()].sort();
+    const options = [...counts.keys()].sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0));
     if (!options.length) return '';
     const selected = new Set(state.filters[g.key] || []);
     const body = options.map(opt => {
@@ -307,9 +307,11 @@ function renderFilterSections() {
       const cnt = counts.get(opt) || 0;
       return `<label class="catalog-filter-option"><input type="checkbox" data-group="${esc(g.key)}" value="${esc(opt)}"${checked}><span>${esc(opt)}</span><span class="catalog-filter-count">(${cnt})</span></label>`;
     }).join('');
-    return `<div class="catalog-sidebar__section" data-filter-key="${esc(g.key)}">
-      <div class="catalog-sidebar__title">${esc(g.title)}</div>
-      <div class="catalog-filter-body">${body}</div>
+    const selectedCount = selected.size;
+    const isOpen = selectedCount > 0 || g.key === 'maker';
+    return `<div class="catalog-sidebar__section${isOpen ? '' : ' is-collapsed'}" data-filter-key="${esc(g.key)}">
+      <button type="button" class="catalog-sidebar__title" data-toggle-filter="${esc(g.key)}">${esc(g.title)}${selectedCount ? ` <span class="catalog-filter-selected">${selectedCount}</span>` : ''}<svg class="catalog-sidebar__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+      <div class="catalog-filter-body"${isOpen ? '' : ' hidden'}>${body}</div>
     </div>`;
   }).join('');
 }
@@ -349,6 +351,19 @@ function bindEvents() {
     if ($search) $search.value = '';
     renderFilterSections();
     applyFilters();
+  });
+
+  // 필터 섹션 접기/펼치기
+  $filterSections?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-toggle-filter]');
+    if (!btn) return;
+    const section = btn.closest('.catalog-sidebar__section');
+    if (!section) return;
+    const body = section.querySelector('.catalog-filter-body');
+    if (!body) return;
+    const isHidden = body.hidden;
+    body.hidden = !isHidden;
+    section.classList.toggle('is-collapsed', !isHidden);
   });
 
   // 필터 체크박스
