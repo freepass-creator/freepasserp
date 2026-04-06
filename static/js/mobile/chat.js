@@ -187,15 +187,20 @@ async function init() {
 
   bindEvents();
 
-  // 키보드 올라올 때 채팅방 높이 조정
+  // 키보드 올라올 때 채팅방 높이 조정 (top 고정, height만 변경)
   const chatroom = document.querySelector('.m-chatroom');
   if (chatroom && window.visualViewport) {
+    const topbarH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mobile-topbar-height')) || 48;
     const onResize = () => {
-      const keyboardH = window.innerHeight - window.visualViewport.height;
-      chatroom.style.bottom = keyboardH > 0 ? `${keyboardH}px` : '0';
+      const vvH = window.visualViewport.height;
+      const vvTop = window.visualViewport.offsetTop;
+      // top 고정, height = viewport 높이 - topbar - viewport 스크롤 오프셋
+      chatroom.style.top = `${topbarH}px`;
+      chatroom.style.height = `${vvH - topbarH + vvTop}px`;
+      chatroom.style.bottom = 'auto';
       // 메시지 영역 스크롤 맨 아래로
       const msgs = chatroom.querySelector('.m-chatroom__messages');
-      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      if (msgs) requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
     };
     window.visualViewport.addEventListener('resize', onResize);
     window.visualViewport.addEventListener('scroll', onResize);
