@@ -58,12 +58,12 @@ export function isReplyPending(room) {
 const ROOM_COLS = [
   { key: 'status',   label: '문의구분',     align: 'c', filterable: true, w: 80 },
   { key: 'reply',    label: '처리상태',     align: 'c', filterable: true, w: 80 },
-  { key: 'carNo',    label: '차량번호',     align: 'c', searchable: true },
-  { key: 'model',    label: '세부모델',     searchable: true },
   { key: 'partner',  label: '공급사코드',   align: 'c', filterable: true },
   { key: 'agent',    label: '영업자코드',   align: 'c', filterable: true },
+  { key: 'carNo',    label: '차량번호',     align: 'c', searchable: true },
+  { key: 'model',    label: '세부모델',     searchable: true },
   { key: 'message',  label: '마지막메시지', searchable: true },
-  { key: 'datetime', label: '일자 및 시간', align: 'c' },
+  { key: 'datetime', label: '일자 시간',    align: 'c' },
 ];
 
 export function renderChatRoomList({ thead, container, rooms, selectedRoomId, productsMap, getRoomProductLookupKeys, onSelect, myRole, myUid }) {
