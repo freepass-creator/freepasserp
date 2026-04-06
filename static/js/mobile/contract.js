@@ -3,11 +3,13 @@
  * 웹 contract-manage.js와 완전 분리. Firebase 직접 조회. 읽기 전용.
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { watchContracts } from '../firebase/firebase-db.js';
+import { watchContracts, watchProducts } from '../firebase/firebase-db.js';
+import { normalizeProduct } from '../shared/product-list-detail-view.js';
 import { escapeHtml } from '../core/management-format.js';
 
 let currentProfile = null;
 let allContracts = [];
+let productMap = new Map();
 
 const $list = document.getElementById('contract-m-list');
 
@@ -23,7 +25,7 @@ const STATUS_SHORT = {
 function formatDate(ts) {
   if (!ts) return '';
   const d = new Date(ts);
-  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  return `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
 function formatMoney(v) {
@@ -45,8 +47,9 @@ function renderList(contracts) {
   $list.innerHTML = contracts.map(c => {
     const status = c.contract_status || '계약대기';
     const color = STATUS_COLORS[status] || 'gray';
-    const carNo = c.car_number || '';
-    const vehicle = String(c.sub_model || c.detail_model || c.detail_vehicle_model || c.model_name || '').trim();
+    const product = productMap.get(c.car_number) || productMap.get(c.product_uid) || productMap.get(c.product_code) || null;
+    const carNo = c.car_number || product?.carNo || '';
+    const vehicle = product?.subModel || String(c.sub_model || c.model_name || '').trim();
     const customer = c.customer_name || '';
     const rent = formatMoney(c.rent_amount);
     const date = formatDate(c.updated_at || c.created_at);
@@ -121,6 +124,17 @@ async function init() {
   currentProfile = profile;
 
   const updateCount = bindFilter();
+
+  watchProducts((products) => {
+    productMap = new Map();
+    products.forEach(p => {
+      const n = normalizeProduct(p);
+      if (n.id) productMap.set(n.id, n);
+      if (n.carNo) productMap.set(n.carNo, n);
+      if (n.productCode) productMap.set(n.productCode, n);
+    });
+    if (allContracts.length) renderList(allContracts);
+  });
 
   watchContracts((contracts) => {
     allContracts = applyRoleFilter(contracts);
