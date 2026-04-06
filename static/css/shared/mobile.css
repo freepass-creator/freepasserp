@@ -174,10 +174,10 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   justify-content: space-between;
   height: var(--mobile-topbar-height);
   padding: 0 14px;
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(12px);
+  background: #fff;
   border-bottom: 1px solid rgba(15, 23, 42, 0.07);
   flex-shrink: 0;
+  contain: layout style paint;
 }
 
 .mobile-topbar__left {
@@ -243,9 +243,9 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
   justify-content: space-around;
   height: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(12px);
+  background: #fff;
   border-top: 1px solid rgba(15, 23, 42, 0.07);
+  contain: layout style paint;
 }
 
 .mobile-tab {
@@ -302,7 +302,6 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
   inset: 0;
   z-index: 300;
   background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(2px);
 }
 .mobile-drawer-overlay[hidden] { display: none !important; }
 
@@ -314,7 +313,7 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
   z-index: 301;
   width: var(--mobile-drawer-width);
   background: #fff;
-  box-shadow: -4px 0 24px rgba(15, 23, 42, 0.12);
+  box-shadow: -2px 0 12px rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
 }
@@ -530,6 +529,7 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
     width: 280px;
     transform: translateX(100%);
     transition: transform 0.25s ease;
+    will-change: transform;
     border-left: 1px solid #e2e8f0;
     background: #fff;
     overflow-y: auto;
@@ -537,7 +537,7 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
   }
   .m-filter-sidebar.is-open {
     transform: translateX(0);
-    box-shadow: -4px 0 20px rgba(15, 23, 42, 0.1);
+    box-shadow: -2px 0 10px rgba(15, 23, 42, 0.08);
   }
 }
 

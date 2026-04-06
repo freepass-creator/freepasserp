@@ -87,7 +87,7 @@ function renderMessages(messages) {
       <div class="message-time">${hm}</div>
     </div>`;
   }).join('');
-  $msgList.scrollTop = $msgList.scrollHeight;
+  requestAnimationFrame(() => { $msgList.scrollTop = $msgList.scrollHeight; });
 }
 
 // ─── 방 열기/닫기 ────────────────────────────────────────────────────────────
