@@ -46,7 +46,7 @@ function renderList(contracts) {
     const status = c.contract_status || '계약대기';
     const color = STATUS_COLORS[status] || 'gray';
     const carNo = c.car_number || '';
-    const vehicle = c.vehicle_name || c.model_name || '';
+    const vehicle = c.sub_model || c.vehicle_name || '';
     const customer = c.customer_name || '';
     const rent = formatMoney(c.rent_amount);
     const date = formatDate(c.updated_at || c.created_at);
