@@ -781,6 +781,17 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
   border-radius: 8px;
 }
 .m-back-btn:active { background: var(--m-input-bg); }
+.m-back-title {
+  display: none;
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--m-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ── 모바일 상세 상단바 (뒤로가기 + 타이틀 + 액션) ── */
 .m-detail-bar {

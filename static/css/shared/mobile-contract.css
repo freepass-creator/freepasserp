@@ -56,9 +56,10 @@
     background: #fff;
   }
 
-  /* contract-m-open: 폼 전체화면 — 상단바는 뒤로가기만 */
+  /* contract-m-open: 폼 전체화면 — 상단바는 뒤로가기+타이틀 */
   body.contract-m-open .mobile-topbar .m-search-bar { display: none !important; }
   body.contract-m-open .mobile-topbar .m-back-btn { display: flex !important; }
+  body.contract-m-open .mobile-topbar .m-back-title { display: block !important; }
   body.contract-m-open .contract-page-shell .pls-grid-panel { display: none !important; }
   body.contract-m-open #contract-m-list { display: none !important; }
   body.contract-m-open .contract-page-shell .panel-slot {

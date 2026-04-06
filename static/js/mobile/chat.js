@@ -111,9 +111,15 @@ function openRoom(roomId) {
   if (unsubMessages) unsubMessages();
   unsubMessages = watchMessages(roomId, renderMessages);
 
-  // 코드 표시
+  // 상단바 타이틀 표시
   const room = allRooms.find(r => r.room_id === roomId);
   if ($chatCode) $chatCode.textContent = room?.chat_code || '';
+  const backTitle = document.getElementById('m-back-title');
+  if (backTitle && room) {
+    const carNo = room.car_number || '';
+    const model = room.model_name || room.sub_model || '';
+    backTitle.textContent = [carNo, model].filter(Boolean).join(' ') || room.chat_code || '';
+  }
 
   // 목록 active 갱신
   $rooms?.querySelectorAll('.m-list-card').forEach(el => {

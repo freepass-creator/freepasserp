@@ -192,6 +192,14 @@ function openDetail(id) {
   const subModel = product?.subModel || String(c.sub_model || c.model_name || '').trim();
   const status = c.contract_status || '계약대기';
 
+  // 상단바 타이틀
+  const backTitle = document.getElementById('m-back-title');
+  if (backTitle) {
+    const carNo = c.car_number || '';
+    const model = subModel || '';
+    backTitle.textContent = [carNo, model].filter(Boolean).join(' ') || c.contract_code || '';
+  }
+
   const checkFields = [
     ['deposit_confirmed', '계약금'], ['docs_confirmed', '서류'],
     ['approval_confirmed', '승인'], ['contract_confirmed', '계약서'],
