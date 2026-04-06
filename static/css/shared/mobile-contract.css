@@ -80,11 +80,119 @@
     position: sticky !important;
     top: 0 !important;
     z-index: 1;
+    background: #fff !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+    border-bottom: none !important;
   }
   body.contract-m-open .contract-page-shell .panel-slot .panel--form .panel-body {
     flex: 1 !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
     min-height: 0 !important;
+    background: #f8f9fa !important;
+    padding: 0 !important;
+  }
+
+  /* ─── 모바일 폼 스타일 오버라이드 ──────────────────────────────────────── */
+
+  /* 폼 전체 */
+  body.contract-m-open .manage-form-shell {
+    padding: var(--space-3) !important;
+    gap: var(--space-3) !important;
+  }
+
+  /* 섹션 카드 */
+  body.contract-m-open .form-section {
+    background: #fff;
+    border-radius: 14px;
+    padding: var(--space-4) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    margin: 0 !important;
+    border: none !important;
+  }
+  body.contract-m-open .form-section + .form-section {
+    border-top: none !important;
+    padding-top: var(--space-4) !important;
+    margin-top: 0 !important;
+  }
+
+  /* 섹션 타이틀 */
+  body.contract-m-open .section-title {
+    font-size: 12px;
+    margin-bottom: var(--space-3);
+  }
+
+  /* 그리드 → 1열 */
+  body.contract-m-open .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-3) !important;
+  }
+
+  /* 입력칸 — 모바일 네이티브 느낌 */
+  body.contract-m-open .field > input,
+  body.contract-m-open .field > select,
+  body.contract-m-open .field > textarea {
+    height: 48px !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
+    padding: 0 var(--space-4) !important;
+    border-radius: 12px !important;
+    background: #f2f3f7 !important;
+    border: 1.5px solid transparent !important;
+  }
+  body.contract-m-open .field > input:focus,
+  body.contract-m-open .field > select:focus,
+  body.contract-m-open .field > textarea:focus {
+    background: #fff !important;
+    border-color: #1b2a4a !important;
+    box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.08) !important;
+  }
+  body.contract-m-open .field > textarea {
+    height: auto !important;
+    min-height: 96px !important;
+    padding: var(--space-3) var(--space-4) !important;
+  }
+
+  /* 라벨 */
+  body.contract-m-open .field > label {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: var(--text-subtle) !important;
+    min-height: auto !important;
+    margin-bottom: 2px;
+  }
+
+  /* 셀렉트 화살표 */
+  body.contract-m-open .field > select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2380868b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 16px center !important;
+    padding-right: 40px !important;
+  }
+
+  /* 체크 그리드 */
+  body.contract-m-open .contract-check-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--space-2) !important;
+  }
+  body.contract-m-open .contract-check-item {
+    height: 44px;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+  }
+
+  /* 드롭존 */
+  body.contract-m-open .upload-dropzone {
+    border-radius: 14px !important;
+    min-height: 80px !important;
+  }
+
+  /* 버튼 */
+  body.contract-m-open .inline-button.btn-tone-edit {
+    height: 48px !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
   }
 }
