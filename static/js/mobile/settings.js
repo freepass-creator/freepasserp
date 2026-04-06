@@ -15,11 +15,11 @@ async function init() {
   const { user, profile } = await requireAuth();
 
   // 프로필 정보 표시
+  const name = profile.name || profile.user_name || '-';
   const fields = {
+    'ms-name': name,
     'ms-company': profile.company_name || profile.company || '-',
     'ms-code': profile.user_code || profile.company_code || '-',
-    'ms-name': profile.name || profile.user_name || '-',
-    'ms-position': profile.position || profile.rank || '-',
     'ms-email': user.email || '-',
     'ms-role': ROLE_LABELS[profile.role] || profile.role || '-',
     'ms-status': STATUS_LABELS[profile.status] || profile.status || '-',
@@ -31,6 +31,9 @@ async function init() {
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = value;
     else el.textContent = value;
   }
+  // 아바타 이니셜
+  const avatar = document.getElementById('ms-avatar');
+  if (avatar && name && name !== '-') avatar.textContent = name.charAt(0);
 
   // 카탈로그 링크 생성
   const catalogUrl = `${location.origin}/catalog?a=${encodeURIComponent(profile.user_code || '')}`;
@@ -98,6 +101,17 @@ async function init() {
       }
     });
   }
+
+  // 비밀번호 변경
+  document.getElementById('ms-password-reset')?.addEventListener('click', async () => {
+    const { sendPasswordReset } = await import('../firebase/firebase-auth.js');
+    try {
+      await sendPasswordReset(user.email);
+      showToast('비밀번호 재설정 메일이 발송되었습니다.', 'success');
+    } catch (e) {
+      showToast('발송 실패: ' + e.message, 'error');
+    }
+  });
 
   // 로그아웃
   document.getElementById('ms-logout')?.addEventListener('click', async () => {

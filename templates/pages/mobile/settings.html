@@ -3,36 +3,59 @@
 <script>document.body.classList.add('page-settings');</script>
 <div class="work-page min-h-work m-settings-page">
 
-  <!-- 내 정보 -->
-  <div class="m-settings-card">
-    <div class="m-settings-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>내 정보</div>
-    <div class="m-settings-rows">
-      <div class="m-settings-row"><span class="m-settings-label">소속</span><span class="m-settings-value" id="ms-company">-</span></div>
-      <div class="m-settings-row"><span class="m-settings-label">이름</span><span class="m-settings-value" id="ms-name">-</span></div>
-      <div class="m-settings-row"><span class="m-settings-label">직급</span><span class="m-settings-value" id="ms-position">-</span></div>
-      <div class="m-settings-row"><span class="m-settings-label">연락처</span><span class="m-settings-value" id="ms-phone">-</span></div>
-      <div class="m-settings-row"><span class="m-settings-label">이메일</span><span class="m-settings-value" id="ms-email">-</span></div>
-      <div class="m-settings-row"><span class="m-settings-label">계정코드</span><span class="m-settings-value" id="ms-code">-</span></div>
-      <div class="m-settings-row"><span class="m-settings-label">구분</span><span class="m-settings-value" id="ms-role">-</span></div>
-      <div class="m-settings-row"><span class="m-settings-label">상태</span><span class="m-settings-value" id="ms-status">-</span></div>
+  <!-- 프로필 카드 -->
+  <div class="ms-profile-card">
+    <div class="ms-profile-avatar" id="ms-avatar">?</div>
+    <div class="ms-profile-info">
+      <div class="ms-profile-name" id="ms-name">-</div>
+      <div class="ms-profile-meta"><span id="ms-role">-</span> · <span id="ms-status">-</span></div>
+      <div class="ms-profile-email" id="ms-email">-</div>
     </div>
+  </div>
+
+  <!-- 계정 정보 -->
+  <div class="ms-card">
+    <div class="ms-card-title">계정 정보</div>
+    <div class="ms-menu-item"><span class="ms-menu-label">소속</span><span class="ms-menu-value" id="ms-company">-</span></div>
+    <div class="ms-menu-item"><span class="ms-menu-label">연락처</span><span class="ms-menu-value" id="ms-phone">-</span></div>
+    <div class="ms-menu-item"><span class="ms-menu-label">계정코드</span><span class="ms-menu-value" id="ms-code">-</span></div>
   </div>
 
   <!-- 내 카탈로그 -->
-  <div class="m-settings-card">
-    <div class="m-settings-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>내 카탈로그</div>
-    <div class="m-settings-rows">
-      <div class="m-settings-row"><span class="m-settings-label">링크</span><span class="m-settings-value m-settings-value--small" id="ms-catalog-url">-</span></div>
-    </div>
-    <div class="m-settings-card-actions">
-      <button class="m-settings-btn--outline" id="ms-catalog-copy" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>복사</button>
-      <button class="m-settings-btn--primary" id="ms-catalog-share" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>공유</button>
-    </div>
+  <div class="ms-card">
+    <button class="ms-menu-item ms-menu-item--tap" id="ms-catalog-copy" type="button">
+      <span class="ms-menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+      <span class="ms-menu-label">내 카탈로그 링크 복사</span>
+      <span class="ms-menu-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+    </button>
+    <button class="ms-menu-item ms-menu-item--tap" id="ms-catalog-share" type="button">
+      <span class="ms-menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg></span>
+      <span class="ms-menu-label">카탈로그 공유하기</span>
+      <span class="ms-menu-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+    </button>
   </div>
 
-  <!-- 로그아웃 -->
-  <div class="m-settings-card">
-    <button class="m-settings-action-row m-settings-action-row--danger" id="ms-logout" type="button"><span>로그아웃</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+  <!-- 앱 설치 -->
+  <div class="ms-card" id="ms-install-section" hidden>
+    <button class="ms-menu-item ms-menu-item--tap" id="ms-install-btn" type="button">
+      <span class="ms-menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg></span>
+      <span class="ms-menu-label">앱 설치</span>
+      <span class="ms-menu-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+    </button>
+  </div>
+
+  <!-- 계정 관리 -->
+  <div class="ms-card">
+    <button class="ms-menu-item ms-menu-item--tap" id="ms-password-reset" type="button">
+      <span class="ms-menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+      <span class="ms-menu-label">비밀번호 변경</span>
+      <span class="ms-menu-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+    </button>
+    <button class="ms-menu-item ms-menu-item--tap ms-menu-item--danger" id="ms-logout" type="button">
+      <span class="ms-menu-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg></span>
+      <span class="ms-menu-label">로그아웃</span>
+      <span class="ms-menu-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+    </button>
   </div>
 
 </div>

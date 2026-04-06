@@ -684,11 +684,133 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .m-settings-page {
-  padding: 16px 16px 32px;
+  padding: 0 0 32px;
   display: flex;
   flex-direction: column;
+  gap: 0;
+  background: #f7f8fa;
+}
+
+/* ── 토스 스타일 설정 ── */
+.ms-profile-card {
+  display: flex;
+  align-items: center;
   gap: 16px;
-  background: #f5f5f5;
+  padding: 28px 24px;
+  background: #fff;
+  margin-bottom: 8px;
+}
+.ms-profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #1b2a4a;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ms-profile-info {
+  min-width: 0;
+}
+.ms-profile-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #191f28;
+  line-height: 1.3;
+}
+.ms-profile-meta {
+  font-size: 14px;
+  color: #8b95a1;
+  margin-top: 2px;
+}
+.ms-profile-email {
+  font-size: 13px;
+  color: #b0b8c1;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ms-card {
+  background: #fff;
+  margin: 0 0 8px;
+}
+.ms-card-title {
+  padding: 20px 24px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b95a1;
+}
+
+.ms-menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 24px;
+  min-height: 54px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: #191f28;
+  text-align: left;
+  cursor: default;
+}
+.ms-menu-item + .ms-menu-item {
+  border-top: 1px solid #f2f4f6;
+}
+.ms-menu-item--tap {
+  cursor: pointer;
+  transition: background 0.08s ease;
+}
+.ms-menu-item--tap:active {
+  background: #f7f8fa;
+}
+.ms-menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #f2f4f6;
+  color: #4e5968;
+  flex-shrink: 0;
+  margin-right: 14px;
+}
+.ms-menu-label {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 400;
+  color: #191f28;
+}
+.ms-menu-value {
+  font-size: 15px;
+  color: #8b95a1;
+  text-align: right;
+  padding-left: 12px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms-menu-arrow {
+  flex-shrink: 0;
+  color: #d1d6db;
+  margin-left: 8px;
+  display: flex;
+}
+.ms-menu-item--danger .ms-menu-label {
+  color: #f04452;
+  font-weight: 500;
+}
+.ms-menu-item--danger .ms-menu-icon {
+  background: #fff0f0;
+  color: #f04452;
 }
 .m-settings-section {
   margin: 0;
