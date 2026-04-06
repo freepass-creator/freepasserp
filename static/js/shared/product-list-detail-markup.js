@@ -90,6 +90,15 @@ export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termF
   const p = product.policy || {};
   const c = product.condition || {};
 
+  // 사진 프리로드 — 상세 열릴 때 백그라운드로 미리 캐싱
+  if (total > 0) {
+    for (let i = 0; i < total; i++) {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = photos[i];
+    }
+  }
+
   // ── 1. 차량사진 ──
   const normalizedIndex = Math.min(Math.max(Number(activePhotoIndex || 0), 0), Math.max(total - 1, 0));
   const galleryHtml = total

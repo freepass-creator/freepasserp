@@ -1,6 +1,7 @@
 import { runPageCleanup } from './core/utils.js'; // logout/unload 시 사용
 import { savePageState } from './core/page-state.js';
 import { showToast, showConfirm } from './core/toast.js';
+import { pausePageWatchers, resumePageWatchers } from './firebase/firebase-db-helpers.js';
 
 const PAGE_STYLE_SELECTOR = 'link[data-page-style], link[href*="/static/css/pages/"], link[href*="/static/css/shared/"]';
 const DASHBOARD_SELECTOR = '.dashboard-shell';
@@ -135,8 +136,9 @@ async function loadPage(url, options = {}) {
     const mainShell = document.querySelector(MAIN_SHELL_SELECTOR);
     if (!mainShell) { window.location.href = url; return; }
 
-    // ── 이전 페이지 숨기기 (Firebase 구독 유지 — cleanup 없음) ──
+    // ── 이전 페이지 숨기기 (Firebase 리스너 유지, 콜백만 일시정지) ──
     if (currentPageKey && currentPageKey !== nextPathname) {
+      pausePageWatchers(currentPageKey);
       const cur = pageCache.get(currentPageKey);
       if (cur?.container) {
         savePageState(currentPageKey, { scrollTop: cur.container.scrollTop || 0, _autoSaved: true });
@@ -157,10 +159,12 @@ async function loadPage(url, options = {}) {
     }
 
     let cached = pageCache.get(nextPathname);
+    window.__currentPage = nextPathname;
 
     if (cached?.mounted) {
-      // ── 재방문: 컨테이너 즉시 표시 (구독 살아있음, DOM 최신) ──
+      // ── 재방문: 컨테이너 즉시 표시 + 일시정지 콜백 재개 ──
       cached.container.style.display = '';
+      resumePageWatchers(nextPathname);
       if (cached.doc) syncTopBar(cached.doc);
       // top-bar-actions 교체 후 이벤트 재바인딩
       if (cached.module && typeof cached.module.onShow === 'function') {
@@ -231,7 +235,6 @@ async function loadPage(url, options = {}) {
     document.body.dataset.page = cached.bodyPage || '';
     setActiveSidebar(nextPathname);
     currentPageKey = nextPathname;
-    window.__currentPage = nextPathname;
 
     if (pushState) history.pushState({ page: nextPathname }, '', nextPathname);
 
