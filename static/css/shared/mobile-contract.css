@@ -95,31 +95,37 @@
 
   /* ─── 모바일 폼 스타일 오버라이드 ──────────────────────────────────────── */
 
-  /* 폼 전체 */
+  /* 폼 전체 — 토스 배경 */
   body.contract-m-open .manage-form-shell {
-    padding: var(--space-3) !important;
-    gap: var(--space-3) !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+  body.contract-m-open .manage-form-body {
+    background: #f7f8fa !important;
   }
 
-  /* 섹션 카드 */
+  /* 섹션 카드 — 토스 스타일 */
   body.contract-m-open .form-section {
     background: #fff;
-    border-radius: 14px;
-    padding: var(--space-4) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    border-radius: 18px;
+    padding: 20px !important;
     margin: 0 !important;
     border: none !important;
+    box-shadow: none;
   }
   body.contract-m-open .form-section + .form-section {
     border-top: none !important;
-    padding-top: var(--space-4) !important;
+    padding-top: 20px !important;
     margin-top: 0 !important;
   }
 
-  /* 섹션 타이틀 */
+  /* 섹션 타이틀 — 토스 */
   body.contract-m-open .section-title {
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #191f28;
     margin-bottom: var(--space-3);
+    letter-spacing: -0.01em;
   }
 
   /* 그리드 → 1열 */
@@ -153,13 +159,13 @@
     padding: var(--space-3) var(--space-4) !important;
   }
 
-  /* 라벨 */
+  /* 라벨 — 토스 */
   body.contract-m-open .field > label {
     font-size: 13px !important;
     font-weight: 500 !important;
-    color: var(--text-subtle) !important;
+    color: #8b95a1 !important;
     min-height: auto !important;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
 
   /* 셀렉트 화살표 */
@@ -172,27 +178,40 @@
     padding-right: 40px !important;
   }
 
-  /* 체크 그리드 */
+  /* 체크 그리드 — 토스 */
   body.contract-m-open .contract-check-grid {
     grid-template-columns: 1fr 1fr !important;
-    gap: var(--space-2) !important;
+    gap: 8px !important;
   }
   body.contract-m-open .contract-check-item {
-    height: 44px;
-    border-radius: 10px !important;
-    font-size: 14px !important;
-  }
-
-  /* 드롭존 */
-  body.contract-m-open .upload-dropzone {
-    border-radius: 14px !important;
-    min-height: 80px !important;
-  }
-
-  /* 버튼 */
-  body.contract-m-open .inline-button.btn-tone-edit {
-    height: 48px !important;
+    height: 46px;
     border-radius: 12px !important;
-    font-size: 15px !important;
+    font-size: 14px !important;
+    background: #f2f4f6 !important;
+    border: none !important;
+  }
+  body.contract-m-open .contract-check-item:has(input:checked) {
+    background: #e8f4fd !important;
+    color: #1b2a4a;
+  }
+
+  /* 드롭존 — 토스 */
+  body.contract-m-open .upload-dropzone {
+    border-radius: 16px !important;
+    min-height: 80px !important;
+    border: 2px dashed #d1d6db !important;
+    background: #fafbfc !important;
+  }
+
+  /* 버튼 — 토스 */
+  body.contract-m-open .inline-button.btn-tone-edit {
+    height: 52px !important;
+    border-radius: 14px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    transition: transform 0.1s ease !important;
+  }
+  body.contract-m-open .inline-button.btn-tone-edit:active {
+    transform: scale(0.97) !important;
   }
 }
