@@ -1069,7 +1069,7 @@ html {
   .filter-check input[type="checkbox"] { width: 17px; height: 17px; }
   .filter-check__count { font-size: var(--font-size-base); }
   .filter-search-input { height: var(--height-lg); font-size: var(--font-size-xl); }   /* iOS 줌 방지 */
-  .catalog-search { height: var(--height-lg); font-size: var(--font-size-xl); box-sizing: border-box; }  /* iOS 줌 방지 */
+  .catalog-search { height: 38px; font-size: 13px !important; box-sizing: border-box; }
   .catalog-sidebar__search { padding: 0 var(--space-3) var(--space-2); }
   .catalog-search-icon { left: 22px; }
   .catalog-sidebar__summary { padding-top: var(--space-2); padding-bottom: var(--space-1); }

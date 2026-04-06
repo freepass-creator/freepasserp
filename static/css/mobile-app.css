@@ -282,7 +282,7 @@ button, a, [role="button"] {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 15px !important;
+  font-size: 13px !important;
   color: #0f172a;
   outline: none;
   min-width: 0;
