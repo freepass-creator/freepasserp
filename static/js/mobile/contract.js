@@ -52,8 +52,13 @@ function renderList(contracts) {
     const date = formatDate(c.updated_at || c.created_at);
     const month = c.rent_month ? `${c.rent_month}개월` : '';
 
+    const isDone = status === '계약완료';
+    const cAvatarCls = isDone ? 'm-list-card__avatar--done' : 'm-list-card__avatar--pending';
+    const cAvatarSvg = isDone
+      ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
     return `<div class="m-list-card" data-id="${escapeHtml(c.id || c.contract_code || '')}">
-      <div class="m-list-card__avatar" style="background:#f0f4ff;color:#1b2a4a;font-size:11px;font-weight:700">${escapeHtml(STATUS_SHORT[status] || status.slice(0,2))}</div>
+      <span class="m-list-card__avatar ${cAvatarCls}">${cAvatarSvg}</span>
       <div class="m-list-card__body">
         <div class="m-list-card__main">
           <span class="m-list-card__name">${escapeHtml(carNo || vehicle || '계약')}</span>

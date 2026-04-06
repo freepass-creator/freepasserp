@@ -46,8 +46,16 @@ function renderRooms(rooms) {
     const badge = unread > 0 ? `<span class="m-list-badge m-list-badge--blue">${unread}</span>` : '';
     const active = room.room_id === currentRoomId ? ' is-active' : '';
 
+    const eff = room.last_effective_sender_role || '';
+    const lastRole = room.last_sender_role || '';
+    const sender = (eff === 'agent' || eff === 'provider') ? eff : ((lastRole === 'agent' || lastRole === 'provider') ? lastRole : '');
+    const isPending = sender === 'agent';
+    const avatarCls = isPending ? 'm-list-card__avatar--pending' : 'm-list-card__avatar--done';
+    const avatarSvg = isPending
+      ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg>';
     return `<div class="m-list-card${active}" data-room-id="${escapeHtml(room.room_id)}">
-      <div class="m-list-card__avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg></div>
+      <span class="m-list-card__avatar ${avatarCls}">${avatarSvg}</span>
       <div class="m-list-card__body">
         <div class="m-list-card__main">
           <span class="m-list-card__name">${escapeHtml(carNo || model || '대화')}</span>
