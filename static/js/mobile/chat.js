@@ -34,7 +34,12 @@ function renderRooms(rooms) {
   $rooms.innerHTML = rooms.map(room => {
     const product = productMap.get(room.product_uid);
     const carNo = room.vehicle_number || product?.carNo || '';
-    const model = product?.subModel || product?.model || room.model_name || '';
+    const model = product?.subModel || (function() {
+      // room.model_name에서 세부모델 추출: "제조사 모델명 세부모델 ..." → 세부모델부터
+      const full = room.model_name || '';
+      const parts = full.split(' ').filter(Boolean);
+      return parts.length > 2 ? parts.slice(2).join(' ') : (parts.length > 1 ? parts.slice(1).join(' ') : full);
+    })();
     const partner = currentProfile?.role === 'agent'
       ? (room.provider_name || room.provider_company_code || '')
       : (room.agent_name || room.agent_code || '');
