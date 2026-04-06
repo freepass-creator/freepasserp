@@ -372,26 +372,28 @@ button, a, [role="button"] {
 
 /* ── 모바일 폼 (계약 입력/수정) ── */
 .m-form-card {
-  padding: 16px;
+  padding: 0 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  background: #fff;
+  gap: 12px;
+  background: #f7f8fa;
 }
 .m-form-section {
-  background: transparent;
-  border-radius: 0;
+  background: #fff;
+  border-radius: 18px;
   overflow: visible;
+  margin: 0 16px;
+  padding: 20px;
 }
 .m-form-section-head {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted, #80868b);
-  letter-spacing: 0.03em;
-  padding: 16px 0 8px;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #191f28;
+  letter-spacing: -0.01em;
+  padding: 0 0 12px;
   margin: 0;
 }
 .m-form-section:first-child .m-form-section-head {
@@ -401,30 +403,30 @@ button, a, [role="button"] {
 .m-form-checks {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  padding: 0 0 8px;
+  gap: 8px;
 }
 .m-form-check {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  height: 40px;
-  border-radius: 10px;
-  background: #f2f3f7;
-  font-size: 13px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f2f4f6;
+  font-size: 14px;
   font-weight: 500;
-  color: #64748b;
+  color: #8b95a1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.1s, color 0.1s;
 }
+.m-form-check:active { transform: scale(0.97); }
 .m-form-check input[type="checkbox"] {
   display: none;
 }
 .m-form-check:has(input:checked) {
-  background: #ecfdf5;
-  color: #10b981;
+  background: #e8f4fd;
+  color: #1b2a4a;
   font-weight: 600;
 }
 .m-form-check:has(input:checked)::before {
@@ -440,65 +442,68 @@ button, a, [role="button"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: 12px;
   padding: 0;
-  min-height: 44px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  min-height: 52px;
 }
-.m-form-field:last-child { border-bottom: none; }
+.m-form-field + .m-form-field {
+  border-top: 1px solid #f2f4f6;
+}
 .m-form-field > span {
-  font-size: 13px;
-  color: var(--text-subtle);
+  font-size: 15px;
+  color: #191f28;
   flex-shrink: 0;
 }
 .m-form-field > input,
 .m-form-field > select {
   flex: 1;
   min-width: 0;
-  height: 36px;
+  height: 40px;
   border: none;
-  border-radius: 8px;
-  background: #f2f3f7;
-  font-size: 14px !important;
-  color: #0f172a;
+  border-radius: 10px;
+  background: #f2f4f6;
+  font-size: 15px !important;
+  color: #191f28;
   text-align: right;
-  padding: 0 12px;
+  padding: 0 14px;
   outline: none;
   max-width: 60%;
+  transition: background 0.1s, box-shadow 0.1s;
 }
 .m-form-field > input:focus,
 .m-form-field > select:focus {
   background: #fff;
-  box-shadow: 0 0 0 2px rgba(27, 42, 74, 0.1);
+  box-shadow: 0 0 0 2px rgba(27, 42, 74, 0.08);
 }
 .m-form-field > input[readonly] {
   background: transparent;
-  color: #0f172a;
-  font-weight: 600;
+  color: #8b95a1;
+  font-weight: 400;
 }
 .m-form-field > select {
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2380868b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234e5968' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
-  padding-right: 24px;
+  background-position: right 10px center;
+  padding-right: 28px;
 }
 .m-form-actions {
-  padding: 16px 0 env(safe-area-inset-bottom);
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
 }
 .m-form-btn--save {
   width: 100%;
-  height: 48px;
+  height: 54px;
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   background: #1b2a4a;
   color: #fff;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.1s ease, background 0.1s ease;
 }
-.m-form-btn--save:active { background: #142038; }
+.m-form-btn--save:active { background: #142038; transform: scale(0.97); }
 .m-detail-row {
   display: flex;
   justify-content: space-between;
