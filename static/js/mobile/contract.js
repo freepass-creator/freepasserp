@@ -25,7 +25,7 @@ const STATUS_SHORT = {
 function formatDate(ts) {
   if (!ts) return '';
   const d = new Date(ts);
-  return `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
+  return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
 
 function formatMoney(v) {

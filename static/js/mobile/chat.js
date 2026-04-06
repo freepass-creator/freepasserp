@@ -136,9 +136,7 @@ function truncate(text, max) { return text.length > max ? text.slice(0, max) + '
 function formatDate(ts) {
   if (!ts) return '';
   const d = new Date(ts);
-  const now = new Date();
-  if (d.toDateString() === now.toDateString()) return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-  return `${d.getMonth()+1}/${d.getDate()}`;
+  return `${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 // ─── 이벤트 ──────────────────────────────────────────────────────────────────
