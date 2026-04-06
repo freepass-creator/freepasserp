@@ -477,15 +477,16 @@ function renderMobileList(visible) {
     const d = at ? new Date(at) : null;
     const dateStr = d ? `${String(d.getFullYear()).slice(-2)}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}` : '';
     const isActive = c.contract_code === selectedCode;
+    const statusIcon = status === '계약완료'
+      ? '<span class="m-list-card__avatar m-list-card__avatar--done"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg></span>'
+      : '<span class="m-list-card__avatar m-list-card__avatar--pending"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>';
     let badgeCls = 'm-list-badge';
     if (status === '계약완료') badgeCls += ' m-list-badge--green';
     else if (status === '계약철회') badgeCls += ' m-list-badge--red';
     else if (status === '계약발송') badgeCls += ' m-list-badge--blue';
     else badgeCls += ' m-list-badge--yellow';
     return `<div class="m-list-card${isActive ? ' is-active' : ''}" data-contract-code="${escapeHtml(c.contract_code || '')}">
-      <div class="m-list-card__avatar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m9 15 2 2 4-4"/></svg>
-      </div>
+      ${statusIcon}
       <div class="m-list-card__body">
         <div class="m-list-card__main">
           <span class="m-list-card__name">${escapeHtml(mainLine)}</span>

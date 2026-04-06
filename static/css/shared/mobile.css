@@ -448,6 +448,14 @@ html.is-mobile body[data-page="계약"] .mobile-topbar__filter-btn { display: in
   flex-shrink: 0;
   color: #64748b;
 }
+.m-list-card__avatar--pending {
+  background: #fff7ed;
+  color: #f59e0b;
+}
+.m-list-card__avatar--done {
+  background: #ecfdf5;
+  color: #10b981;
+}
 
 .m-list-card__body {
   flex: 1; min-width: 0;
