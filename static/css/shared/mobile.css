@@ -10,23 +10,16 @@
   display: none;
 }
 
-/* 모바일 기기가 아닌 경우 (웹 브라우저) — 모바일 요소 강제 숨김, 데스크탑 요소 강제 표시 */
-html:not(.is-mobile) .mobile-topbar,
-html:not(.is-mobile) .mobile-tab-bar,
-html:not(.is-mobile) .mobile-drawer,
-html:not(.is-mobile) .mobile-drawer-overlay,
-html:not(.is-mobile) .m-filter-overlay,
-html:not(.is-mobile) .m-filter-sidebar,
-html:not(.is-mobile) .chat-m-rooms,
-html:not(.is-mobile) #contract-m-list,
-html:not(.is-mobile) .pls-m-catalog-wrap,
-html:not(.is-mobile) .pls-m-detail,
-html:not(.is-mobile) .pls-mobile-sheet-overlay,
-html:not(.is-mobile) .pls-mobile-sheet { display: none !important; }
-
-html:not(.is-mobile) .sidebar,
-html:not(.is-mobile) .sidebar--new { display: flex !important; }
-html:not(.is-mobile) .top-bar { display: grid !important; }
+/* 데스크탑 (769px 이상) — 모바일 요소 숨김, 데스크탑 요소 표시 */
+@media (min-width: 769px) {
+  .mobile-topbar,
+  .mobile-tab-bar,
+  .mobile-drawer,
+  .mobile-drawer-overlay { display: none !important; }
+  .sidebar,
+  .sidebar--new { display: flex !important; }
+  .top-bar { display: grid !important; }
+}
 
 html:not(.is-mobile) .dashboard-shell--new {
   display: grid !important;
