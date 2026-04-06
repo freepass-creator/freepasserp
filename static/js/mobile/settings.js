@@ -27,13 +27,15 @@ async function init() {
   };
   for (const [id, value] of Object.entries(fields)) {
     const el = document.getElementById(id);
-    if (el) el.value = value;
+    if (!el) continue;
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = value;
+    else el.textContent = value;
   }
 
   // 카탈로그 링크 생성
   const catalogUrl = `${location.origin}/catalog?a=${encodeURIComponent(profile.user_code || '')}`;
   const catalogInput = document.getElementById('ms-catalog-url');
-  if (catalogInput) catalogInput.value = catalogUrl;
+  if (catalogInput) catalogInput.textContent = catalogUrl;
 
   // 카탈로그 링크 복사
   document.getElementById('ms-catalog-copy')?.addEventListener('click', async () => {

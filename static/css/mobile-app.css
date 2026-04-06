@@ -687,8 +687,8 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  background: #fff;
+  gap: 12px;
+  background: #f2f3f7;
 }
 .m-settings-section {
   margin: 0;
