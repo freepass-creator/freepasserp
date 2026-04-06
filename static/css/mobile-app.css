@@ -774,8 +774,18 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
 }
 .m-settings-btn:active { background: rgba(0, 0, 0, 0.1); }
 .m-settings-btn--primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
   background: #1b2a4a;
   color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 .m-settings-btn--primary:active { background: #142038; }
 .m-settings-logout {
@@ -804,9 +814,13 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
   letter-spacing: 0.03em;
 }
 .m-settings-card-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
   padding: 8px 16px 12px;
+}
+.m-settings-card-actions button {
+  width: 100%;
 }
 .m-settings-card-action {
   padding: 8px 16px 12px;
