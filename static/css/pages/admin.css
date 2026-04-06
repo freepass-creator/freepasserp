@@ -51,6 +51,23 @@
   flex: 1;
   min-height: 0;
 }
+.admin-tab-scroll td {
+  padding: var(--space-2) var(--space-2);
+  height: var(--height-md);
+  vertical-align: middle;
+  font-size: var(--font-size-base);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+}
+.admin-tab-scroll th {
+  padding: var(--space-2) var(--space-2);
+  height: var(--height-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-subtle);
+  background: var(--surface-subtle, #f8f8f7);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+}
 .admin-notice-split {
   display: flex;
   flex: 1;
