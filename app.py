@@ -106,11 +106,6 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login')
 def login():
-    if _is_mobile():
-        try:
-            return render_template('mobile/login.html', page_title='로그인')
-        except Exception:
-            pass
     return render_template('login.html', page_title='로그인')
 
 @auth_bp.route('/signup')
