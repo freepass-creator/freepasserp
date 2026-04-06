@@ -477,19 +477,15 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .m-chatroom__messages .message-wrap {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
   margin-bottom: 4px !important;
   padding: 0 !important;
+  max-width: 85% !important;
 }
 .m-chatroom__messages .message-wrap.out {
-  align-items: flex-end !important;
+  align-self: flex-end !important;
 }
 .m-chatroom__messages .message-content {
   max-width: 85% !important;
-  display: flex !important;
-  flex-direction: column !important;
 }
 .m-chatroom__messages .message-wrap.out .message-content {
   align-items: flex-end !important;
@@ -499,7 +495,6 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
 }
 .m-chatroom__messages .message-bubble {
   word-break: break-word !important;
-  display: inline-block !important;
 }
 .m-chatroom__messages .message-time {
   font-size: 10px !important;
