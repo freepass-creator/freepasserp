@@ -2,20 +2,11 @@
 {% block body %}
 <div class="dashboard-shell dashboard-shell--new">
   <div class="main-area">
-    <!-- 모바일 상단 타이틀바 -->
+    <!-- 모바일 공통 상단바 프레임 -->
     <div class="mobile-topbar" id="mobile-topbar">
-      <div class="mobile-topbar__left">
-        <div class="mobile-topbar__user-info" id="mobile-topbar-user">
-          <span class="mobile-topbar__company" id="mobile-topbar-company"></span>
-          <span class="mobile-topbar__name" id="mobile-topbar-name"></span>
-          <span class="mobile-topbar__rank" id="mobile-topbar-rank"></span>
-        </div>
-      </div>
-      <div class="mobile-topbar__right">
-        <button class="mobile-topbar__icon-btn mobile-topbar__filter-btn" id="mobile-filter-btn" type="button" aria-label="필터">
-          <svg class="mobile-filter-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></svg>
-        </button>
-      </div>
+      {% block mobile_topbar %}
+      <!-- 기본: 비어있음. 페이지별로 오버라이드 -->
+      {% endblock %}
     </div>
     <main class="main-shell main-shell--new">
       {% block workspace_body %}{% endblock %}
