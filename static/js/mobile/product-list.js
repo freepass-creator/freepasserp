@@ -274,23 +274,38 @@ const FILTER_GROUPS = [
   { key: 'extColor', title: '색상' },
 ];
 
+function _passesOtherFilters(product, skipKey) {
+  return FILTER_GROUPS.every(g => {
+    if (g.key === skipKey) return true;
+    const selected = state.filters[g.key];
+    if (!selected || !selected.length) return true;
+    const v = String(product[g.key] || '').trim();
+    return selected.includes(v);
+  });
+}
+
 function renderFilterSections() {
   if (!$filterSections) return;
+  // faceted: 각 그룹의 옵션은 다른 필터를 통과한 상품에서 추출
   const optionSets = {};
-  FILTER_GROUPS.forEach(g => { optionSets[g.key] = new Set(); });
-  state.allProducts.forEach(p => {
-    FILTER_GROUPS.forEach(g => {
+  FILTER_GROUPS.forEach(g => {
+    const counts = new Map();
+    state.allProducts.forEach(p => {
+      if (!_passesOtherFilters(p, g.key)) return;
       const v = String(p[g.key] || '').trim();
-      if (v && v !== '-') optionSets[g.key].add(v);
+      if (v && v !== '-') counts.set(v, (counts.get(v) || 0) + 1);
     });
+    optionSets[g.key] = counts;
   });
   $filterSections.innerHTML = FILTER_GROUPS.map(g => {
-    const options = [...optionSets[g.key]].sort();
+    const counts = optionSets[g.key];
+    const options = [...counts.keys()].sort();
     if (!options.length) return '';
     const selected = new Set(state.filters[g.key] || []);
     const body = options.map(opt => {
       const checked = selected.has(opt) ? ' checked' : '';
-      return `<label class="catalog-filter-option"><input type="checkbox" data-group="${esc(g.key)}" value="${esc(opt)}"${checked}><span>${esc(opt)}</span></label>`;
+      const cnt = counts.get(opt) || 0;
+      return `<label class="catalog-filter-option"><input type="checkbox" data-group="${esc(g.key)}" value="${esc(opt)}"${checked}><span>${esc(opt)}</span><span class="catalog-filter-count">(${cnt})</span></label>`;
     }).join('');
     return `<div class="catalog-sidebar__section" data-filter-key="${esc(g.key)}">
       <div class="catalog-sidebar__title">${esc(g.title)}</div>
@@ -345,6 +360,7 @@ function bindEvents() {
     const set = new Set(state.filters[key]);
     if (input.checked) set.add(input.value); else set.delete(input.value);
     state.filters[key] = [...set];
+    renderFilterSections();
     applyFilters();
   });
 
