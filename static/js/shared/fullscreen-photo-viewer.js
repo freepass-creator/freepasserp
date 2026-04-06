@@ -4,10 +4,8 @@
  */
 
 import { escapeHtml as esc } from '../core/management-format.js';
-import { pushEsc, removeEsc } from '../core/esc-stack.js';
 
 let viewerEl = null;
-let _escId = null;
 
 function ensureViewer() {
   if (viewerEl) return viewerEl;
@@ -23,10 +21,28 @@ function ensureViewer() {
   `;
   document.body.appendChild(viewerEl);
 
-  viewerEl.querySelector('[data-fp-photo-close]').addEventListener('click', close);
+  viewerEl.querySelector('[data-fp-photo-close]').addEventListener('click', (e) => {
+    e.stopPropagation();
+    close();
+  });
   viewerEl.querySelector('[data-fp-photo-scroll]').addEventListener('click', (e) => {
+    e.stopPropagation();
     if (e.target.closest('.fp-photo-viewer__img')) close();
   });
+
+  // 뷰어 내 모든 클릭이 밖으로 전파되지 않게
+  viewerEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  // ESC — capture phase + stopImmediatePropagation으로 다른 핸들러 차단
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !viewerEl || viewerEl.hidden) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    close();
+  }, true);
+
   return viewerEl;
 }
 
@@ -46,10 +62,6 @@ export function open(photos = [], startIndex = 0) {
   el.hidden = false;
   document.body.style.overflow = 'hidden';
 
-  // ESC 스택에 등록 — ESC 누르면 뷰어만 닫히고 상세는 유지
-  if (_escId) removeEsc(_escId);
-  _escId = pushEsc(() => close());
-
   if (startIndex > 0) {
     requestAnimationFrame(() => {
       scroll.querySelectorAll('.fp-photo-viewer__img')[startIndex]?.scrollIntoView({ behavior: 'instant' });
@@ -61,7 +73,6 @@ export function close() {
   if (!viewerEl || viewerEl.hidden) return;
   viewerEl.hidden = true;
   document.body.style.overflow = '';
-  if (_escId) { removeEsc(_escId); _escId = null; }
 }
 
 export function isOpen() {
