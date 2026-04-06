@@ -190,11 +190,19 @@ async function init() {
     renderRooms(allRooms); // 상품 정보 갱신 시 방 목록도 재렌더
   });
 
+  // pending room (상품에서 대화 버튼으로 진입)
+  const pendingRoomId = localStorage.getItem('freepass_pending_chat_room');
+  if (pendingRoomId) localStorage.removeItem('freepass_pending_chat_room');
+
   // 방 목록 구독
   watchRooms((rooms) => {
-    // 숨긴 방 필터
     allRooms = rooms.filter(r => !r.hidden_by?.[user.uid]);
     renderRooms(allRooms);
+    // pending room이 있으면 바로 열기
+    if (pendingRoomId && !currentRoomId) {
+      const room = allRooms.find(r => r.room_id === pendingRoomId);
+      if (room) openRoom(pendingRoomId);
+    }
   });
 }
 
