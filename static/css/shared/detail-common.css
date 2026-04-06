@@ -178,6 +178,7 @@
   object-fit: cover;
   display: block;
   cursor: grab;
+  pointer-events: auto;
 }
 .pls-mobile-detail-gallery__nav {
   position: absolute;
@@ -194,6 +195,7 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  pointer-events: auto;
 }
 .pls-mobile-detail-gallery__nav--prev { left: 8px; }
 .pls-mobile-detail-gallery__nav--next { right: 8px; }
