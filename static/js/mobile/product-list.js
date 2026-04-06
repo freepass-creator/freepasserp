@@ -144,6 +144,11 @@ async function openDetail(id) {
   $detail.hidden = false;
   document.body.classList.add('detail-open');
   history.pushState({ detail: true }, '');
+  // 상단바 타이틀
+  const backTitle = document.getElementById('m-back-title');
+  if (backTitle) {
+    backTitle.textContent = [product.carNo || product.car_number || '', product.model || product.model_name || ''].filter(Boolean).join(' ') || '';
+  }
   // term 아직 없으면 로드 후 재렌더
   const key = getTermCacheKey(product);
   if (key && !state.termCache[key]) {

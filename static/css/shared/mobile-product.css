@@ -172,10 +172,11 @@
 
   .pls-m-catalog-wrap { display: block !important; }
 
-  /* 상세 패널 표시 허용 + 상단바 숨김 */
+  /* 상세 패널 표시 허용 + 상단바: 뒤로가기+타이틀 */
   .pls-m-detail:not([hidden]) { display: flex !important; }
-  .pls-m-detail:not([hidden]) ~ .mobile-topbar,
-  body:has(.pls-m-detail:not([hidden])) .mobile-topbar { display: none !important; }
+  body:has(.pls-m-detail:not([hidden])) .mobile-topbar .m-search-bar { display: none !important; }
+  body:has(.pls-m-detail:not([hidden])) .mobile-topbar .m-back-btn { display: flex !important; }
+  body:has(.pls-m-detail:not([hidden])) .mobile-topbar .m-back-title { display: block !important; }
 
   /* 상품목록: 외부 패딩 제거 → 내부 그리드 패딩으로만 여백 관리 */
   body[data-page="상품목록"] .main-shell--new {
