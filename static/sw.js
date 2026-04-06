@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v17';
+const CACHE_NAME = 'freepass-v18';
 
 const PRECACHE_URLS = [
   '/static/css/reset.css',
@@ -37,6 +37,11 @@ self.addEventListener('fetch', (event) => {
   // API, Firebase, 외부 요청은 무시
   if (request.url.includes('/api/') || request.url.includes('firebaseio.com') || request.url.includes('googleapis.com')) return;
   if (request.method !== 'GET') return;
+  // HTML 페이지는 항상 네트워크 우선 (캐시 잔상 방지)
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request).catch(() => caches.match(request)));
+    return;
+  }
 
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
