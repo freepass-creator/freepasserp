@@ -386,24 +386,38 @@ button, a, [role="button"] {
 }
 .m-form-section-head svg { stroke: currentColor; fill: none; flex-shrink: 0; }
 .m-form-checks {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
   padding: 0 16px 14px;
 }
 .m-form-check {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f2f3f7;
   font-size: 13px;
-  color: #334155;
+  font-weight: 500;
+  color: #64748b;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s;
 }
 .m-form-check input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #1b2a4a;
+  display: none;
+}
+.m-form-check:has(input:checked) {
+  background: #ecfdf5;
+  color: #10b981;
+  font-weight: 600;
+}
+.m-form-check:has(input:checked)::before {
+  content: '✓';
+  font-size: 14px;
+  font-weight: 700;
 }
 .m-form-fields {
   display: flex;
