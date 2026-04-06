@@ -250,21 +250,15 @@ function bindGallery(container) {
     idx=dx<0?(idx+1)%photos.length:(idx-1+photos.length)%photos.length;
     update();
   });
-  // 사진 탭 → 확대 뷰어 (click + touchend 이중 바인딩으로 모바일 대응)
-  let _tapHandled = false;
-  wrap.addEventListener('click', (e) => {
-    if (_tapHandled) { _tapHandled = false; return; }
-    if (e.target.closest('.pls-mobile-detail-gallery__nav')) return;
-    if (_swiped) { _swiped = false; return; }
-    openFullscreenViewer(photos, idx);
-  });
-  wrap.addEventListener('touchend', (e) => {
-    if (_swiped) return;
-    if (e.target.closest('.pls-mobile-detail-gallery__nav')) return;
-    // 짧은 탭만 처리 (스와이프 아닌 경우)
-    _tapHandled = true;
-    openFullscreenViewer(photos, idx);
-  });
+  // 사진 탭 → 확대 뷰어
+  const galleryImg = container.querySelector('#plsMGalleryImg');
+  if (galleryImg) {
+    galleryImg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (_swiped) { _swiped = false; return; }
+      openFullscreenViewer(photos, idx);
+    });
+  }
 }
 
 // ─── 필터 사이드바 ───────────────────────────────────────────────────────────

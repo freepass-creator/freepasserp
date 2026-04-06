@@ -177,8 +177,10 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  cursor: grab;
-  pointer-events: auto;
+  cursor: pointer;
+  pointer-events: auto !important;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .pls-mobile-detail-gallery__nav {
   position: absolute;
