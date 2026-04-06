@@ -212,6 +212,19 @@ html.is-mobile body.detail-open .mobile-topbar__filter-btn { display: none !impo
   overscroll-behavior: contain;
 }
 /* 상세 열렸을 때 뒤 목록 스크롤 차단 */
+/* 계약 상세 폼 — 스크롤 */
+body.detail-open #contract-m-detail {
+  position: fixed;
+  top: var(--mobile-topbar-height);
+  left: 0;
+  right: 0;
+  bottom: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #f0f4f9;
+  z-index: 250;
+}
+
 body.detail-open .main-shell--new {
   overflow: hidden !important;
 }
