@@ -142,6 +142,25 @@ function formatDate(ts) {
 // ─── 이벤트 ──────────────────────────────────────────────────────────────────
 
 function bindEvents() {
+  // 검색바 필터 버튼
+  document.getElementById('chatMFilterBtn')?.addEventListener('click', () => {
+    const sidebar = document.getElementById('chatMFilterSidebar');
+    const overlay = document.getElementById('chatMFilterOverlay');
+    if (sidebar) { sidebar.classList.toggle('is-open'); overlay?.classList.toggle('is-open'); }
+  });
+  // 검색바 입력
+  const $topSearch = document.getElementById('chatMSearchInput');
+  const $sideSearch = document.getElementById('chatMFilterSearch');
+  let searchTimer;
+  function onChatSearch(e) {
+    if ($topSearch && $topSearch !== e.target) $topSearch.value = e.target.value;
+    if ($sideSearch && $sideSearch !== e.target) $sideSearch.value = e.target.value;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => renderRooms(), 150);
+  }
+  $topSearch?.addEventListener('input', onChatSearch);
+  $sideSearch?.addEventListener('input', onChatSearch);
+
   // 방 클릭
   $rooms?.addEventListener('click', (e) => {
     const card = e.target.closest('.m-list-card[data-room-id]');

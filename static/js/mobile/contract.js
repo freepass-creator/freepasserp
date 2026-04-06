@@ -98,7 +98,32 @@ function bindFilter() {
   // 필터 config (mobile-shell.js 공통 핸들러에서 사용)
   window._mobileFilterConfig = { sidebar: 'contractMFilterSidebar', overlay: 'contractMFilterOverlay', close: 'contractMFilterClose' };
 
+  // 검색바 필터 버튼
+  document.getElementById('contractMFilterBtn')?.addEventListener('click', () => {
+    const sidebar = document.getElementById('contractMFilterSidebar');
+    const overlay = document.getElementById('contractMFilterOverlay');
+    if (sidebar) { sidebar.classList.toggle('is-open'); overlay?.classList.toggle('is-open'); }
+  });
+
+  // 검색바 입력 동기화
+  const $topSearch = document.getElementById('contractMSearchInput');
   let timer;
+  function onContractSearch(e) {
+    if (search && search !== e.target) search.value = e.target.value;
+    if ($topSearch && $topSearch !== e.target) $topSearch.value = e.target.value;
+    clearTimeout(timer);
+    const q = e.target.value.trim().toLowerCase();
+    timer = setTimeout(() => {
+      const filtered = q
+        ? allContracts.filter(c => {
+            const fields = [c.customer_name, c.car_number, c.vehicle_name, c.contract_code];
+            return fields.some(f => String(f||'').toLowerCase().includes(q));
+          })
+        : allContracts;
+      renderList(filtered);
+    }, 150);
+  }
+  $topSearch?.addEventListener('input', onContractSearch);
   search?.addEventListener('input', () => {
     clearTimeout(timer);
     timer = setTimeout(() => {
