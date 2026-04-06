@@ -187,6 +187,20 @@ async function init() {
 
   bindEvents();
 
+  // 키보드 올라올 때 채팅방 높이 조정
+  const chatroom = document.querySelector('.m-chatroom');
+  if (chatroom && window.visualViewport) {
+    const onResize = () => {
+      const keyboardH = window.innerHeight - window.visualViewport.height;
+      chatroom.style.bottom = keyboardH > 0 ? `${keyboardH}px` : '0';
+      // 메시지 영역 스크롤 맨 아래로
+      const msgs = chatroom.querySelector('.m-chatroom__messages');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    };
+    window.visualViewport.addEventListener('resize', onResize);
+    window.visualViewport.addEventListener('scroll', onResize);
+  }
+
   // 상품 맵 구축 (방 목록에 차량 정보 표시용)
   watchProducts((products) => {
     productMap = new Map(products.map(p => {

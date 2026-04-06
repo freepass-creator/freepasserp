@@ -393,6 +393,7 @@ button, a, [role="button"] {
   left: 0;
   right: 0;
   bottom: 0;
+  bottom: env(keyboard-inset-height, 0);
   z-index: 200;
   background: #f8fafc;
   contain: layout style paint;
