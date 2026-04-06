@@ -398,11 +398,14 @@ function initSidebarCollapse() {
 
 // ─── 초기화 ─────────────────────────────────────────────────────────────────
 
+import { initPanelResize } from './core/panel-resize.js';
+
 normalizeRequiredFields(document);
 initGlobalFilterOverlayClose();
 initKeyboardListNavigation();
 initShellNavigation();
 initSidebarCollapse();
+initPanelResize();
 registerInitialPage();
 const _initialPath = window.location.pathname;
 history.replaceState({ page: _initialPath }, '', _initialPath);
