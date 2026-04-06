@@ -57,7 +57,7 @@ function renderRooms(rooms) {
       <span class="m-list-card__avatar ${avatarCls}">${avatarSvg}</span>
       <div class="m-list-card__body">
         <div class="m-list-card__main">
-          <span class="m-list-card__name">${escapeHtml(model || carNo || '대화')}</span>
+          <span class="m-list-card__name">${escapeHtml([carNo, model].filter(Boolean).join(' ') || '대화')}</span>
         </div>
         <div class="m-list-card__sub">
           <span class="m-list-card__info">${escapeHtml(subParts.join(' · '))}</span>

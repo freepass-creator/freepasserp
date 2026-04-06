@@ -61,7 +61,7 @@ function renderList(contracts) {
       <span class="m-list-card__avatar ${cAvatarCls}">${cAvatarSvg}</span>
       <div class="m-list-card__body">
         <div class="m-list-card__main">
-          <span class="m-list-card__name">${escapeHtml(vehicle || carNo || '계약')}</span>
+          <span class="m-list-card__name">${escapeHtml([carNo, vehicle].filter(Boolean).join(' ') || '계약')}</span>
         </div>
         <div class="m-list-card__sub">
           <span class="m-list-card__info">${escapeHtml([c.partner_code || c.provider_company_code || '', c.agent_code || '', month, rent].filter(Boolean).join(' · '))}</span>
