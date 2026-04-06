@@ -417,8 +417,8 @@ function fmtPrice(v) { const n = moneyToNumber(v); return n ? n.toLocaleString('
 function cellValue(col, item) {
   const tf = getTermFields(item);
   switch (col.key) {
-    case 'vehicleStatus': return { html: renderBadgeRow([{ field: 'vehicle_status', value: item.vehicleStatus }]) };
-    case 'productType': return { html: renderBadgeRow([{ field: 'product_type', value: item.productType }]) };
+    case 'vehicleStatus': return { html: renderBadgeRow([{ field: 'vehicle_status', value: item.vehicleStatus }]), text: item.vehicleStatus || '' };
+    case 'productType': return { html: renderBadgeRow([{ field: 'product_type', value: item.productType }]), text: item.productType || '' };
     case 'partnerCode': return { text: safe(item.partnerCode) };
     case 'carNo': return { text: safe(item.carNo) };
     case 'maker': return { text: safe(item.maker) };
