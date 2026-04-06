@@ -29,7 +29,7 @@
 <input id="policy_code" type="hidden"/>
 <input id="product_code" type="hidden"/>
 <section class="form-section">
-<div class="section-title">계약체크</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>계약체크</div>
 <div class="form-grid">
 <div class="field full"><label>진행상황</label></div>
 </div>
@@ -43,17 +43,27 @@
 </div>
 </section>
 <section class="form-section">
-<div class="section-title">계약정보</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>기본정보</div>
 <div class="form-grid">
 <div class="field"><label for="contract_status">계약상태</label><select id="contract_status"><option value="계약대기">계약대기</option><option value="계약요청">계약요청</option><option value="계약발송">계약발송</option><option value="계약완료">계약완료</option><option value="계약철회">계약철회</option></select></div>
 <div class="field"><label for="contract_code">계약코드</label><input id="contract_code" readonly/></div>
 <div class="field"><label for="partner_code">공급사코드</label><input id="partner_code" readonly/></div>
 <div class="field"><label for="agent_code">영업채널코드</label><input id="agent_code" readonly/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2.7-3.4A2 2 0 0 0 13.7 6H6.3a2 2 0 0 0-1.6.8L2 10l-1.5 1.1C.2 11.6 0 12.1 0 12.6V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>차량/대여</div>
+<div class="form-grid">
 <div class="field"><label for="car_number">차량번호</label><input id="car_number" readonly/></div>
 <div class="field"><label for="vehicle_name">세부모델</label><input id="vehicle_name" readonly/></div>
 <div class="field"><label for="rent_month">대여기간</label><select id="rent_month"><option value="">선택</option></select></div>
 <div class="field"><label for="rent_amount">대여료</label><input id="rent_amount" inputmode="numeric" placeholder="자동반영 (수정가능)"/></div>
 <div class="field"><label for="deposit_amount">보증금</label><input id="deposit_amount" inputmode="numeric" placeholder="자동반영 (수정가능)"/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>고객정보</div>
+<div class="form-grid">
 <div class="field"><label for="customer_name">고객명</label><input id="customer_name"/></div>
 <div class="field"><label for="customer_birth">생년월일</label><input id="customer_birth" placeholder="예: 900101"/></div>
 <div class="field"><label for="customer_phone">연락처</label><input id="customer_phone" placeholder="예: 010-0000-0000"/></div>
@@ -61,7 +71,7 @@
 </div>
 </section>
 <section class="form-section">
-<div class="section-title">요청서류</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>요청서류</div>
 <div class="field full" id="contract-doc-editor-field">
 <label for="contract_docs">면허증 및 요청서류</label>
 <div class="upload-dropzone" id="contract-doc-dropzone">

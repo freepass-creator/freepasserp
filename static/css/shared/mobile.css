@@ -25,8 +25,8 @@ html:not(.is-mobile) .pls-mobile-sheet-overlay,
 html:not(.is-mobile) .pls-mobile-sheet { display: none !important; }
 
 html:not(.is-mobile) .sidebar,
-html:not(.is-mobile) .sidebar--new,
-html:not(.is-mobile) .top-bar { display: flex !important; }
+html:not(.is-mobile) .sidebar--new { display: flex !important; }
+html:not(.is-mobile) .top-bar { display: grid !important; }
 
 html:not(.is-mobile) .dashboard-shell--new {
   display: grid !important;

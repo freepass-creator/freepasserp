@@ -32,7 +32,7 @@
 <input id="existing_image_url" type="hidden"/>
 <input id="existing_image_urls" type="hidden"/>
 <section class="form-section">
-<div class="section-title">차량정보</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>관리정보</div>
 <div class="form-grid">
 <div class="field"><label for="partner_code">공급사코드</label><select id="partner_code" name="partner_code"><option value="">선택</option></select></div>
 <div class="field"><label for="policy_code">정책코드</label><select id="policy_code" name="policy_code"><option value="">선택</option></select></div>
@@ -40,18 +40,33 @@
 <div class="field"><label for="product_code_display">상품코드</label><input id="product_code_display" name="product_code_display" placeholder="저장 시 자동부여" readonly="" type="text"/></div>
 <div class="field"><label for="vehicle_status">차량상태</label><select data-code-group="PRODUCT_VEHICLE_STATUS" id="vehicle_status" name="vehicle_status"><option value="">선택</option></select></div>
 <div class="field"><label for="product_type">상품구분</label><select data-code-group="PRODUCT_TYPE" id="product_type" name="product_type"><option value="">선택</option></select></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2.7-3.4A2 2 0 0 0 13.7 6H6.3a2 2 0 0 0-1.6.8L2 10l-1.5 1.1C.2 11.6 0 12.1 0 12.6V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>모델/스펙</div>
+<div class="form-grid">
 <div class="field"><label for="maker">제조사</label><select data-code-group="PRODUCT_MAKER" id="maker" name="maker"><option value="">선택</option></select></div>
 <div class="field"><label for="model_name">모델명</label><select data-code-group="PRODUCT_MODEL_NAME" id="model_name" name="model_name"><option value="">선택</option></select></div>
 <div class="field"><label for="sub_model">세부모델</label><select data-code-group="PRODUCT_SUB_MODEL" id="sub_model" name="sub_model"><option value="">선택</option></select></div>
 <div class="field"><label for="trim_name">세부트림</label><input id="trim_name" name="trim_name" placeholder="예: 1.6 하이브리드 2WD 캘리그래피" type="text"/></div>
 <div class="field"><label for="options">선택옵션</label><input id="options" name="options"/></div>
 <div class="field"><label for="vehicle_price">차량가격</label><input id="vehicle_price" inputmode="numeric" name="vehicle_price" type="text"/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 22v-2"/><path d="m17 20.66-1-1.73"/><path d="M11 10.27 7 3.34"/><path d="m20.66 17-1.73-1"/><path d="m3.34 7 1.73 1"/><path d="M14 12h8"/><path d="M2 12h2"/><path d="m20.66 7-1.73 1"/><path d="m3.34 17 1.73-1"/><path d="m17 3.34-1 1.73"/><path d="m11 13.73-4 6.93"/></svg>외관/제원</div>
+<div class="form-grid">
 <div class="field"><label for="ext_color">외부색상</label><select id="ext_color" name="ext_color"><option value="">선택</option></select></div>
 <div class="field"><label for="int_color">내부색상</label><select id="int_color" name="int_color"><option value="">선택</option></select></div>
 <div class="field"><label for="year">연식</label><select id="year" name="year"><option value="">선택</option></select></div>
 <div class="field"><label for="mileage">주행거리</label><input id="mileage" inputmode="numeric" name="mileage" type="text"/></div>
 <div class="field"><label for="fuel_type">연료</label><select data-code-group="PRODUCT_FUEL_TYPE" id="fuel_type" name="fuel_type"><option value="">선택</option></select></div>
 <div class="field"><label for="vehicle_class">차종구분</label><input id="vehicle_class" name="vehicle_class" placeholder="모델 선택 시 자동입력" readonly="" type="text"/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>등록/기타</div>
+<div class="form-grid">
 <div class="field"><label for="first_registration_date">최초등록일</label><input id="first_registration_date" inputmode="numeric" name="first_registration_date" placeholder="예: 230315 또는 20230315" type="text"/></div>
 <div class="field"><label for="vehicle_age_expiry_date">차령만료일</label><input id="vehicle_age_expiry_date" inputmode="numeric" name="vehicle_age_expiry_date" placeholder="예: 330314 또는 20330314" type="text"/></div>
 <div class="field"><label for="partner_memo">특이사항(공급사메모)</label><input id="partner_memo" name="partner_memo" placeholder="예: 앞범퍼 미세스크래치 / 비흡연 / 단기출고 우선" type="text"/></div>
@@ -59,7 +74,7 @@
 </div>
 </section>
 <section class="form-section" id="product-photo-section">
-<div class="section-title">사진업로드</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>사진업로드</div>
 <div class="field full product-image-editor" id="product-image-editor-field">
 <label for="product_image">차량 사진</label>
 <div class="upload-dropzone" id="upload-dropzone">
@@ -78,7 +93,7 @@
 </div>
 </section>
 <section class="form-section">
-<div class="section-title">대여료/보증금 정보</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>대여료/보증금 정보</div>
 <div class="field full rent-plan-field">
 <label>기간별 대여료 및 보증금</label>
 <div class="price-manage-grid">
@@ -114,7 +129,7 @@
 </div>
 </section>
 <section class="form-section" id="product-sheet-import-section">
-<div class="section-title">구글시트 반영</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>구글시트 반영</div>
 <div class="field full">
 <label for="sheet_url">구글시트 주소 (여러 개는 줄바꿈으로 구분)</label>
 <div class="sheet-apply-row">

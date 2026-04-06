@@ -186,7 +186,42 @@
 }
 
 .work-page.layout-66 {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  display: flex !important;
+  gap: 0 !important;
+}
+.work-page.layout-66 > .panel:first-child,
+.work-page.layout-66 > .panel-slot:first-child { flex: 0 0 auto; width: 50%; min-width: 200px; }
+.work-page.layout-66 > .panel:last-child,
+.work-page.layout-66 > .panel-slot:last-child { flex: 1 1 0; min-width: 300px; }
+
+/* 리사이즈 핸들 — 좌우 여백과 동일 */
+.panel-resize-handle {
+  flex: 0 0 var(--space-3);
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  z-index: 5;
+}
+.panel-resize-handle:hover,
+.panel-resize-handle.is-dragging {
+  background: rgba(0, 0, 0, 0.04);
+}
+.panel-resize-handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 28px;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.panel-resize-handle:hover::after,
+.panel-resize-handle.is-dragging::after {
+  opacity: 1;
 }
 
 .work-page.layout-39,

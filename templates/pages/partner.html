@@ -21,12 +21,20 @@
 </div>
 <div class="panel-body manage-form-body">
 <div class="manage-idle-hint">좌측 목록에서 파트너를 선택하거나 신규를 눌러주세요.</div>
-<form class="form-grid manage-form-shell" id="partner-form">
+<form class="form-stack manage-form-shell" id="partner-form">
 <input id="editing_partner_code" type="hidden"/>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>코드정보</div>
+<div class="form-grid">
 <div class="field"><label for="partner_status">파트너상태</label><select id="partner_status"><option value="active">활성</option><option value="inactive">비활성</option></select></div>
 <div class="field"><label for="partner_type">파트너유형</label><select id="partner_type" required><option value="provider">공급사</option><option value="sales_channel">영업채널</option></select></div>
 <div class="field"><label for="partner_code_preview">파트너코드</label><input id="partner_code_preview" readonly/></div>
 <div class="field"><label for="partner_business_number">사업자등록번호</label><input id="partner_business_number" required/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>회사정보</div>
+<div class="form-grid">
 <div class="field"><label for="partner_name">회사명</label><input id="partner_name" required/></div>
 <div class="field"><label for="partner_ceo_name">대표자명</label><input id="partner_ceo_name" required/></div>
 <div class="field"><label for="partner_company_phone">회사연락처</label><input id="partner_company_phone"/></div>
@@ -37,8 +45,10 @@
 <div class="field"><label for="partner_email">이메일</label><input id="partner_email" type="email"/></div>
 <div class="field"><label for="partner_fax">회사계좌번호</label><input id="partner_fax"/></div>
 <div class="field"><label for="partner_note">비고</label><input id="partner_note"/></div>
+</div>
+</section>
 <section class="form-section">
-<div class="section-title">첨부서류</div>
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>첨부서류</div>
 <div class="form-grid">
 <div class="field">
 <label>사업자등록증</label>

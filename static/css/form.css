@@ -6,20 +6,20 @@
   --form-label-color: var(--text-subtle);
   --form-label-min-h: var(--space-4);
   --form-field-gap: var(--space-2);
-  --form-control-height: var(--height-lg);
-  --form-control-px: var(--space-3);
+  --form-control-height: 42px;
+  --form-control-px: 14px;
   --form-control-textarea-min-h: 96px;
-  --form-control-select-pr: var(--height-sm);
-  --form-control-border: var(--border-main);
-  --form-control-bg: var(--surface-base);
+  --form-control-select-pr: 32px;
+  --form-control-border: transparent;
+  --form-control-bg: #f2f3f7;
   --form-control-text: var(--text-main);
-  --form-control-radius: var(--radius-ui);
+  --form-control-radius: 8px;
   --form-checkbox-size: var(--space-4);
   --form-check-gap: var(--space-2);
   --form-check-px: var(--space-3);
   --form-focus-border: var(--interactive-active-border);
-  --form-focus-bg: var(--surface-base);
-  --form-focus-shadow: var(--interactive-shadow-focus);
+  --form-focus-bg: #fff;
+  --form-focus-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
   --form-required-color: rgba(148, 163, 184, 0.95);
   --form-view-bg: var(--surface-subtle);
   --form-view-border: transparent;
@@ -90,7 +90,7 @@
 .field textarea,
 textarea {
   width: 100%;
-  border: 1px solid var(--form-control-border);
+  border: 1.5px solid var(--form-control-border);
   border-radius: var(--form-control-radius);
   background-color: var(--form-control-bg);
   font-size: var(--font-size-main);
@@ -163,13 +163,10 @@ textarea {
 }
 
 
-.field input:hover,
-.field select:hover,
-.field textarea:hover,
-input:hover,
-select:hover,
-textarea:hover {
-  border-color: var(--interactive-hover-border);
+.field input:not(:focus):not(:disabled):not([readonly]):hover,
+.field select:not(:focus):not(:disabled):hover,
+.field textarea:not(:focus):not(:disabled):not([readonly]):hover {
+  background-color: #eaecf2;
 }
 
 .field input:focus,
@@ -226,21 +223,24 @@ textarea:focus {
 }
 
 .section-title {
-  font-size: var(--font-size-main);
-  font-weight: var(--font-weight-strong);
-  color: var(--text-main);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted, #80868b);
+  letter-spacing: 0.03em;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
-.section-title::before {
-  content: '';
-  flex: 0 0 3px;
-  height: 13px;
-  background: currentColor;
-  border-radius: var(--radius-ui);
-  opacity: 0.35;
+.section-title svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
 }
 
 .section-helper {
@@ -430,8 +430,8 @@ textarea:focus {
 }
 
 .form-section + .form-section {
-  border-top: 0;
-  padding-top: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: var(--form-section-gap);
   margin-top: var(--form-section-gap);
 }
 
@@ -558,10 +558,9 @@ select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, rgba(100, 116, 139, 0.7) 50%), linear-gradient(135deg, rgba(100, 116, 139, 0.7) 50%, transparent 50%);
-  background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 11px) calc(50% - 2px);
-  background-size: 5px 5px, 5px 5px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2380868b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
+  background-position: right 12px center;
   padding-right: var(--form-control-select-pr);
 }
 

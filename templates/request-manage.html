@@ -31,12 +31,17 @@
           </div>
         </div>
         <div class="panel-body manage-form-body">
-          <form id="request-form" class="form-grid manage-form-shell">
+          <form id="request-form" class="form-stack manage-form-shell">
             <input id="request-form_mode" type="hidden" value="create">
+            <section class="form-section">
+            <div class="section-title"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>요청정보</div>
+            <div class="form-grid">
             <div class="field"><label for="request_code">요청코드</label><input id="request_code" data-auto-code readonly placeholder="자동 배정"></div>
             <div class="field"><label for="request_status">상태</label><input id="request_status" placeholder="예: 작성중"></div>
             <div class="field"><label for="request_title">요청제목</label><input id="request_title" placeholder="요청제목 입력"></div>
             <div class="field full"><label for="request_note">요청내용</label><textarea id="request_note" placeholder="요청 관련 내용을 입력합니다."></textarea></div>
+            </div>
+            </section>
           </form>
           <p id="request-message" class="message"></p>
         </div>

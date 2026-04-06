@@ -50,6 +50,7 @@
         <span class="top-bar-identity" id="topBarIdentity" hidden></span>
         <span class="top-bar-work-badge" id="topBarWorkBadge"></span>
       </div>
+      <div class="top-bar-actions">{% block top_bar_actions %}{% endblock %}</div>
     </div>
     <main class="main-shell main-shell--new">
       {% block workspace_body %}{% endblock %}

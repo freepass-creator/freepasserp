@@ -33,8 +33,11 @@
           </div>
         </div>
         <div class="panel-body manage-form-body">
-          <form id="code-form" class="form-grid manage-form-shell">
+          <form id="code-form" class="form-stack manage-form-shell">
             <input id="editing_code_key" type="hidden">
+            <section class="form-section">
+            <div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>코드정보</div>
+            <div class="form-grid">
             <div class="field"><label for="group_code">그룹코드</label><input id="group_code" required></div>
             <div class="field"><label for="item_code">항목코드</label><input id="item_code" required></div>
             <div class="field"><label for="item_name">항목명</label><input id="item_name" required></div>
@@ -44,6 +47,8 @@
               <select id="is_active"><option value="true">사용</option><option value="false">미사용</option></select>
             </div>
             <div class="field full helper-row">입력값 코드는 Firebase input_codes 에 저장되며, 재고관리에서는 PRODUCT_VEHICLE_STATUS / PRODUCT_TYPE / PRODUCT_MAKER / PRODUCT_MODEL_NAME / PRODUCT_SUB_MODEL / PRODUCT_FUEL_TYPE / PRODUCT_VEHICLE_SUB_STATUS / PRODUCT_ACCIDENT_YN / PRODUCT_MAINTENANCE_SERVICE / PRODUCT_CREDIT_GRADE / PRODUCT_REVIEW_STATUS 그룹을 우선 사용합니다.</div>
+            </div>
+            </section>
           </form>
           <p id="code-message" class="message"></p>
         </div>

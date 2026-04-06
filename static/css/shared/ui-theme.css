@@ -53,7 +53,7 @@
   --font-size-title: 12px;
   --letter-spacing-base: -0.03em;
   --panel-head-height: 40px;
-  --panel-gap: 8px;
+  --panel-gap: var(--space-3);
   --panel-body-pad: 16px;
   --list-row-min-h: 40px;
 

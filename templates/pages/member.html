@@ -21,20 +21,30 @@
 </div>
 <div class="panel-body manage-form-body">
 <div class="manage-idle-hint">좌측 목록에서 회원을 선택하세요.</div>
-<form class="form-grid manage-form-shell" id="member-form">
+<form class="form-stack manage-form-shell" id="member-form">
 <input id="editing_member_uid" type="hidden"/>
 <input id="member_business_number" type="hidden"/>
 <input id="member_match_result" type="hidden"/>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>코드 및 계정정보</div>
+<div class="form-grid">
 <div class="field"><label for="member_status">회원상태</label><select id="member_status"><option value="pending">대기</option><option value="active">승인</option><option value="rejected">반려</option></select></div>
 <div class="field"><label for="member_role_select">회원구분</label><select id="member_role_select"><option value="">선택</option><option value="admin">관리자</option><option value="provider">공급사</option><option value="agent">영업자</option></select></div>
 <div class="field"><label for="member_company_code_select">소속코드</label><select id="member_company_code_select"><option value="">선택</option></select></div>
 <div class="field"><label for="member_company_name">소속회사</label><input id="member_company_name" readonly/></div>
 <div class="field"><label for="member_user_code">계정코드</label><input id="member_user_code" readonly/></div>
 <div class="field"><label for="member_email">이메일</label><input id="member_email" readonly/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>개인정보</div>
+<div class="form-grid">
 <div class="field"><label for="member_name">이름</label><input id="member_name"/></div>
 <div class="field"><label for="member_position">직급</label><input id="member_position"/></div>
 <div class="field"><label for="member_phone">연락처</label><input id="member_phone"/></div>
 <div class="field"><label for="member_note">기타정보</label><input id="member_note"/></div>
+</div>
+</section>
 </form>
 <p class="message" id="member-message"></p>
 </div>

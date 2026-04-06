@@ -21,14 +21,22 @@
 </div>
 <div class="panel-body manage-form-body term-form-wrap">
 <div class="manage-idle-hint">좌측 목록에서 정책을 선택하거나 신규를 눌러주세요.</div>
-<form class="form-grid policy-form-grid manage-form-shell" id="term-form" novalidate>
+<form class="form-stack policy-form-grid manage-form-shell" id="term-form" novalidate>
 <input id="editing_term_code" type="hidden"/>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>정책 기본정보</div>
+<div class="form-grid">
 <div class="field"><label for="term_provider_code">공급사코드*</label><select id="term_provider_code" required></select></div>
 <div class="field"><label for="term_code_preview">정책코드</label><input id="term_code_preview" readonly/></div>
 <div class="field"><label for="term_name_input">정책명*</label><input id="term_name_input" placeholder="예: 무심사 만26세 국산차" required/></div>
 <div class="field"><label for="term_description">정책설명</label><input id="term_description" placeholder="예: 국산차 기본 조건 / 선불형 정책"/></div>
 <div class="field"><label for="screening_criteria">심사기준</label><select id="screening_criteria"><option selected value="무심사">무심사</option><option value="심사필요">심사필요</option></select></div>
 <div class="field"><label for="credit_grade">신용등급</label><select id="credit_grade"><option selected value="저신용">저신용</option><option value="중신용">중신용</option><option value="일반신용">일반신용</option></select></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>운전자 조건</div>
+<div class="form-grid">
 <div class="field"><label for="basic_driver_age">기본운전자연령</label><select id="basic_driver_age"><option value="만 21세 이상">만 21세 이상</option><option value="만 22세 이상">만 22세 이상</option><option value="만 23세 이상">만 23세 이상</option><option value="만 24세 이상">만 24세 이상</option><option value="만 25세 이상">만 25세 이상</option><option selected value="만 26세 이상">만 26세 이상</option><option value="만 27세 이상">만 27세 이상</option><option value="만 28세 이상">만 28세 이상</option><option value="만 29세 이상">만 29세 이상</option><option value="만 30세 이상">만 30세 이상</option><option value="만 31세 이상">만 31세 이상</option><option value="만 32세 이상">만 32세 이상</option><option value="만 33세 이상">만 33세 이상</option><option value="만 34세 이상">만 34세 이상</option><option value="만 35세 이상">만 35세 이상</option></select></div>
 <div class="field"><label for="driver_age_lowering">운전연령하향</label><select id="driver_age_lowering"><option selected value="불가">불가</option><option value="협의">협의</option><option value="만25세">만25세</option><option value="만24세">만24세</option><option value="만23세">만23세</option><option value="만22세">만22세</option><option value="만21세">만21세</option></select></div>
 <div class="field"><label for="personal_driver_scope">개인운전자범위</label><select id="personal_driver_scope"><option selected value="계약자 본인+직계가족">계약자 본인+직계가족</option><option value="계약자 본인만">계약자 본인만</option><option value="계약자 본인+추가운전자">계약자 본인+추가운전자</option><option value="협의">협의</option></select></div>
@@ -44,7 +52,17 @@
 <div class="field"><label for="deposit_card_payment">보증금카드결제</label><select id="deposit_card_payment"><option selected value="가능">가능</option><option value="협의">협의</option><option value="불가">불가</option></select></div>
 <div class="field"><label for="rental_region">대여지역</label><select id="rental_region"><option selected value="전국">전국</option><option value="수도권">수도권</option><option value="제주도불가">제주도불가</option><option value="협의">협의</option></select></div>
 <div class="field"><label for="delivery_fee">탁송비</label><input id="delivery_fee" placeholder="예: 서울 무료 / 지역별 별도"/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>운영 조건</div>
+<div class="form-grid">
 <div class="field"><label for="commission_clawback_condition">수수료환수조건</label><input id="commission_clawback_condition" placeholder="예: 출고 전 취소 시 전액 환수"/></div>
+</div>
+</section>
+<section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>보험 조건</div>
+<div class="form-grid">
 <div class="field"><label for="injury_compensation_limit">대인I, II 배상</label><input id="injury_compensation_limit" readonly value="무한"/></div>
 <div class="field"><label for="injury_deductible">대인면책금</label><select id="injury_deductible"><option selected value="없음">없음</option><option value="10만원">10만원</option><option value="20만원">20만원</option><option value="30만원">30만원</option><option value="50만원">50만원</option><option value="100만원">100만원</option></select></div>
 <div class="field"><label for="property_compensation_limit">대물배상</label><select id="property_compensation_limit"><option value="2천만원">2천만원</option><option value="3천만원">3천만원</option><option value="5천만원">5천만원</option><option selected value="1억원">1억원</option><option value="2억원">2억원</option><option value="3억원">3억원</option><option value="5억원">5억원</option><option value="10억원">10억원</option></select></div>
@@ -60,6 +78,8 @@
 <div class="field"><label for="maintenance_service">정비서비스</label><select id="maintenance_service"><option selected value="불포함">불포함</option><option value="포함">포함</option><option value="협의">협의</option></select></div>
 <div class="field"><label for="annual_roadside_assistance">긴급출동</label><select id="annual_roadside_assistance"><option value="연간 1회">연간 1회</option><option value="연간 2회">연간 2회</option><option value="연간 3회">연간 3회</option><option value="연간 4회">연간 4회</option><option selected value="연간 5회">연간 5회</option><option value="없음">없음</option></select></div>
 <div class="field"><label for="insurance_included">보험료</label><select id="insurance_included"><option selected value="보험료 포함">보험료 포함</option><option value="보험료 별도">보험료 별도</option><option value="보험료 협의">보험료 협의</option></select></div>
+</div>
+</section>
 </form>
 <p class="message" id="term-message"></p>
 </div>
