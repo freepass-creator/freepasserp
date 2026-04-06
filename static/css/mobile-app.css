@@ -868,6 +868,9 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
   font-weight: 700;
   color: var(--m-text-primary);
 }
+/* 설정 페이지: 검색바 숨기고 타이틀만 */
+body.page-settings .mobile-topbar .m-search-bar { display: none !important; }
+body.page-settings .mobile-topbar .m-title-bar { display: flex !important; }
 
 .m-settings-page {
   padding: 0 0 32px;
