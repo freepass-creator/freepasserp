@@ -202,7 +202,12 @@ async function init() {
 
   // 방 목록 구독
   watchRooms((rooms) => {
-    allRooms = rooms.filter(r => !r.hidden_by?.[user.uid]);
+    allRooms = rooms.filter(r => {
+      if (r.hidden_by?.[user.uid]) return false;
+      if (currentProfile.role === 'agent') return r.agent_uid === user.uid || r.agent_code === currentProfile.user_code;
+      if (currentProfile.role === 'provider') return r.provider_company_code === currentProfile.company_code;
+      return true; // admin
+    });
     renderRooms(allRooms);
     // pending room이 있으면 바로 열기
     if (pendingRoomId && !currentRoomId) {
