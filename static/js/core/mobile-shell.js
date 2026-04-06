@@ -169,7 +169,7 @@ async function handleMobileBack() {
   if (document.body.classList.contains('chat-m-open')) {
     const msgInput = document.getElementById('message-input');
     if (msgInput && msgInput.value.trim()) {
-      const ok = await showConfirm('작성 중인 메시지가 있습니다.\n대화목록으로 돌아가시겠습니까?');
+      const ok = await showConfirm('작성 중인 메시지가 있어요.\n대화 목록으로 돌아갈까요?');
       if (!ok) return true;
     }
     document.body.classList.remove('chat-m-open');
@@ -184,15 +184,9 @@ async function handleMobileBack() {
     return true;
   }
 
-  // 6. 상품목록(홈) → 종료 확인
-  if (page === '/product-list') {
-    const exit = await showConfirm('앱을 종료하시겠습니까?');
-    if (exit) { history.go(-1); return false; }
-    return true;
-  }
-
-  // 7. 그 외 페이지(대화목록, 계약목록, 설정) → 상품목록(홈)으로
-  navigateToProductList();
+  // 6. 모든 페이지 — 종료 확인
+  const exit = await showConfirm('프리패스 ERP를 종료할까요?');
+  if (exit) { history.go(-1); return false; }
   return true;
 }
 
