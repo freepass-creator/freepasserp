@@ -274,5 +274,11 @@ if (isMobile) {
     updateActiveTab();
     initMobileBackTrap();
     initMobileFilterToggle();
+
+    // 공통 뒤로가기 버튼
+    document.getElementById('m-back-btn')?.addEventListener('click', async () => {
+      await handleMobileBack();
+      cleanupMobileViewClasses();
+    });
   }).catch(() => {});
 }
