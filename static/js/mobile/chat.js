@@ -40,10 +40,6 @@ function renderRooms(rooms) {
       : (room.agent_name || room.agent_code || '');
     const lastMsg = truncate(room.last_message || '', 25);
     const date = formatDate(room.last_message_at);
-    const unread = currentProfile?.role === 'agent'
-      ? (room.unread_for_agent || 0)
-      : (room.unread_for_provider || 0);
-    const unreadDot = unread > 0 ? `<span class="m-list-card__unread">${unread}</span>` : '';
     const active = room.room_id === currentRoomId ? ' is-active' : '';
 
     const eff = room.last_effective_sender_role || '';
@@ -62,7 +58,6 @@ function renderRooms(rooms) {
       <div class="m-list-card__body">
         <div class="m-list-card__main">
           <span class="m-list-card__name">${escapeHtml(model || carNo || '대화')}</span>
-          ${unreadDot}
         </div>
         <div class="m-list-card__sub">
           <span class="m-list-card__info">${escapeHtml(subParts.join(' · '))}</span>
