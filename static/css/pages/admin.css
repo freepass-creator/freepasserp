@@ -13,6 +13,14 @@
 .admin-tab-bar {
   flex-shrink: 0;
 }
+.admin-tab-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.admin-tab-panel[hidden] {
+  display: none !important;
+}
 
 /* ─── 좌측 메뉴 ─────────────────────────────────────────────────────────────── */
 
