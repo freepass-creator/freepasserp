@@ -214,23 +214,38 @@ async function handleDelete() {
     return;
   }
   // 소속 직원 확인
-  const { fetchUsersOnce, fetchProductsOnce } = await import('../firebase/firebase-db.js');
+  const { fetchUsersOnce, fetchProductsOnce, deleteProduct } = await import('../firebase/firebase-db.js');
   const users = await fetchUsersOnce();
   const hasUsers = users.some(u => u.company_code === editingCode && u.status !== 'deleted');
   if (hasUsers) {
-    showToast('소속 직원이 있는 파트너는 삭제할 수 없습니다.', 'error');
+    showToast('소속 직원이 있는 파트너는 삭제할 수 없습니다.\n소속 직원을 먼저 삭제하세요.', 'error');
     return;
   }
   // 등록 상품 확인
   const products = await fetchProductsOnce();
-  const hasProducts = products.some(p => (p.provider_company_code || p.partner_code) === editingCode && p.status !== 'deleted');
-  if (hasProducts) {
-    showToast('등록된 상품이 있는 파트너는 삭제할 수 없습니다.', 'error');
-    return;
+  const partnerProducts = products.filter(p => (p.provider_company_code || p.partner_code) === editingCode && p.status !== 'deleted');
+  if (partnerProducts.length > 0) {
+    const deleteWithProducts = await showConfirm(
+      `파트너 ${editingCode}에 등록된 상품 ${partnerProducts.length}건이 있습니다.\n\n파트너와 함께 상품을 모두 삭제할까요?`
+    );
+    if (!deleteWithProducts) return;
+    // 상품 일괄 삭제
+    let deletedCount = 0;
+    for (const p of partnerProducts) {
+      try {
+        await deleteProduct(p.product_uid || p.product_code || p._key);
+        deletedCount++;
+      } catch (e) {
+        console.warn('상품 삭제 실패', p.product_code, e);
+      }
+    }
+    await deletePartner(editingCode);
+    showToast(`파트너 ${editingCode} 삭제 완료 (상품 ${deletedCount}건 함께 삭제)`, 'success');
+  } else {
+    if (!await showConfirm(`선택한 파트너 ${editingCode} 를 삭제할까요?`)) return;
+    await deletePartner(editingCode);
+    showToast(`삭제 완료: ${editingCode}`, 'success');
   }
-  if (!await showConfirm(`선택한 파트너 ${editingCode} 를 삭제할까요?`)) return;
-  await deletePartner(editingCode);
-  showToast(`삭제 완료: ${editingCode}`, 'success');
   setCreateMode();
 }
 
