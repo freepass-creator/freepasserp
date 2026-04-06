@@ -96,6 +96,9 @@
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
 }
 
+/* 필터 헤더 숨김 */
+.catalog-sidebar__head { display: none !important; }
+
 /* 상품 목록 여백 통일 */
 .catalog-content { padding-top: 0 !important; }
 .catalog-grid { padding: var(--space-3) !important; }
