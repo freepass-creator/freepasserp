@@ -1,7 +1,27 @@
-// FREEPASS ERP — Service Worker (stale-while-revalidate)
-const CACHE_NAME = 'freepass-v16';
+// FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
+const CACHE_NAME = 'freepass-v17';
 
-self.addEventListener('install', () => self.skipWaiting());
+const PRECACHE_URLS = [
+  '/static/css/reset.css',
+  '/static/css/base.css',
+  '/static/css/ui_tokens.css',
+  '/static/css/ui_toast.css',
+  '/static/css/mobile-app.css',
+  '/static/css/shared/mobile.css',
+  '/static/css/shared/detail-common.css',
+  '/static/css/shared/fullscreen-photo-viewer.css',
+  '/static/css/form.css',
+  '/static/css/button.css',
+  '/static/css/list.css',
+  '/static/css/catalog.css',
+  '/static/icons/icon-192.png',
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_URLS)).then(() => self.skipWaiting())
+  );
+});
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(

@@ -3,27 +3,7 @@
    base-mobile.html에서만 로드. 데스크탑 CSS와 완전 분리.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── 필요한 데스크탑 공통 토큰/유틸만 가져오기 ── */
-@import url('/static/css/ui_tokens.css');
-@import url('/static/css/ui_toast.css');
-
-/* ── 모바일 전용 CSS ── */
-@import url('/static/css/shared/fullscreen-photo-viewer.css');
-@import url('/static/css/shared/detail-common.css');
-@import url('/static/css/shared/mobile.css');
-@import url('/static/css/shared/mobile-chat.css');
-@import url('/static/css/shared/mobile-contract.css');
-@import url('/static/css/shared/mobile-product.css');
-
-/* ── 공통 스타일 (폼/버튼/필터 사이드바 등) ── */
-@import url('/static/css/form.css');
-@import url('/static/css/button.css');
-@import url('/static/css/ui_upload.css');
-@import url('/static/css/catalog.css');
-@import url('/static/css/list.css');
-@import url('/static/css/panel.css');
-@import url('/static/css/detail.css');
-@import url('/static/css/chat.css');
+/* 모든 CSS는 base-mobile.html에서 <link>로 병렬 로딩 */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    성능 최적화 오버라이드
