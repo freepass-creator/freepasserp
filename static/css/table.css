@@ -22,9 +22,10 @@
 .detail-table th,
 .detail-table td {
   padding: var(--table-cell-py) var(--table-cell-px);
-  border: 1px solid var(--border-soft);
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
   font-size: var(--font-size-main);
-  line-height: 1.4;
+  line-height: 1.5;
   text-align: right;
   word-break: break-word;
   white-space: nowrap;
@@ -42,9 +43,16 @@
 .price-table th,
 .insurance-table th,
 .detail-table th {
-  font-weight: var(--font-weight-strong);
+  font-weight: 600;
   background: var(--table-head-bg);
   color: var(--table-head-color);
+  border-bottom: 1.5px solid #d1d5db;
+}
+
+.price-table tr:hover td,
+.insurance-table tr:hover td,
+.detail-table tr:hover td {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .insurance-table td:last-child,

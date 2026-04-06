@@ -69,7 +69,8 @@ const _sharedWatchers = new Map();
 // ─── 페이지별 콜백 일시정지 (숨겨진 페이지의 불필요한 DOM 업데이트 방지) ────
 // Firebase 리스너는 유지하되, 보이지 않는 페이지의 콜백만 스킵한다.
 // 페이지가 다시 보이면 dirty 플래그가 있을 때만 최신 데이터로 1회 렌더링.
-const _pageWatchers = new Map(); // pageKey → Set<entry>
+// 판단 기준: 콜백 실행 시점에 window.__currentPage와 등록 페이지를 비교.
+const _allEntries = []; // { pageKey, dirty, flush }
 
 function _applyTransform(raw, filter, sort) {
   let items = raw.slice(); // 공유 배열 변경 방지
@@ -83,18 +84,7 @@ export { limitToLast, query, orderByChild };
 /**
  * 특정 경로를 watch하고, snapshot을 변환·필터·정렬한 뒤 callback에 전달한다.
  * 동일 경로에 대한 Firebase onValue는 최초 1회만 생성하며 이후 구독자는 공유한다.
- * 페이지 전환 시 숨겨진 페이지의 콜백은 자동으로 일시정지된다.
- *
- * @param {string} path           Firebase 경로
- * @param {Function} callback     결과 배열을 받는 함수
- * @param {object} options
- * @param {'values'|'entries'} options.mode  배열 변환 방식 (기본: 'values')
- * @param {string} options.entryKey          entries 모드일 때 key 이름 (기본: 'uid')
- * @param {Function} [options.filter]        필터 함수
- * @param {Function} [options.sort]          정렬 함수
- * @param {Function} [options.queryFn]       Firebase ref → query 변환 함수 (limitToLast 등)
- * @param {string}   [options.queryKey]      queryFn 식별용 캐시 키 접미사
- * @returns unsubscribe 함수
+ * 페이지 전환 시 숨겨진 페이지의 콜백은 자동으로 스킵된다.
  */
 
 export function watchCollection(path, callback, {
@@ -124,10 +114,14 @@ export function watchCollection(path, callback, {
 
   const shared = _sharedWatchers.get(cacheKey);
   const pageKey = window.__currentPage || '';
-  const entry = { paused: false, dirty: false };
+  const entry = { pageKey, dirty: false, flush: null };
 
   const notify = () => {
-    if (entry.paused) { entry.dirty = true; return; }
+    // 현재 활성 페이지가 아니면 스킵, dirty 표시만
+    if (entry.pageKey && entry.pageKey !== window.__currentPage) {
+      entry.dirty = true;
+      return;
+    }
     callback(_applyTransform(shared.latestRaw, filter, sort));
   };
   entry.flush = () => {
@@ -135,19 +129,15 @@ export function watchCollection(path, callback, {
   };
 
   shared.listeners.add(notify);
-
-  // 페이지별 추적 등록
-  if (pageKey) {
-    if (!_pageWatchers.has(pageKey)) _pageWatchers.set(pageKey, new Set());
-    _pageWatchers.get(pageKey).add(entry);
-  }
+  _allEntries.push(entry);
 
   // 이미 데이터가 있으면 즉시 호출 (재방문 시 캐시 활용)
   if (shared.latestRaw !== null) { try { notify(); } catch (e) { console.warn('[watchCollection] immediate notify error', e); } }
 
   return () => {
     shared.listeners.delete(notify);
-    if (pageKey) _pageWatchers.get(pageKey)?.delete(entry);
+    const idx = _allEntries.indexOf(entry);
+    if (idx !== -1) _allEntries.splice(idx, 1);
     if (shared.listeners.size === 0) {
       shared.unsubFirebase();
       _sharedWatchers.delete(cacheKey);
@@ -156,29 +146,20 @@ export function watchCollection(path, callback, {
 }
 
 /**
- * 특정 페이지의 모든 watchCollection 콜백을 일시정지한다.
- * Firebase 리스너는 유지되며, 데이터 변경 시 dirty 플래그만 설정된다.
- */
-export function pausePageWatchers(pageKey) {
-  const entries = _pageWatchers.get(pageKey);
-  if (entries) entries.forEach(e => { e.paused = true; });
-}
-
-/**
- * 특정 페이지의 일시정지된 콜백을 재개한다.
- * dirty 플래그가 있는 콜백만 최신 데이터로 1회 실행된다.
+ * 페이지 전환 시 호출 — 돌아온 페이지의 dirty 콜백만 flush.
+ * pause/resume 대신 notify() 내부에서 실시간 판단하므로 pausePageWatchers는 불필요.
  */
 export function resumePageWatchers(pageKey) {
-  const entries = _pageWatchers.get(pageKey);
-  if (!entries) return;
-  entries.forEach(e => {
-    e.paused = false;
-    if (e.dirty) {
+  _allEntries.forEach(e => {
+    if (e.pageKey === pageKey && e.dirty) {
       e.dirty = false;
       try { e.flush(); } catch (err) { console.warn('[watchCollection] resume flush error', err); }
     }
   });
 }
+
+// 하위 호환 — 호출해도 무해 (실제 pause는 notify 내부에서 자동 판단)
+export function pausePageWatchers(_pageKey) {}
 
 // ─── 단일 레코드 조회 ────────────────────────────────────────────────────────
 

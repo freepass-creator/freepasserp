@@ -23,6 +23,8 @@ export function setTopBarWorkState(mode) {
   }
 }
 
+import { logoutCurrentUser } from '../firebase/firebase-auth.js';
+
 requireAuth().then(({ user, profile }) => {
   const org  = getEl('topBarOrg');
   const name = getEl('topBarName');
@@ -31,4 +33,16 @@ requireAuth().then(({ user, profile }) => {
   if (org)  org.textContent  = profile?.company_name || '-';
   if (name) name.textContent = profile?.name || user?.displayName || '-';
   if (rank) rank.textContent = ROLE_LABEL[profile?.role] || profile?.role || '-';
+
+  const logoutBtn = getEl('topBarLogoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await logoutCurrentUser();
+        window.location.href = '/login';
+      } catch (e) {
+        console.warn('logout failed', e);
+      }
+    });
+  }
 }).catch(() => {});

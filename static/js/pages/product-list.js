@@ -247,7 +247,7 @@ const INFO_COLS = [
 
 // 기간별 대여료 컬럼 — 9,999,999 기준 고정폭
 const PRICE_COLS = PRICE_MONTHS.map(m => ({
-  key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, wCh: '9,999,999', num: true, priceMonth: m,
+  key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, wCh: '9,999,999', num: true, priceMonth: m, sortable: true, filterable: true,
 }));
 
 const GRID_COLS = [...INFO_COLS, ...PRICE_COLS];

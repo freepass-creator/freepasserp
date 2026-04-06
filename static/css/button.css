@@ -65,11 +65,11 @@ button[data-filter-reset] {
   min-height: var(--btn-height);
   height: var(--btn-height);
   padding: 0 var(--btn-padding-x);
-  border: var(--btn-border-width) solid var(--btn-border);
+  border: var(--btn-border-width) solid transparent;
   background: var(--btn-bg);
   color: var(--btn-text);
   font-size: var(--btn-font-size);
-  font-weight: var(--font-weight-base);
+  font-weight: 500;
   line-height: 1;
   border-radius: var(--radius-ui);
   box-shadow: none;
@@ -82,15 +82,14 @@ button[data-filter-reset] {
   letter-spacing: -0.01em;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color var(--transition-normal), border-color var(--transition-normal), color var(--transition-normal);
+  transition: background-color var(--transition-normal), border-color var(--transition-normal), color var(--transition-normal), transform 0.1s ease;
 }
 
 .inline-button:hover,
 .btn-filter:hover,
 .btn-primary:hover,
 button[data-filter-reset]:hover {
-  background: var(--interactive-hover-bg);
-  border-color: var(--interactive-hover-border);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .inline-button:active,
@@ -98,7 +97,7 @@ button[data-filter-reset]:hover {
 .btn-primary:active,
 button[data-filter-reset]:active {
   background: var(--interactive-active-bg);
-  border-color: var(--interactive-active-border);
+  transform: scale(0.97);
 }
 
 .inline-button:disabled,
@@ -122,43 +121,36 @@ button[data-filter-reset]:disabled {
 .btn-tone-edit {
   color: var(--btn-edit-text);
   background: var(--btn-edit-bg);
-  border-color: var(--btn-edit-border);
 }
 
 .btn-tone-save {
   color: var(--btn-save-text);
   background: var(--btn-save-bg);
-  border-color: var(--btn-save-border);
 }
 
 .btn-danger {
   color: var(--btn-danger-text);
   background: var(--btn-danger-bg);
-  border-color: var(--btn-danger-border);
 }
 
 .btn-tone-hide {
   color: var(--btn-hide-text);
   background: var(--btn-hide-bg);
-  border-color: var(--btn-hide-border);
 }
 
 .btn-tone-share {
   color: var(--btn-share-text);
   background: var(--btn-share-bg);
-  border-color: var(--btn-share-border);
 }
 
 .btn-tone-inquiry {
   color: var(--btn-inquiry-text);
   background: var(--btn-inquiry-bg);
-  border-color: var(--btn-inquiry-border);
 }
 
 .btn-tone-contract {
   color: var(--btn-contract-text);
   background: var(--btn-contract-bg);
-  border-color: var(--btn-contract-border);
 }
 
 /* ── 색조 버튼 disabled ── */

@@ -14,7 +14,7 @@
   border: none;
   border-radius: var(--radius-ui);
   background: var(--panel-bg);
-  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12), 0 4px 8px 3px rgba(60, 64, 67, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
   display: grid;
   grid-template-rows: var(--panel-head-height) minmax(0, 1fr);
   min-height: 0;
@@ -26,7 +26,7 @@
   min-height: var(--panel-head-height);
   height: var(--panel-head-height);
   padding: 0 var(--panel-head-px);
-  border-bottom: 1px solid var(--panel-border);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   background: var(--panel-head-bg);
   display: flex;
   align-items: center;
@@ -60,7 +60,7 @@
 .panel-head-title {
   min-width: 0;
   font-size: var(--panel-title-size);
-  font-weight: var(--panel-title-weight);
+  font-weight: 600;
   color: var(--text-main);
   line-height: 1.2;
 }

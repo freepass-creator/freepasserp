@@ -10,13 +10,14 @@
   display: flex; flex-direction: column; overflow: hidden;
   border: none; border-radius: var(--radius-ui, 2px) 0 0 var(--radius-ui, 2px);
   background: #fff;
-  box-shadow: -8px 0 24px rgba(60, 64, 67, 0.12), -2px 0 8px rgba(60, 64, 67, 0.06);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
   transform: translateX(100%);
 }
 .pls-detail-panel .panel-head {
-  background: var(--new-bg-panel-head, #f0f4f9);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  min-height: var(--height-lg);
+  background: var(--new-bg-panel-head);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  min-height: var(--panel-head-height);
+  height: var(--panel-head-height);
 }
 .pls-detail-panel.is-open { transform: translateX(0); }
 .pls-detail-panel[hidden] { display: none; }

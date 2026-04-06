@@ -20,33 +20,38 @@
 .settings-right-panel-body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--panel-body-pad, 16px);
+  gap: var(--form-section-gap);
+  padding: var(--panel-body-pad);
 }
 .settings-left-panel-body .form-section {
-  gap: var(--space-2);
+  gap: var(--form-section-inner-gap);
 }
 
 .settings-section-block {
   display: flex;
   flex-direction: column;
-  gap: var(--form-section-inner-gap, 8px);
+  gap: var(--form-section-inner-gap);
+}
+
+.settings-section-block + .settings-section-block {
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  padding-top: var(--form-section-gap);
 }
 
 .settings-subsection-title {
-  font-size: var(--font-size-title);
-  font-weight: var(--font-weight-heavy);
-  color: var(--text-main);
+  font-size: var(--font-size-main);
+  font-weight: 500;
+  color: var(--text-subtle);
 }
 
 .settings-subsection-title.is-small {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-main);
 }
 
 .settings-helper {
-  font-size: var(--font-size-sub, 10px);
+  font-size: var(--font-size-sub);
   line-height: 1.5;
-  color: var(--text-subtle);
+  color: var(--text-muted);
 }
 
 /* 섹션 타이틀 + 설명 한 줄 */
@@ -57,7 +62,7 @@
 }
 .section-title-row .section-title { margin: 0; }
 .section-desc {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sub);
   color: var(--text-muted, #94a3b8);
 }
 
@@ -142,9 +147,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-3);
-  border: 1px solid var(--border-soft);
-  background: var(--surface-base);
+  padding: var(--space-4);
+  border: none;
+  border-radius: var(--radius-ui);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .settings-action-row,
@@ -213,16 +219,19 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--border-soft);
+  padding: var(--space-3) var(--space-3);
+  margin: 0 calc(-1 * var(--space-3));
+  border-bottom: none;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: var(--font-size-main);
   color: var(--text-main);
+  transition: background 0.1s ease;
 }
 
 .settings-account-action-row:hover {
   color: var(--text-main);
-  background: var(--interactive-hover-bg);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .settings-account-action-row svg {
@@ -249,9 +258,9 @@
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-3);
-  border: 1px solid var(--border-soft);
+  border: none;
   border-radius: var(--radius-ui);
-  background: var(--surface-subtle, #f8fafc);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .settings-account-action-expand[hidden] {
@@ -292,12 +301,12 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  min-height: 32px;
-  padding: 2px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  min-height: 36px;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 .settings-badge-row:last-child { border-bottom: none; }
-.settings-badge-label { font-size: var(--font-size-base); color: var(--text-main); }
+.settings-badge-label { font-size: var(--font-size-main); color: var(--text-main); }
 
 .settings-download-list { display: flex; flex-direction: column; }
 .settings-download-row {
@@ -305,27 +314,29 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
-  min-height: 32px;
-  padding: 2px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  min-height: 36px;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 .settings-download-row:last-child { border-bottom: none; }
-.settings-download-label { font-size: var(--font-size-base); color: var(--text-main); }
+.settings-download-label { font-size: var(--font-size-main); color: var(--text-main); }
 .settings-download-btn {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   height: var(--height-xs);
   padding: 0 var(--space-2);
-  border: 1px solid var(--border-soft, #e1e5ea);
-  border-radius: var(--radius-ui, 6px);
-  background: var(--surface-base, #fff);
+  border: none;
+  border-radius: var(--radius-ui, 8px);
+  background: rgba(0, 0, 0, 0.05);
   font-size: var(--font-size-xs);
+  font-weight: 500;
   color: var(--text-main);
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.1s ease;
 }
-.settings-download-btn:hover { background: #fafaf9; }
+.settings-download-btn:hover { background: rgba(0, 0, 0, 0.08); }
 .settings-download-btn svg { flex-shrink: 0; }
 
 /* 카탈로그 링크 */
@@ -338,9 +349,9 @@
   flex: 1;
   height: var(--space-8);
   padding: 0 var(--space-3);
-  border: 1px solid var(--border-soft, #e1e5ea);
-  border-radius: var(--radius-ui, 6px);
-  background: var(--surface-subtle, #f8fafc);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-ui, 8px);
+  background: #f2f3f7;
   font-size: var(--font-size-base);
   color: var(--text-main);
   outline: none;
@@ -352,25 +363,32 @@
   gap: var(--space-1);
   height: 32px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--border-soft, #e1e5ea);
-  border-radius: var(--radius-ui, 6px);
-  background: var(--surface-base, #fff);
+  border: none;
+  border-radius: var(--radius-ui, 8px);
+  background: rgba(0, 0, 0, 0.05);
   font-size: var(--font-size-sm);
+  font-weight: 500;
   color: var(--text-main);
   cursor: pointer;
   white-space: nowrap;
   transition: background var(--transition-fast);
 }
-.settings-catalog-copy-btn:hover { background: #fafaf9; }
+.settings-catalog-copy-btn:hover { background: rgba(0, 0, 0, 0.08); }
 .settings-catalog-copy-btn svg { flex-shrink: 0; }
 
 .settings-catalog-provider-select {
   flex: 1;
   height: 32px;
   padding: 0 var(--space-2);
-  border: 1px solid var(--border-soft, #e1e5ea);
-  border-radius: var(--radius-ui, 6px);
-  background: var(--surface-base, #fff);
+  padding-right: 28px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-ui, 8px);
+  background: #f2f3f7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2380868b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  appearance: none;
+  -webkit-appearance: none;
   font-size: var(--font-size-base);
   color: var(--text-main);
   min-width: 0;

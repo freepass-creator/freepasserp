@@ -6,8 +6,8 @@
   --form-label-color: var(--text-subtle);
   --form-label-min-h: var(--space-4);
   --form-field-gap: var(--space-2);
-  --form-control-height: 42px;
-  --form-control-px: 14px;
+  --form-control-height: 44px;
+  --form-control-px: 16px;
   --form-control-textarea-min-h: 96px;
   --form-control-select-pr: 32px;
   --form-control-border: transparent;
@@ -268,8 +268,9 @@ textarea:focus {
   min-height: var(--height-md);
   margin-bottom: var(--space-3);
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border-soft);
-  background: var(--surface-muted);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--text-main);
   font-size: var(--font-size-main);
   line-height: 1.4;
@@ -366,7 +367,7 @@ textarea:focus {
   justify-content: space-between;
   gap: var(--space-3);
   padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--border-soft);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .top-gap {
@@ -404,10 +405,12 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--form-control-border);
-  background: var(--surface-subtle);
+  border: none;
+  border-radius: var(--form-control-radius);
+  background: rgba(0, 0, 0, 0.04);
   font-size: var(--font-size-main);
-  color: var(--text-main);
+  font-weight: 500;
+  color: var(--text-subtle);
 }
 
 .rent-plan-row input {
@@ -415,7 +418,8 @@ textarea:focus {
   min-height: var(--form-control-height);
   height: var(--form-control-height);
   padding: 0 var(--form-control-px);
-  border: 1px solid var(--form-control-border);
+  border: 1.5px solid transparent;
+  border-radius: var(--form-control-radius);
   background: var(--form-control-bg);
   font-size: var(--font-size-main);
 }
@@ -430,7 +434,7 @@ textarea:focus {
 }
 
 .form-section + .form-section {
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
   padding-top: var(--form-section-gap);
   margin-top: var(--form-section-gap);
 }
@@ -471,8 +475,8 @@ textarea:focus {
 .ui-mode-edit .field input:not([readonly]),
 .ui-mode-edit .field textarea:not([readonly]),
 .ui-mode-edit .field select:not(:disabled) {
-  background-color: #fffdf5;
-  border-color: #e8d96a;
+  background-color: #fffef7;
+  border-color: rgba(202, 180, 60, 0.35);
 }
 
 .ui-mode-edit .field input:not([readonly]):focus,
@@ -577,15 +581,15 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--form-control-border);
+  border: none;
   border-radius: var(--form-control-radius);
-  background: var(--surface-subtle);
+  background: rgba(0, 0, 0, 0.04);
   font-size: var(--font-size-main);
-  color: var(--text-main);
+  color: var(--text-subtle);
 }
 
 .price-manage-head {
-  font-weight: var(--font-weight-strong);
+  font-weight: 600;
 }
 
 .price-manage-grid input {
@@ -593,7 +597,7 @@ select {
   min-height: var(--form-control-height);
   height: var(--form-control-height);
   padding: 0 var(--form-control-px);
-  border: 1px solid var(--form-control-border);
+  border: 1.5px solid transparent;
   border-radius: var(--form-control-radius);
   background: var(--form-control-bg);
   font-size: var(--font-size-main);
@@ -613,9 +617,9 @@ select {
   gap: var(--space-2);
   min-height: var(--form-control-height);
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--form-control-border);
+  border: none;
   border-radius: var(--form-control-radius);
-  background: var(--surface-base);
+  background: rgba(0, 0, 0, 0.03);
   font-size: var(--font-size-main);
 }
 
@@ -623,9 +627,9 @@ select {
   width: var(--height-lg);
   height: var(--height-lg);
   overflow: hidden;
-  border: 1px solid var(--form-control-border);
-  border-radius: var(--form-control-radius);
-  background: var(--surface-subtle);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -650,11 +654,15 @@ select {
   gap: var(--space-2);
   min-height: var(--form-control-height);
   padding: 0 var(--space-3);
-  border: 1px solid var(--form-control-border);
+  border: none;
   border-radius: var(--form-control-radius);
-  background: var(--surface-base);
+  background: rgba(0, 0, 0, 0.03);
   font-size: var(--font-size-main);
   color: var(--text-main);
+  transition: background 0.1s ease;
+}
+.check-item:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .check-item input {
@@ -679,9 +687,9 @@ select {
 
 .product-manage-filter-empty {
   padding: var(--space-3);
-  border: 1px solid var(--form-control-border);
+  border: none;
   border-radius: var(--form-control-radius);
-  background: var(--surface-subtle);
+  background: rgba(0, 0, 0, 0.03);
   font-size: var(--font-size-sub);
   color: var(--text-subtle);
 }
@@ -727,7 +735,7 @@ select {
   flex-direction: column;
   flex: 1 1 0;
   min-height: 0;
-  background: var(--surface-subtle);
+  background: var(--new-bg-panel, #fff);
   overflow: auto;
 }
 

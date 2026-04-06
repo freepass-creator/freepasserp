@@ -13,7 +13,7 @@
   border: none;
   border-radius: var(--radius-ui, 8px);
   background: var(--new-bg-panel, #fff);
-  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12), 0 4px 8px 3px rgba(60, 64, 67, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .pls-grid-scroll {
@@ -36,25 +36,25 @@
   z-index: 10;
 }
 
-.pls-table thead tr { background: var(--new-bg-panel-head, #f0f4f9); }
+.pls-table thead tr { background: var(--new-bg-panel-head, #fff); }
 
 /* ─── 헤더 셀 (th) ───────────────────────────────────────────────────────── */
 
 .pls-th {
   position: relative;
   padding: 0 var(--space-2);
-  height: var(--height-lg);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-strong);
-  color: #041e49;
+  height: var(--panel-head-height);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-subtle, #64748b);
   white-space: nowrap;
   user-select: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   border-right: none;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  text-transform: none;
+  letter-spacing: 0;
   text-align: center;
-  background: var(--new-bg-panel-head, #f0f4f9);
+  background: var(--new-bg-panel-head, #fff);
 }
 
 .pls-th:last-child { border-right: none; }
@@ -69,7 +69,7 @@
   position: sticky;
   left: 0;
   z-index: 11;
-  background: var(--new-bg-panel-head, #f0f4f9);
+  background: var(--new-bg-panel-head, #fff);
   border-right: none;
 }
 
@@ -85,14 +85,14 @@
 
 .pls-row:nth-child(even) td { background: #ffffff; }
 .pls-row:nth-child(odd) td { background: #ffffff; }
-.pls-row:hover td { background: #fafaf9; }
-.pls-row.is-active td { background: #f5f5f4; }
+.pls-row:hover td { background: #f8f9fa; }
+.pls-row.is-active td { background: #f0f4f9; }
 
 /* ─── 데이터 셀 (td) ─────────────────────────────────────────────────────── */
 
 .pls-cell {
   padding: 0 var(--space-2);
-  height: var(--height-md);
+  height: var(--height-lg);
   vertical-align: middle;
   font-size: var(--font-size-base);
   color: var(--text-main, #1f1f1f);
@@ -294,9 +294,9 @@
 
 .pls-fdd__match-count {
   flex-shrink: 0;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-heavy);
-  color: #475569;
+  font-size: 9px;
+  font-weight: 400;
+  color: #94a3b8;
   font-variant-numeric: tabular-nums;
 }
 

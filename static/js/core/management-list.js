@@ -518,7 +518,18 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
       if (!countEl) return;
       const q = (query || '').trim().toLowerCase();
       if (!q) { countEl.textContent = ''; return; }
-      const matchCount = items.filter(item => {
+      // faceted: 다른 컬럼 필터 반영
+      let base = items;
+      for (const [otherKey, otherSet] of Object.entries(gf.active || {})) {
+        if (otherKey === colKey || !otherSet.size) continue;
+        const otherCol = columns.find(c => c.key === otherKey);
+        if (!otherCol) continue;
+        base = base.filter(item => {
+          const text = typeof getCellText === 'function' ? getCellText(otherCol, item) : '';
+          return otherSet.has(text);
+        });
+      }
+      const matchCount = base.filter(item => {
         const text = typeof getCellText === 'function' ? getCellText(col, item) : '';
         return text.toLowerCase().includes(q);
       }).length;
@@ -534,19 +545,41 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
         const q = (searchInput.value || '').trim();
         gf.search[colKey] = q;
         updateMatchCount(q);
-        renderTableGrid({ ...fullOptions, items, _bodyOnly: true });
+        const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
+        renderTableGrid({ ...latest, _bodyOnly: true });
       }, 150);
     });
     dd.addEventListener('click', (e) => {
-      if (e.target.closest('[data-fdd-apply]')) { _closeGridFilter(thead); renderTableGrid({ ...fullOptions, items }); return; }
-      if (e.target.closest('[data-fdd-reset]')) { delete gf.search[colKey]; _closeGridFilter(thead); renderTableGrid({ ...fullOptions, items }); }
+      const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
+      if (e.target.closest('[data-fdd-apply]')) { _closeGridFilter(thead); renderTableGrid(latest); return; }
+      if (e.target.closest('[data-fdd-reset]')) { delete gf.search[colKey]; _closeGridFilter(thead); renderTableGrid(latest); }
     });
     return;
   }
 
-  // ── 체크박스형 필터 ──
+  // ── 체크박스형 필터 (faceted: 다른 컬럼 필터 반영) ──
+  let facetedItems = items;
+  for (const [otherKey, otherSet] of Object.entries(gf.active)) {
+    if (otherKey === colKey || !otherSet.size) continue;
+    const otherCol = columns.find(c => c.key === otherKey);
+    if (!otherCol) continue;
+    facetedItems = facetedItems.filter(item => {
+      const text = typeof getCellText === 'function' ? getCellText(otherCol, item) : '';
+      return otherSet.has(text);
+    });
+  }
+  for (const [otherKey, query] of Object.entries(gf.search || {})) {
+    if (otherKey === colKey || !query) continue;
+    const otherCol = columns.find(c => c.key === otherKey);
+    if (!otherCol) continue;
+    const q = query.toLowerCase();
+    facetedItems = facetedItems.filter(item => {
+      const text = typeof getCellText === 'function' ? getCellText(otherCol, item) : '';
+      return text.toLowerCase().includes(q);
+    });
+  }
   const counts = new Map();
-  items.forEach(item => {
+  facetedItems.forEach(item => {
     const text = typeof getCellText === 'function' ? getCellText(col, item) : '';
     if (text && text !== '-') counts.set(text, (counts.get(text) || 0) + 1);
   });
@@ -570,20 +603,23 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
     if (!input) return;
     if (input.checked) selected.add(input.value); else selected.delete(input.value);
     input.closest('label')?.classList.toggle('is-checked', input.checked);
-    renderTableGrid({ ...fullOptions, items, _bodyOnly: true });
+    const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
+    renderTableGrid({ ...latest, _bodyOnly: true });
   });
 
   // 적용/초기화
   dd.addEventListener('click', (e) => {
     if (e.target.closest('[data-fdd-apply]')) {
       _closeGridFilter(thead);
-      renderTableGrid({ ...fullOptions, items });
+      const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
+      renderTableGrid(latest);
       return;
     }
     if (e.target.closest('[data-fdd-reset]')) {
       selected.clear();
       _closeGridFilter(thead);
-      renderTableGrid({ ...fullOptions, items });
+      const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
+      renderTableGrid(latest);
     }
   });
 }

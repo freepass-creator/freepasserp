@@ -513,7 +513,7 @@ async function bootstrap() {
         await roomSelectionController.moveToNextRoomAfterRemoval(visibleRoomsCache);
         showToast('대화를 숨겼습니다.', 'success');
       } catch (error) {
-        showToast(`숨김 실패: ${error.message}`, 'error');
+        showToast(`숨김 실패: ${error.message || '알 수 없는 오류'}`, 'error');
       }
     });
 
@@ -530,7 +530,7 @@ async function bootstrap() {
         currentRoomId = null;
         openedRoomId = null;
       } catch (error) {
-        showToast(`삭제 실패: ${error.message}`, 'error');
+        showToast(`삭제 실패: ${error.message || '알 수 없는 오류'}`, 'error');
       }
     });
 
@@ -558,7 +558,7 @@ async function bootstrap() {
     });
   } catch (error) {
     console.error('[chat] bootstrap error:', error);
-    showToast(`대화 초기화 오류: ${error.message}`, 'error');
+    showToast(`대화 초기화 오류: ${error.message || '알 수 없는 오류'}`, 'error');
   }
 }
 

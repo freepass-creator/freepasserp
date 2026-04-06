@@ -43,9 +43,9 @@
   width: 100%;
   max-width: 400px;
   background: #ffffff;
-  border: 1px solid #dadce0;
-  border-radius: var(--radius-md);
-  padding: 36px var(--space-8);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 40px var(--space-8);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04), 0 10px 30px rgba(0, 0, 0, 0.06);
   display: grid;
   gap: var(--space-6);

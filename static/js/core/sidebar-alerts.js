@@ -60,7 +60,7 @@ function countUnreadRooms(rooms) {
     if (room.hidden_by && (Array.isArray(room.hidden_by) ? room.hidden_by.includes(uid) : room.hidden_by[uid])) return false;
     // 역할별 방 필터
     if (profile.role === 'agent' && room.agent_uid && room.agent_uid !== uid) return false;
-    if (profile.role === 'provider' && room.provider_code && room.provider_code !== companyCode) return false;
+    if (profile.role === 'provider' && room.provider_company_code && room.provider_company_code !== companyCode) return false;
     // 메시지 없으면 제외
     if (!Number(room.last_message_at || 0)) return false;
     // 내가 확인/처리해야 할 건 카운트

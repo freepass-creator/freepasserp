@@ -9,7 +9,7 @@
 .home-section {
   border-radius: var(--radius-ui, 8px);
   background: var(--surface-base, #fff);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
 
@@ -23,7 +23,7 @@
   user-select: none;
   transition: background 0.1s;
 }
-.home-section-head:hover { background: #fafaf9; }
+.home-section-head:hover { background: rgba(0, 0, 0, 0.02); }
 
 .home-section-head__left {
   display: flex;
@@ -102,9 +102,10 @@
 /* ─── 리포트 테이블 ──────────────────────────────────────────────────────── */
 
 .rpt-group {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: var(--radius-ui, 6px);
+  border: none;
+  border-radius: var(--radius-ui, 8px);
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .rpt-group__title {
@@ -113,10 +114,11 @@
   justify-content: space-between;
   gap: var(--space-2);
   font-size: var(--font-size-xs);
+  font-weight: 600;
   color: var(--text-subtle, #64748b);
-  padding: var(--space-1) var(--space-2);
-  background: rgba(15, 23, 42, 0.03);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .rpt-group__total {
@@ -170,7 +172,7 @@
 .home-notice-message:empty { display: none; }
 .home-panel--notice .panel-body { padding: 0 !important; }
 .home-notice-list { display: flex; flex-direction: column; }
-.home-notice-item { border-bottom: 1px solid var(--border-soft); cursor: pointer; }
+.home-notice-item { border-bottom: 1px solid rgba(0, 0, 0, 0.05); cursor: pointer; }
 .home-notice-trigger { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-3); border: none; background: transparent; text-align: left; cursor: pointer; }
 .home-notice-trigger:hover { background: rgba(15, 23, 42, 0.02); }
 .home-notice-title { min-width: 0; font-size: var(--font-size-base); color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

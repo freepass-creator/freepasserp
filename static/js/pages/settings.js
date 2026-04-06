@@ -188,19 +188,21 @@ function bindAppSettings(profile) {
 
   (async () => {
     try {
+      const partners = await fetchPartnersOnce();
+      const providers = partners.filter(p => p.partner_type === 'provider');
       if (profile.role === 'provider') {
-        // 공급사: 자기 공급사코드 고정
+        // 공급사: 자기 공급사코드 고정 + 회사명 표시
         const myCode = profile.company_code || '';
+        const myPartner = providers.find(p => p.partner_code === myCode);
+        const myName = myPartner?.partner_name || profile.company_name || '';
         if (providerSelect && myCode) {
-          providerSelect.innerHTML = `<option value="${myCode}">${myCode}</option>`;
+          providerSelect.innerHTML = `<option value="${myCode}">${myCode} / ${myName}</option>`;
           providerSelect.value = myCode;
           providerSelect.disabled = true;
           updateProviderUrl();
         }
       } else {
         // 관리자/영업자: 전체 공급사 선택 가능
-        const partners = await fetchPartnersOnce();
-        const providers = partners.filter(p => p.partner_type === 'provider');
         if (providerSelect) {
           providerSelect.innerHTML = '<option value="">공급사 선택</option>' +
             providers.map(p => `<option value="${p.partner_code || ''}">${p.partner_code || ''} / ${p.partner_name || ''}</option>`).join('');
@@ -272,13 +274,13 @@ function bindAppSettings(profile) {
   // 상품목록 기간
   const savedPeriods = currentProfile.settings?.periods || null;
   if (periodList) {
-    periodList.innerHTML = `<div class="settings-period-checks">${ALL_PERIODS.map(p => {
+    periodList.innerHTML = ALL_PERIODS.map(p => {
       const checked = !savedPeriods || savedPeriods.includes(p);
-      return `<label class="settings-period-check">
-        <input type="checkbox" data-period="${p}" ${checked ? 'checked' : ''}>
-        <span>${p}개월</span>
-      </label>`;
-    }).join('')}</div>`;
+      return `<div class="settings-badge-row">
+        <span class="settings-badge-label">${p === '1' ? '1개월 (월렌트)' : `${p}개월`}</span>
+        <label class="toggle-switch"><input type="checkbox" data-period="${p}" ${checked ? 'checked' : ''}><span class="toggle-switch-track"></span></label>
+      </div>`;
+    }).join('');
     periodList.addEventListener('change', saveAppSettings);
   }
 
@@ -402,7 +404,7 @@ function bindDownloadSection(profile) {
     .map(item => `
       <div class="settings-download-row">
         <span class="settings-download-label">${item.label}</span>
-        <button class="settings-download-btn" data-dl="${item.label}" type="button" title="다운로드">${DOWNLOAD_ICON}</button>
+        <button class="settings-download-btn" data-dl="${item.label}" type="button" title="다운로드">${DOWNLOAD_ICON} 다운로드</button>
       </div>
     `).join('');
 

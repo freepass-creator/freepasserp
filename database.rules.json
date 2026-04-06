@@ -85,9 +85,9 @@
       // 본인이 참여한 대화방만 읽기 (RTDB 한계로 컬렉션 레벨에서는 auth 체크만)
       ".read": "auth != null",
       "$room_id": {
-        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.child('agent_uid').val() === auth.uid || newData.child('provider_uid').val() === auth.uid || data.child('agent_uid').val() === auth.uid || data.child('provider_uid').val() === auth.uid)"
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.child('agent_uid').val() === auth.uid || newData.child('provider_uid').val() === auth.uid || data.child('agent_uid').val() === auth.uid || data.child('provider_uid').val() === auth.uid || root.child('users').child(auth.uid).child('company_code').val() === data.child('provider_company_code').val() || root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val())"
       },
-      ".indexOn": ["product_uid", "agent_uid", "provider_uid", "last_message_at"]
+      ".indexOn": ["product_uid", "agent_uid", "provider_uid", "provider_company_code", "last_message_at"]
     },
 
     "messages": {

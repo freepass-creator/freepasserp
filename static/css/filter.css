@@ -8,10 +8,13 @@
   max-width: 100%;
   height: 100%;
   background: var(--surface-base);
-  box-shadow: -8px 0 18px rgba(17, 24, 39, 0.08);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
+  border-left: none;
 }
 
-.filter-overlay.panel--filter > .panel-head,
+.filter-overlay.panel--filter > .panel-head {
+  background: var(--new-bg-panel-head);
+}
 .filter-overlay.panel--filter > .panel-body {
   background: var(--surface-base);
 }
@@ -28,10 +31,15 @@
 }
 
 .filter-group {
-  border: 1px solid var(--border-soft);
+  border: none;
   border-radius: var(--radius-ui);
   background: var(--surface-base);
   overflow: hidden;
+}
+
+.filter-group + .filter-group {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 0;
 }
 
 .filter-group-head {
@@ -39,21 +47,22 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: var(--height-md);
+  min-height: 40px;
   padding: 0 var(--space-3);
   border: 0;
-  background: var(--surface-subtle);
-  border-bottom: 1px solid transparent;
+  background: transparent;
+  border-bottom: none;
   cursor: pointer;
+  transition: background 0.1s ease;
 }
 
 .filter-group.is-open .filter-group-head {
-  border-bottom-color: var(--border-soft);
+  border-bottom-color: transparent;
 }
 
 .filter-group-title {
   font-size: var(--font-size-main);
-  font-weight: var(--font-weight-strong);
+  font-weight: 600;
   color: var(--text-main);
 }
 
@@ -109,19 +118,20 @@
 
 
 .filter-group-head:hover {
-  background: var(--interactive-hover-bg);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .filter-group.is-open .filter-group-head {
-  background: var(--surface-base);
+  background: transparent;
 }
 
 /* ── 검색 ── */
 .filter-search-wrap {
-  border: 1px solid var(--border-soft);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-ui);
-  background: var(--surface-base);
+  background: #f2f3f7;
   margin-bottom: var(--space-2);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .filter-search-input {
@@ -146,4 +156,5 @@
 
 .filter-search-wrap:focus-within {
   border-color: var(--interactive-active-border);
+  background: #fff;
 }

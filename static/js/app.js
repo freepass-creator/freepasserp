@@ -3,6 +3,10 @@ import { savePageState } from './core/page-state.js';
 import { showToast, showConfirm } from './core/toast.js';
 import { pausePageWatchers, resumePageWatchers } from './firebase/firebase-db-helpers.js';
 
+// 초기 페이지 키를 즉시 설정 — 페이지 JS의 mount()가 app.js보다 먼저 실행되므로
+// watchCollection 콜백이 올바른 pageKey에 등록되려면 여기서 설정해야 한다.
+window.__currentPage = window.location.pathname;
+
 const PAGE_STYLE_SELECTOR = 'link[data-page-style], link[href*="/static/css/pages/"], link[href*="/static/css/shared/"]';
 const DASHBOARD_SELECTOR = '.dashboard-shell';
 const MAIN_SHELL_SELECTOR = '.main-shell';

@@ -32,7 +32,7 @@
 
 .message-list {
   border: 0;
-  background: #f0f2f5;
+  background: #f5f6f8;
   padding: var(--space-4) var(--space-4);
   overflow-y: auto;
   display: flex;
@@ -95,13 +95,13 @@
 
 .message-bubble {
   position: relative;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-lg);
-  font-size: 12.5px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 12px;
   line-height: 1.55;
   word-break: break-word;
   white-space: pre-wrap;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* ── 내 메시지 (오른쪽) 기본 ── */
