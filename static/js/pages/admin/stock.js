@@ -3,7 +3,7 @@ import { showToast, showConfirm } from '../../core/toast.js';
 
 export function createStockController({ getPartnerNameMap }) {
   let allProducts = [];
-  let filterPartner = '', filterStatus = '', filterType = '', filterMaker = '';
+  let filterPartner = '', filterStatus = '', filterType = '', filterMaker = '', searchQuery = '';
   const checked = new Set();
 
   function getFiltered() {
@@ -12,6 +12,10 @@ export function createStockController({ getPartnerNameMap }) {
     if (filterStatus) items = items.filter(p => p.vehicle_status === filterStatus);
     if (filterType) items = items.filter(p => p.product_type === filterType);
     if (filterMaker) items = items.filter(p => p.maker === filterMaker);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      items = items.filter(p => (p.car_number || '').toLowerCase().includes(q) || (p.model_name || '').toLowerCase().includes(q));
+    }
     return items;
   }
 
@@ -80,6 +84,11 @@ export function createStockController({ getPartnerNameMap }) {
     };
     ['adminStockPartner','adminStockStatus','adminStockType','adminStockMaker'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', onFilterChange);
+    });
+    let _searchTimer = 0;
+    document.getElementById('adminStockSearch')?.addEventListener('input', (e) => {
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(() => { searchQuery = e.target.value.trim(); checked.clear(); renderList(); }, 200);
     });
 
     container?.addEventListener('change', (e) => {

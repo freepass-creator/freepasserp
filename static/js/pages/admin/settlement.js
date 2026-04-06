@@ -25,7 +25,7 @@ function stlStatus(s)      { return s.settlement_status || s.status || '정산�
 
 export function createSettlementController({ getPartnerNameMap, getProductTypeMap }) {
   let allSettlements = [];
-  let filterYear = '', filterMonth = '', filterPartner = '', filterChannel = '', filterAgent = '';
+  let filterYear = '', filterMonth = '', filterPartner = '', filterChannel = '', filterAgent = '', searchQuery = '';
 
   function stlPartnerName(s) { const c = stlPartner(s); return getPartnerNameMap().get(c) || c; }
   function stlPtype(s) { return getProductTypeMap().get(stlCar(s)) || '-'; }
@@ -47,6 +47,10 @@ export function createSettlementController({ getPartnerNameMap, getProductTypeMa
     if (filterPartner) items = items.filter(s => stlPartner(s) === filterPartner);
     if (filterChannel) items = items.filter(s => stlChannel(s) === filterChannel);
     if (filterAgent) items = items.filter(s => stlAgent(s) === filterAgent);
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      items = items.filter(s => stlCar(s).toLowerCase().includes(q) || stlCustomer(s).toLowerCase().includes(q) || (s.settlement_code || '').toLowerCase().includes(q));
+    }
     return items;
   }
 
@@ -180,6 +184,11 @@ export function createSettlementController({ getPartnerNameMap, getProductTypeMa
     };
     ['adminStlYear','adminStlMonth','adminStlPartner','adminStlChannel','adminStlAgent'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', onChange);
+    });
+    let _searchTimer = 0;
+    document.getElementById('adminStlSearch')?.addEventListener('input', (e) => {
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(() => { searchQuery = e.target.value.trim(); renderList(); }, 200);
     });
   }
 
