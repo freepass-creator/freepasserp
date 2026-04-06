@@ -43,7 +43,7 @@ function renderRooms(rooms) {
     const unread = currentProfile?.role === 'agent'
       ? (room.unread_for_agent || 0)
       : (room.unread_for_provider || 0);
-    const badge = unread > 0 ? `<span class="m-list-badge m-list-badge--blue">${unread}</span>` : '';
+    const unreadDot = unread > 0 ? `<span class="m-list-card__unread">${unread}</span>` : '';
     const active = room.room_id === currentRoomId ? ' is-active' : '';
 
     const eff = room.last_effective_sender_role || '';
@@ -54,15 +54,18 @@ function renderRooms(rooms) {
     const avatarSvg = isPending
       ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>'
       : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg>';
+    const providerCode = room.provider_company_code || '';
+    const agentCode = room.agent_code || '';
+    const subParts = [providerCode, agentCode, lastMsg].filter(Boolean);
     return `<div class="m-list-card${active}" data-room-id="${escapeHtml(room.room_id)}">
       <span class="m-list-card__avatar ${avatarCls}">${avatarSvg}</span>
       <div class="m-list-card__body">
         <div class="m-list-card__main">
-          <span class="m-list-card__name">${escapeHtml(carNo || model || '대화')}</span>
-          ${badge}
+          <span class="m-list-card__name">${escapeHtml([carNo, model].filter(Boolean).join(' ') || '대화')}</span>
+          ${unreadDot}
         </div>
         <div class="m-list-card__sub">
-          <span class="m-list-card__info">${escapeHtml(partner ? partner + ' · ' : '')}${escapeHtml(lastMsg)}</span>
+          <span class="m-list-card__info">${escapeHtml(subParts.join(' · '))}</span>
           <span class="m-list-card__date">${escapeHtml(date)}</span>
         </div>
       </div>
