@@ -693,47 +693,20 @@ body.chat-m-open .mobile-tab-bar { display: none !important; }
 
 /* ── 토스 스타일 설정 ── */
 .ms-profile-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 28px 24px;
+  padding: 24px 24px 20px;
   background: #fff;
   margin-bottom: 8px;
 }
-.ms-profile-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: #1b2a4a;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.ms-profile-info {
-  min-width: 0;
-}
 .ms-profile-name {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #191f28;
   line-height: 1.3;
 }
-.ms-profile-meta {
+.ms-profile-sub {
   font-size: 14px;
   color: #8b95a1;
-  margin-top: 2px;
-}
-.ms-profile-email {
-  font-size: 13px;
-  color: #b0b8c1;
-  margin-top: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin-top: 4px;
 }
 
 .ms-card {
