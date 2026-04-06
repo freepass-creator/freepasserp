@@ -193,6 +193,15 @@
   white-space: nowrap;
 }
 
+/* ── 상태 아이콘 (채팅/계약 목록) ── */
+.chat-reply-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.chat-reply-icon--pending { color: #f59e0b; }
+.chat-reply-icon--done { color: #10b981; }
+
 .pls-badge--ok { background: #dcfce7; color: #166534; }
 .pls-badge--warn { background: #fef3c7; color: #92400e; }
 .pls-badge--off { background: #f1f5f9; color: #64748b; }

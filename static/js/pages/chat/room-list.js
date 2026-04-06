@@ -84,7 +84,9 @@ export function renderChatRoomList({ thead, container, rooms, selectedRoomId, pr
         case 'status': return renderBadgeRow([{ field: 'chat_status', value: deriveStatusLabel(room, myUid) }]);
         case 'reply': {
           const reply = deriveReplyStatus(room);
-          return reply ? renderBadgeRow([{ field: 'reply_status', value: reply }]) : '';
+          if (reply === '문의접수') return '<span class="chat-reply-icon chat-reply-icon--pending" title="문의접수"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>';
+          if (reply === '회신완료') return '<span class="chat-reply-icon chat-reply-icon--done" title="회신완료"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg></span>';
+          return '';
         }
         case 'carNo': return escapeHtml(product?.carNo || room.car_number || '-');
         case 'model': return escapeHtml(String(product?.subModel || room.sub_model || '-').replace(/20(\d{2})~/g, '$1~'));

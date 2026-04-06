@@ -414,7 +414,11 @@ function renderList() {
     },
     getCellValue: (col, c) => {
       switch (col.key) {
-        case 'status': return renderBadgeRow([{ field: 'contract_status', value: c.contract_status || '계약대기' }]);
+        case 'status': {
+          const st = c.contract_status || '계약대기';
+          if (st === '계약완료') return '<span class="chat-reply-icon chat-reply-icon--done" title="계약완료"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="m9 12 2 2 4-4"/></svg></span>';
+          return '<span class="chat-reply-icon chat-reply-icon--pending" title="' + escapeHtml(st) + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>';
+        }
         case 'process': return renderBadgeRow([{ field: 'process_status', value: getProcessStatus(c) }]);
         case 'code': return escapeHtml(formatContractCodeDisplay(c.contract_code));
         case 'partner': return escapeHtml(c.partner_code || c.provider_company_code || '');
