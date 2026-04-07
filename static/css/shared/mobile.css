@@ -167,9 +167,11 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
   display: flex;
   align-items: center;
   min-height: var(--mobile-topbar-height);
-  padding: 0;
+  padding: 0 16px;
   background: #fff;
   border-bottom: 1px solid var(--m-divider, #f2f4f6);
+  justify-content: space-between;
+  gap: 12px;
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
