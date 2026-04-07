@@ -386,6 +386,11 @@
   }
   .work-page .panel-head { display: none !important; }
 
+  /* 스켈레톤 모바일에서 숨김 */
+  .catalog-skeleton-wrap,
+  .pls-mobile-skeleton-wrap,
+  [class*="skeleton"] { display: none !important; }
+
   /* 목록 패널 */
   .work-page > .panel:first-child,
   .work-page > .pls-grid-panel:first-child {
