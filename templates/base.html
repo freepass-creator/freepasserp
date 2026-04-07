@@ -6,17 +6,19 @@
   <meta name="theme-color" content="#1b2a4a">
   <meta name="description" content="FREEPASS ERP — 렌터카 장기렌트 B2B 관리 시스템">
   <title>{{ page_title }} — FREEPASS ERP</title>
+  <script>
+    // 모바일 클래스를 head에서 즉시 부여 (CSS 로드 전)
+    if (window.innerWidth <= 768) document.documentElement.classList.add('is-mobile-view');
+  </script>
   <style>
     /* Critical: 모바일 1열 강제 — 외부 CSS 로드 전 깜빡임 방지 */
-    @media (max-width: 768px) {
-      .dashboard-shell, .dashboard-shell--new { display: flex !important; flex-direction: column !important; height: 100dvh; }
-      .sidebar, .sidebar--new, .top-bar { display: none !important; }
-      .work-page, .work-page.layout-66, .work-page.layout-39, .work-page.layout-93, .work-page.layout-633, .work-page.grid-12 {
-        display: flex !important; flex-direction: column !important; width: 100% !important;
-      }
-      .work-page > .panel, .work-page > .panel-slot, .work-page > section {
-        width: 100% !important; min-width: 0 !important; flex: none !important;
-      }
+    html.is-mobile-view .dashboard-shell, html.is-mobile-view .dashboard-shell--new { display: flex !important; flex-direction: column !important; height: 100dvh; grid-template-columns: 1fr !important; }
+    html.is-mobile-view .sidebar, html.is-mobile-view .sidebar--new, html.is-mobile-view .top-bar { display: none !important; }
+    html.is-mobile-view .work-page, html.is-mobile-view .work-page.layout-66, html.is-mobile-view .work-page.layout-39, html.is-mobile-view .work-page.layout-93, html.is-mobile-view .work-page.layout-633, html.is-mobile-view .work-page.grid-12 {
+      display: flex !important; flex-direction: column !important; width: 100% !important;
+    }
+    html.is-mobile-view .work-page > .panel, html.is-mobile-view .work-page > .panel-slot, html.is-mobile-view .work-page > section {
+      width: 100% !important; min-width: 0 !important; flex: none !important;
     }
   </style>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
