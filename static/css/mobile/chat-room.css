@@ -3,11 +3,20 @@
   height: 100svh;
   overflow: hidden;
 }
+.m-body:has(.m-cr) .m-topbar {
+  position: fixed; /* 키보드 올라와도 화면 상단에 고정 */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
 .m-body:has(.m-cr) .m-page {
-  padding-bottom: 0; /* 탭바 패딩 제거 */
+  padding-top: 48px; /* 상단바 fixed → 본문 시작점 보정 */
+  padding-bottom: 0;
+  height: 100svh;
 }
 .m-body:has(.m-cr) .m-tabbar {
-  display: none; /* 채팅방에서는 하단 탭바 숨김 */
+  display: none;
 }
 .m-cr {
   display: flex;

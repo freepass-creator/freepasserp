@@ -195,6 +195,10 @@ function render() {
             <input class="m-st-field__input" value="${escapeHtml(window.APP_VER || '1.0.0')}" readonly>
           </div>
         </div>
+        <button class="m-st-action" id="m-st-install" type="button">
+          앱 설치하기
+          ${ICO.chevron}
+        </button>
       </div>
     </section>
   `;
@@ -266,6 +270,24 @@ function render() {
       console.error(e);
       showToast('로그아웃 실패', 'error');
     }
+  });
+
+  // 앱 설치
+  $st.querySelector('#m-st-install')?.addEventListener('click', async () => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      showToast('이미 설치되어 있습니다', 'info');
+      return;
+    }
+    const p = window.__fpInstallPrompt;
+    if (!p) {
+      showToast('이 브라우저에서는 직접 설치해주세요 (메뉴 → 홈 화면에 추가)', 'info');
+      return;
+    }
+    try {
+      p.prompt();
+      await p.userChoice;
+      window.__fpInstallPrompt = null;
+    } catch (e) { console.error(e); }
   });
 }
 

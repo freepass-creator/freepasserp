@@ -45,6 +45,15 @@
     .m-topbar__left:empty,.m-topbar__center:empty,.m-topbar__right:empty{display:none}
     .m-topbar__title{display:flex;align-items:center;gap:6px;font-size:0.9375rem;font-weight:700;color:#0f172a}
     .m-topbar__title svg{flex-shrink:0}
+    .m-pwa-install{position:fixed;left:8px;right:8px;bottom:calc(56px + env(safe-area-inset-bottom) + 8px);z-index:300;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 24px rgba(15,23,42,.12);padding:14px 16px}
+    .m-pwa-install__inner{display:flex;flex-direction:column;gap:10px}
+    .m-pwa-install__text strong{display:block;font-size:14px;font-weight:700;color:#0f172a}
+    .m-pwa-install__text span{display:block;font-size:12px;color:#64748b;margin-top:2px}
+    .m-pwa-install__check{display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b}
+    .m-pwa-install__actions{display:flex;gap:8px;justify-content:flex-end}
+    .m-pwa-install__btn{border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer}
+    .m-pwa-install__btn--dismiss{background:#f1f5f9;color:#64748b}
+    .m-pwa-install__btn--accept{background:#1b2a4a;color:#fff}
     .m-page{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff;padding-bottom:calc(56px + env(safe-area-inset-bottom));contain:layout style}
     .m-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:stretch;justify-content:space-around;height:calc(56px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid #f2f4f6}
     .m-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;border:none;background:transparent;text-decoration:none;color:#8b95a1;font-size:11px;font-weight:500;padding:6px 0 0;position:relative}
@@ -100,6 +109,23 @@
     {% block body %}{% endblock %}
   </main>
 
+  <!-- PWA 설치 배너 -->
+  <div class="m-pwa-install" id="m-pwa-install" hidden>
+    <div class="m-pwa-install__inner">
+      <div class="m-pwa-install__text">
+        <strong>FREEPASS 앱 설치</strong>
+        <span>홈화면에 추가하면 더 빠르게 사용할 수 있어요</span>
+      </div>
+      <label class="m-pwa-install__check">
+        <input type="checkbox" id="m-pwa-install-7d"> 7일간 묻지 않기
+      </label>
+      <div class="m-pwa-install__actions">
+        <button type="button" class="m-pwa-install__btn m-pwa-install__btn--dismiss" id="m-pwa-install-close">닫기</button>
+        <button type="button" class="m-pwa-install__btn m-pwa-install__btn--accept" id="m-pwa-install-ok">설치</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 하단 탭바 (아이콘은 사이드바와 동일 - role-menu.js ICON_PATHS) -->
   <nav class="m-tabbar" id="m-tabbar">
     <a class="m-tab" href="/m/product-list" data-tab="product">
@@ -122,6 +148,48 @@
     </a>
   </nav>
 
+  <script>
+    // ⚡ PWA 설치 배너 — beforeinstallprompt 이벤트 처리
+    (function(){
+      var deferredPrompt = null;
+      var DISMISS_KEY = 'fp_pwa_install_dismiss_until';
+      // 이미 설치된 PWA에선 표시 안 함
+      if (window.matchMedia('(display-mode: standalone)').matches) return;
+      // 7일 dismiss 체크
+      var dismissUntil = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
+      var dismissed = Date.now() < dismissUntil;
+
+      window.addEventListener('beforeinstallprompt', function(e){
+        e.preventDefault();
+        deferredPrompt = e;
+        window.__fpInstallPrompt = e;
+        if (!dismissed) {
+          var banner = document.getElementById('m-pwa-install');
+          if (banner) banner.hidden = false;
+        }
+      });
+
+      function closeBanner(){
+        var banner = document.getElementById('m-pwa-install');
+        if (banner) banner.hidden = true;
+        var chk = document.getElementById('m-pwa-install-7d');
+        if (chk && chk.checked) {
+          localStorage.setItem(DISMISS_KEY, String(Date.now() + 7*24*60*60*1000));
+        }
+      }
+      document.addEventListener('click', function(e){
+        if (e.target.closest('#m-pwa-install-close')) { closeBanner(); }
+        else if (e.target.closest('#m-pwa-install-ok')) {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.finally(function(){ deferredPrompt = null; window.__fpInstallPrompt = null; closeBanner(); });
+          } else {
+            closeBanner();
+          }
+        }
+      });
+    })();
+  </script>
   <script>
     // ⚡ Service Worker 등록 + 새 버전 감지 시 자동 reload
     if ('serviceWorker' in navigator) {
