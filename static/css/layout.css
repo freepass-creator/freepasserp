@@ -367,10 +367,12 @@
   .work-page.layout-66,
   .work-page.layout-39,
   .work-page.layout-93,
-  .work-page.layout-633 {
+  .work-page.layout-633,
+  .settings-page-shell {
     display: flex !important;
     flex-direction: column !important;
     height: auto !important;
+    grid-template-columns: 1fr !important;
   }
 
   /* 패널 폭 자동 + 모서리/마진/배경 제거 */
@@ -399,11 +401,18 @@
   .work-page .panel-body--detail,
   .work-page .panel-body--form,
   .work-page .panel-body--filter,
-  .work-page .manage-form-body {
-    padding: 0 !important;
+  .work-page .manage-form-body,
+  .work-page .settings-left-panel-body,
+  .work-page .settings-right-panel-body {
+    padding: 16px !important;
     background: #fff !important;
     flex: 1 !important;
     min-height: 0 !important;
+  }
+  /* form-grid 1열 강제 */
+  .work-page .form-grid {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
   }
 
   /* 스켈레톤 모바일에서 숨김 */
