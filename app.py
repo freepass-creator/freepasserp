@@ -18,8 +18,9 @@ import io, re, zipfile
 
 app = Flask(__name__)
 
-import os
-APP_VERSION = '1.0.0'
+import os, time
+# 서버 시작 시각을 버전으로 사용 — 배포할 때마다 자동 증가 → 브라우저 캐시 무효화
+APP_VERSION = str(int(time.time()))
 
 @app.context_processor
 def inject_app_version():

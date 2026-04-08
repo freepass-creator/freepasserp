@@ -121,6 +121,23 @@
   </nav>
 
   <script>
+    // ⚡ Service Worker 등록 + 새 버전 감지 시 자동 reload
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/static/sw.js', { scope: '/' }).then(reg => {
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'activated' && navigator.serviceWorker.controller) {
+              // 새 SW 활성화됨 → 페이지 자동 새로고침
+              window.location.reload();
+            }
+          });
+        });
+      }).catch(() => {});
+    }
+  </script>
+  <script>
     // ⚡ 탭바 뱃지 — sessionStorage 캐시 즉시 적용 (페이지 첫 페인트 전, 깜빡임 제거)
     try {
       var _bc = JSON.parse(sessionStorage.getItem('fp_tab_badges_v1') || '{}');
