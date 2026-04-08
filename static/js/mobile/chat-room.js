@@ -167,6 +167,16 @@ $send?.addEventListener('mousedown', (e) => {
   doSend();
 });
 
+// form submit (Enter키 / iOS Send 키 대비) — 폼 자동 제출 방지
+$form?.addEventListener('submit', (e) => {
+  e.preventDefault();
+});
+
+// click도 막아서 어떤 경로든 form 제출/포커스 이동 차단
+$send?.addEventListener('click', (e) => {
+  e.preventDefault();
+});
+
 // textarea 자동 높이
 $text?.addEventListener('input', () => {
   $text.style.height = 'auto';
