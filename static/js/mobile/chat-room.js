@@ -128,34 +128,14 @@ $back?.addEventListener('click', () => {
   else location.href = '/m/chat';
 });
 
-// ⚡ 핵심: 전송 버튼 — type="button" + tabindex="-1" (포커스 가져가지 않음)
-const $send = $form?.querySelector('.m-cr__send') || $form?.querySelector('button');
-if ($send) {
-  $send.setAttribute('tabindex', '-1');
-  $send.setAttribute('type', 'button');
-}
-
-// ⚡ 강제 포커스 가드 — textarea가 blur되면 즉시 다시 박기 (전송 후 ~2초 윈도우)
-let _forceFocusUntil = 0;
-$text?.addEventListener('focusout', (e) => {
-  if (Date.now() < _forceFocusUntil) {
-    // 즉시 동기적으로 + 다음 tick에서도 한 번 더
-    try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
-    setTimeout(() => {
-      try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
-    }, 0);
-  }
-});
-
-// ⚡ 메모리 검증 패턴: 단 한 줄 focus() — sync value='' → focus() → sendMessage() (fire-and-forget)
+// ⚡ 메모리 검증 패턴: value='' → focus() → sendMessage() (fire-and-forget, await 없음)
 function doSend() {
   if (!$text) return;
   const text = ($text.value || '').trim();
   if (!text) return;
   $text.value = '';
   $text.style.height = 'auto';
-  $text.focus(); // ← 이 한 줄이 핵심. await 전에 동기적으로.
-  _forceFocusUntil = Date.now() + 2000; // 2초 동안 blur되면 즉시 re-focus
+  $text.focus();
   sendMessage(roomId, {
     text,
     sender_uid: currentUser?.uid || '',
@@ -168,27 +148,12 @@ function doSend() {
   });
 }
 
-// touchstart에서 preventDefault → 버튼이 포커스 가져가는 것 자체 차단
+// 전송 버튼 — touchstart preventDefault로 포커스 도둑질 차단
+const $send = $form?.querySelector('.m-cr__send');
 $send?.addEventListener('touchstart', (e) => {
   e.preventDefault();
   doSend();
 }, { passive: false });
-
-// 데스크탑/마우스: mousedown에서 preventDefault
-$send?.addEventListener('mousedown', (e) => {
-  e.preventDefault();
-  doSend();
-});
-
-// form submit (Enter키 / iOS Send 키 대비) — 폼 자동 제출 방지
-$form?.addEventListener('submit', (e) => {
-  e.preventDefault();
-});
-
-// click도 막아서 어떤 경로든 form 제출/포커스 이동 차단
-$send?.addEventListener('click', (e) => {
-  e.preventDefault();
-});
 
 // textarea 자동 높이
 $text?.addEventListener('input', () => {
