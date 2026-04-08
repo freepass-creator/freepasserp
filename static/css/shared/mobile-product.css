@@ -530,4 +530,30 @@
     height: 18px !important;
     padding: 0 6px !important;
   }
+  .catalog-card__submodel {
+    font-size: 12px !important;
+    color: var(--m-text-secondary) !important;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .catalog-card__trim {
+    font-size: 11px !important;
+    color: var(--m-text-tertiary) !important;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .catalog-card__dep-row {
+    font-size: 11px !important;
+    color: var(--m-text-tertiary) !important;
+    margin-top: 1px;
+  }
+  .catalog-card__specs {
+    font-size: 11px !important;
+    color: var(--m-text-tertiary) !important;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-top: 4px;
+  }
+  .catalog-card__colors {
+    font-size: 11px !important;
+    color: var(--m-text-tertiary) !important;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
 }

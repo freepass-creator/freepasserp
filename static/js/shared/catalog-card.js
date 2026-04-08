@@ -102,6 +102,8 @@ export function renderCatalogCard(p, { periods = ['1','6','12','24','36','48','6
   const mileage   = rf(p, 'mileageDisplay')
     || (p.mileageValue ? p.mileageValue.toLocaleString('ko-KR') + 'km' : '')
     || (p.mileage ? Number(p.mileage).toLocaleString('ko-KR') + 'km' : '');
+  const extColor  = rf(p, 'extColor', 'ext_color');
+  const intColor  = rf(p, 'intColor', 'int_color');
 
   // 대표 가격
   let cardRent = 0, cardDep = 0, cardMonth = '';
@@ -131,10 +133,15 @@ export function renderCatalogCard(p, { periods = ['1','6','12','24','36','48','6
     ? `<span class="catalog-card__photo-count"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${photos.length}</span>`
     : '';
 
-  const tags = [
+  const specs = [
     fuel && fuel !== '-' ? fuel : null,
     year && year !== '-' ? `${year}년` : null,
     mileage || null,
+  ].filter(Boolean);
+
+  const colors = [
+    extColor && extColor !== '-' ? extColor : null,
+    intColor && intColor !== '-' ? intColor : null,
   ].filter(Boolean);
 
   const carNoHtml = carNo && carNo !== '-'
@@ -148,13 +155,14 @@ export function renderCatalogCard(p, { periods = ['1','6','12','24','36','48','6
   </div>
   <div class="catalog-card__body">
     <div class="catalog-card__model">${esc(modelText || '차량')}${carNoHtml}</div>
-    ${sub ? `<div class="catalog-card__sub">${esc(sub)}</div>` : ''}
-    <div class="catalog-card__price-row">
-      ${cardRent
-        ? `<span class="catalog-card__price">월 ${fmt(cardRent)}</span>${cardDep ? `<span class="catalog-card__dep">보증금 ${fmt(cardDep)}</span>` : ''}<span class="catalog-card__dep">${monthLabel}</span>`
-        : `<span class="catalog-card__price-inquiry">가격 문의</span>`}
-    </div>
-    ${tags.length ? `<div class="catalog-card__tags">${tags.map(t => `<span class="catalog-card__tag">${esc(t)}</span>`).join('')}</div>` : ''}
+    ${subModel && subModel !== '-' ? `<div class="catalog-card__submodel">${esc(subModel)}</div>` : ''}
+    ${trim && trim !== '-' ? `<div class="catalog-card__trim">${esc(trim)}</div>` : ''}
+    ${cardRent
+      ? `<div class="catalog-card__price">월 ${fmt(cardRent)}</div>
+         <div class="catalog-card__dep-row">${cardDep ? `보증금 ${fmt(cardDep)}` : ''}${monthLabel ? ` <span>${monthLabel}</span>` : ''}</div>`
+      : `<div class="catalog-card__price-inquiry">가격 문의</div>`}
+    ${specs.length ? `<div class="catalog-card__specs">${specs.map(s => esc(s)).join(' · ')}</div>` : ''}
+    ${colors.length ? `<div class="catalog-card__colors">${colors.map(c => esc(c)).join(' · ')}</div>` : ''}
   </div>
 </article>`;
 }
