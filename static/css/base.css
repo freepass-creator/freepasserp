@@ -120,7 +120,7 @@
   --badge-height: 22px;
   --badge-padding-x: 8px;
   --badge-font-size: var(--font-size-xs);
-  --badge-radius: var(--radius-pill);
+  --badge-radius: var(--radius-xs);
   --badge-min-width: 54px;
 
   /* ── 폼 ── */
