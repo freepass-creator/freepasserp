@@ -135,6 +135,18 @@ if ($send) {
   $send.setAttribute('tabindex', '-1');
 }
 
+// ⚡ 강제 포커스 가드 — textarea가 blur되면 즉시 다시 박기 (전송 후 ~2초 윈도우)
+let _forceFocusUntil = 0;
+$text?.addEventListener('focusout', (e) => {
+  if (Date.now() < _forceFocusUntil) {
+    // 즉시 동기적으로 + 다음 tick에서도 한 번 더
+    try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
+    setTimeout(() => {
+      try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
+    }, 0);
+  }
+});
+
 // ⚡ 메모리 검증 패턴: 단 한 줄 focus() — sync value='' → focus() → sendMessage() (fire-and-forget)
 function doSend() {
   if (!$text) return;
@@ -143,6 +155,7 @@ function doSend() {
   $text.value = '';
   $text.style.height = 'auto';
   $text.focus(); // ← 이 한 줄이 핵심. await 전에 동기적으로.
+  _forceFocusUntil = Date.now() + 2000; // 2초 동안 blur되면 즉시 re-focus
   sendMessage(roomId, {
     text,
     sender_uid: currentUser?.uid || '',
