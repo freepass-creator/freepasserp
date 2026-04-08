@@ -33,10 +33,24 @@
 
 .product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 0; }
 .product-list-page-shell .panel-body--detail { padding: 0 !important; }
-/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 여백 최소화 */
+/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 여백 최소화 + 라운드 각짐 */
 .product-list-page-shell .panel-body--detail .m-pd { padding: 0; background: var(--new-bg-panel, #fff); }
 .product-list-page-shell .panel-body--detail .m-pd-group { margin: 0; border-radius: 0; box-shadow: none; }
 .product-list-page-shell .panel-body--detail .m-pd-group + .m-pd-group { border-top: 1px solid rgba(0, 0, 0, 0.06); }
+/* jpkerp 스타일 각진 라운드 — 패널 안의 모든 pill·박스 4px */
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-group__count,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-gallery__counter,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-color,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-badge {
+  border-radius: 4px !important;
+}
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-group__body,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-gallery {
+  border-radius: 4px;
+}
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-gallery__dot.is-active {
+  border-radius: 2px;
+}
 .product-list-page-shell .plist-detail__summary-top { display: flex; flex-direction: column; gap: var(--space-1); }
 .product-list-page-shell .plist-detail__summary-line { min-width: 0; font-size: var(--font-size-base); line-height: 1.5; color: var(--text-main); word-break: break-word; }
 .product-list-page-shell .plist-detail__summary-line--top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
