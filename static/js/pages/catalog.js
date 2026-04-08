@@ -21,6 +21,7 @@ import {
 } from '../shared/catalog-card.js';
 import { normalizeProduct } from '../shared/product-list-detail-data.js';
 import { renderProductDetailMarkup } from '../shared/product-list-detail-markup.js';
+import { renderMobileProductDetail } from '../shared/mobile-product-detail-markup.js';
 
 // ─── DOM refs ──────────────────────────────────────────────────────────────
 
@@ -295,10 +296,16 @@ function fmtRentalGuide(pol) {
 // ─── 상세 마크업 생성 ─────────────────────────────────────────────────────
 
 function renderProductDetail(p) {
-  const normalized = normalizeProduct(p);
-  const termFields = getPolicy(p);
-  const shareBtn = `<div class="md-actions"><button class="md-action-btn" id="cat-share-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg> 공유</button></div>`;
-  return renderProductDetailMarkup(normalized, { termFields, actionsHtml: shareBtn, showGallery: false, showFee: false });
+  // 모바일 상품 상세와 동일한 마크업 사용 (수수료 섹션은 숨김)
+  // catalog의 allPolicies는 객체({code: policy}) → 배열로 변환해서 전달
+  const policiesArr = allPolicies && typeof allPolicies === 'object'
+    ? Object.values(allPolicies)
+    : [];
+  return renderMobileProductDetail(p, {
+    policies: policiesArr,
+    showGallery: false, // 갤러리는 catalog의 별도 single-gallery에서 처리
+    showFee: false,     // 수수료 섹션 제외
+  });
 }
 
 // ─── 뷰 전환 ──────────────────────────────────────────────────────────────
