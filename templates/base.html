@@ -11,7 +11,8 @@
     if (window.innerWidth <= 768) document.documentElement.classList.add('is-mobile-view');
   </script>
   <style>
-    /* Critical: 모바일 1열 강제 — 외부 CSS 로드 전 깜빡임 방지 */
+    /* Critical: 모바일 1열 강제 + 외부 CSS 로드 전 콘텐츠 숨김 */
+    html.is-mobile-view body { background: #fff; }
     html.is-mobile-view .dashboard-shell, html.is-mobile-view .dashboard-shell--new { display: flex !important; flex-direction: column !important; height: 100dvh; grid-template-columns: 1fr !important; }
     html.is-mobile-view .sidebar, html.is-mobile-view .sidebar--new, html.is-mobile-view .top-bar { display: none !important; }
     html.is-mobile-view .work-page, html.is-mobile-view .work-page.layout-66, html.is-mobile-view .work-page.layout-39, html.is-mobile-view .work-page.layout-93, html.is-mobile-view .work-page.layout-633, html.is-mobile-view .work-page.grid-12 {
@@ -19,6 +20,11 @@
     }
     html.is-mobile-view .work-page > .panel, html.is-mobile-view .work-page > .panel-slot, html.is-mobile-view .work-page > section {
       width: 100% !important; min-width: 0 !important; flex: none !important;
+    }
+    /* CSS 로드 전 깜빡임 방지: 모바일에서 main-shell 콘텐츠 숨김 */
+    html.is-mobile-view.no-transition .main-shell,
+    html.is-mobile-view.no-transition .main-shell--new {
+      visibility: hidden;
     }
   </style>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
