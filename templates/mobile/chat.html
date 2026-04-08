@@ -1,0 +1,13 @@
+{% extends 'mobile/_layout.html' %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/chat.css') }}?v={{ app_version }}">
+{% endblock %}
+{% block topbar_center %}대화{% endblock %}
+{% block body %}
+<div class="m-list" id="m-chat-list">
+  <!-- JS 렌더 -->
+</div>
+{% endblock %}
+{% block page_js %}
+<script type="module" src="{{ url_for('static', filename='js/mobile/chat.js') }}?v={{ app_version }}"></script>
+{% endblock %}

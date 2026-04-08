@@ -41,6 +41,11 @@ import functools
 _MOBILE_RE = re.compile(r'Mobi|Android|iPhone|iPad|iPod', re.IGNORECASE)
 
 def _is_mobile():
+    # 디버깅용: ?mobile=1 쿼리로 강제 모바일
+    if request.args.get('mobile') == '1':
+        return True
+    if request.args.get('mobile') == '0':
+        return False
     ua = request.headers.get('User-Agent', '')
     return bool(_MOBILE_RE.search(ua))
 
