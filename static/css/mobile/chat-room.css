@@ -26,18 +26,6 @@
   background: var(--m-bg);
 }
 
-/* 상단바 제목 — 차량번호 세부모델명 한 줄 */
-.m-cr__title {
-  margin-left: 4px;
-  min-width: 0;
-  flex: 1 1 auto;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--m-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 /* 메시지 영역 */
 .m-cr__messages {

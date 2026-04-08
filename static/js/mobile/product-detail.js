@@ -485,6 +485,13 @@ function render() {
     $content.innerHTML = '<div style="padding:48px 16px;text-align:center;color:#8b95a1;">상품을 찾을 수 없습니다</div>';
     return;
   }
+  // 상단바 타이틀: 차량번호 세부모델명
+  const $title = document.getElementById('m-pd-title');
+  if ($title) {
+    const carNo = p.car_number || '';
+    const subModel = p.sub_model || '';
+    $title.textContent = [carNo, subModel].filter(Boolean).join(' ') || '상품';
+  }
   const policy = findPolicy(p, allPolicies);
 
   $content.innerHTML = `

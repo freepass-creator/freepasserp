@@ -50,6 +50,15 @@ function render(c) {
   if (!$cf || !c) return;
   const checks = c.checks || {};
 
+  // 상단바 타이틀: 차량번호 세부모델명
+  const $title = document.getElementById('m-cf-title');
+  if ($title) {
+    const p = productMap.get(c.product_uid) || productMap.get(c.product_code);
+    const carNo = c.car_number || p?.car_number || '';
+    const subModel = p?.sub_model || '';
+    $title.textContent = [carNo, subModel].filter(Boolean).join(' ') || '계약';
+  }
+
   $cf.innerHTML = `
     <!-- 계약 체크 -->
     <section class="m-cf-group">
