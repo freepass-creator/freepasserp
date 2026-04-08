@@ -1,24 +1,50 @@
 {% extends 'mobile/_layout.html' %}
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/chat.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/chat-room.css') }}?v={{ app_version }}">
 {% endblock %}
 {% block topbar_left %}
-  <div class="m-search-bar">
+  <div class="m-search-bar m-chat-list-only">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
     <input id="m-chat-search" type="search" placeholder="차량번호·모델·메시지 검색">
   </div>
+  <button class="m-icon-btn m-chat-room-only" id="m-cr-back" type="button" aria-label="뒤로" hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+  </button>
 {% endblock %}
 {% block topbar_right %}
-  <button class="m-icon-btn" id="m-chat-filter-btn" type="button" aria-label="필터">
+  <button class="m-icon-btn m-chat-list-only" id="m-chat-filter-btn" type="button" aria-label="필터">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></svg>
+  </button>
+  <button class="m-icon-btn m-chat-room-only" id="m-cr-hide" type="button" aria-label="숨김" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+  </button>
+  <button class="m-icon-btn m-chat-room-only" id="m-cr-delete" type="button" aria-label="삭제" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
   </button>
 {% endblock %}
 {% block body %}
-<div class="m-list" id="m-chat-list">
-  <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
-  <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
-  <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
-  <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
+<div id="m-chat-root" data-view="list"{% if room_id %} data-initial-room="{{ room_id }}"{% endif %}>
+  <!-- 목록 뷰 -->
+  <div class="m-list" id="m-chat-list">
+    <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
+    <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
+    <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
+    <div class="m-skeleton" style="height:80px;margin-bottom:8px"></div>
+  </div>
+
+  <!-- 대화방 뷰 (항상 DOM에 존재 — iOS 키보드 정책 대응) -->
+  <div class="m-cr" id="m-chat-room">
+    <div class="m-cr__messages" id="m-cr-messages">
+      <div class="m-cr__loading">대화를 불러오는 중…</div>
+    </div>
+    <form class="m-cr__input" id="m-cr-form">
+      <textarea class="m-cr__textarea" id="m-cr-text" rows="1" placeholder="메시지 입력" enterkeyhint="send"></textarea>
+      <button class="m-cr__send" type="submit" aria-label="전송" tabindex="-1">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+      </button>
+    </form>
+  </div>
 </div>
 {% endblock %}
 {% block page_js %}

@@ -130,18 +130,17 @@ $back?.addEventListener('click', () => {
 
 // ⚡ 핵심: 전송 버튼이 textarea 포커스를 뺏지 못하게
 const $send = $form?.querySelector('button[type="submit"]');
-if ($send) {
-  // tabindex -1로 포커스 대상에서 제외
-  $send.setAttribute('tabindex', '-1');
-}
+if ($send) $send.setAttribute('tabindex', '-1');
 
-function doSend() {
+// ⚡ 키보드 유지의 핵심: value='' → focus() → sendMessage() 동기 순서 (await 금지, fire-and-forget)
+$form?.addEventListener('submit', (e) => {
+  e.preventDefault();
   if (!$text) return;
   const text = ($text.value || '').trim();
   if (!text) return;
   $text.value = '';
   $text.style.height = 'auto';
-  // 백그라운드 전송 (fire-and-forget)
+  $text.focus(); // 비동기 작업 전에 동기적으로 포커스 — 키보드 유지
   sendMessage(roomId, {
     text,
     sender_uid: currentUser?.uid || '',
@@ -152,32 +151,6 @@ function doSend() {
     console.error('[mobile/chat-room] send failed', err);
     showToast('전송 실패', 'error');
   });
-}
-
-// touchstart 단계에서 처리: 포커스 이동 전에 가로채기
-let _sendTouchHandled = false;
-$send?.addEventListener('touchstart', (e) => {
-  // textarea 포커스 보존을 위해 기본 동작 차단 (블러 방지)
-  e.preventDefault();
-  _sendTouchHandled = true;
-  // textarea가 이미 포커스 있으면 그대로, 없으면 다시 포커스
-  if (document.activeElement !== $text) $text?.focus();
-  doSend();
-}, { passive: false });
-
-// 데스크탑/마우스용
-$send?.addEventListener('mousedown', (e) => {
-  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
-  e.preventDefault();
-  if (document.activeElement !== $text) $text?.focus();
-  doSend();
-});
-
-// form submit (Enter키 등) — 키보드/iOS Send 키
-$form?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
-  doSend();
 });
 
 // textarea 자동 높이
@@ -213,26 +186,27 @@ $delete?.addEventListener('click', async () => {
 });
 
 // ⚡ 페이지 진입 즉시 textarea 포커스 (키보드 자동 오픈)
+// 모바일 브라우저는 user gesture 안에서만 키보드를 띄움 → 스크립트 로드 직후 동기 focus()
 function autoFocusTextarea() {
   if (!$text) return;
-  $text.focus();
-  // iOS Safari는 click 같은 user gesture가 필요할 수 있음 → 첫 touch에서 다시 시도
-  const onFirstTouch = () => {
-    $text.focus();
-    document.removeEventListener('touchstart', onFirstTouch);
-    document.removeEventListener('click', onFirstTouch);
-  };
-  document.addEventListener('touchstart', onFirstTouch, { once: true, passive: true });
-  document.addEventListener('click', onFirstTouch, { once: true });
+  try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
 }
+// 1) 스크립트 파싱 직후 즉시 (이전 페이지의 tap gesture 컨텍스트가 아직 살아 있을 때)
+autoFocusTextarea();
+// 2) 첫 touch/click에서 한 번 더 (iOS Safari 보강)
+const _onFirstGesture = () => {
+  autoFocusTextarea();
+  document.removeEventListener('touchstart', _onFirstGesture);
+  document.removeEventListener('click', _onFirstGesture);
+};
+document.addEventListener('touchstart', _onFirstGesture, { once: true, passive: true });
+document.addEventListener('click', _onFirstGesture, { once: true });
 
 (async () => {
   try {
     const auth = await requireAuth();
     currentUser = auth.user;
     currentProfile = auth.profile;
-    // 즉시 포커스 (요청 대기 안 함)
-    requestAnimationFrame(autoFocusTextarea);
 
     // 역할별 버튼 노출: 공급사·관리자만 삭제 가능, 영업자는 숨김만
     const role = currentProfile?.role || '';
