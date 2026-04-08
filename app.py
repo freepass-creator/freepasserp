@@ -19,11 +19,28 @@ import io, re, zipfile
 app = Flask(__name__)
 
 import os, time
-# 서버 시작 시각을 버전으로 사용 — 배포할 때마다 자동 증가 → 브라우저 캐시 무효화
+# 서버 시작 시각을 버전으로 사용 — 운영 배포 시
 APP_VERSION = str(int(time.time()))
 
 @app.context_processor
 def inject_app_version():
+    # 개발 모드: static/ 폴더의 가장 최근 수정 시각을 매 요청마다 계산 → CSS만 바꿔도 즉시 캐시 무효화
+    if app.debug or os.environ.get('FLASK_ENV') == 'development':
+        try:
+            static_dir = os.path.join(os.path.dirname(__file__), 'static')
+            latest = 0
+            for root, dirs, files in os.walk(static_dir):
+                # node_modules, .git 등 큰 폴더 스킵
+                dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'node_modules']
+                for f in files:
+                    try:
+                        mt = os.path.getmtime(os.path.join(root, f))
+                        if mt > latest: latest = mt
+                    except OSError:
+                        pass
+            return {'app_version': str(int(latest)) if latest else APP_VERSION}
+        except Exception:
+            pass
     return {'app_version': APP_VERSION}
 
 @app.after_request
