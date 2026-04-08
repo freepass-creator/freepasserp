@@ -8,6 +8,43 @@ import { escapeHtml } from '../core/management-format.js';
 import { showToast, showConfirm } from '../core/toast.js';
 
 const $st = document.getElementById('m-settings');
+const $help = document.getElementById('m-st-help');
+const $notice = document.getElementById('m-st-notice');
+
+const HELP_SECTIONS = [
+  {
+    title: '상품 보기',
+    items: [
+      '상단 검색창에서 차량번호·모델로 빠르게 찾기',
+      '필터 버튼으로 가격·기간·제조사 등 다중 선택',
+      '카드를 누르면 상세 정보, 사진 누르면 풀스크린',
+    ],
+  },
+  {
+    title: '대화',
+    items: [
+      '대화 목록의 미확인 표시는 안 읽은 메시지 수',
+      '대화방 진입 시 자동 읽음 처리',
+      '숨김 = 내 목록에서만 사라짐 / 삭제 = 영구',
+    ],
+  },
+  {
+    title: '계약',
+    items: [
+      '미입력 N = 계약 진행 6단계 중 안 누른 갯수',
+      '카드 클릭 → 폼에서 수정 버튼 → 저장',
+      '고객 정보는 기본 마스킹, 원본 열람은 비밀번호 필요',
+    ],
+  },
+  {
+    title: '계정',
+    items: [
+      '내 정보의 [수정] 버튼으로 직급·연락처 변경',
+      '카탈로그 링크는 손님에게 공유',
+      '비밀번호 재설정 메일은 가입한 이메일로 발송',
+    ],
+  },
+];
 
 let currentUser = null;
 let currentProfile = null;
@@ -229,6 +266,48 @@ function render() {
     }
   });
 }
+
+// 도움말 모달
+function showHelp() {
+  const html = HELP_SECTIONS.map(s => `
+    <div class="m-st-help__section">
+      <div class="m-st-help__section-title">${escapeHtml(s.title)}</div>
+      <ul>${s.items.map(it => `<li>${escapeHtml(it)}</li>`).join('')}</ul>
+    </div>`).join('');
+  openSheet('도움말', html);
+}
+
+function showNotice() {
+  openSheet('공지사항', '<div class="m-st-help__empty">등록된 공지사항이 없습니다</div>');
+}
+
+function openSheet(title, contentHtml) {
+  const existing = document.querySelector('.m-st-sheet');
+  if (existing) existing.remove();
+  const sheet = document.createElement('div');
+  sheet.className = 'm-st-sheet';
+  sheet.innerHTML = `
+    <div class="m-st-sheet__backdrop"></div>
+    <div class="m-st-sheet__panel">
+      <div class="m-st-sheet__head">
+        <div class="m-st-sheet__title">${escapeHtml(title)}</div>
+        <button class="m-st-sheet__close" type="button" aria-label="닫기"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+      </div>
+      <div class="m-st-sheet__body">${contentHtml}</div>
+    </div>
+  `;
+  document.body.appendChild(sheet);
+  requestAnimationFrame(() => sheet.classList.add('is-open'));
+  const close = () => {
+    sheet.classList.remove('is-open');
+    setTimeout(() => sheet.remove(), 220);
+  };
+  sheet.querySelector('.m-st-sheet__backdrop').addEventListener('click', close);
+  sheet.querySelector('.m-st-sheet__close').addEventListener('click', close);
+}
+
+$help?.addEventListener('click', showHelp);
+$notice?.addEventListener('click', showNotice);
 
 (async () => {
   try {

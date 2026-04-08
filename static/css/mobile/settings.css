@@ -117,6 +117,97 @@
 .m-st-action.is-danger { color: #ef4444; }
 .m-st-action.is-danger svg { color: #ef4444; }
 
+/* 도움말/공지 시트 */
+.m-st-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+.m-st-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.m-st-sheet.is-open { pointer-events: auto; }
+.m-st-sheet.is-open .m-st-sheet__backdrop { opacity: 1; }
+.m-st-sheet__panel {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  max-height: 75dvh;
+  background: var(--m-card-bg);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.22s ease-out;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.m-st-sheet.is-open .m-st-sheet__panel { transform: translateY(0); }
+.m-st-sheet__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--m-space-4);
+  border-bottom: 1px solid var(--m-divider);
+}
+.m-st-sheet__title {
+  font-size: var(--m-font-title);
+  font-weight: 800;
+  color: var(--m-text-primary);
+}
+.m-st-sheet__close {
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--m-text-secondary);
+  cursor: pointer;
+}
+.m-st-sheet__body {
+  flex: 1 1 0;
+  overflow-y: auto;
+  padding: var(--m-space-4);
+}
+.m-st-help__section { margin-bottom: var(--m-space-5); }
+.m-st-help__section:last-child { margin-bottom: 0; }
+.m-st-help__section-title {
+  font-size: var(--m-font-body);
+  font-weight: 800;
+  color: var(--m-accent);
+  margin-bottom: var(--m-space-2);
+}
+.m-st-help__section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.m-st-help__section li {
+  font-size: var(--m-font-caption);
+  color: var(--m-text-secondary);
+  padding: var(--m-space-2) 0;
+  border-bottom: 1px solid var(--m-divider);
+  line-height: 1.5;
+}
+.m-st-help__section li:last-child { border-bottom: none; }
+.m-st-help__section li::before {
+  content: '•';
+  margin-right: 6px;
+  color: var(--m-accent);
+}
+.m-st-help__empty {
+  padding: var(--m-space-7) 0;
+  text-align: center;
+  color: var(--m-text-tertiary);
+  font-size: var(--m-font-caption);
+}
+
 /* 토글 (iOS 스타일) */
 .m-st-toggles { padding: 0 var(--m-space-4); }
 .m-st-toggle {
