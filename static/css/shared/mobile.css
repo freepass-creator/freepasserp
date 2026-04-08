@@ -509,16 +509,14 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
    공통 모바일 필터 오버레이/사이드바 (대화·계약 페이지)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.m-filter-overlay {
-  display: none;
-}
-.m-filter-sidebar {
-  display: none;
-}
+/* 데스크탑(>768px)에선 모바일 필터 사이드바/오버레이는 절대 표시 안 함
+   다른 클래스(.catalog-sidebar 등)가 같이 붙어도 !important로 차단 */
+.m-filter-overlay { display: none !important; }
+.m-filter-sidebar { display: none !important; }
 
 @media (max-width: 768px) {
   .m-filter-overlay {
-    display: none;
+    display: none !important;
     position: fixed;
     top: var(--mobile-topbar-height);
     left: 0;
@@ -527,10 +525,10 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
     z-index: 90;
     background: rgba(15, 23, 42, 0.4);
   }
-  .m-filter-overlay.is-open { display: block; }
+  .m-filter-overlay.is-open { display: block !important; }
 
   .m-filter-sidebar {
-    display: block;
+    display: block !important;
     position: fixed;
     right: 0;
     top: var(--mobile-topbar-height);
