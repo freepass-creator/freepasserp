@@ -135,28 +135,14 @@ if ($send) {
   $send.setAttribute('tabindex', '-1');
 }
 
-// 전송 직후 짧은 윈도우 동안 textarea가 blur되면 즉시 re-focus (키보드 내려가는 것 방지)
-let _refocusGuardUntil = 0;
-$text?.addEventListener('blur', () => {
-  if (Date.now() < _refocusGuardUntil) {
-    // 동기적으로 즉시 re-focus
-    setTimeout(() => {
-      try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
-    }, 0);
-  }
-});
-
+// ⚡ 메모리 검증 패턴: 단 한 줄 focus() — sync value='' → focus() → sendMessage() (fire-and-forget)
 function doSend() {
   if (!$text) return;
   const text = ($text.value || '').trim();
   if (!text) return;
   $text.value = '';
   $text.style.height = 'auto';
-  // ⚡ 메모리 패턴: value='' → focus() → sendMessage() 동기 순서 (await 금지)
-  try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
-  // 다음 1초 동안 blur 발생 시 즉시 re-focus
-  _refocusGuardUntil = Date.now() + 1000;
-  // 백그라운드 전송 (fire-and-forget)
+  $text.focus(); // ← 이 한 줄이 핵심. await 전에 동기적으로.
   sendMessage(roomId, {
     text,
     sender_uid: currentUser?.uid || '',
@@ -169,36 +155,15 @@ function doSend() {
   });
 }
 
-// touchstart 단계에서 처리: 포커스 이동 전에 가로채기
-let _sendTouchHandled = false;
-// pointerdown은 touchstart보다 더 빨리 발생 — blur가 일어나기 전 단계에서 차단
-$send?.addEventListener('pointerdown', (e) => {
-  e.preventDefault(); // textarea blur 자체를 막음
-}, { passive: false });
+// touchstart에서 preventDefault → 버튼이 포커스 가져가는 것 자체 차단
 $send?.addEventListener('touchstart', (e) => {
   e.preventDefault();
-  _sendTouchHandled = true;
-  // textarea가 이미 포커스 있으면 그대로, 없으면 다시 포커스
-  if (document.activeElement !== $text) {
-    try { $text?.focus({ preventScroll: true }); } catch { $text?.focus(); }
-  }
   doSend();
 }, { passive: false });
 
-// 데스크탑/마우스용
+// 데스크탑/마우스: mousedown에서 preventDefault
 $send?.addEventListener('mousedown', (e) => {
-  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
   e.preventDefault();
-  if (document.activeElement !== $text) {
-    try { $text?.focus({ preventScroll: true }); } catch { $text?.focus(); }
-  }
-  doSend();
-});
-
-// form submit (Enter키 등) — 키보드/iOS Send 키
-$form?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
   doSend();
 });
 
