@@ -632,7 +632,7 @@ $btnShare?.addEventListener('click', async (e) => {
   const carTitle = [carPart, agentPart && `- ${agentPart}`].filter(Boolean).join(' ');
   if (carTitle) url.searchParams.set('t', carTitle);
   if (company) url.searchParams.set('c', company);
-  // 설명: 가장 싼 월 대여료/보증금 + 연식·주행거리 정도
+  // 설명: 가격 위주 — "48개월 월 79만원 · 보증금 100만원"
   const num = (v) => Number(String(v ?? '').replace(/[^\d.-]/g, '')) || 0;
   const months = [1, 12, 24, 36, 48, 60];
   let cheapest = null;
@@ -641,12 +641,36 @@ $btnShare?.addEventListener('click', async (e) => {
     const rent = num(slot.rent);
     if (rent && (!cheapest || rent < cheapest.rent)) cheapest = { m, rent, deposit: num(slot.deposit) };
   }
+  // 형식: "48개월 월 79만원 · 보증금 100만원 · 24년식 · 1.2만km · 가솔린"
+  const fmtMan = (n) => {
+    if (n >= 10000 && n % 10000 === 0) return `${(n/10000).toLocaleString('ko-KR')}만원`;
+    return `${n.toLocaleString('ko-KR')}원`;
+  };
+  const fmtKm = (n) => {
+    if (n >= 10000) return `${(n/10000).toFixed(1).replace(/\.0$/, '')}만km`;
+    return `${n.toLocaleString('ko-KR')}km`;
+  };
   const descParts = [];
-  if (cheapest) descParts.push(`${cheapest.m}개월 월 ${cheapest.rent.toLocaleString('ko-KR')}원`);
+  if (cheapest) {
+    descParts.push(`${cheapest.m}개월 월 ${fmtMan(cheapest.rent)}`);
+    if (cheapest.deposit) descParts.push(`보증금 ${fmtMan(cheapest.deposit)}`);
+  }
   if (p.year) descParts.push(`${String(p.year).slice(-2)}년식`);
-  if (p.mileage) descParts.push(`${Number(p.mileage).toLocaleString('ko-KR')}km`);
+  if (p.mileage) descParts.push(fmtKm(num(p.mileage)));
+  if (p.fuel_type) descParts.push(String(p.fuel_type));
   if (descParts.length) url.searchParams.set('d', descParts.join(' · '));
-  // 이미지 URL은 너무 길어서 query에 넣지 않음 — 서버가 OG 기본 이미지 사용
+  // 차량 대표 이미지 → 서버 인메모리 캐시에 저장 (await로 캐시 보장)
+  const firstImg = (Array.isArray(p.image_urls) && p.image_urls[0]) || p.image_url || '';
+  const productKey = p.product_uid || p.product_code || '';
+  if (firstImg && productKey) {
+    try {
+      await fetch('/api/share/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: productKey, img: firstImg }),
+      });
+    } catch {}
+  }
   const shareUrl = url.toString();
   const title = carTitle || [p.maker, p.model_name].filter(Boolean).join(' ') || '상품';
   // Web Share API 우선

@@ -163,6 +163,26 @@ _MOBILE_REDIRECT_MAP = {
     'pages/settings.html': '/m/settings',
 }
 
+# ─── 공유 이미지 캐시 (in-memory, 서버 재시작 시 휘발) ────────────────────
+# 카탈로그 공유 링크의 OG:image용 — 클라가 POST로 product_id ↔ image_url 등록
+_share_image_cache = {}
+
+@app.route('/api/share/image', methods=['POST'])
+def api_share_image_register():
+    from flask import request as req
+    data = req.get_json(silent=True) or {}
+    pid = str(data.get('id') or '').strip()
+    img = str(data.get('img') or '').strip()
+    if not pid or not img:
+        return ('', 400)
+    _share_image_cache[pid] = img
+    # 메모리 보호 — 1000개 넘으면 가장 오래된 것부터 제거
+    if len(_share_image_cache) > 1000:
+        for k in list(_share_image_cache.keys())[:200]:
+            _share_image_cache.pop(k, None)
+    return ('', 204)
+
+
 @pages_bp.route('/catalog')
 def catalog_view():
     from flask import request as req
@@ -172,8 +192,9 @@ def catalog_view():
     # 동적 타이틀
     car_title = req.args.get('t', '')
     company = req.args.get('c', '')
-    # 이미지 URL은 query에 안 받음 (너무 김) → 고정 OG 이미지 사용
-    og_image = req.url_root.rstrip('/') + '/static/icons/icon-512.png'
+    # 이미지: in-memory 캐시에서 product id로 조회, 없으면 고정 아이콘
+    cached_img = _share_image_cache.get(share_id) if share_id else None
+    og_image = cached_img or (req.url_root.rstrip('/') + '/static/icons/icon-512.png')
     suffix = f' | {company}' if company else ''
     if share_id and car_title:
         title = f'{car_title}{suffix}'
