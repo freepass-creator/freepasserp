@@ -513,6 +513,17 @@ function render() {
 
   // 갤러리 인터랙션
   const photos = (Array.isArray(p.image_urls) && p.image_urls.length ? p.image_urls : null) || (p.image_url ? [p.image_url] : []);
+  // ⚡ 모든 사진 백그라운드 preload — 풀스크린 뷰어 진입 시 즉시 표시
+  if (!window.__pdPreloadedFor || window.__pdPreloadedFor !== productId) {
+    window.__pdPreloadedFor = productId;
+    photos.forEach((url) => {
+      if (!url) return;
+      const img = new Image();
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = url;
+    });
+  }
   $content.querySelector('#m-pd-prev')?.addEventListener('click', () => {
     activePhotoIndex = (activePhotoIndex - 1 + photos.length) % photos.length;
     render();
