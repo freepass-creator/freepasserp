@@ -121,6 +121,17 @@
   </nav>
 
   <script>
+    // ⚡ 탭바 뱃지 — sessionStorage 캐시 즉시 적용 (페이지 첫 페인트 전, 깜빡임 제거)
+    try {
+      var _bc = JSON.parse(sessionStorage.getItem('fp_tab_badges_v1') || '{}');
+      Object.keys(_bc).forEach(function(id){
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.hidden = !(Number(_bc[id] || 0) > 0);
+      });
+    } catch (e) {}
+  </script>
+  <script>
     // 활성 탭
     (function(){
       const path = location.pathname;
