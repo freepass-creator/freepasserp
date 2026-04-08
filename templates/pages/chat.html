@@ -3,7 +3,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/detail-view.css') }}" data-page-style="true">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/detail-common.css') }}" data-page-style="true">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/chat.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile-chat.css') }}" data-page-style="true">
 {% endblock %}
 {% block page_title_text %}실시간 문의·응대{% endblock %}
 {% block top_bar_actions %}{% endblock %}
@@ -53,34 +52,6 @@
 </section>
 </div>
 </div>
-<!-- 모바일: 방 목록 -->
-<div class="chat-m-rooms" id="chatMRooms"></div>
-<!-- 모바일: 필터 사이드바 -->
-<div class="m-filter-overlay" id="chatMFilterOverlay"></div>
-<aside class="m-filter-sidebar catalog-sidebar" id="chatMFilterSidebar">
-  <div class="catalog-sidebar__head">
-    <span class="catalog-sidebar__head-title">필터</span>
-    <button class="catalog-sidebar__close" id="chatMFilterClose" type="button">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-    </button>
-  </div>
-  <div class="catalog-sidebar__summary">
-    <div class="catalog-sidebar__count">
-      <span class="catalog-sidebar__count-label">대화</span>
-      <span class="catalog-sidebar__count-value" id="chatMFilterCount">0</span><span class="catalog-sidebar__count-unit">건</span>
-    </div>
-  </div>
-  <div class="catalog-sidebar__search">
-    <svg class="catalog-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    <input class="catalog-search" id="chatMFilterSearch" type="search" placeholder="상대방, 상품명 검색...">
-  </div>
-  <div id="chatMFilterSections">
-    <div class="catalog-sidebar__section" data-filter-key="provider">
-      <div class="catalog-sidebar__title">공급사</div>
-      <div class="catalog-filter-body" id="chatMFilterProviders"></div>
-    </div>
-  </div>
-</aside>
 {% endblock %}
 {% block workspace_page_js %}
 <script type="module" src="{{ url_for('static', filename='js/pages/chat.js') }}" data-page-script="true"></script>
