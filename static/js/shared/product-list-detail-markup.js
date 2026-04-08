@@ -99,28 +99,30 @@ export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termF
     }
   }
 
-  // ── 1. 차량사진 ──
+  // ── 1. 차량사진 (사진 위에 출고가능/신차렌트 뱃지) ──
   const normalizedIndex = Math.min(Math.max(Number(activePhotoIndex || 0), 0), Math.max(total - 1, 0));
+  const galleryBadges = [product.vehicleStatus, product.productType].filter(v => v && v !== '-').map(v =>
+    `<span class="md-gallery-badge">${esc(v)}</span>`).join('');
   const galleryHtml = total
     ? `<div class="pls-mobile-detail-gallery" id="plsMGallery" data-photos='${JSON.stringify(photos).replace(/'/g,"&#39;")}'>
         <img class="pls-mobile-detail-gallery__img" id="plsMGalleryImg" src="${esc(photos[normalizedIndex] || photos[0])}" alt="" loading="eager" decoding="async">
+        ${galleryBadges ? `<div class="md-gallery-badges">${galleryBadges}</div>` : ''}
         ${total > 1 ? `<button class="pls-mobile-detail-gallery__nav pls-mobile-detail-gallery__nav--prev" id="plsMGalleryPrev" type="button" aria-label="이전"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button><button class="pls-mobile-detail-gallery__nav pls-mobile-detail-gallery__nav--next" id="plsMGalleryNext" type="button" aria-label="다음"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>` : ''}
         <span class="pls-mobile-detail-gallery__counter" id="plsMGalleryCtr">${normalizedIndex + 1} / ${total}</span>
       </div>`
-    : `<div class="md-no-photo">등록된 사진이 없습니다.</div>`;
+    : `<div class="md-no-photo">${galleryBadges ? `<div class="md-gallery-badges">${galleryBadges}</div>` : ''}등록된 사진이 없습니다.</div>`;
 
   // ── 2. 차량정보 ──
-  const badges = [product.vehicleStatus, product.productType].filter(v => v && v !== '-').map(v =>
-    `<span class="md-badge">${esc(v)}</span>`).join('');
+  // 순서: 제조사 모델명 차량번호 / 세부모델 / 세부트림 / 선택옵션 / 연료·연식·주행거리·색상
   const vehicleInfo = `
     ${sectionHead('차량정보')}
     <div class="md-card">
       <div class="md-vehicle-head">
         <div class="md-vehicle-model">${esc(safe(product.maker))} ${esc(safe(product.model))}</div>
         <div class="md-vehicle-carno">${esc(safe(product.carNo))}</div>
-        ${badges ? `<div class="md-badges">${badges}</div>` : ''}
       </div>
-      <div class="md-vehicle-sub">${esc(safe(product.subModel))} ${esc(safe(product.trim))}</div>
+      ${product.subModel && product.subModel !== '-' ? `<div class="md-vehicle-sub">${esc(product.subModel)}</div>` : ''}
+      ${product.trim && product.trim !== '-' ? `<div class="md-vehicle-sub">${esc(product.trim)}</div>` : ''}
       ${product.optionSummary && product.optionSummary !== '-' ? `<div class="md-vehicle-sub">${esc(product.optionSummary)}</div>` : ''}
       <div class="md-vehicle-meta">${esc(safe(product.fuel))} · ${esc(safe(product.year))}년식 · ${esc(safe(product.mileageDisplay))} ${colorBadge(product.extColor)}${colorBadge(product.intColor)}</div>
     </div>`;

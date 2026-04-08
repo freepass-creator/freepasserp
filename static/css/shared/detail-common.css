@@ -196,6 +196,26 @@
   background: #0f172a;
   position: relative;
 }
+.md-gallery-badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+.md-gallery-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--m-radius-pill, 999px);
+  background: rgba(15, 23, 42, 0.7);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
 .pls-mobile-detail-gallery {
   cursor: pointer;
 }
