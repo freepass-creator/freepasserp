@@ -212,11 +212,27 @@ $delete?.addEventListener('click', async () => {
   }
 });
 
+// ⚡ 페이지 진입 즉시 textarea 포커스 (키보드 자동 오픈)
+function autoFocusTextarea() {
+  if (!$text) return;
+  $text.focus();
+  // iOS Safari는 click 같은 user gesture가 필요할 수 있음 → 첫 touch에서 다시 시도
+  const onFirstTouch = () => {
+    $text.focus();
+    document.removeEventListener('touchstart', onFirstTouch);
+    document.removeEventListener('click', onFirstTouch);
+  };
+  document.addEventListener('touchstart', onFirstTouch, { once: true, passive: true });
+  document.addEventListener('click', onFirstTouch, { once: true });
+}
+
 (async () => {
   try {
     const auth = await requireAuth();
     currentUser = auth.user;
     currentProfile = auth.profile;
+    // 즉시 포커스 (요청 대기 안 함)
+    requestAnimationFrame(autoFocusTextarea);
 
     // 역할별 버튼 노출: 공급사·관리자만 삭제 가능, 영업자는 숨김만
     const role = currentProfile?.role || '';
