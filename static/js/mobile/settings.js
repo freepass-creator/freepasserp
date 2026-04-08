@@ -91,6 +91,22 @@ function field(label, value, key, readonly = false, isEdit = false) {
   </div>`;
 }
 
+// 내 카탈로그 URL 빌더 — 담당자 이름/직급/소속을 query에 포함
+// 공급사 역할이면 provider 파라미터에 본인 회사코드를 넣어 자기 상품만 보이도록
+function buildMyCatalogUrl(p) {
+  const url = new URL(location.origin + '/catalog');
+  if (p.user_code) url.searchParams.set('a', p.user_code);
+  // 공급사 → 자기 상품만 (provider 파라미터)
+  if (p.role === 'provider' && p.company_code) {
+    url.searchParams.set('provider', p.company_code);
+  }
+  // 담당자/직급/소속 → catalog OG 타이틀 조립용
+  if (p.name) url.searchParams.set('n', p.name);
+  if (p.position) url.searchParams.set('pos', p.position);
+  if (p.company_name) url.searchParams.set('c', p.company_name);
+  return url.toString();
+}
+
 function render() {
   if (!$st || !currentProfile) return;
   const p = currentProfile;
@@ -156,9 +172,12 @@ function render() {
       </div>
       <div class="m-st-group__body">
         <div class="m-st-link">
-          <span class="m-st-link__url" id="m-st-catalog-url">${escapeHtml(`${location.origin}/catalog?a=${p.user_code || ''}`)}</span>
+          <span class="m-st-link__url" id="m-st-catalog-url">${escapeHtml(buildMyCatalogUrl(p))}</span>
           <button class="m-st-link__btn" id="m-st-catalog-copy" type="button" aria-label="복사">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          </button>
+          <button class="m-st-link__btn" id="m-st-catalog-share" type="button" aria-label="공유">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
           </button>
         </div>
       </div>
@@ -243,6 +262,23 @@ function render() {
     } catch (e) {
       showToast('복사 실패', 'error');
     }
+  });
+
+  // 카탈로그 공유 (Web Share API → 카톡 등)
+  $st.querySelector('#m-st-catalog-share')?.addEventListener('click', async () => {
+    const url = $st.querySelector('#m-st-catalog-url')?.textContent || '';
+    if (!url) return;
+    const agentPart = [currentProfile?.name, currentProfile?.position].filter(Boolean).join(' ');
+    const company = currentProfile?.company_name || '';
+    const title = `전체상품${agentPart ? ` - ${agentPart}` : ''}${company ? ` | ${company}` : ''}`;
+    if (navigator.share) {
+      try { await navigator.share({ title, url }); return; }
+      catch (err) { if (err?.name === 'AbortError') return; }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('링크 복사됨', 'success');
+    } catch { window.prompt('아래 링크를 복사하세요', url); }
   });
 
   // 비밀번호 재설정

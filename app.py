@@ -189,21 +189,28 @@ def catalog_view():
     provider = req.args.get('provider', '')
     share_id = req.args.get('id', '')
     agent = req.args.get('a', '')
-    # 동적 타이틀
     car_title = req.args.get('t', '')
     company = req.args.get('c', '')
+    agent_name = req.args.get('n', '')
+    agent_position = req.args.get('pos', '')
     # 이미지: in-memory 캐시에서 product id로 조회, 없으면 고정 아이콘
     cached_img = _share_image_cache.get(share_id) if share_id else None
     og_image = cached_img or (req.url_root.rstrip('/') + '/static/icons/icon-512.png')
-    suffix = f' | {company}' if company else ''
+    # 양식 통일:
+    #   상품별:  "상품구분 차량번호 차종 - 홍길동 팀장 | 소속회사"
+    #   공급사:  "공급코드 상품 - 홍길동 팀장 | 소속회사"
+    #   전체:    "전체상품 - 홍길동 팀장 | 소속회사"
+    agent_part = ' '.join([s for s in [agent_name, agent_position] if s])
+    agent_suffix = f' - {agent_part}' if agent_part else ''
+    company_suffix = f' | {company}' if company else ''
     if share_id and car_title:
-        title = f'{car_title}{suffix}'
+        title = f'{car_title}{company_suffix}'
     elif share_id:
-        title = f'상품 안내{suffix}'
+        title = f'상품 안내{agent_suffix}{company_suffix}'
     elif provider:
-        title = f'{provider} 상품{suffix}'
+        title = f'{provider} 상품{agent_suffix}{company_suffix}'
     else:
-        title = f'전체 상품{suffix}'
+        title = f'전체상품{agent_suffix}{company_suffix}'
     custom_desc = req.args.get('d', '')
     og_desc = custom_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.'
     return render_template('pages/catalog.html', page_title=title, og_title=title, og_desc=og_desc, og_image=og_image)
