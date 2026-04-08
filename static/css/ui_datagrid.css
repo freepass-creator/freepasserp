@@ -92,7 +92,7 @@
 
 .pls-cell {
   padding: 0 var(--space-2);
-  height: var(--height-lg);
+  height: 34px; /* 헤더(40px)보다 살짝 작게 — 줄 간격 컴팩트 */
   vertical-align: middle;
   font-size: var(--font-size-base);
   color: var(--text-main, #1f1f1f);
