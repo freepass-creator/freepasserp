@@ -828,8 +828,20 @@ export async function updateContract(contractCode, updates) {
   const snapshot = await get(contractRef);
   if (!snapshot.exists()) throw new Error('수정할 계약이 없습니다.');
   const current = snapshot.val() || {};
-  const next = { ...current, ...updates, contract_code: code, updated_at: Date.now() };
-  await set(contractRef, next);
+  // _secure는 절대 건드리지 않음 (provider 권한 차단 방지)
+  const safeUpdates = { ...updates };
+  delete safeUpdates._secure;
+  const next = { ...current, ...safeUpdates, contract_code: code, updated_at: Date.now() };
+  // update()로 patch — Firebase 권한 평가 시 필수 필드도 함께 전달
+  const patch = {
+    ...safeUpdates,
+    contract_code: code,
+    partner_code: current.partner_code || current.provider_company_code || '',
+    provider_company_code: current.provider_company_code || current.partner_code || '',
+    created_at: current.created_at || Date.now(),
+    updated_at: Date.now(),
+  };
+  await update(contractRef, patch);
   if (next.contract_status === '계약완료') {
     const settlementRef = ref(db, `settlements/${code}`);
     const settlementSnapshot = await get(settlementRef);
