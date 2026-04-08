@@ -10,12 +10,16 @@
  * 7. 추가 정보
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { watchProducts, watchTerms } from '../firebase/firebase-db.js';
+import { watchProducts, watchTerms, ensureRoom } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
 import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
+import { showToast, showConfirm } from '../core/toast.js';
 
-const $content = document.getElementById('m-pd-content');
-const $back = document.getElementById('m-back-btn');
+const $content   = document.getElementById('m-pd-content');
+const $back      = document.getElementById('m-back-btn');
+const $btnChat   = document.getElementById('m-pd-chat-top');
+const $btnContract = document.getElementById('m-pd-contract');
+const $btnShare  = document.getElementById('m-pd-share');
 
 const pathParts = location.pathname.split('/').filter(Boolean);
 const productId = decodeURIComponent(pathParts[pathParts.length - 1] || '');
@@ -23,6 +27,8 @@ const productId = decodeURIComponent(pathParts[pathParts.length - 1] || '');
 let activePhotoIndex = 0;
 let currentProduct = null;
 let allPolicies = [];
+let currentUser = null;
+let currentProfile = null;
 
 /* ── 아이콘 (Lucide 정통, stroke 2) ──────────────── */
 const SVG = (paths) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
@@ -525,9 +531,107 @@ $back?.addEventListener('click', () => {
   else location.href = '/m/product-list';
 });
 
+// ─── 액션: 문의(채팅) ────────────────────────────────────────────────────
+$btnChat?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  if (!currentProduct) { showToast('상품 정보를 불러오는 중입니다', 'info'); return; }
+  if (currentProfile?.role !== 'agent') { showToast('영업자만 문의할 수 있습니다', 'error'); return; }
+  $btnChat.disabled = true;
+  try {
+    const p = currentProduct;
+    const roomId = await ensureRoom({
+      productUid: p.product_uid || '',
+      productCode: p.product_code || p.product_uid || '',
+      providerUid: p.provider_uid || '',
+      providerCompanyCode: p.provider_company_code || p.partner_code || '',
+      providerName: p.provider_name || '',
+      agentUid: currentUser?.uid || '',
+      agentCode: currentProfile?.user_code || '',
+      agentName: currentProfile?.name || '',
+      vehicleNumber: p.car_number || '',
+      modelName: [p.maker, p.model_name, p.sub_model, p.trim_name].filter(v => v && v !== '-').join(' '),
+    });
+    // 채팅방으로 이동 → 입력칸 자동 포커스
+    location.href = `/m/chat/${encodeURIComponent(roomId)}`;
+  } catch (err) {
+    console.error('[product-detail] chat failed', err);
+    showToast('대화 연결 실패: ' + (err?.message || ''), 'error');
+    $btnChat.disabled = false;
+  }
+});
+
+// ─── 액션: 계약 ──────────────────────────────────────────────────────────
+$btnContract?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  if (!currentProduct) { showToast('상품 정보를 불러오는 중입니다', 'info'); return; }
+  if (currentProfile?.role !== 'agent') { showToast('영업자만 계약을 생성할 수 있습니다', 'error'); return; }
+  const ok = await showConfirm('이 상품으로 계약을 생성하시겠습니까?');
+  if (!ok) return;
+  const p = currentProduct;
+  const seed = {
+    seed_product_key: p.product_uid || p.product_code || '',
+    product_uid: p.product_uid || p.product_code || '',
+    product_code: p.product_code || p.product_uid || '',
+    product_code_snapshot: p.product_code || p.product_uid || '',
+    partner_code: p.partner_code || p.provider_company_code || '',
+    provider_company_code: p.provider_company_code || p.partner_code || '',
+    policy_code: p.policy_code || p.term_code || '',
+    car_number: p.car_number || '',
+    vehicle_name: [p.maker, p.model_name, p.sub_model, p.trim_name].filter(Boolean).join(' '),
+    maker: p.maker || '',
+    model_name: p.model_name || '',
+    sub_model: p.sub_model || '',
+    trim_name: p.trim_name || '',
+    rent_month: '48',
+    rent_amount: Number(p.price?.['48']?.rent || p.rental_price_48 || 0),
+    deposit_amount: Number(p.price?.['48']?.deposit || p.deposit_48 || 0),
+  };
+  try {
+    localStorage.setItem('freepass_pending_contract_seed', JSON.stringify(seed));
+  } catch {}
+  // 계약 페이지로 이동 → 빈 폼 자동 채움
+  location.href = '/contract';
+});
+
+// ─── 액션: 공유 ──────────────────────────────────────────────────────────
+$btnShare?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  if (!currentProduct) return;
+  const p = currentProduct;
+  const url = new URL(location.origin + '/catalog');
+  url.searchParams.set('id', p.product_uid || p.product_code || '');
+  if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
+  const shareUrl = url.toString();
+  const title = [p.maker, p.model_name].filter(Boolean).join(' ') || '상품';
+  // Web Share API 우선
+  if (navigator.share) {
+    try { await navigator.share({ title, url: shareUrl }); return; }
+    catch (err) { if (err?.name === 'AbortError') return; }
+  }
+  // 클립보드 fallback
+  try {
+    await navigator.clipboard.writeText(shareUrl);
+    showToast('링크가 복사되었습니다', 'success');
+  } catch {
+    window.prompt('아래 링크를 복사하세요', shareUrl);
+  }
+});
+
+// ─── 권한별 버튼 노출 ────────────────────────────────────────────────────
+function applyRoleVisibility() {
+  const role = currentProfile?.role || '';
+  // 영업자만 문의/계약 가능
+  if ($btnChat)     $btnChat.hidden     = role !== 'agent';
+  if ($btnContract) $btnContract.hidden = role !== 'agent';
+  // 공유는 모두 가능
+}
+
 (async () => {
   try {
-    await requireAuth();
+    const auth = await requireAuth();
+    currentUser = auth.user;
+    currentProfile = auth.profile;
+    applyRoleVisibility();
     watchProducts((products) => {
       currentProduct = products.find(p => p.product_uid === productId || p.product_code === productId);
       render();
