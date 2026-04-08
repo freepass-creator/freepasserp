@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% block page_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-theme.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-panel.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-topbar.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-form.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-list.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-viewmode.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-section.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-theme.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-panel.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-topbar.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-form.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-list.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-viewmode.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-section.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile.css') }}?v={{ app_version }}" data-page-style="true">
 {% block workspace_page_css %}{% endblock %}
 {% endblock %}
 {% block body %}

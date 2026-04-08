@@ -1,7 +1,7 @@
 {% extends 'pages/layout/workspace.html' %}
 {% block workspace_page_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contract.css') }}" data-page-style="true">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile-contract.css') }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contract.css') }}?v={{ app_version }}" data-page-style="true">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile-contract.css') }}?v={{ app_version }}" data-page-style="true">
 {% endblock %}
 {% block page_title_text %}계약 관리{% endblock %}
 {% block top_bar_actions %}{% endblock %}
