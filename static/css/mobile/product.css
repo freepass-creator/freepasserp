@@ -1,0 +1,59 @@
+/* 모바일 상품목록 */
+
+.m-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  height: 36px;
+  padding: 0 12px;
+  background: var(--m-bg);
+  border-radius: var(--m-radius-md);
+  color: var(--m-text-tertiary);
+}
+.m-search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: var(--m-text-primary);
+  min-width: 0;
+}
+.m-search-bar input::placeholder { color: var(--m-text-tertiary); }
+
+.m-product-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  background: var(--m-bg);
+}
+.m-product-card {
+  background: var(--m-card-bg);
+  border-radius: var(--m-radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+}
+.m-product-card__img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--m-divider);
+  object-fit: cover;
+  display: block;
+}
+.m-product-card__no-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--m-divider);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--m-text-tertiary);
+}
+.m-product-card__body {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

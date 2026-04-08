@@ -137,8 +137,24 @@ _NEW_ROUTES = [
     ('/request',       'request-manage.html',           '요청하기'),
 ]
 
+# 모바일 전용 템플릿 매핑 (있는 경우만 모바일 템플릿 렌더, 없으면 데스크탑 fallback)
+_MOBILE_TEMPLATE_MAP = {
+    'pages/product.html':  'mobile/product.html',
+    'pages/chat.html':     'mobile/chat.html',
+    'pages/contract.html': 'mobile/contract.html',
+    'pages/settings.html': 'mobile/settings.html',
+}
+
 def _make_new_view(template: str, title: str):
     def view():
+        # 모바일이면 모바일 전용 템플릿 우선 시도
+        if _is_mobile():
+            mobile_tpl = _MOBILE_TEMPLATE_MAP.get(template)
+            if mobile_tpl:
+                try:
+                    return render_template(mobile_tpl, page_title=title)
+                except Exception:
+                    pass
         return render_template(template, page_title=title)
     return view
 
