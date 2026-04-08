@@ -180,19 +180,23 @@ function render(items) {
   }).join('');
 }
 
+let _renderRaf = 0;
 function applySearch() {
-  let result = allProducts;
-  // 1) 필터 적용
-  result = applyFilter(result, activeFilters, FILTER_GROUPS, allPolicies);
-  // 2) 검색 적용
-  const q = searchQuery.trim().toLowerCase();
-  if (q) {
-    result = result.filter(p => {
-      const fields = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name];
-      return fields.some(f => String(f || '').toLowerCase().includes(q));
-    });
-  }
-  render(result);
+  // 디바운스: 연속 호출 시 1프레임만 유지
+  if (_renderRaf) cancelAnimationFrame(_renderRaf);
+  _renderRaf = requestAnimationFrame(() => {
+    _renderRaf = 0;
+    let result = allProducts;
+    result = applyFilter(result, activeFilters, FILTER_GROUPS, allPolicies);
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      result = result.filter(p => {
+        const fields = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name];
+        return fields.some(f => String(f || '').toLowerCase().includes(q));
+      });
+    }
+    render(result);
+  });
 }
 
 $filterBtn?.addEventListener('click', () => {
@@ -231,9 +235,11 @@ $grid?.addEventListener('click', (e) => {
       allPolicies = Array.isArray(terms) ? terms : [];
       applySearch();
     });
+    let searchTimer;
     $search?.addEventListener('input', () => {
       searchQuery = $search.value;
-      applySearch();
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applySearch, 200);
     });
   } catch (e) {
     console.error('[mobile/product] init failed', e);

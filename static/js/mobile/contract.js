@@ -165,22 +165,29 @@ function render(contracts) {
   }).join('');
 }
 
+let _applyRaf = 0;
 function applyAll() {
-  const enriched = allContracts.map(enrichContract);
-  let result = applyFilter(enriched, activeFilters, FILTER_GROUPS);
-  const q = searchQuery.trim().toLowerCase();
-  if (q) {
-    result = result.filter(c => {
-      const fields = [c.customer_name, c.vehicle_number, c.car_number, c.contract_code, c.model_name, c.product_model];
-      return fields.some(f => String(f || '').toLowerCase().includes(q));
-    });
-  }
-  render(result);
+  if (_applyRaf) cancelAnimationFrame(_applyRaf);
+  _applyRaf = requestAnimationFrame(() => {
+    _applyRaf = 0;
+    const enriched = allContracts.map(enrichContract);
+    let result = applyFilter(enriched, activeFilters, FILTER_GROUPS);
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      result = result.filter(c => {
+        const fields = [c.customer_name, c.vehicle_number, c.car_number, c.contract_code, c.model_name, c.product_model];
+        return fields.some(f => String(f || '').toLowerCase().includes(q));
+      });
+    }
+    render(result);
+  });
 }
 
+let _searchTimer;
 $search?.addEventListener('input', () => {
   searchQuery = $search.value;
-  applyAll();
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(applyAll, 200);
 });
 
 $filterBtn?.addEventListener('click', () => {

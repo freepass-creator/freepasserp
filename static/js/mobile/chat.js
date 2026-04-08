@@ -127,22 +127,29 @@ function render(rooms) {
   }).join('');
 }
 
+let _applyRaf = 0;
 function applyAll() {
-  const enriched = allRooms.map(enrichRoom);
-  let result = applyFilter(enriched, activeFilters, FILTER_GROUPS);
-  const q = searchQuery.trim().toLowerCase();
-  if (q) {
-    result = result.filter(r => {
-      const fields = [r.vehicle_number, r.model_name, r.last_message, r.provider_company_code, r.agent_code, r.provider_name, r.agent_name];
-      return fields.some(f => String(f || '').toLowerCase().includes(q));
-    });
-  }
-  render(result);
+  if (_applyRaf) cancelAnimationFrame(_applyRaf);
+  _applyRaf = requestAnimationFrame(() => {
+    _applyRaf = 0;
+    const enriched = allRooms.map(enrichRoom);
+    let result = applyFilter(enriched, activeFilters, FILTER_GROUPS);
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      result = result.filter(r => {
+        const fields = [r.vehicle_number, r.model_name, r.last_message, r.provider_company_code, r.agent_code, r.provider_name, r.agent_name];
+        return fields.some(f => String(f || '').toLowerCase().includes(q));
+      });
+    }
+    render(result);
+  });
 }
 
+let _searchTimer;
 $search?.addEventListener('input', () => {
   searchQuery = $search.value;
-  applyAll();
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(applyAll, 200);
 });
 
 $filterBtn?.addEventListener('click', () => {
