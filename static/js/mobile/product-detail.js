@@ -632,8 +632,7 @@ $btnShare?.addEventListener('click', async (e) => {
   const carTitle = [carPart, agentPart && `- ${agentPart}`].filter(Boolean).join(' ');
   if (carTitle) url.searchParams.set('t', carTitle);
   if (company) url.searchParams.set('c', company);
-  const firstImg = (Array.isArray(p.image_urls) && p.image_urls[0]) || p.image_url || '';
-  if (firstImg) url.searchParams.set('img', firstImg);
+  // 이미지 URL은 너무 길어서 query에 넣지 않음 — 서버가 OG 기본 이미지 사용
   const shareUrl = url.toString();
   const title = carTitle || [p.maker, p.model_name].filter(Boolean).join(' ') || '상품';
   // Web Share API 우선

@@ -172,7 +172,8 @@ def catalog_view():
     # 동적 타이틀
     car_title = req.args.get('t', '')
     company = req.args.get('c', '')
-    og_image = req.args.get('img', '')
+    # 이미지 URL은 query에 안 받음 (너무 김) → 고정 OG 이미지 사용
+    og_image = req.url_root.rstrip('/') + '/static/icons/icon-512.png'
     suffix = f' | {company}' if company else ''
     if share_id and car_title:
         title = f'렌터카 {car_title} 상품{suffix}'
