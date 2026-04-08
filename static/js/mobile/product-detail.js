@@ -624,6 +624,11 @@ $btnShare?.addEventListener('click', async (e) => {
   const url = new URL(location.origin + '/catalog');
   url.searchParams.set('id', p.product_uid || p.product_code || '');
   if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
+  // 차량 정보 + 대표 이미지 → OG 태그용
+  const carTitle = [p.car_number, p.maker, p.model_name, p.sub_model].filter(Boolean).join(' ');
+  if (carTitle) url.searchParams.set('t', carTitle);
+  const firstImg = (Array.isArray(p.image_urls) && p.image_urls[0]) || p.image_url || '';
+  if (firstImg) url.searchParams.set('img', firstImg);
   const shareUrl = url.toString();
   const title = [p.maker, p.model_name].filter(Boolean).join(' ') || '상품';
   // Web Share API 우선

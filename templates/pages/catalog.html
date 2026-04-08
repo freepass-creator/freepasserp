@@ -7,6 +7,18 @@
 <meta property="og:title" content="{{ og_title or '렌터카 상품 안내' }}">
 <meta property="og:description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
 <meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.url }}">
+{% if og_image %}
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ og_image }}">
+{% else %}
+<meta name="twitter:card" content="summary">
+{% endif %}
+<meta name="twitter:title" content="{{ og_title or '렌터카 상품 안내' }}">
+<meta name="twitter:description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
 <meta name="description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-theme.css') }}?v={{ app_version }}">

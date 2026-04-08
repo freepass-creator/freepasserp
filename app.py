@@ -172,6 +172,7 @@ def catalog_view():
     # 동적 타이틀
     car_title = req.args.get('t', '')
     company = req.args.get('c', '')
+    og_image = req.args.get('img', '')
     suffix = f' | {company}' if company else ''
     if share_id and car_title:
         title = f'렌터카 {car_title} 상품{suffix}'
@@ -182,7 +183,7 @@ def catalog_view():
     else:
         title = f'렌터카 전체 상품{suffix}'
     og_desc = '렌터카 장기렌트 상품을 검색하고 비교해보세요.'
-    return render_template('pages/catalog.html', page_title=title, og_title=title, og_desc=og_desc)
+    return render_template('pages/catalog.html', page_title=title, og_title=title, og_desc=og_desc, og_image=og_image)
 
 for _path, _tpl, _title in _NEW_ROUTES:
     _ep = _path.lstrip('/').replace('-', '_').replace('/', '_')
