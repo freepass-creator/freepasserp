@@ -592,13 +592,13 @@ $btnContract?.addEventListener('click', async (e) => {
     localStorage.setItem('freepass_pending_contract_seed', JSON.stringify(seed));
   } catch {}
   // 계약 페이지로 이동 → 빈 폼 자동 채움
-  location.href = '/contract';
+  location.href = '/m/contract';
 });
 
 // ─── 액션: 공유 ──────────────────────────────────────────────────────────
 $btnShare?.addEventListener('click', async (e) => {
   e.preventDefault();
-  if (!currentProduct) return;
+  if (!currentProduct) { showToast('상품 정보를 불러오는 중입니다', 'info'); return; }
   const ok = await showConfirm('이 상품의 공유 링크를 만드시겠습니까?');
   if (!ok) return;
   const p = currentProduct;
@@ -621,13 +621,11 @@ $btnShare?.addEventListener('click', async (e) => {
   }
 });
 
-// ─── 권한별 버튼 노출 ────────────────────────────────────────────────────
+// ─── 권한별 버튼 노출 — 항상 보이게 두고, 클릭 시 핸들러에서 역할 체크 ───
 function applyRoleVisibility() {
-  const role = currentProfile?.role || '';
-  // 영업자만 문의/계약 가능
-  if ($btnChat)     $btnChat.hidden     = role !== 'agent';
-  if ($btnContract) $btnContract.hidden = role !== 'agent';
-  // 공유는 모두 가능
+  if ($btnChat)     $btnChat.hidden     = false;
+  if ($btnContract) $btnContract.hidden = false;
+  if ($btnShare)    $btnShare.hidden    = false;
 }
 
 (async () => {
