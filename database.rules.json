@@ -110,7 +110,7 @@
       ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider' || root.child('users').child(auth.uid).child('role').val() === 'agent')",
       ".indexOn": ["product_uid", "partner_code", "contract_status", "agent_uid", "created_at"],
       "$contract_code": {
-        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'agent' && (newData.child('agent_uid').val() === auth.uid || (!newData.exists() && data.child('agent_uid').val() === auth.uid))))",
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'agent' && (newData.child('agent_uid').val() === auth.uid || (!newData.exists() && data.child('agent_uid').val() === auth.uid))) || (root.child('users').child(auth.uid).child('role').val() === 'provider' && (newData.child('partner_code').val() === root.child('users').child(auth.uid).child('company_code').val() || (!newData.exists() && data.child('partner_code').val() === root.child('users').child(auth.uid).child('company_code').val()))))",
         ".validate": "!newData.exists() || newData.hasChildren(['contract_code', 'partner_code', 'created_at'])",
         // _secure 노드: admin만 직접 읽기, 클라이언트에서 암호화된 값으로 저장
         "_secure": {
