@@ -405,37 +405,18 @@
     min-height: auto;
   }
 
-  /* ─── 데스크탑 그리드 테이블 → 모바일 카드 변환 ─── */
-  .pls-grid-panel { overflow: visible !important; }
-  .pls-grid-scroll { overflow: visible !important; }
-  .pls-table, .pls-table tbody { display: block !important; width: 100% !important; }
-  .pls-table thead { display: none !important; }
-  .pls-table colgroup { display: none !important; }
-  .pls-table tbody tr.pls-row {
+  /* 모바일에서는 데스크탑 그리드 패널 완전 숨김 */
+  .pls-grid-panel { display: none !important; }
+  /* 모바일 카드 컨테이너 강제 표시 */
+  #contract-m-list,
+  .chat-m-rooms,
+  .pls-m-catalog-wrap {
     display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 14px 16px !important;
-    border-bottom: 1px solid var(--m-divider, #f2f4f6) !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
     background: #fff !important;
-    width: 100% !important;
-  }
-  .pls-table tbody tr.pls-row.is-active { background: #f0f4ff !important; }
-  .pls-table tbody tr.pls-row td {
-    display: none !important;
-  }
-  /* 차량번호(4) + 세부모델(6) 셀만 표시 */
-  .pls-table tbody tr.pls-row td:nth-child(4),
-  .pls-table tbody tr.pls-row td:nth-child(6) {
-    display: block !important;
-    padding: 0 !important;
-    border: none !important;
-    height: auto !important;
-    text-align: left !important;
-    font-size: 13px !important;
-    color: #0f172a !important;
-    font-weight: 600 !important;
-    background: transparent !important;
   }
 
   .col-3, .col-4, .col-5, .col-6,
