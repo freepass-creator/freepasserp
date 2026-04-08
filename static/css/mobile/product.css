@@ -14,6 +14,9 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  contain: layout style paint;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 280px;
 }
 .m-product-card:active { background: var(--m-divider); }
 

@@ -102,6 +102,11 @@ function typeTone(v) {
   return 'neutral';
 }
 
+// 카드 HTML 캐시 (상품 데이터 변경 없으면 재사용)
+const _cardCache = new Map();
+function _cardKey(p) {
+  return `${p.product_uid || p.product_code}|${p.updated_at || 0}`;
+}
 function render(items) {
   if (!$grid) return;
   if (!items.length) {
@@ -109,6 +114,10 @@ function render(items) {
     return;
   }
   $grid.innerHTML = items.map(p => {
+    const key = _cardKey(p);
+    const cached = _cardCache.get(key);
+    if (cached) return cached;
+    const html = (() => {
     const photos = (Array.isArray(p.image_urls) && p.image_urls.length ? p.image_urls : null) || (p.image_url ? [p.image_url] : []);
     const thumb = photos[0] || '';
     const maker = p.maker || '';
@@ -137,7 +146,7 @@ function render(items) {
     ].join('');
 
     const imgInner = thumb
-      ? `<img class="m-product-card__img" src="${escapeHtml(thumb)}" loading="lazy" alt="">`
+      ? `<img class="m-product-card__img" src="${escapeHtml(thumb)}" loading="lazy" decoding="async" fetchpriority="low" alt="">`
       : `<div class="m-product-card__no-img"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
     const imgHtml = `<div class="m-product-card__media">${imgInner}${badges ? `<div class="m-product-card__badges">${badges}</div>` : ''}</div>`;
 
@@ -177,7 +186,15 @@ function render(items) {
         ${priceSub ? `<div class="m-product-card__price-sub">${escapeHtml(priceSub)}</div>` : ''}
       </div>
     </article>`;
+    })();
+    _cardCache.set(key, html);
+    return html;
   }).join('');
+  // 캐시 크기 제한 (메모리 leak 방지)
+  if (_cardCache.size > 500) {
+    const keys = [...(_cardCache.keys())];
+    for (let i = 0; i < keys.length - 300; i++) _cardCache.delete(keys[i]);
+  }
 }
 
 let _renderRaf = 0;
