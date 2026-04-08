@@ -158,12 +158,17 @@ function doSend() {
 
 // touchstart 단계에서 처리: 포커스 이동 전에 가로채기
 let _sendTouchHandled = false;
+// pointerdown은 touchstart보다 더 빨리 발생 — blur가 일어나기 전 단계에서 차단
+$send?.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); // textarea blur 자체를 막음
+}, { passive: false });
 $send?.addEventListener('touchstart', (e) => {
-  // textarea 포커스 보존을 위해 기본 동작 차단 (블러 방지)
   e.preventDefault();
   _sendTouchHandled = true;
   // textarea가 이미 포커스 있으면 그대로, 없으면 다시 포커스
-  if (document.activeElement !== $text) $text?.focus();
+  if (document.activeElement !== $text) {
+    try { $text?.focus({ preventScroll: true }); } catch { $text?.focus(); }
+  }
   doSend();
 }, { passive: false });
 
@@ -171,7 +176,9 @@ $send?.addEventListener('touchstart', (e) => {
 $send?.addEventListener('mousedown', (e) => {
   if (_sendTouchHandled) { _sendTouchHandled = false; return; }
   e.preventDefault();
-  if (document.activeElement !== $text) $text?.focus();
+  if (document.activeElement !== $text) {
+    try { $text?.focus({ preventScroll: true }); } catch { $text?.focus(); }
+  }
   doSend();
 });
 

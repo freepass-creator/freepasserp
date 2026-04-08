@@ -154,12 +154,13 @@
       if (t.matches('input, textarea, [contenteditable=true]')) return;
       e.preventDefault();
     });
-    // ⚡ 햅틱 진동 (지원 기기에서) — 버튼/탭/카드 클릭 시
+    // ⚡ 햅틱 진동 — 모든 인터랙티브 요소에 동일하게 (사진 확대 등 포함)
     if ('vibrate' in navigator) {
-      document.addEventListener('click', (e) => {
-        const t = e.target.closest('button, a, [role=button], .m-tab, .m-list-row, .m-product-card');
+      const HAPTIC_SEL = 'button, a, [role=button], .m-tab, .m-list-row, .m-product-card, .m-card, .m-icon-btn, label, summary, [data-haptic], img';
+      document.addEventListener('pointerdown', (e) => {
+        const t = e.target.closest(HAPTIC_SEL);
         if (t) navigator.vibrate(8);
-      }, { passive: true });
+      }, { passive: true, capture: true });
     }
     // ⚡ 탭 hover/touchstart 시 prefetch (실제 클릭 전에 미리 다운로드)
     document.querySelectorAll('.m-tab[href]').forEach(tab => {
