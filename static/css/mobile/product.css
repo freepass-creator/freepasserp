@@ -3,14 +3,17 @@
 .m-search-bar {
   display: flex;
   align-items: center;
-  gap: clamp(4px, 1.6vw, 8px);
-  flex: 1;
+  gap: var(--m-space-2);
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
   height: var(--m-icon-btn);
-  padding: 0 clamp(8px, 3.2vw, 14px);
+  padding: 0 var(--m-space-3);
   background: var(--m-bg);
   border-radius: var(--m-radius-md);
   color: var(--m-text-tertiary);
 }
+.m-search-bar input { min-width: 0; }
 .m-search-bar input {
   flex: 1;
   border: none;

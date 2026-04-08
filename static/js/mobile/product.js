@@ -47,8 +47,8 @@ function render(items) {
       deposit: num(pr[m]?.deposit) || (m === '48' ? num(p.deposit_48) || num(p.deposit) : (m === '60' ? num(p.deposit_60) : 0)),
     })).filter(r => r.rent > 0);
     const cheapest = priceRows.length ? priceRows.reduce((a, b) => (a.rent <= b.rent ? a : b)) : null;
-    const priceLabel = cheapest ? `월 ${cheapest.rent.toLocaleString('ko-KR')}원` : '';
-    const priceSub = cheapest ? `보증금 ${cheapest.deposit ? cheapest.deposit.toLocaleString('ko-KR') + '원' : '-'} · ${cheapest.m}개월` : '';
+    const priceLabel = cheapest ? `월 ${cheapest.rent.toLocaleString('ko-KR')}원 · ${cheapest.m}개월` : '';
+    const priceSub = cheapest ? `보증금 ${cheapest.deposit ? cheapest.deposit.toLocaleString('ko-KR') + '원' : '-'}` : '';
 
     return `<article class="m-product-card" data-id="${escapeHtml(p.product_uid || p.product_code || '')}">
       ${imgHtml}

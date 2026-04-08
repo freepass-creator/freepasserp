@@ -87,15 +87,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
   flex: 0 0 var(--m-topbar-h);
   display: flex;
   align-items: center;
-  justify-content: space-between;
   height: var(--m-topbar-h);
   padding: 0 var(--m-pad-x);
+  gap: var(--m-space-2);
   background: var(--m-card-bg);
   border-bottom: 1px solid var(--m-divider);
   z-index: 100;
-}
-.m-topbar {
-  gap: clamp(8px, 2.4vw, 12px);
 }
 .m-topbar__left,
 .m-topbar__center,
@@ -104,8 +101,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   align-items: center;
   min-width: 0;
 }
-.m-topbar__left { flex: 1 1 auto; }
-.m-topbar__right { flex: 0 0 auto; gap: clamp(2px, 1vw, 6px); }
+.m-topbar__left  { flex: 1 1 0; min-width: 0; overflow: hidden; }
+.m-topbar__right { flex: 0 0 auto; gap: var(--m-space-1); }
 .m-topbar__left:empty,
 .m-topbar__center:empty,
 .m-topbar__right:empty { display: none; }
