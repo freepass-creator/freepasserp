@@ -219,10 +219,17 @@ document.addEventListener('click', _onFirstGesture, { once: true });
     const canDelete = role === 'provider' || role === 'admin';
     if ($delete && !canDelete) $delete.hidden = true;
 
-    // 방 정보 조회 (메타용)
+    // 방 정보 조회 + 상단바 제목 채우기 (차량번호 / 차종)
+    const $titleCar = document.getElementById('m-cr-title-car');
+    const $titleModel = document.getElementById('m-cr-title-model');
     watchRooms((rooms) => {
       const room = (rooms || []).find(r => r.room_id === roomId || r.chat_code === roomId);
-      if (room) currentRoom = room;
+      if (!room) return;
+      currentRoom = room;
+      const carNo = room.vehicle_number || room.car_number || '';
+      const model = room.model_name || '';
+      if ($titleCar) $titleCar.textContent = carNo || '대화방';
+      if ($titleModel) $titleModel.textContent = model;
     });
 
     // 메시지 구독

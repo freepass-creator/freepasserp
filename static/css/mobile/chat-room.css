@@ -17,6 +17,34 @@
   background: var(--m-bg);
 }
 
+/* 상단바 제목 — 차량번호·차종 */
+.m-cr__title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.m-cr__title-line1 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--m-text-primary);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.m-cr__title-line2 {
+  font-size: 0.6875rem;
+  color: var(--m-text-tertiary);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.m-cr__title-line2:empty { display: none; }
+
 /* 메시지 영역 */
 .m-cr__messages {
   flex: 1 1 0;
