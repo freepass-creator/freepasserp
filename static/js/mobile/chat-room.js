@@ -103,25 +103,12 @@ function renderMessages(messages) {
   }
 }
 
-// 키보드 올라올 때 — 페이지 전체가 밀리지 않고 본문만 줄어들도록
-function adjustForKeyboard() {
-  const vv = window.visualViewport;
-  if (!vv) return;
-  const $cr = document.querySelector('.m-cr');
-  if (!$cr) return;
-  // 상단바(.m-topbar) 높이 빼고 visualViewport 높이만큼만 차지
-  const topbarH = document.querySelector('.m-topbar')?.offsetHeight || 0;
-  const newH = vv.height - topbarH;
-  $cr.style.height = newH + 'px';
-  // 입력창이 보이도록 스크롤
-  if ($messages) $messages.scrollTop = $messages.scrollHeight;
-}
+// 키보드 올라올 때 메시지 영역만 자동 스크롤 (CSS dvh가 레이아웃 담당)
 if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', adjustForKeyboard);
-  window.visualViewport.addEventListener('scroll', adjustForKeyboard);
+  window.visualViewport.addEventListener('resize', () => {
+    if ($messages) $messages.scrollTop = $messages.scrollHeight;
+  });
 }
-window.addEventListener('load', adjustForKeyboard);
-adjustForKeyboard();
 
 $back?.addEventListener('click', () => {
   if (history.length > 1) history.back();

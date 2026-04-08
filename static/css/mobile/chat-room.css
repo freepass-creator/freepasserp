@@ -1,6 +1,6 @@
 /* 모바일 대화방 — 채팅방 진입 시 페이지 전체 사용 */
 .m-body:has(.m-cr) {
-  height: 100dvh;
+  height: 100svh;
   overflow: hidden;
 }
 .m-body:has(.m-cr) .m-page {
