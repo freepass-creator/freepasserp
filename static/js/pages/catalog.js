@@ -465,6 +465,9 @@ function renderSingleView(p) {
 let sGalleryIndex = 0;
 let sGalleryImages = [];
 let _sTouchStartX = 0;
+let _sTouchStartY = 0;
+let _sSwiped = false;
+let _sLocked = false;
 
 function renderSingleGallery(images) {
   sGalleryImages = images;
@@ -478,7 +481,6 @@ function renderSingleGallery(images) {
   updateGallerySlide();
 
   // 스와이프 (스크롤 충돌 방지 + 클릭 오작동 방지)
-  let _sTouchStartY = 0, _sSwiped = false, _sLocked = false;
   singleGallery.addEventListener('touchstart', (e) => {
     _sTouchStartX = e.touches[0].clientX; _sTouchStartY = e.touches[0].clientY;
     _sSwiped = false; _sLocked = false;
