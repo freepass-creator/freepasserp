@@ -128,11 +128,11 @@ $back?.addEventListener('click', () => {
   else location.href = '/m/chat';
 });
 
-// ⚡ 핵심: 전송 버튼이 textarea 포커스를 뺏지 못하게
-const $send = $form?.querySelector('button[type="submit"]');
+// ⚡ 핵심: 전송 버튼 — type="button" + tabindex="-1" (포커스 가져가지 않음)
+const $send = $form?.querySelector('.m-cr__send') || $form?.querySelector('button');
 if ($send) {
-  // tabindex -1로 포커스 대상에서 제외
   $send.setAttribute('tabindex', '-1');
+  $send.setAttribute('type', 'button');
 }
 
 // ⚡ 강제 포커스 가드 — textarea가 blur되면 즉시 다시 박기 (전송 후 ~2초 윈도우)
