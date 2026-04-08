@@ -135,6 +135,17 @@ if ($send) {
   $send.setAttribute('tabindex', '-1');
 }
 
+// 전송 직후 짧은 윈도우 동안 textarea가 blur되면 즉시 re-focus (키보드 내려가는 것 방지)
+let _refocusGuardUntil = 0;
+$text?.addEventListener('blur', () => {
+  if (Date.now() < _refocusGuardUntil) {
+    // 동기적으로 즉시 re-focus
+    setTimeout(() => {
+      try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
+    }, 0);
+  }
+});
+
 function doSend() {
   if (!$text) return;
   const text = ($text.value || '').trim();
@@ -143,6 +154,8 @@ function doSend() {
   $text.style.height = 'auto';
   // ⚡ 메모리 패턴: value='' → focus() → sendMessage() 동기 순서 (await 금지)
   try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
+  // 다음 1초 동안 blur 발생 시 즉시 re-focus
+  _refocusGuardUntil = Date.now() + 1000;
   // 백그라운드 전송 (fire-and-forget)
   sendMessage(roomId, {
     text,
