@@ -142,44 +142,23 @@ _NEW_ROUTES = [
     ('/request',       'request-manage.html',           '요청하기'),
 ]
 
-# 모바일 전용 템플릿 매핑 (있는 경우만 모바일 템플릿 렌더, 없으면 데스크탑 fallback)
-_MOBILE_TEMPLATE_MAP = {
-    'pages/product.html':  'mobile/product.html',
-    'pages/chat.html':     'mobile/chat.html',
-    'pages/contract.html': 'mobile/contract.html',
-    'pages/settings.html': 'mobile/settings.html',
-}
-
-def _make_new_view_with_detail_check(template: str, title: str, detail_template: str = None):
-    """상품 페이지: 모바일 + ?id= 가 있으면 상세 페이지 렌더"""
-    def view():
-        if _is_mobile():
-            if detail_template and request.args.get('id'):
-                try:
-                    return render_template(detail_template, page_title=title)
-                except Exception:
-                    pass
-            mobile_tpl = _MOBILE_TEMPLATE_MAP.get(template)
-            if mobile_tpl:
-                try:
-                    return render_template(mobile_tpl, page_title=title)
-                except Exception:
-                    pass
-        return render_template(template, page_title=title)
-    return view
-
 def _make_new_view(template: str, title: str):
+    """데스크탑 전용 — 모바일 사용자는 /m/ 으로 리다이렉트"""
     def view():
-        # 모바일이면 모바일 전용 템플릿 우선 시도
         if _is_mobile():
-            mobile_tpl = _MOBILE_TEMPLATE_MAP.get(template)
-            if mobile_tpl:
-                try:
-                    return render_template(mobile_tpl, page_title=title)
-                except Exception:
-                    pass
+            mobile_path = _MOBILE_REDIRECT_MAP.get(template)
+            if mobile_path:
+                return redirect(mobile_path)
         return render_template(template, page_title=title)
     return view
+
+# 데스크탑 → 모바일 리다이렉트 매핑
+_MOBILE_REDIRECT_MAP = {
+    'pages/product.html':  '/m/product-list',
+    'pages/chat.html':     '/m/chat',
+    'pages/contract.html': '/m/contract',
+    'pages/settings.html': '/m/settings',
+}
 
 @pages_bp.route('/catalog')
 def catalog_view():
@@ -204,12 +183,30 @@ def catalog_view():
 
 for _path, _tpl, _title in _NEW_ROUTES:
     _ep = _path.lstrip('/').replace('-', '_').replace('/', '_')
-    # 상품목록은 ?id= 있으면 모바일 상세로
-    if _path == '/product-list':
-        pages_bp.add_url_rule(_path, endpoint=_ep,
-            view_func=_make_new_view_with_detail_check(_tpl, _title, 'mobile/product-detail.html'))
-    else:
-        pages_bp.add_url_rule(_path, endpoint=_ep, view_func=_make_new_view(_tpl, _title))
+    pages_bp.add_url_rule(_path, endpoint=_ep, view_func=_make_new_view(_tpl, _title))
+
+
+# ─── Blueprint: 모바일 전용 (/m/*) ───────────────────────────────────────────
+
+mobile_bp = Blueprint('mobile', __name__, url_prefix='/m')
+
+_MOBILE_ROUTES = [
+    ('/product-list', 'mobile/product.html',         '상품목록'),
+    ('/product-list/<product_id>', 'mobile/product-detail.html', '상품상세'),
+    ('/chat',         'mobile/chat.html',            '대화'),
+    ('/contract',     'mobile/contract.html',        '계약'),
+    ('/settings',     'mobile/settings.html',        '설정'),
+]
+
+def _make_mobile_view(template: str, title: str, has_id: bool = False):
+    def view(**kwargs):
+        return render_template(template, page_title=title, **kwargs)
+    return view
+
+for _mp in _MOBILE_ROUTES:
+    _path, _tpl, _title = _mp
+    _ep = 'm_' + _path.lstrip('/').replace('-', '_').replace('/', '_').replace('<', '').replace('>', '')
+    mobile_bp.add_url_rule(_path, endpoint=_ep, view_func=_make_mobile_view(_tpl, _title))
 
 
 # ─── Blueprint: API ───────────────────────────────────────────────────────────
@@ -331,6 +328,7 @@ def internal_error(e):
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(pages_bp)
+app.register_blueprint(mobile_bp)
 app.register_blueprint(api_bp)
 
 @app.route('/')

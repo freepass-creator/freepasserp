@@ -9,8 +9,9 @@ const $content = document.getElementById('m-pd-content');
 const $title = document.getElementById('m-pd-title');
 const $back = document.getElementById('m-back-btn');
 
-const params = new URLSearchParams(location.search);
-const productId = params.get('id') || '';
+// URL 패턴: /m/product-list/<id>
+const pathParts = location.pathname.split('/').filter(Boolean);
+const productId = decodeURIComponent(pathParts[pathParts.length - 1] || '');
 
 let allProducts = [];
 let activePhotoIndex = 0;
@@ -111,7 +112,7 @@ function render(p) {
 
 $back?.addEventListener('click', () => {
   if (history.length > 1) history.back();
-  else location.href = '/product-list';
+  else location.href = '/m/product-list';
 });
 
 (async () => {

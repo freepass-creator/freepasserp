@@ -65,9 +65,7 @@ $grid?.addEventListener('click', (e) => {
   if (!card) return;
   const id = card.dataset.id;
   if (id) {
-    const url = new URL(location.href);
-    url.searchParams.set('id', id);
-    location.href = url.toString();
+    location.href = `/m/product-list/${encodeURIComponent(id)}`;
   }
 });
 
