@@ -37,6 +37,11 @@
     .m-tab__badge[hidden]{display:none}
     .m-skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e9eef5 50%,#f1f5f9 75%);background-size:400% 100%;animation:m-shimmer 1.4s ease infinite;border-radius:8px}
     @keyframes m-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+    /* 버튼 타격감 — 모든 버튼/링크 active 시 즉각 시각 피드백 */
+    button,a,[role=button],.m-tab,.m-icon-btn,.m-list-row,.m-product-card{transition:transform .08s ease-out,opacity .08s ease-out,background-color .12s ease-out}
+    button:active,a:active,[role=button]:active,.m-icon-btn:active{transform:scale(.94);opacity:.85}
+    .m-tab:active{transform:scale(.92);opacity:.7}
+    .m-list-row:active,.m-product-card:active{transform:scale(.985);background-color:#f8fafc}
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/app.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}?v={{ app_version }}">
@@ -96,6 +101,13 @@
       else if (path.startsWith('/m/contract')) document.querySelectorAll('.m-tab').forEach(t => t.classList.toggle('is-active', t.dataset.tab === 'contract'));
       else if (path.startsWith('/m/settings')) document.querySelectorAll('.m-tab').forEach(t => t.classList.toggle('is-active', t.dataset.tab === 'settings'));
     })();
+    // ⚡ 햅틱 진동 (지원 기기에서) — 버튼/탭/카드 클릭 시
+    if ('vibrate' in navigator) {
+      document.addEventListener('click', (e) => {
+        const t = e.target.closest('button, a, [role=button], .m-tab, .m-list-row, .m-product-card');
+        if (t) navigator.vibrate(8);
+      }, { passive: true });
+    }
     // ⚡ 탭 hover/touchstart 시 prefetch (실제 클릭 전에 미리 다운로드)
     document.querySelectorAll('.m-tab[href]').forEach(tab => {
       let prefetched = false;

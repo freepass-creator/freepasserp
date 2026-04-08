@@ -128,24 +128,26 @@ $back?.addEventListener('click', () => {
   else location.href = '/m/chat';
 });
 
-$form?.addEventListener('submit', async (e) => {
+$form?.addEventListener('submit', (e) => {
   e.preventDefault();
-  const text = ($text?.value || '').trim();
+  if (!$text) return;
+  const text = ($text.value || '').trim();
   if (!text) return;
+  // ⚡ 동기적으로 입력값 비우고 포커스 유지 (await 전에 → 키보드 안 내려감)
   $text.value = '';
   $text.style.height = 'auto';
-  try {
-    await sendMessage(roomId, {
-      text,
-      sender_uid: currentUser?.uid || '',
-      sender_role: currentProfile?.role || '',
-      sender_code: currentProfile?.user_code || '',
-      sender_name: currentProfile?.name || '',
-    });
-  } catch (err) {
+  $text.focus();
+  // 백그라운드 전송 (fire-and-forget)
+  sendMessage(roomId, {
+    text,
+    sender_uid: currentUser?.uid || '',
+    sender_role: currentProfile?.role || '',
+    sender_code: currentProfile?.user_code || '',
+    sender_name: currentProfile?.name || '',
+  }).catch((err) => {
     console.error('[mobile/chat-room] send failed', err);
     showToast('전송 실패', 'error');
-  }
+  });
 });
 
 // textarea 자동 높이
