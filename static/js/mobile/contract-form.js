@@ -240,18 +240,24 @@ $edit?.addEventListener('click', () => {
 });
 
 $save?.addEventListener('click', async () => {
-  if (!currentContract) return;
+  if (!currentContract) { showToast('계약 정보가 없습니다', 'error'); return; }
+  if (!currentContract.contract_code) { showToast('계약코드가 없습니다', 'error'); return; }
   $save.disabled = true;
   try {
     const updates = collectFormData();
+    // 숫자 필드 정수 변환
+    if (updates.rent_amount !== undefined) updates.rent_amount = Number(updates.rent_amount) || 0;
+    if (updates.deposit_amount !== undefined) updates.deposit_amount = Number(updates.deposit_amount) || 0;
+    if (updates.rent_month !== undefined) updates.rent_month = String(updates.rent_month || '').replace(/[^\d]/g, '');
+    console.log('[contract-form] saving', currentContract.contract_code, updates);
     await updateContract(currentContract.contract_code, updates);
     showToast('저장 완료', 'success');
     isEditMode = false;
     $save.hidden = true;
     $edit.hidden = false;
   } catch (e) {
-    console.error(e);
-    showToast('저장 실패', 'error');
+    console.error('[contract-form] save failed', e);
+    showToast(`저장 실패: ${e?.message || '알 수 없는 오류'}`, 'error');
   } finally {
     $save.disabled = false;
   }
