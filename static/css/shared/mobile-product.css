@@ -474,14 +474,15 @@
   /* ─── catalog-card 모바일 통일 규격 ─── */
   .catalog-grid {
     grid-template-columns: 1fr 1fr !important;
-    gap: 1px !important;
-    padding: 0 !important;
-    background: var(--m-divider) !important;
+    gap: 4px !important;
+    padding: 4px !important;
+    background: var(--m-bg) !important;
   }
   .catalog-card {
-    border-radius: 0 !important;
+    border-radius: 4px !important;
     box-shadow: none !important;
     background: var(--m-card-bg) !important;
+    overflow: hidden !important;
   }
   .catalog-card:hover {
     transform: none !important;
