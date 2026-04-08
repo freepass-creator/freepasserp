@@ -2,26 +2,17 @@
  * mobile/chat.js — 모바일 대화 목록
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { watchRooms, watchProducts } from '../firebase/firebase-db.js';
+import { watchRooms } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
 import { deriveReplyStatus } from '../pages/chat/room-list.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
+import { wireHtmlCache } from './page-cache.js';
 
 const $list = document.getElementById('m-chat-list');
 const $search = document.getElementById('m-chat-search');
 const $filterBtn = document.getElementById('m-chat-filter-btn');
 
-// ⚡ sessionStorage HTML 캐시 — 재방문 0ms 복원
-const SS_HTML_KEY = 'fp_chl_html';
-(function restoreLastHtml() {
-  try {
-    const cached = sessionStorage.getItem(SS_HTML_KEY);
-    if (cached && $list) $list.innerHTML = cached;
-  } catch {}
-})();
-window.addEventListener('pagehide', () => {
-  try { if ($list) sessionStorage.setItem(SS_HTML_KEY, $list.innerHTML); } catch {}
-});
+wireHtmlCache('fp_chl_html', $list);
 
 // ⚡ 뒤로가기 → 상품목록(홈)으로
 history.pushState({ tabPage: true }, '', location.href);

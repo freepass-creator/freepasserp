@@ -14,6 +14,7 @@ import { watchProducts, watchTerms, ensureRoom } from '../firebase/firebase-db.j
 import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { renderMobileProductDetail } from '../shared/mobile-product-detail-markup.js';
+import { wireHtmlCache } from './page-cache.js';
 
 const $content   = document.getElementById('m-pd-content');
 const $back      = document.getElementById('m-back-btn');
@@ -237,17 +238,7 @@ function applyRoleVisibility() {
   if ($btnShare)    $btnShare.hidden    = false;
 }
 
-// ⚡ 마지막으로 렌더된 HTML을 sessionStorage에 보관 → 재방문 시 즉시 복원 (체감 0ms)
-const SS_HTML_KEY = 'fp_pd_html_' + productId;
-(function restoreLastHtml() {
-  try {
-    const cached = sessionStorage.getItem(SS_HTML_KEY);
-    if (cached && $content) $content.innerHTML = cached;
-  } catch {}
-})();
-window.addEventListener('pagehide', () => {
-  try { if ($content) sessionStorage.setItem(SS_HTML_KEY, $content.innerHTML); } catch {}
-});
+wireHtmlCache('fp_pd_html_' + productId, $content);
 
 // ⚡ 캐시 즉시 사용 — Firebase 응답 기다리지 않고 첫 페인트 전에 렌더
 function hydrateFromCache() {

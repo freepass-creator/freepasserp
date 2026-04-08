@@ -5,6 +5,7 @@ import { requireAuth } from '../core/auth-guard.js';
 import { watchContracts, watchProducts } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
+import { wireHtmlCache } from './page-cache.js';
 
 // 처리상태 도출 — 데스크탑과 동일 로직
 const CHECK_FIELD_KEYS = ['deposit_confirmed', 'docs_confirmed', 'approval_confirmed', 'contract_confirmed', 'balance_confirmed', 'delivery_confirmed'];
@@ -24,17 +25,7 @@ const $list = document.getElementById('m-contract-list');
 const $search = document.getElementById('m-contract-search');
 const $filterBtn = document.getElementById('m-contract-filter-btn');
 
-// ⚡ sessionStorage HTML 캐시 — 재방문 0ms 복원
-const SS_HTML_KEY = 'fp_cl_html';
-(function restoreLastHtml() {
-  try {
-    const cached = sessionStorage.getItem(SS_HTML_KEY);
-    if (cached && $list) $list.innerHTML = cached;
-  } catch {}
-})();
-window.addEventListener('pagehide', () => {
-  try { if ($list) sessionStorage.setItem(SS_HTML_KEY, $list.innerHTML); } catch {}
-});
+wireHtmlCache('fp_cl_html', $list);
 
 // ⚡ 뒤로가기 → 상품목록(홈)으로
 history.pushState({ tabPage: true }, '', location.href);

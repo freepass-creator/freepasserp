@@ -6,6 +6,7 @@ import { watchContracts, updateContract, deleteContract, watchProducts } from '.
 import { escapeHtml } from '../core/management-format.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { maskName, maskPhone, maskBirth, decryptField, requestDecryptPassword } from '../core/crypto.js';
+import { wireHtmlCache } from './page-cache.js';
 
 const $cf       = document.getElementById('m-cf');
 const $back     = document.getElementById('m-cf-back');
@@ -275,7 +276,6 @@ $save?.addEventListener('click', async () => {
     if (updates.rent_amount !== undefined) updates.rent_amount = Number(updates.rent_amount) || 0;
     if (updates.deposit_amount !== undefined) updates.deposit_amount = Number(updates.deposit_amount) || 0;
     if (updates.rent_month !== undefined) updates.rent_month = String(updates.rent_month || '').replace(/[^\d]/g, '');
-    console.log('[contract-form] saving', currentContract.contract_code, updates);
     await updateContract(currentContract.contract_code, updates);
     showToast('저장 완료', 'success');
     isEditMode = false;
@@ -303,17 +303,7 @@ $delete?.addEventListener('click', async () => {
   }
 });
 
-// ⚡ 마지막 렌더 HTML sessionStorage 보관 → 재방문 시 즉시 복원
-const SS_HTML_KEY = 'fp_cf_html_' + contractCode;
-(function restoreLastHtml() {
-  try {
-    const cached = sessionStorage.getItem(SS_HTML_KEY);
-    if (cached && $cf) $cf.innerHTML = cached;
-  } catch {}
-})();
-window.addEventListener('pagehide', () => {
-  try { if ($cf) sessionStorage.setItem(SS_HTML_KEY, $cf.innerHTML); } catch {}
-});
+wireHtmlCache('fp_cf_html_' + contractCode, $cf);
 
 // ⚡ 캐시 즉시 사용
 function hydrateFromCache() {

@@ -7,22 +7,13 @@ import { watchProducts, watchTerms } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
 import { showConfirm } from '../core/toast.js';
+import { wireHtmlCache } from './page-cache.js';
 
 const $grid = document.getElementById('m-product-grid');
 const $search = document.getElementById('m-product-search');
 const $filterBtn = document.getElementById('m-product-filter-btn');
 
-// ⚡ sessionStorage HTML 캐시 — 재방문 0ms 복원
-const SS_HTML_KEY = 'fp_pl_html';
-(function restoreLastHtml() {
-  try {
-    const cached = sessionStorage.getItem(SS_HTML_KEY);
-    if (cached && $grid) $grid.innerHTML = cached;
-  } catch {}
-})();
-window.addEventListener('pagehide', () => {
-  try { if ($grid) sessionStorage.setItem(SS_HTML_KEY, $grid.innerHTML); } catch {}
-});
+wireHtmlCache('fp_pl_html', $grid);
 
 // ⚡ 홈(상품목록)에서 뒤로가기 → 종료 확인
 // 진입 시 가짜 history state push → popstate 가로채서 confirm

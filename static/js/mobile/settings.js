@@ -6,6 +6,7 @@ import { updateUserProfile } from '../firebase/firebase-db.js';
 import { logoutCurrentUser, sendPasswordReset } from '../firebase/firebase-auth.js';
 import { escapeHtml } from '../core/management-format.js';
 import { showToast, showConfirm } from '../core/toast.js';
+import { wireHtmlCache } from './page-cache.js';
 
 const $st = document.getElementById('m-settings');
 const $help = document.getElementById('m-st-help');
@@ -375,17 +376,7 @@ function openSheet(title, contentHtml) {
 $help?.addEventListener('click', showHelp);
 $notice?.addEventListener('click', showNotice);
 
-// ⚡ 마지막 렌더 HTML sessionStorage 보관 → 재방문 시 즉시 복원
-const SS_HTML_KEY = 'fp_st_html';
-(function restoreLastHtml() {
-  try {
-    const cached = sessionStorage.getItem(SS_HTML_KEY);
-    if (cached && $st) $st.innerHTML = cached;
-  } catch {}
-})();
-window.addEventListener('pagehide', () => {
-  try { if ($st) sessionStorage.setItem(SS_HTML_KEY, $st.innerHTML); } catch {}
-});
+wireHtmlCache('fp_st_html', $st);
 
 // ⚡ 뒤로가기 → 상품목록(홈)으로
 history.pushState({ tabPage: true }, '', location.href);
