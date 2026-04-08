@@ -9,6 +9,19 @@ import {
 import { escapeHtml } from '../core/management-format.js';
 import { showToast, showConfirm } from '../core/toast.js';
 
+// URL을 클릭 가능한 링크로 변환 (escape 후 적용 — XSS 안전)
+function linkify(text) {
+  const escaped = escapeHtml(text || '');
+  // http(s)://... 또는 www.... 패턴 매칭
+  return escaped.replace(
+    /(\bhttps?:\/\/[^\s<]+|\bwww\.[^\s<]+)/g,
+    (m) => {
+      const href = m.startsWith('www.') ? 'https://' + m : m;
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="m-cr__link">${m}</a>`;
+    }
+  );
+}
+
 const $messages = document.getElementById('m-cr-messages');
 const $title    = document.getElementById('m-cr-title');
 const $back     = document.getElementById('m-cr-back');
@@ -52,11 +65,11 @@ function buildMessageHtml(m, prevDayTs) {
     dayMark = `<div class="m-cr__day">${fmtDay(m.created_at)}</div>`;
   }
   if (isSystem) {
-    return dayMark + `<div class="m-cr__msg m-cr__msg--system"><div class="m-cr__msg-bubble">${escapeHtml(m.text || '')}</div></div>`;
+    return dayMark + `<div class="m-cr__msg m-cr__msg--system"><div class="m-cr__msg-bubble">${linkify(m.text || '')}</div></div>`;
   }
   return dayMark + `<div class="m-cr__msg m-cr__msg--${isMine ? 'mine' : 'other'}">
     ${!isMine ? `<div class="m-cr__msg-meta">${escapeHtml(m.sender_code || '')}</div>` : ''}
-    <div class="m-cr__msg-bubble">${escapeHtml(m.text || '')}</div>
+    <div class="m-cr__msg-bubble">${linkify(m.text || '')}</div>
     <div class="m-cr__msg-meta">${fmtTime(m.created_at)}</div>
   </div>`;
 }
