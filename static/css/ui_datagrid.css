@@ -105,6 +105,10 @@
 
 .pls-row td:last-child { border-right: none; }
 .pls-row.is-active .pls-cell { border-bottom-color: rgba(0, 0, 0, 0.06); }
+/* jpkerp 스타일 zebra 줄 — 짝수 행 살짝 음영 */
+.pls-table tbody tr:nth-child(even) .pls-cell { background: #fafbfc; }
+.pls-table tbody tr:hover .pls-cell { background: #f4f6fa; }
+.pls-table tbody tr.is-active .pls-cell { background: #e8edf5; }
 
 .pls-cell--sticky {
   position: sticky;

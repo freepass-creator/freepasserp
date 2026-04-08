@@ -15,7 +15,8 @@
 
   /* ── panel / content ── */
   --new-bg-panel:      #ffffff;
-  --new-bg-panel-head: #fafbfd;
+  /* 그리드/패널 헤더 — 사이드바(#dfe4ed)와 흰색 사이의 옅은 톤 */
+  --new-bg-panel-head: #ebeef4;
 
   /* ── borders ── */
   --new-border-soft:   rgba(0, 0, 0, 0.06);

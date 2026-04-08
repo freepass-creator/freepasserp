@@ -12,11 +12,11 @@
   --space-6: 24px;
   --space-8: 32px;
 
-  /* ── 곡률 (M3 기준) ── */
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* ── 곡률 — jpkerp 스타일(살짝 각진) ── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-pill: 999px;
   --radius-circle: 50%;
   --radius-ui: var(--radius-xs);
@@ -30,9 +30,10 @@
   --font-size-xl: 17px;
   --font-size-2xl: 20px;
   --font-size-3xl: 28px;
-  --font-weight-base: 400;
-  --font-weight-strong: 500;
-  --font-weight-heavy: 700;
+  /* 폰트 두께 — jpkerp 스타일(가벼운 톤) */
+  --font-weight-base: 300;
+  --font-weight-strong: 400;
+  --font-weight-heavy: 500;
   --letter-spacing-base: -0.03em;
   /* 하위 호환 별칭 */
   --font-size-main: var(--font-size-base);
