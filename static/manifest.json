@@ -1,6 +1,6 @@
 {
   "name": "FREEPASS ERP",
-  "short_name": "FREEPASS",
+  "short_name": "FREEPASS ERP",
   "description": "렌터카 장기렌트 B2B ERP 시스템",
   "start_url": "/",
   "display": "standalone",
