@@ -236,9 +236,26 @@ async function revealPII() {
   }
 }
 
-$back?.addEventListener('click', () => {
+async function confirmLeaveIfDirty() {
+  if (!isEditMode) return true;
+  return await showConfirm('수정 중인 내용이 있습니다. 저장하지 않고 나가시겠습니까?');
+}
+$back?.addEventListener('click', async () => {
+  const ok = await confirmLeaveIfDirty();
+  if (!ok) return;
   if (history.length > 1) history.back();
   else location.href = '/m/contract';
+});
+// 하드웨어 뒤로가기 가드
+history.pushState({ contractForm: true }, '', location.href);
+let _leaveConfirming = false;
+window.addEventListener('popstate', async () => {
+  if (_leaveConfirming) return;
+  _leaveConfirming = true;
+  history.pushState({ contractForm: true }, '', location.href);
+  const ok = await confirmLeaveIfDirty();
+  _leaveConfirming = false;
+  if (ok) history.go(-2);
 });
 
 $edit?.addEventListener('click', () => {

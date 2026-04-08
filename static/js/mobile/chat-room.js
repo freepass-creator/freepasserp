@@ -123,9 +123,28 @@ if (window.visualViewport) {
   });
 }
 
-$back?.addEventListener('click', () => {
+// 입력 중인 텍스트가 있으면 뒤로가기 시 확인
+async function confirmLeaveIfDirty() {
+  const dirty = $text && ($text.value || '').trim().length > 0;
+  if (!dirty) return true;
+  return await showConfirm('작성 중인 메시지가 있습니다. 나가시겠습니까?');
+}
+$back?.addEventListener('click', async () => {
+  const ok = await confirmLeaveIfDirty();
+  if (!ok) return;
   if (history.length > 1) history.back();
   else location.href = '/m/chat';
+});
+// 하드웨어 뒤로가기(popstate) 가드
+history.pushState({ chatRoom: true }, '', location.href);
+let _leaveConfirming = false;
+window.addEventListener('popstate', async () => {
+  if (_leaveConfirming) return;
+  _leaveConfirming = true;
+  history.pushState({ chatRoom: true }, '', location.href);
+  const ok = await confirmLeaveIfDirty();
+  _leaveConfirming = false;
+  if (ok) history.go(-2);
 });
 
 // ⚡ 메모리 검증 패턴: value='' → focus() → sendMessage() (fire-and-forget, await 없음)

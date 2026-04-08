@@ -6,6 +6,7 @@ import { requireAuth } from '../core/auth-guard.js';
 import { watchProducts, watchTerms } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
+import { showConfirm } from '../core/toast.js';
 
 const $grid = document.getElementById('m-product-grid');
 const $search = document.getElementById('m-product-search');
@@ -21,6 +22,23 @@ const SS_HTML_KEY = 'fp_pl_html';
 })();
 window.addEventListener('pagehide', () => {
   try { if ($grid) sessionStorage.setItem(SS_HTML_KEY, $grid.innerHTML); } catch {}
+});
+
+// ⚡ 홈(상품목록)에서 뒤로가기 → 종료 확인
+// 진입 시 가짜 history state push → popstate 가로채서 confirm
+history.pushState({ home: true }, '', location.href);
+let _exitConfirming = false;
+window.addEventListener('popstate', async () => {
+  if (_exitConfirming) return;
+  _exitConfirming = true;
+  // 다시 가짜 state 채워두기 (사용자가 취소하면 그대로 머물러야 함)
+  history.pushState({ home: true }, '', location.href);
+  const ok = await showConfirm('앱을 종료하시겠습니까?');
+  _exitConfirming = false;
+  if (ok) {
+    // 가짜 state 제거 후 실제 뒤로가기 (PWA 종료 시도)
+    history.go(-2);
+  }
 });
 
 // 웹 카탈로그와 동일 — 변경 시 양쪽 같이 업데이트
