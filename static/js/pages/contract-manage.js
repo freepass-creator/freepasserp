@@ -352,8 +352,17 @@ function markIncompleteFields(contract) {
 
 function contractVisible(contract) {
   if (currentProfile?.role === 'admin') return true;
-  if (currentProfile?.role === 'provider') return (contract.partner_code || '') === (currentProfile.company_code || '');
-  if (currentProfile?.role === 'agent') return (contract.agent_uid || '') === (currentProfile.uid || '');
+  if (currentProfile?.role === 'provider') {
+    const cp = String(contract.partner_code || contract.provider_company_code || '').trim();
+    return cp === String(currentProfile.company_code || '').trim();
+  }
+  if (currentProfile?.role === 'agent') {
+    const myUid = String(currentProfile.uid || '').trim();
+    const myCode = String(currentProfile.user_code || '').trim();
+    const cAgentUid = String(contract.agent_uid || '').trim();
+    const cAgentCode = String(contract.agent_code || '').trim();
+    return (myUid && cAgentUid === myUid) || (myCode && cAgentCode === myCode);
+  }
   return false;
 }
 

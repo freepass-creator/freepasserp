@@ -440,9 +440,10 @@ async function bootstrap() {
         const hiddenBy = room.hidden_by || {};
         const isHiddenForMe = !!hiddenBy[user.uid];
         if (isHiddenForMe) return false;
+        if (profile.role === 'admin') return true;
         if (profile.role === 'agent') return room.agent_uid === user.uid || room.agent_code === profile.user_code;
-        if (profile.role === 'provider') return room.provider_company_code === profile.company_code;
-        return true;
+        if (profile.role === 'provider') return (room.provider_company_code || '') === (profile.company_code || '');
+        return false;
       });
 
       visibleRoomsCache = visibleRooms;
