@@ -256,10 +256,10 @@
       if (t.matches('input, textarea, [contenteditable=true]')) return;
       e.preventDefault();
     });
-    // ⚡ 햅틱 진동 — 모든 인터랙티브 요소에 동일하게 (사진 확대 등 포함)
+    // ⚡ 햅틱 진동 — click 이벤트 기반 (스크롤 시엔 발생 안 함, 실제 탭에서만)
     if ('vibrate' in navigator) {
-      const HAPTIC_SEL = 'button, a, [role=button], .m-tab, .m-list-row, .m-product-card, .m-card, .m-icon-btn, label, summary, [data-haptic], img';
-      document.addEventListener('pointerdown', (e) => {
+      const HAPTIC_SEL = 'button, a, [role=button], .m-tab, .m-list-row, .m-product-card, .m-card, .m-icon-btn, label, summary, input[type=checkbox], input[type=radio], [data-haptic], img';
+      document.addEventListener('click', (e) => {
         const t = e.target.closest(HAPTIC_SEL);
         if (t) navigator.vibrate(8);
       }, { passive: true, capture: true });
