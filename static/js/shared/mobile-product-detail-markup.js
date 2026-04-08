@@ -427,6 +427,7 @@ export function renderProvider(p) {
 export function renderMobileProductDetail(p, opts = {}) {
   const {
     policies = [],
+    policy: policyOverride = null,
     activePhotoIndex = 0,
     showGallery = true,
     showPrice = true,
@@ -441,7 +442,7 @@ export function renderMobileProductDetail(p, opts = {}) {
     showProvider = true,
     showFee = true,
   } = opts;
-  const policy = findPolicy(p, policies);
+  const policy = policyOverride || findPolicy(p, policies);
   return `
     ${showGallery ? renderGallery(p, activePhotoIndex) : ''}
     ${renderVehicleGroup(p)}

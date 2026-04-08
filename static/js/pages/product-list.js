@@ -12,6 +12,8 @@ import { pushEsc, removeEsc } from "../core/esc-stack.js";
 import { ensureRoom, watchProducts, resolveTermForProduct } from "../firebase/firebase-db.js";
 import { showConfirm, showToast } from "../core/toast.js";
 import { bindProductDetailPhotoEvents, extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
+import { renderMobileProductDetail } from "../shared/mobile-product-detail-markup.js";
+import { open as openFullscreenViewer } from "../shared/fullscreen-photo-viewer.js";
 import { renderBadgeRow } from "../shared/badge.js";
 
 const _isMobile = { get matches() { return window.matchMedia('(max-width: 768px)').matches; } };
@@ -744,9 +746,13 @@ function renderDetail(){
   $title.textContent = _carNo && _carNo !== '-' ? `상세정보(${_carNo})` : '상세정보';
   syncDetailBadges(product);
   syncTopBarIdentity(product);
-  $detail.innerHTML=renderProductDetailMarkup(product,{ activePhotoIndex: state.activePhotoIndex, termFields: getTermFields(product) });
-  bindProductDetailPhotoEvents($detail,(index)=>{ state.activePhotoIndex=index; renderDetail(); });
-  bindDetailGallery($detail, product);
+  // 모바일 상품 상세와 동일한 마크업 사용
+  const rawProduct = product._raw || product;
+  $detail.innerHTML = `<div class="m-pd">${renderMobileProductDetail(rawProduct, {
+    activePhotoIndex: state.activePhotoIndex,
+    policy: getTermFields(product),
+  })}</div>`;
+  bindMobileGalleryEvents($detail, rawProduct);
   ensureTermLoaded(product);
 }
 function applyFilters(){
@@ -946,6 +952,30 @@ function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
     + renderCatalogInsuranceTable(insRows)
     + renderCatalogConditions(condRows)
     + renderCatalogExtra(extraRows);
+}
+
+// 모바일 갤러리 이벤트 바인딩 — m-pd-gallery 마크업용
+function bindMobileGalleryEvents($root, rawProduct) {
+  const photos = (Array.isArray(rawProduct.image_urls) && rawProduct.image_urls.length ? rawProduct.image_urls : null) || (rawProduct.image_url ? [rawProduct.image_url] : []);
+  if (!photos.length) return;
+  $root.querySelector('#m-pd-prev')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    state.activePhotoIndex = (state.activePhotoIndex - 1 + photos.length) % photos.length;
+    renderDetail();
+  });
+  $root.querySelector('#m-pd-next')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    state.activePhotoIndex = (state.activePhotoIndex + 1) % photos.length;
+    renderDetail();
+  });
+  const $img = $root.querySelector('.m-pd-gallery img');
+  if ($img) {
+    $img.style.cursor = 'zoom-in';
+    $img.addEventListener('click', (e) => {
+      if (e.target.closest('.m-pd-gallery__nav')) return;
+      openFullscreenViewer(photos, state.activePhotoIndex || 0);
+    });
+  }
 }
 
 let _detailGalleryState = null;
@@ -1198,7 +1228,7 @@ async function init(){
   }
 
   const unsubscribe = watchProducts((products) => {
-    state.allProducts = applyRoleFilter(products.map(normalizeProduct)).filter(item => item.id);
+    state.allProducts = applyRoleFilter(products.map((p) => Object.assign(normalizeProduct(p), { _raw: p }))).filter(item => item.id);
     state.allProducts.forEach(item => ensureTermLoaded(item));
     applyFilters();
   });
