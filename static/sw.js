@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v111';
+const CACHE_NAME = 'freepass-v120';
 const IMG_CACHE = 'freepass-img-v1';
 
 // 핵심 자원 — 첫 방문 시 미리 다운로드
@@ -113,8 +113,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 모바일 JS/CSS: network-first (항상 최신 코드, 오프라인 시만 캐시 fallback)
+  // 페이지/모바일 JS/CSS: network-first (항상 최신 코드, 오프라인 시만 캐시 fallback)
+  // - SPA가 fetch로 HTML 가져오는 경우, 페이지별 CSS/JS, Firebase/core 모두 포함
   if (url.includes('/static/js/mobile/') || url.includes('/static/css/mobile/') ||
+      url.includes('/static/js/pages/')  || url.includes('/static/css/pages/')  ||
       url.includes('/static/js/firebase/') || url.includes('/static/js/core/')) {
     event.respondWith(
       fetch(request).then((response) => {
@@ -124,6 +126,12 @@ self.addEventListener('fetch', (event) => {
         return response;
       }).catch(() => caches.match(request))
     );
+    return;
+  }
+  // SPA HTML fetch (X-Requested-With: XMLHttpRequest) — 항상 최신
+  if (request.headers.get('X-Requested-With') === 'XMLHttpRequest' &&
+      request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(fetch(request).catch(() => caches.match(request)));
     return;
   }
 
