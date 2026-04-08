@@ -635,6 +635,18 @@ function applyRoleVisibility() {
   if ($btnShare)    $btnShare.hidden    = false;
 }
 
+// ⚡ 캐시 즉시 사용 — Firebase 응답 기다리지 않고 첫 페인트 전에 렌더
+(function hydrateFromCache() {
+  const cached = window.__appData || {};
+  if (Array.isArray(cached.products)) {
+    currentProduct = cached.products.find(p => p.product_uid === productId || p.product_code === productId);
+  }
+  if (Array.isArray(cached.terms)) {
+    allPolicies = cached.terms;
+  }
+  if (currentProduct) render();
+})();
+
 (async () => {
   try {
     const auth = await requireAuth();

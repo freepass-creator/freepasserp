@@ -286,6 +286,26 @@ $delete?.addEventListener('click', async () => {
   }
 });
 
+// ⚡ 캐시 즉시 사용
+(function hydrateFromCache() {
+  const cached = window.__appData || {};
+  if (Array.isArray(cached.products)) {
+    const map = new Map();
+    cached.products.forEach(p => {
+      if (p?.product_uid) map.set(p.product_uid, p);
+      if (p?.product_code) map.set(p.product_code, p);
+    });
+    productMap = map;
+  }
+  if (Array.isArray(cached.contracts)) {
+    const found = cached.contracts.find(c => c.contract_code === contractCode);
+    if (found) {
+      currentContract = found;
+      render(found);
+    }
+  }
+})();
+
 (async () => {
   try {
     const auth = await requireAuth();
