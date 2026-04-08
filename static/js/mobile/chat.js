@@ -2,28 +2,14 @@
  * mobile/chat.js — 모바일 대화 목록
  */
 import { requireAuth } from '../core/auth-guard.js';
-import {
-  watchRooms, watchProducts, watchMessages, sendMessage,
-  markRoomRead, hideRoomForUser, deleteRoomEverywhere,
-} from '../firebase/firebase-db.js';
+import { watchRooms, watchProducts } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
 import { deriveReplyStatus } from '../pages/chat/room-list.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
-import { showToast, showConfirm } from '../core/toast.js';
 
-const $root = document.getElementById('m-chat-root');
 const $list = document.getElementById('m-chat-list');
 const $search = document.getElementById('m-chat-search');
 const $filterBtn = document.getElementById('m-chat-filter-btn');
-
-// 대화방 뷰 요소
-const $room      = document.getElementById('m-chat-room');
-const $messages  = document.getElementById('m-cr-messages');
-const $form      = document.getElementById('m-cr-form');
-const $text      = document.getElementById('m-cr-text');
-const $back      = document.getElementById('m-cr-back');
-const $hideBtn   = document.getElementById('m-cr-hide');
-const $deleteBtn = document.getElementById('m-cr-delete');
 
 const DATE_OPTIONS = [
   { value: '1w',   label: '최근 1주',  days: 7 },
@@ -193,224 +179,12 @@ $filterBtn?.addEventListener('click', () => {
   });
 });
 
-// ─── SPA: 목록 ↔ 대화방 전환 ───────────────────────────────────────────
-let currentRoomId = null;
-let unsubscribeMessages = null;
-let lastRenderedTs = 0;
-let lastRenderedDay = 0;
-
-function setView(view) {
-  if (!$root) return;
-  $root.dataset.view = view;
-  // ⚡ hidden 사용 금지: iOS는 직전까지 display:none이었던 요소에 focus() 시 키보드 안 띄움
-  // 항상 렌더 트리에 두고 CSS(transform/opacity)로만 토글
-  if ($list) $list.hidden = false;
-  if ($room) $room.hidden = false;
-  // 토스트바 토글: 클래스 셀렉터 기반
-  document.querySelectorAll('.m-chat-list-only').forEach(el => { el.hidden = (view !== 'list'); });
-  document.querySelectorAll('.m-chat-room-only').forEach(el => {
-    if (el.dataset.roleHidden === '1') { el.hidden = true; return; }
-    el.hidden = (view !== 'room');
-  });
-  // 하단 탭바도 대화방에서는 숨김
-  const $tabbar = document.querySelector('.m-tabbar');
-  if ($tabbar) $tabbar.style.display = (view === 'room') ? 'none' : '';
-}
-
-function fmtTime2(ts) {
-  const d = new Date(Number(ts || 0));
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-function fmtDay2(ts) {
-  const d = new Date(Number(ts || 0));
-  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${'일월화수목금토'[d.getDay()]})`;
-}
-function sameDay2(a, b) {
-  const da = new Date(Number(a)), db = new Date(Number(b));
-  return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate();
-}
-function buildMsgHtml(m, prevDayTs) {
-  const isMine = m.sender_uid === currentUser?.uid || (m.sender_role === currentProfile?.role && m.sender_code === currentProfile?.user_code);
-  const isSystem = m.sender_role === 'system';
-  let dayMark = '';
-  if (!prevDayTs || !sameDay2(prevDayTs, m.created_at)) {
-    dayMark = `<div class="m-cr__day">${fmtDay2(m.created_at)}</div>`;
-  }
-  if (isSystem) {
-    return dayMark + `<div class="m-cr__msg m-cr__msg--system"><div class="m-cr__msg-bubble">${escapeHtml(m.text || '')}</div></div>`;
-  }
-  return dayMark + `<div class="m-cr__msg m-cr__msg--${isMine ? 'mine' : 'other'}">
-    ${!isMine ? `<div class="m-cr__msg-meta">${escapeHtml(m.sender_code || '')}</div>` : ''}
-    <div class="m-cr__msg-bubble">${escapeHtml(m.text || '')}</div>
-    <div class="m-cr__msg-meta">${fmtTime2(m.created_at)}</div>
-  </div>`;
-}
-function renderMessages(messages) {
-  if (!$messages) return;
-  if (!messages || !messages.length) {
-    $messages.innerHTML = '<div class="m-cr__empty">아직 대화가 없습니다</div>';
-    lastRenderedTs = 0; lastRenderedDay = 0;
-    return;
-  }
-  const sorted = [...messages].sort((a,b) => Number(a.created_at||0) - Number(b.created_at||0));
-  const wasAtBottom = $messages.scrollTop + $messages.clientHeight >= $messages.scrollHeight - 30;
-  if (!lastRenderedTs || sorted[sorted.length-1].created_at < lastRenderedTs) {
-    let html = ''; let prevDay = 0;
-    for (const m of sorted) { html += buildMsgHtml(m, prevDay); prevDay = m.created_at; }
-    $messages.innerHTML = html;
-    lastRenderedTs = sorted[sorted.length-1].created_at;
-    lastRenderedDay = prevDay;
-  } else {
-    const fresh = sorted.filter(m => m.created_at > lastRenderedTs);
-    if (!fresh.length) return;
-    let html = ''; let prevDay = lastRenderedDay;
-    for (const m of fresh) { html += buildMsgHtml(m, prevDay); prevDay = m.created_at; }
-    $messages.insertAdjacentHTML('beforeend', html);
-    lastRenderedTs = fresh[fresh.length-1].created_at;
-    lastRenderedDay = prevDay;
-  }
-  if (wasAtBottom) requestAnimationFrame(() => { $messages.scrollTop = $messages.scrollHeight; });
-}
-
-function openRoom(roomId, { push = true } = {}) {
-  if (!roomId) return;
-  currentRoomId = roomId;
-  // 메시지 영역 초기화
-  if ($messages) $messages.innerHTML = '<div class="m-cr__loading">대화를 불러오는 중…</div>';
-  lastRenderedTs = 0; lastRenderedDay = 0;
-  setView('room');
-  // focus는 click 핸들러 첫 라인에서 이미 호출됨 (gesture 컨텍스트 보존)
-  // URL 동기화
-  if (push) {
-    try { history.pushState({ roomId }, '', `/m/chat/${encodeURIComponent(roomId)}`); } catch {}
-  }
-  // 이전 구독 해제
-  if (typeof unsubscribeMessages === 'function') { try { unsubscribeMessages(); } catch {} }
-  unsubscribeMessages = watchMessages(roomId, (messages) => {
-    renderMessages(messages || []);
-    if (currentProfile?.role && currentUser?.uid) {
-      markRoomRead(roomId, currentProfile.role, currentUser.uid).catch(() => {});
-    }
-  });
-}
-
-function closeRoom({ push = true } = {}) {
-  if (typeof unsubscribeMessages === 'function') { try { unsubscribeMessages(); } catch {} }
-  unsubscribeMessages = null;
-  currentRoomId = null;
-  setView('list');
-  if (push) {
-    try { history.pushState({}, '', '/m/chat'); } catch {}
-  }
-}
-
 $list?.addEventListener('click', (e) => {
   const row = e.target.closest('.m-list-row[data-id]');
   if (!row) return;
   const id = row.dataset.id;
-  if (!id) return;
-  // ⚡ 순서가 중요: setView('room') 먼저 → textarea가 viewport 안으로 들어옴
-  //                 → 같은 gesture tick에서 즉시 focus() → 키보드 오픈
-  openRoom(id);
-  try { $text?.focus({ preventScroll: true }); } catch { $text?.focus(); }
+  if (id) location.href = `/m/chat/${encodeURIComponent(id)}`;
 });
-
-$back?.addEventListener('click', () => { closeRoom(); });
-
-window.addEventListener('popstate', (e) => {
-  // URL 패턴으로 판단
-  const m = location.pathname.match(/^\/m\/chat\/(.+)$/);
-  if (m) openRoom(decodeURIComponent(m[1]), { push: false });
-  else closeRoom({ push: false });
-});
-
-// ⚡ 전송 버튼이 textarea 포커스를 빼앗지 못하게 — touchstart/mousedown 단계에서 차단
-function doSendKeepFocus() {
-  if (!$text || !currentRoomId) return;
-  const text = ($text.value || '').trim();
-  if (!text) return;
-  $text.value = '';
-  $text.style.height = 'auto';
-  // textarea가 이미 포커스를 잃었을 수도 있으니 다시 박아넣기 (동기)
-  if (document.activeElement !== $text) {
-    try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
-  }
-  sendMessage(currentRoomId, {
-    text,
-    sender_uid: currentUser?.uid || '',
-    sender_role: currentProfile?.role || '',
-    sender_code: currentProfile?.user_code || '',
-    sender_name: currentProfile?.name || '',
-  }).catch((err) => {
-    console.error('[mobile/chat] send failed', err);
-    showToast('전송 실패', 'error');
-  });
-}
-
-const $sendBtn = $form?.querySelector('button[type="submit"]');
-let _sendTouchHandled = false;
-// touchstart 단계에서 preventDefault → 버튼이 포커스 가져가는 것 자체를 막음
-$sendBtn?.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  _sendTouchHandled = true;
-  if (document.activeElement !== $text) {
-    try { $text?.focus({ preventScroll: true }); } catch { $text?.focus(); }
-  }
-  doSendKeepFocus();
-}, { passive: false });
-// 데스크탑/마우스용
-$sendBtn?.addEventListener('mousedown', (e) => {
-  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
-  e.preventDefault();
-  if (document.activeElement !== $text) {
-    try { $text?.focus({ preventScroll: true }); } catch { $text?.focus(); }
-  }
-  doSendKeepFocus();
-});
-// form submit (Enter키 / iOS Send 키)
-$form?.addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
-  doSendKeepFocus();
-});
-
-// textarea 자동 높이
-$text?.addEventListener('input', () => {
-  $text.style.height = 'auto';
-  $text.style.height = Math.min($text.scrollHeight, 128) + 'px';
-});
-
-$hideBtn?.addEventListener('click', async () => {
-  if (!currentRoomId) return;
-  const ok = await showConfirm('이 대화를 목록에서 숨기시겠습니까?');
-  if (!ok) return;
-  try {
-    await hideRoomForUser(currentRoomId, currentUser?.uid);
-    closeRoom();
-  } catch (e) { console.error(e); showToast('숨김 실패', 'error'); }
-});
-$deleteBtn?.addEventListener('click', async () => {
-  if (!currentRoomId) return;
-  const ok = await showConfirm('이 대화를 영구 삭제하시겠습니까?');
-  if (!ok) return;
-  try {
-    await deleteRoomEverywhere(currentRoomId);
-    closeRoom();
-  } catch (e) { console.error(e); showToast('삭제 실패', 'error'); }
-});
-
-// 키보드 올라올 때 본문만 줄어들도록
-function adjustForKeyboard() {
-  if ($root?.dataset.view !== 'room') return;
-  const vv = window.visualViewport; if (!vv) return;
-  const topbarH = document.querySelector('.m-topbar')?.offsetHeight || 0;
-  $room.style.height = (vv.height - topbarH) + 'px';
-  if ($messages) $messages.scrollTop = $messages.scrollHeight;
-}
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', adjustForKeyboard);
-  window.visualViewport.addEventListener('scroll', adjustForKeyboard);
-}
 
 function _hydrateProductMap(products) {
   const map = new Map();
@@ -437,14 +211,6 @@ function _hydrateProductMap(products) {
     currentProfile = profile;
     currentRole = profile?.role || '';
     if (allRooms.length) applyAll();
-
-    // 역할별 삭제 버튼 노출 (provider/admin만)
-    const canDelete = currentRole === 'provider' || currentRole === 'admin';
-    if ($deleteBtn && !canDelete) $deleteBtn.dataset.roleHidden = '1';
-
-    // 초기 진입 시 URL이 /m/chat/<id>면 바로 방 열기
-    const initialRoom = $root?.dataset.initialRoom || '';
-    if (initialRoom) openRoom(initialRoom, { push: false });
 
     watchRooms((rooms) => {
       allRooms = (rooms || []).filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
