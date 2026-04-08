@@ -49,8 +49,8 @@
   color: var(--text-subtle, #64748b);
   white-space: nowrap;
   user-select: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  border-right: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
   text-transform: none;
   letter-spacing: 0;
   text-align: center;
@@ -99,11 +99,12 @@
   white-space: nowrap;
   letter-spacing: -0.03em;
   text-align: center;
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
-  border-right: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.pls-row td:last-child { border-right: none; }
+.pls-table th:last-child,
+.pls-table td:last-child { border-right: none; }
 .pls-row.is-active .pls-cell { border-bottom-color: rgba(0, 0, 0, 0.06); }
 /* jpkerp 스타일 zebra 줄 — 짝수 행 살짝 음영 */
 .pls-table tbody tr:nth-child(even) .pls-cell { background: #fafbfc; }
