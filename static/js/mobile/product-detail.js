@@ -23,13 +23,13 @@ let activePhotoIndex = 0;
 let currentProduct = null;
 let allPolicies = [];
 
-/* ── 아이콘 (Lucide style — 1.5 stroke) ──────────── */
-const SVG = (paths) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+/* ── 아이콘 (Lucide 정통, stroke 2) ──────────────── */
+const SVG = (paths) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 const ICO = {
-  // car-front (lucide)
+  // car-front
   car:    SVG('<path d="M21 8 17.65 2.65A2 2 0 0 0 15.94 2H8.06a2 2 0 0 0-1.71 1.65L3 8"/><path d="M7 10h0"/><path d="M17 10h0"/><rect width="18" height="13" x="3" y="8" rx="2"/><path d="M5 21v-2"/><path d="M19 21v-2"/>'),
-  // wallet
-  money:  SVG('<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>'),
+  // banknote
+  money:  SVG('<rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>'),
   // table
   table:  SVG('<path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/>'),
   // shield-check
@@ -42,8 +42,8 @@ const ICO = {
   fee:    SVG('<line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>'),
   // credit-card
   card:   SVG('<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>'),
-  // gauge
-  gauge:  SVG('<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>'),
+  // milestone (주행거리 — 도로 표지)
+  gauge:  SVG('<path d="M12 13v8"/><path d="M12 3v3"/><path d="M4 6a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/>'),
   // user-round
   user:   SVG('<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>'),
   // truck
@@ -54,13 +54,49 @@ const ICO = {
   pkg:    SVG('<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/>'),
   // tag
   tag:    SVG('<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>'),
-  // building
-  bldg:   SVG('<rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>'),
+  // building-2
+  bldg:   SVG('<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>'),
 };
 
 /* ── 유틸 ──────────────────────────────────────────── */
 const has = (v) => v !== null && v !== undefined && String(v).trim() && String(v).trim() !== '-';
 const dash = (v) => has(v) ? String(v) : '-';
+
+// 색상 이름 → hex (어두운 색이면 흰 글자)
+function colorToHex(name) {
+  const s = String(name || '').toLowerCase().trim();
+  if (!s || s === '-') return null;
+  const map = [
+    [/펄|화이트|흰|white/,    '#f8fafc'],
+    [/블랙|검정|black/,        '#0f172a'],
+    [/실버|silver/,            '#c0c0c0'],
+    [/그레이|회색|gray|grey/,  '#6b7280'],
+    [/레드|빨강|red/,          '#ef4444'],
+    [/블루|파랑|navy|blue/,    '#1e3a8a'],
+    [/그린|초록|green/,        '#16a34a'],
+    [/옐로우|노랑|yellow/,     '#eab308'],
+    [/오렌지|주황|orange/,     '#f97316'],
+    [/브라운|갈색|brown/,      '#7c2d12'],
+    [/베이지|beige/,           '#d6c8a8'],
+    [/카키|khaki/,             '#78716c'],
+    [/와인|버건디|wine/,       '#7f1d1d'],
+  ];
+  for (const [re, hex] of map) if (re.test(s)) return hex;
+  return '#cbd5e1';
+}
+function isLightColor(hex) {
+  if (!hex) return true;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 160;
+}
+function colorBadge(name) {
+  if (!has(name)) return '';
+  const hex = colorToHex(name);
+  const fg = isLightColor(hex) ? '#0f172a' : '#fff';
+  return `<span class="m-pd-color" style="background:${hex};color:${fg}">${escapeHtml(name)}</span>`;
+}
 const fmtKRW = (v) => {
   const n = Number(v || 0);
   return n ? n.toLocaleString('ko-KR') : '0';
@@ -74,11 +110,15 @@ function groupHead(icon, title, count) {
   </div>`;
 }
 
+function box(content) {
+  return `<div class="m-pd-group__body">${content}</div>`;
+}
+
 function kvList(rows) {
-  return `<div class="m-pd-kv">${rows.map(([k, v, sub]) => `
+  return `<div class="m-pd-kv">${rows.map(([k, v, sub, raw]) => `
     <div class="m-pd-kv__row">
       <span class="m-pd-kv__key">${escapeHtml(k)}</span>
-      <span class="m-pd-kv__val${has(v) ? '' : ' m-pd-kv__val--empty'}">${escapeHtml(dash(v))}${sub ? `<span class="m-pd-kv__sub">${escapeHtml(sub)}</span>` : ''}</span>
+      <span class="m-pd-kv__val${has(v) ? '' : ' m-pd-kv__val--empty'}">${raw ? v : escapeHtml(dash(v))}${sub ? `<span class="m-pd-kv__sub">${escapeHtml(sub)}</span>` : ''}</span>
     </div>
   `).join('')}</div>`;
 }
@@ -90,27 +130,6 @@ function renderGallery(p) {
     return `<div class="m-pd-gallery m-pd-gallery--empty">사진이 등록되지 않았습니다</div>`;
   }
   const idx = Math.min(activePhotoIndex, photos.length - 1);
-  // 차량상태 색상
-  const statusTone = (v) => {
-    const s = String(v || '').trim();
-    if (/출고가능|즉시출고/.test(s)) return 'success';
-    if (/출고불가|정비중|사고/.test(s)) return 'danger';
-    if (/예약|대기/.test(s)) return 'warn';
-    return 'neutral';
-  };
-  // 상품구분 색상
-  const typeTone = (v) => {
-    const s = String(v || '').trim();
-    if (/신차/.test(s)) return 'info';
-    if (/중고/.test(s)) return 'warn';
-    if (/리스/.test(s)) return 'purple';
-    if (/렌트/.test(s)) return 'info';
-    return 'neutral';
-  };
-  const badges = [
-    has(p.vehicle_status) ? `<span class="m-pd-gallery__badge m-pd-gallery__badge--${statusTone(p.vehicle_status)}">${escapeHtml(p.vehicle_status)}</span>` : '',
-    has(p.product_type)   ? `<span class="m-pd-gallery__badge m-pd-gallery__badge--${typeTone(p.product_type)}">${escapeHtml(p.product_type)}</span>` : '',
-  ].join('');
   const counter = photos.length > 1 ? `<div class="m-pd-gallery__counter">${idx + 1} / ${photos.length}</div>` : '';
   const navs = photos.length > 1 ? `
     <button class="m-pd-gallery__nav m-pd-gallery__nav--prev" id="m-pd-prev" type="button" aria-label="이전"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
@@ -122,11 +141,27 @@ function renderGallery(p) {
 
   return `<div class="m-pd-gallery">
     <img src="${escapeHtml(photos[idx])}" alt="">
-    ${badges ? `<div class="m-pd-gallery__badges">${badges}</div>` : ''}
     ${counter}
     ${navs}
     ${dots}
   </div>`;
+}
+
+/* 차량상태/상품구분 → 톤 클래스 */
+function statusTone(v) {
+  const s = String(v || '').trim();
+  if (/출고가능|즉시출고/.test(s)) return 'success';
+  if (/출고불가|정비중|사고/.test(s)) return 'danger';
+  if (/예약|대기/.test(s)) return 'warn';
+  return 'neutral';
+}
+function typeTone(v) {
+  const s = String(v || '').trim();
+  if (/신차/.test(s)) return 'info';
+  if (/중고/.test(s)) return 'warn';
+  if (/리스/.test(s)) return 'purple';
+  if (/렌트/.test(s)) return 'info';
+  return 'neutral';
 }
 
 /* ─── 2. 차량 정보 그룹 ────────────────────────────── */
@@ -137,38 +172,68 @@ function renderVehicleGroup(p) {
   const subModel = p.sub_model || '';
   const trim = p.trim_name || '';
   const fuel = p.fuel_type || '';
-  const year = p.year || '';
-  const mileage = p.mileage ? `${(Number(p.mileage) / 10000).toFixed(1)}만km` : '';
+  const yearRaw = String(p.year || '').trim();
+  const year = yearRaw ? `${yearRaw.slice(-2)}년식` : '';
+  const mileage = p.mileage ? `${Number(p.mileage).toLocaleString('ko-KR')}km` : '';
   const ext = p.ext_color || '';
   const intc = p.int_color || '';
-  const color = (has(ext) || has(intc)) ? `${dash(ext)} / ${dash(intc)}` : '';
+  const colorBadges = (has(ext) || has(intc))
+    ? `${colorBadge(ext)}${colorBadge(intc)}`
+    : '';
 
   const optsRaw = p.options || p.option_summary || '';
   const opts = has(optsRaw) ? String(optsRaw).split(/[,/·•|\n]/).map(s => s.trim()).filter(Boolean) : [];
 
   return `<section class="m-pd-group">
     ${groupHead(ICO.car, '차량 정보')}
-
-    <!-- ① 제조사 모델 차량번호 (한 줄) -->
-    <div class="m-pd-vh">
-      <span class="m-pd-vh__title">${escapeHtml(dash([maker, model].filter(Boolean).join(' ')))}</span>
-      <span class="m-pd-vh__carno">${escapeHtml(dash(carNo))}</span>
+    <div class="m-pd-group__body">
+    <div class="m-pd-vinfo">
+      <!-- 제조사 / 모델 / 차량번호(보조) + 우측 뱃지 -->
+      <div class="m-pd-vinfo__row m-pd-vinfo__row--head">
+        <div class="m-pd-vinfo__head-title">
+          ${[maker, model].filter(has).map(escapeHtml).join(' ')}
+          ${has(carNo) ? `<span class="m-pd-vinfo__head-sub">${escapeHtml(carNo)}</span>` : ''}
+        </div>
+        <div class="m-pd-vinfo__head-badges">
+          ${has(p.vehicle_status) ? `<span class="m-pd-badge m-pd-badge--${statusTone(p.vehicle_status)}">${escapeHtml(p.vehicle_status)}</span>` : ''}
+          ${has(p.product_type)   ? `<span class="m-pd-badge m-pd-badge--${typeTone(p.product_type)}">${escapeHtml(p.product_type)}</span>` : ''}
+        </div>
+      </div>
+      <!-- 세부모델 (좌우) -->
+      <div class="m-pd-vinfo__row m-pd-vinfo__row--inline">
+        <div class="m-pd-vinfo__label">세부모델</div>
+        <div class="m-pd-vinfo__value">${escapeHtml(dash(subModel))}</div>
+      </div>
+      <!-- 세부트림 (좌우) -->
+      <div class="m-pd-vinfo__row m-pd-vinfo__row--inline">
+        <div class="m-pd-vinfo__label">세부트림</div>
+        <div class="m-pd-vinfo__value">${escapeHtml(dash(trim))}</div>
+      </div>
+      <!-- 선택 옵션 (상하, 큼지막) -->
+      <div class="m-pd-vinfo__row m-pd-vinfo__row--stack">
+        <div class="m-pd-vinfo__label">선택 옵션</div>
+        <div class="m-pd-vinfo__value m-pd-vinfo__value--block">${opts.length ? escapeHtml(opts.join(', ')) : '-'}</div>
+      </div>
+      <!-- 2x2 그리드: 연식·주행거리 / 연료·색상 -->
+      <div class="m-pd-vinfo__row m-pd-vinfo__row--grid2">
+        <div class="m-pd-vinfo__cell">
+          <div class="m-pd-vinfo__label">연식</div>
+          <div class="m-pd-vinfo__value">${escapeHtml(dash(year))}</div>
+        </div>
+        <div class="m-pd-vinfo__cell">
+          <div class="m-pd-vinfo__label">주행거리</div>
+          <div class="m-pd-vinfo__value">${escapeHtml(dash(mileage))}</div>
+        </div>
+        <div class="m-pd-vinfo__cell">
+          <div class="m-pd-vinfo__label">연료</div>
+          <div class="m-pd-vinfo__value">${escapeHtml(dash(fuel))}</div>
+        </div>
+        <div class="m-pd-vinfo__cell">
+          <div class="m-pd-vinfo__label">색상 (외 / 내)</div>
+          <div class="m-pd-vinfo__value">${colorBadges || '-'}</div>
+        </div>
+      </div>
     </div>
-
-    <!-- ② 세부모델 / 세부트림 / 제원 -->
-    ${kvList([
-      ['세부모델',  subModel],
-      ['세부트림',  trim],
-      ['연식',      year ? `${year}년` : ''],
-      ['주행거리',  mileage],
-      ['연료',      fuel],
-      ['외장/내장', color],
-    ])}
-
-    <!-- ③ 선택 옵션 -->
-    <div class="m-pd-block">
-      <div class="m-pd-block__label">선택 옵션</div>
-      <div class="m-pd-options">${opts.length ? opts.map(escapeHtml).join(', ') : '-'}</div>
     </div>
   </section>`;
 }
@@ -193,34 +258,29 @@ function getPriceRows(p) {
   }).filter(r => r.rent > 0);
 }
 
-/* ─── 3. 대여료 (요약 + 표 한 섹션) ───────────────── */
+/* ─── 3. 대여료 (싼 순으로 정렬된 표 한 개) ───────── */
 function renderPrice(p) {
   const rows = getPriceRows(p);
   if (!rows.length) {
     return `<section class="m-pd-group">
       ${groupHead(ICO.money, '대여료')}
-      <div class="m-pd-empty">등록된 대여료가 없습니다</div>
+      <div class="m-pd-group__body"><div class="m-pd-empty">등록된 대여료가 없습니다</div></div>
     </section>`;
   }
-  const cheapest = rows.reduce((a, b) => (a.rent <= b.rent ? a : b));
+  const sorted = [...rows].sort((a, b) => a.rent - b.rent);
   return `<section class="m-pd-group">
     ${groupHead(ICO.money, '대여료')}
-    <div class="m-pd-price-hero">
-      <div class="m-pd-price-hero__label">${cheapest.m}개월 약정 기준 · 최저가</div>
-      <div class="m-pd-price-hero__row">
-        <div class="m-pd-price-hero__amount">월 ${fmtKRW(cheapest.rent)}<span class="m-pd-price-hero__amount-suffix">원~</span></div>
-        ${cheapest.deposit ? `<div class="m-pd-price-hero__deposit">보증금 ${fmtKRW(cheapest.deposit)}원</div>` : ''}
-      </div>
-    </div>
+    <div class="m-pd-group__body">
     <div class="m-pd-price-table">
       <div class="m-pd-price-table__th">
         <span>기간</span><span>월 대여료</span><span>보증금</span>
       </div>
-      ${rows.map(r => `<div class="m-pd-price-table__row${r.m === cheapest.m ? ' is-cheapest' : ''}">
+      ${sorted.map((r, i) => `<div class="m-pd-price-table__row${i === 0 ? ' is-cheapest' : ''}">
         <span>${r.m}개월</span>
         <strong>${fmtKRW(r.rent)}원</strong>
         <span>${r.deposit ? fmtKRW(r.deposit) + '원' : '-'}</span>
       </div>`).join('')}
+    </div>
     </div>
   </section>`;
 }
@@ -240,6 +300,14 @@ function findPolicy(p, policies) {
 }
 
 /* ─── 5. 보험 상세 ───────────────────────────────── */
+// 면책금 포맷: 콤마로 줄바꿈, 최대/최소 제거
+function formatDeductible(v) {
+  if (!has(v)) return '-';
+  const cleaned = String(v).replace(/\s*최[대소]\s*/g, '').trim();
+  const parts = cleaned.split(/\s*,\s*/).filter(Boolean);
+  return parts.map(escapeHtml).join('<br>');
+}
+
 function renderInsurance(p, policy) {
   const src = { ...(policy || {}), ...p };
   const pick = (...keys) => {
@@ -253,9 +321,11 @@ function renderInsurance(p, policy) {
     ['무보험차 상해',  pick('uninsured_damage', 'uninsured_limit_deductible'),           pick('uninsured_deductible')],
     ['자기차량 손해',  pick('own_damage_compensation', 'own_damage_limit_deductible'),   pick('own_damage_min_deductible')],
   ];
+  const roadside = pick('annual_roadside_assistance', 'roadside_assistance');
 
   return `<section class="m-pd-group">
     ${groupHead(ICO.shield, '보험 상세')}
+    <div class="m-pd-group__body">
     <div class="m-pd-tbl">
       <div class="m-pd-tbl__th">
         <span>구분</span><span>보장한도</span><span>면책금</span>
@@ -263,8 +333,13 @@ function renderInsurance(p, policy) {
       ${items.map(([k, limit, ded]) => `<div class="m-pd-tbl__row">
         <span>${escapeHtml(k)}</span>
         <strong>${escapeHtml(dash(limit))}</strong>
-        <span>${escapeHtml(dash(ded))}</span>
+        <span>${formatDeductible(ded)}</span>
       </div>`).join('')}
+      <div class="m-pd-tbl__row m-pd-tbl__row--single">
+        <span>긴급출동</span>
+        <strong class="m-pd-tbl__span2">${escapeHtml(dash(roadside))}</strong>
+      </div>
+    </div>
     </div>
   </section>`;
 }
@@ -274,12 +349,12 @@ function renderPayment(policy) {
   const t = policy || {};
   return `<section class="m-pd-group">
     ${groupHead(ICO.card, '결제·보증금')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['보험포함',       t.insurance_included],
       ['결제방식',       t.payment_method],
       ['보증금분납',     t.deposit_installment],
       ['보증금카드결제', t.deposit_card_payment],
-    ])}
+    ])}</div>
   </section>`;
 }
 
@@ -287,10 +362,10 @@ function renderMileage(policy) {
   const t = policy || {};
   return `<section class="m-pd-group">
     ${groupHead(ICO.gauge, '주행거리')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['연주행거리',     t.annual_mileage],
       ['1만km 추가비용', t.mileage_upcharge_per_10000km],
-    ])}
+    ])}</div>
   </section>`;
 }
 
@@ -298,7 +373,7 @@ function renderDriver(policy) {
   const t = policy || {};
   return `<section class="m-pd-group">
     ${groupHead(ICO.user, '운전자·연령')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['기본운전연령',   t.basic_driver_age],
       ['연령하향',       t.driver_age_lowering],
       ['연령하향비용',   t.age_lowering_cost],
@@ -306,7 +381,7 @@ function renderDriver(policy) {
       ['추가운전자비용', t.additional_driver_cost],
       ['개인운전범위',   t.personal_driver_scope],
       ['사업자운전범위', t.business_driver_scope],
-    ])}
+    ])}</div>
   </section>`;
 }
 
@@ -314,11 +389,11 @@ function renderService(policy) {
   const t = policy || {};
   return `<section class="m-pd-group">
     ${groupHead(ICO.truck, '부가 서비스')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['대여지역', t.rental_region],
       ['탁송비',   t.delivery_fee],
       ['긴급출동', t.annual_roadside_assistance || t.roadside_assistance],
-    ])}
+    ])}</div>
   </section>`;
 }
 
@@ -326,10 +401,10 @@ function renderScreening(policy) {
   const t = policy || {};
   return `<section class="m-pd-group">
     ${groupHead(ICO.check, '심사·신용')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['심사기준', t.screening_criteria],
       ['신용등급', t.credit_grade],
-    ])}
+    ])}</div>
   </section>`;
 }
 
@@ -352,10 +427,10 @@ function renderFee(p) {
 
   return `<section class="m-pd-group">
     ${groupHead(ICO.fee, '수수료 안내')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ...rows.map(r => [`${r.m}개월`, `${r.fee.toLocaleString('ko-KR')}원`]),
       ...(has(clawback) ? [['환수조건', clawback]] : []),
-    ])}
+    ])}</div>
   </section>`;
 }
 
@@ -363,35 +438,35 @@ function renderFee(p) {
 function renderProductMeta(p) {
   return `<section class="m-pd-group">
     ${groupHead(ICO.pkg, '상품 등록')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['상품코드',   p.product_code],
       ['상품유형',   p.product_type],
       ['차량상태',   p.vehicle_status],
       ['차종',       p.vehicle_class],
       ['최초등록일', p.first_registration_date],
       ['차령만료일', p.vehicle_age_expiry_date],
-    ])}
+    ])}</div>
   </section>`;
 }
 
 function renderVehiclePrice(p) {
   return `<section class="m-pd-group">
     ${groupHead(ICO.tag, '차량 가격')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['차량가격', p.vehicle_price ? fmtKRW(p.vehicle_price) + '원' : ''],
       ['가격기준', p.pricing_basis],
       ['인수방식', p.buyout_method || p.pricing_comment],
-    ])}
+    ])}</div>
   </section>`;
 }
 
 function renderProvider(p) {
   return `<section class="m-pd-group">
     ${groupHead(ICO.bldg, '공급사')}
-    ${kvList([
+    <div class="m-pd-group__body">${kvList([
       ['공급사명',   p.provider_name || p.partner_name],
       ['공급사 메모', p.partner_memo || p.note],
-    ])}
+    ])}</div>
   </section>`;
 }
 

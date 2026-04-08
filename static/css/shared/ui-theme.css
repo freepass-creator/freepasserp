@@ -221,6 +221,7 @@ body[data-page] img {
   display: flex;
   align-items: center;
   min-height: var(--height-md);
+  margin: 2px 6px;
   padding: 0 var(--space-3) 0 var(--space-3);
   border-radius: var(--radius-sm);
   background: transparent;
@@ -415,7 +416,26 @@ body[data-page] img {
 
 .dashboard-shell--new .sidebar.sidebar-collapsed .sidebar-head {
   justify-content: center;
+  padding: 4px 0;
+}
+.dashboard-shell--new .sidebar.sidebar-collapsed .sidebar-toggle-btn {
+  width: var(--height-md);
+  height: var(--height-md);
+  min-height: var(--height-md);
   padding: 0;
+  margin: 0 auto;
+}
+.dashboard-shell--new .sidebar.sidebar-collapsed .sidebar-link {
+  width: var(--height-md);
+  height: var(--height-md);
+  min-height: var(--height-md);
+  padding: 0;
+  justify-content: center;
+  margin: 2px auto;
+  gap: 0;
+}
+.dashboard-shell--new .sidebar.sidebar-collapsed .sidebar-nav-badge {
+  margin-left: 0;
 }
 
 .dashboard-shell--new .sidebar.sidebar-collapsed .sidebar-toggle-label {
