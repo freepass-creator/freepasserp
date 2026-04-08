@@ -8,7 +8,9 @@
 .pls-detail-panel {
   position: absolute; top: 0; right: 0; bottom: 0; z-index: 20;
   display: flex; flex-direction: column; overflow: hidden;
-  border: none; border-radius: var(--radius-ui, 2px) 0 0 var(--radius-ui, 2px);
+  border: none;
+  /* jpkerp 스타일 4코너 모두 라운드 */
+  border-radius: var(--radius-ui);
   background: #fff;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
   transform: translateX(100%);
@@ -33,14 +35,10 @@
 
 .product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 0; }
 .product-list-page-shell .panel-body--detail { padding: 0 !important; }
-/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 여백 최소화 + 각진 라운드 */
+/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 여백 최소화만 (라운드는 .m-pd가 자체 변수로 처리) */
 .product-list-page-shell .panel-body--detail .m-pd {
   padding: 0;
   background: var(--new-bg-panel, #fff);
-  /* .m-pd 컨테이너 내부의 라운드 변수만 override → 자연스럽게 모든 자식에 적용 */
-  --m-radius-md: 4px;
-  --m-radius-pill: 4px;
-  --m-radius-photo: 4px;
 }
 .product-list-page-shell .panel-body--detail .m-pd-group { margin: 0; box-shadow: none; }
 .product-list-page-shell .panel-body--detail .m-pd-group + .m-pd-group { border-top: 1px solid rgba(0, 0, 0, 0.06); }
