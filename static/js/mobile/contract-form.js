@@ -286,6 +286,18 @@ $delete?.addEventListener('click', async () => {
   }
 });
 
+// ⚡ 마지막 렌더 HTML sessionStorage 보관 → 재방문 시 즉시 복원
+const SS_HTML_KEY = 'fp_cf_html_' + contractCode;
+(function restoreLastHtml() {
+  try {
+    const cached = sessionStorage.getItem(SS_HTML_KEY);
+    if (cached && $cf) $cf.innerHTML = cached;
+  } catch {}
+})();
+window.addEventListener('pagehide', () => {
+  try { if ($cf) sessionStorage.setItem(SS_HTML_KEY, $cf.innerHTML); } catch {}
+});
+
 // ⚡ 캐시 즉시 사용
 function hydrateFromCache() {
   const cached = window.__appData || {};

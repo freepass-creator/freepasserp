@@ -333,6 +333,18 @@ function openSheet(title, contentHtml) {
 $help?.addEventListener('click', showHelp);
 $notice?.addEventListener('click', showNotice);
 
+// ⚡ 마지막 렌더 HTML sessionStorage 보관 → 재방문 시 즉시 복원
+const SS_HTML_KEY = 'fp_st_html';
+(function restoreLastHtml() {
+  try {
+    const cached = sessionStorage.getItem(SS_HTML_KEY);
+    if (cached && $st) $st.innerHTML = cached;
+  } catch {}
+})();
+window.addEventListener('pagehide', () => {
+  try { if ($st) sessionStorage.setItem(SS_HTML_KEY, $st.innerHTML); } catch {}
+});
+
 (async () => {
   try {
     const auth = await requireAuth();
