@@ -1,42 +1,37 @@
 /* 모바일 대화방 — SPA 토글 (display:none 금지: iOS focus() 정책) */
-/* m-chat-root이 있는 페이지는 항상 풀스크린 레이아웃 */
-.m-body:has(#m-chat-root) { height: 100dvh; overflow: hidden; }
-.m-body:has(#m-chat-root) .m-page { padding-bottom: 0; height: 100%; min-height: 0; display: flex; flex-direction: column; }
-
-#m-chat-root {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  width: 100%;
-  overflow: hidden;
-}
-#m-chat-root > #m-chat-list,
-#m-chat-root > #m-chat-room {
+#m-chat-root { position: relative; height: 100%; }
+#m-chat-root #m-chat-list,
+#m-chat-root #m-chat-room {
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 100%;
-  overflow-y: auto;
 }
-#m-chat-root > #m-chat-room {
+#m-chat-root #m-chat-room {
   /* ⚡ opacity/visibility/display 모두 금지 — iOS 키보드 정책상 focus 거부됨.
      transform으로만 화면 밖으로 밀고, pointer-events로 클릭만 차단 */
   pointer-events: none;
   transform: translateX(100%);
   will-change: transform;
-  overflow: hidden; /* 내부 .m-cr__messages가 스크롤 담당 */
 }
-#m-chat-root[data-view="room"] > #m-chat-room {
+#m-chat-root[data-view="room"] #m-chat-room {
   pointer-events: auto;
   transform: none;
 }
-#m-chat-root[data-view="room"] > #m-chat-list {
+#m-chat-root[data-view="room"] #m-chat-list {
   pointer-events: none;
   transform: translateX(-100%);
 }
 
-/* 대화방 진입 시 하단 탭바 숨김 */
-.m-body:has(#m-chat-root[data-view="room"]) .m-tabbar { display: none; }
+.m-body:has(#m-chat-root[data-view="room"]) {
+  height: 100dvh;
+  overflow: hidden;
+}
+.m-body:has(#m-chat-root[data-view="room"]) .m-page {
+  padding-bottom: 0;
+}
+.m-body:has(#m-chat-root[data-view="room"]) .m-tabbar {
+  display: none;
+}
 .m-cr {
   display: flex;
   flex-direction: column;
