@@ -42,8 +42,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
+  width: 2.375rem;
+  height: 2.375rem;
   border: none;
   border-radius: var(--m-radius-circle);
   background: rgba(255, 255, 255, 0.95);
@@ -83,7 +83,7 @@
   padding: 3px 7px;
   border-radius: var(--m-radius-badge);
   color: #fff;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   backdrop-filter: blur(6px);
   background: rgba(27, 42, 74, 0.75);
@@ -106,14 +106,14 @@
   z-index: 2;
 }
 .m-pd-gallery__dot {
-  width: 6px;
-  height: 6px;
+  width: 0.375rem;
+  height: 0.375rem;
   border-radius: var(--m-radius-circle);
   background: rgba(255, 255, 255, 0.45);
   transition: all 0.2s;
 }
 .m-pd-gallery__dot.is-active {
-  width: 20px;
+  width: 1.25rem;
   border-radius: 999px;
   background: #fff;
 }
@@ -180,15 +180,15 @@
   margin-bottom: var(--m-space-5);
 }
 .m-pd-group__icon {
-  flex: 0 0 18px;
-  width: 18px;
-  height: 18px;
+  flex: 0 0 1.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--m-text-primary);
 }
-.m-pd-group__icon svg { width: 18px; height: 18px; }
+.m-pd-group__icon svg { width: 1.125rem; height: 1.125rem; }
 .m-pd-group__title {
   flex: 1;
   font-size: var(--m-font-title);
@@ -254,7 +254,7 @@
   margin-top: var(--m-space-4);
 }
 .m-pd-block__label {
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--m-text-tertiary);
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -269,7 +269,7 @@
   padding: 1px 6px;
   background: var(--m-text-primary);
   color: #fff;
-  font-size: 9px;
+  font-size: 0.5625rem;
   font-weight: 800;
   border-radius: var(--m-radius-badge);
   letter-spacing: 0;
@@ -288,7 +288,7 @@
   padding: 1px 7px;
   background: var(--m-accent-soft);
   color: var(--m-accent);
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 800;
   border-radius: var(--m-radius-badge);
   letter-spacing: 0;
@@ -318,8 +318,8 @@
   min-width: 0;
 }
 .m-pd-spec__icon {
-  width: 18px;
-  height: 18px;
+  width: 1.125rem;
+  height: 1.125rem;
   margin-bottom: var(--m-space-2);
   color: var(--m-text-tertiary);
   display: flex;
@@ -339,7 +339,7 @@
   font-feature-settings: 'tnum';
 }
 .m-pd-spec__label {
-  font-size: 10px;
+  font-size: 0.625rem;
   color: var(--m-text-tertiary);
   font-weight: 600;
   text-transform: uppercase;
@@ -439,7 +439,7 @@
   font-size: var(--m-font-caption);
 }
 .m-pd-price-table__th {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   color: var(--m-text-tertiary);
   text-transform: uppercase;
@@ -470,7 +470,7 @@
   content: '●';
   color: var(--m-text-primary);
   margin-right: 4px;
-  font-size: 8px;
+  font-size: 0.5rem;
   vertical-align: middle;
 }
 
@@ -506,7 +506,7 @@
 .m-pd-tbl__th span:first-child,
 .m-pd-tbl__row span:first-child { text-align: left; }
 .m-pd-tbl__th {
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 700;
   color: var(--m-text-tertiary);
   text-transform: uppercase;

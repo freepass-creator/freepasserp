@@ -20,16 +20,16 @@
   --m-danger:           #ef4444;
   --m-danger-bg:        #fef2f2;
 
-  /* 사이즈 — vw 기반 비율 (clamp로 최소/최대 보호) */
-  --m-topbar-h:         clamp(44px, 12.5vw, 56px);
-  --m-tabbar-h:         clamp(52px, 14.5vw, 64px);
-  --m-pad-x:            clamp(12px, 4.2vw, 18px);
-  --m-pad-y:            clamp(10px, 3.6vw, 16px);
-  --m-gap:              clamp(8px, 3.2vw, 14px);
-  --m-row-h:            clamp(56px, 16.5vw, 72px);
-  --m-input-h:          clamp(42px, 12vw, 52px);
-  --m-btn-h:            clamp(42px, 12vw, 52px);
-  --m-icon-btn:         clamp(32px, 9.4vw, 40px);
+  /* 사이즈 — rem 기반 (root font-size에 비례) */
+  --m-topbar-h:         3rem;       /* 48px @ 16 */
+  --m-tabbar-h:         3.5rem;     /* 56px */
+  --m-pad-x:            1rem;       /* 16px */
+  --m-pad-y:            0.875rem;   /* 14px */
+  --m-gap:              0.75rem;    /* 12px */
+  --m-row-h:            4rem;       /* 64px */
+  --m-input-h:          3rem;
+  --m-btn-h:            3rem;
+  --m-icon-btn:         2.25rem;    /* 36px */
 
   /* 라운드 — 정제된 느낌 (2/4/6/8) */
   --m-radius-sm:        2px;    /* 뱃지·칩 */
@@ -41,23 +41,28 @@
   --m-radius-pill:      999px;
   --m-radius-circle:    50%;
 
-  /* 여백 — 8pt grid */
-  --m-space-1:          4px;
-  --m-space-2:          8px;
-  --m-space-3:          12px;
-  --m-space-4:          16px;
-  --m-space-5:          20px;
-  --m-space-6:          24px;
-  --m-space-7:          32px;
+  /* 여백 — rem 비율 (root에 비례) */
+  --m-space-1:          0.25rem;   /* 4 */
+  --m-space-2:          0.5rem;    /* 8 */
+  --m-space-3:          0.75rem;   /* 12 */
+  --m-space-4:          1rem;      /* 16 */
+  --m-space-5:          1.25rem;   /* 20 */
+  --m-space-6:          1.5rem;    /* 24 */
+  --m-space-7:          2rem;      /* 32 */
 
-  /* 폰트 — 트렌드 스케일 (모바일 본문 14~16px 표준) */
-  --m-font-display:     clamp(20px, 5.6vw, 26px);  /* 페이지 히어로 */
-  --m-font-title:       clamp(16px, 4.4vw, 19px);  /* 섹션 제목 */
-  --m-font-body:        clamp(14px, 3.8vw, 16px);  /* 본문·값 */
-  --m-font-caption:     clamp(12px, 3.2vw, 13px);  /* 라벨·메타 */
-  --m-font-micro:       clamp(11px, 2.9vw, 12px);  /* 뱃지 */
-  /* 호환용 alias */
+  /* 폰트 — rem 비율 (root에 비례) */
+  --m-font-display:     1.625rem;   /* 26 @ 16 */
+  --m-font-title:       1.1875rem;  /* 19 */
+  --m-font-body:        1rem;       /* 16 */
+  --m-font-caption:     0.8125rem;  /* 13 */
+  --m-font-micro:       0.6875rem;  /* 11 */
   --m-font-sub:         var(--m-font-caption);
+}
+
+/* ─── 반응형 root font-size — 화면 너비에 비례 ─── */
+html {
+  /* 360px → 14px, 390px → 15px, 430px → 16.5px, 480px+ → 17px */
+  font-size: clamp(13px, 3.9vw, 17px);
 }
 
 /* ── reset ── */
