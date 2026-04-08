@@ -171,6 +171,8 @@ function doSend() {
 const $send = $form?.querySelector('.m-cr__send');
 $send?.addEventListener('touchstart', (e) => {
   e.preventDefault();
+  // touchstart에서 preventDefault하면 click이 안 가서 글로벌 햅틱이 안 울림 → 직접 호출
+  if (navigator.vibrate) navigator.vibrate(8);
   doSend();
 }, { passive: false });
 
