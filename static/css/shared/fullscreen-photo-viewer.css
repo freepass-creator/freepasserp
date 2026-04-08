@@ -18,7 +18,7 @@
   width: var(--height-lg);
   height: var(--height-lg);
   border: none;
-  border-radius: var(--radius-circle);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   cursor: pointer;

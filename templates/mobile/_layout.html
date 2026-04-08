@@ -258,7 +258,7 @@
     });
     // ⚡ 햅틱 진동 — click 이벤트 기반 (스크롤 시엔 발생 안 함, 실제 탭에서만)
     if ('vibrate' in navigator) {
-      const HAPTIC_SEL = 'button, a, [role=button], .m-tab, .m-list-row, .m-product-card, .m-card, .m-icon-btn, label, summary, input[type=checkbox], input[type=radio], [data-haptic]';
+      const HAPTIC_SEL = 'button, a, [role=button], .m-tab, .m-list-row, .m-product-card, .m-card, .m-icon-btn, label, summary, input[type=checkbox], input[type=radio], [data-haptic], .m-pd-gallery img';
       document.addEventListener('click', (e) => {
         // 풀스크린 사진 뷰어 안에서는 햅틱 안 함 (스크롤·스와이프용)
         if (e.target.closest('.fp-photo-viewer')) return;
