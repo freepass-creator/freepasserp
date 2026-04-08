@@ -212,27 +212,32 @@ $delete?.addEventListener('click', async () => {
   }
 });
 
-// ⚡ 페이지 진입 즉시 textarea 포커스 (키보드 자동 오픈)
+// ⚡ 페이지 진입 즉시 textarea 포커스 (Android Chrome은 autofocus 속성 + 동기 focus()로 키보드 자동 오픈)
+// iOS Safari는 정책상 페이지 이동 후 프로그램 focus가 키보드를 띄우지 못함 → 첫 사용자 탭에서 활성화
 function autoFocusTextarea() {
   if (!$text) return;
-  $text.focus();
-  // iOS Safari는 click 같은 user gesture가 필요할 수 있음 → 첫 touch에서 다시 시도
-  const onFirstTouch = () => {
-    $text.focus();
-    document.removeEventListener('touchstart', onFirstTouch);
-    document.removeEventListener('click', onFirstTouch);
-  };
-  document.addEventListener('touchstart', onFirstTouch, { once: true, passive: true });
-  document.addEventListener('click', onFirstTouch, { once: true });
+  try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
 }
+// 1) 모듈 로드 직후 즉시 (await 전 — gesture 컨텍스트 잔존 시도)
+autoFocusTextarea();
+// 2) DOMContentLoaded 시점에 한 번 더
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', autoFocusTextarea, { once: true });
+}
+// 3) 첫 touch/click에서 한 번 더 (iOS Safari 대응 — 사용자가 화면 어디든 한 번 탭하면 키보드 오픈)
+const _onFirstGesture = () => {
+  autoFocusTextarea();
+  document.removeEventListener('touchstart', _onFirstGesture);
+  document.removeEventListener('click', _onFirstGesture);
+};
+document.addEventListener('touchstart', _onFirstGesture, { once: true, passive: true });
+document.addEventListener('click', _onFirstGesture, { once: true });
 
 (async () => {
   try {
     const auth = await requireAuth();
     currentUser = auth.user;
     currentProfile = auth.profile;
-    // 즉시 포커스 (요청 대기 안 함)
-    requestAnimationFrame(autoFocusTextarea);
 
     // 역할별 버튼 노출: 공급사·관리자만 삭제 가능, 영업자는 숨김만
     const role = currentProfile?.role || '';
