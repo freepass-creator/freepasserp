@@ -632,6 +632,20 @@ $btnShare?.addEventListener('click', async (e) => {
   const carTitle = [carPart, agentPart && `- ${agentPart}`].filter(Boolean).join(' ');
   if (carTitle) url.searchParams.set('t', carTitle);
   if (company) url.searchParams.set('c', company);
+  // 설명: 가장 싼 월 대여료/보증금 + 연식·주행거리 정도
+  const num = (v) => Number(String(v ?? '').replace(/[^\d.-]/g, '')) || 0;
+  const months = [1, 12, 24, 36, 48, 60];
+  let cheapest = null;
+  for (const m of months) {
+    const slot = (p.price && (p.price[m] || p.price[String(m)])) || {};
+    const rent = num(slot.rent);
+    if (rent && (!cheapest || rent < cheapest.rent)) cheapest = { m, rent, deposit: num(slot.deposit) };
+  }
+  const descParts = [];
+  if (cheapest) descParts.push(`${cheapest.m}개월 월 ${cheapest.rent.toLocaleString('ko-KR')}원`);
+  if (p.year) descParts.push(`${String(p.year).slice(-2)}년식`);
+  if (p.mileage) descParts.push(`${Number(p.mileage).toLocaleString('ko-KR')}km`);
+  if (descParts.length) url.searchParams.set('d', descParts.join(' · '));
   // 이미지 URL은 너무 길어서 query에 넣지 않음 — 서버가 OG 기본 이미지 사용
   const shareUrl = url.toString();
   const title = carTitle || [p.maker, p.model_name].filter(Boolean).join(' ') || '상품';

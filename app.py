@@ -183,7 +183,8 @@ def catalog_view():
         title = f'{provider} 상품{suffix}'
     else:
         title = f'전체 상품{suffix}'
-    og_desc = '렌터카 장기렌트 상품을 검색하고 비교해보세요.'
+    custom_desc = req.args.get('d', '')
+    og_desc = custom_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.'
     return render_template('pages/catalog.html', page_title=title, og_title=title, og_desc=og_desc, og_image=og_image)
 
 for _path, _tpl, _title in _NEW_ROUTES:
