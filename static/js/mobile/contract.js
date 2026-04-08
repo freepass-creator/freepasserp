@@ -208,22 +208,48 @@ $list?.addEventListener('click', (e) => {
   if (id) location.href = `/m/contract/${encodeURIComponent(id)}`;
 });
 
+function _hydrateProductMap(products) {
+  const map = new Map();
+  (products || []).forEach(p => {
+    if (p?.product_uid) map.set(p.product_uid, p);
+    if (p?.product_code) map.set(p.product_code, p);
+  });
+  return map;
+}
+
 (async () => {
   try {
+    // ⚡ 메모리 캐시 즉시 사용
+    const cached = window.__appData || {};
+    if (Array.isArray(cached.contracts) && cached.contracts.length) {
+      allContracts = cached.contracts;
+    }
+    if (Array.isArray(cached.products) && cached.products.length) {
+      productMap = _hydrateProductMap(cached.products);
+    }
+
     const { profile } = await requireAuth();
     currentRole = profile?.role || '';
+    if (allContracts.length) applyAll();
+
     watchContracts((contracts) => {
       allContracts = contracts || [];
       applyAll();
     });
     watchProducts((products) => {
-      const map = new Map();
-      (products || []).forEach(p => {
-        if (p?.product_uid) map.set(p.product_uid, p);
-        if (p?.product_code) map.set(p.product_code, p);
-      });
-      productMap = map;
+      productMap = _hydrateProductMap(products);
       applyAll();
+    });
+
+    window.addEventListener('fp:data', (e) => {
+      const t = e.detail?.type;
+      if (t === 'contracts' && window.__appData.contracts) {
+        allContracts = window.__appData.contracts;
+        applyAll();
+      } else if (t === 'products' && window.__appData.products) {
+        productMap = _hydrateProductMap(window.__appData.products);
+        applyAll();
+      }
     });
   } catch (e) {
     console.error('[mobile/contract] init failed', e);

@@ -243,7 +243,19 @@ $grid?.addEventListener('click', (e) => {
 
 (async () => {
   try {
-    await requireAuth();
+    // ⚡ 메모리 캐시에 데이터 있으면 즉시 렌더 (Firebase 응답 기다리지 않음)
+    const cached = window.__appData || {};
+    if (Array.isArray(cached.products) && cached.products.length) {
+      allProducts = cached.products.filter(p => p && p.product_uid);
+    }
+    if (Array.isArray(cached.terms) && cached.terms.length) {
+      allPolicies = cached.terms;
+    }
+    if (allProducts.length) applySearch();
+
+    // 백그라운드에서 인증 + 실시간 구독 (캐시에 없거나 갱신용)
+    requireAuth().catch(() => {});
+
     watchProducts((products) => {
       allProducts = products.filter(p => p && p.product_uid);
       applySearch();
@@ -252,22 +264,25 @@ $grid?.addEventListener('click', (e) => {
       allPolicies = Array.isArray(terms) ? terms : [];
       applySearch();
     });
+
+    // 글로벌 prefetcher가 새 데이터 받으면 자동 갱신
+    window.addEventListener('fp:data', (e) => {
+      const t = e.detail?.type;
+      if (t === 'products' && window.__appData.products) {
+        allProducts = window.__appData.products.filter(p => p && p.product_uid);
+        applySearch();
+      } else if (t === 'terms' && window.__appData.terms) {
+        allPolicies = window.__appData.terms;
+        applySearch();
+      }
+    });
+
     let searchTimer;
     $search?.addEventListener('input', () => {
       searchQuery = $search.value;
       clearTimeout(searchTimer);
       searchTimer = setTimeout(applySearch, 200);
     });
-
-    // ⚡ 다음 페이지 데이터 백그라운드 prefetch (idle 시)
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => {
-        import('../firebase/firebase-db.js').then(m => {
-          m.watchRooms?.(() => {});
-          m.watchContracts?.(() => {});
-        }).catch(() => {});
-      }, { timeout: 3000 });
-    }
   } catch (e) {
     console.error('[mobile/product] init failed', e);
   }

@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v101';
+const CACHE_NAME = 'freepass-v102';
 const IMG_CACHE = 'freepass-img-v1';
 
 // 핵심 자원 — 첫 방문 시 미리 다운로드
@@ -16,6 +16,7 @@ const PRECACHE_URLS = [
   '/static/js/mobile/contract.js',
   '/static/js/mobile/settings.js',
   '/static/js/mobile/tab-badges.js',
+  '/static/js/mobile/prefetch.js',
   '/static/js/mobile/filter-sheet.js',
   '/static/js/firebase/firebase-config.js',
   '/static/js/firebase/firebase-db.js',

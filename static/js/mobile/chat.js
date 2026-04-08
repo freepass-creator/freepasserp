@@ -170,22 +170,49 @@ $list?.addEventListener('click', (e) => {
   if (id) location.href = `/m/chat/${encodeURIComponent(id)}`;
 });
 
+function _hydrateProductMap(products) {
+  const map = new Map();
+  (products || []).forEach(p => {
+    if (p?.product_uid) map.set(p.product_uid, p);
+    if (p?.product_code) map.set(p.product_code, p);
+  });
+  return map;
+}
+
 (async () => {
   try {
+    // ⚡ 메모리 캐시 즉시 사용
+    const cached = window.__appData || {};
+    if (Array.isArray(cached.rooms) && cached.rooms.length) {
+      allRooms = cached.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+    }
+    if (Array.isArray(cached.products) && cached.products.length) {
+      productMap = _hydrateProductMap(cached.products);
+    }
+
     const { profile } = await requireAuth();
     currentRole = profile?.role || '';
+    if (allRooms.length) applyAll();
+
     watchRooms((rooms) => {
       allRooms = (rooms || []).filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
       applyAll();
     });
     watchProducts((products) => {
-      const map = new Map();
-      (products || []).forEach(p => {
-        if (p?.product_uid) map.set(p.product_uid, p);
-        if (p?.product_code) map.set(p.product_code, p);
-      });
-      productMap = map;
+      productMap = _hydrateProductMap(products);
       applyAll();
+    });
+
+    // 글로벌 prefetcher 이벤트
+    window.addEventListener('fp:data', (e) => {
+      const t = e.detail?.type;
+      if (t === 'rooms' && window.__appData.rooms) {
+        allRooms = window.__appData.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+        applyAll();
+      } else if (t === 'products' && window.__appData.products) {
+        productMap = _hydrateProductMap(window.__appData.products);
+        applyAll();
+      }
     });
   } catch (e) {
     console.error('[mobile/chat] init failed', e);
