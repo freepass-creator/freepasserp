@@ -479,7 +479,7 @@
     background: var(--m-bg) !important;
   }
   .catalog-card {
-    border-radius: 4px !important;
+    border-radius: var(--m-radius-sm) !important;
     box-shadow: none !important;
     background: var(--m-card-bg) !important;
     overflow: hidden !important;

@@ -158,7 +158,12 @@
   --m-row-h: 64px;
   --m-input-h: 48px;
   --m-btn-h: 48px;
-  --m-radius: 12px;
+  --m-radius: 8px;
+  --m-radius-sm: 4px;
+  --m-radius-md: 8px;
+  --m-radius-lg: 12px;
+  --m-radius-pill: 999px;
+  --m-radius-circle: 50%;
   --m-font-title: 15px;
   --m-font-body: 13px;
   --m-font-sub: 11px;
