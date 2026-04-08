@@ -333,6 +333,8 @@ app.register_blueprint(api_bp)
 
 @app.route('/')
 def index():
+    if _is_mobile():
+        return redirect('/m/product-list')
     return redirect('/product-list')
 
 
