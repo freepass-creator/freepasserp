@@ -136,6 +136,32 @@
   --mobile-tabbar-height: 56px;
   --mobile-input-font-size: var(--font-size-xl);
   --mobile-drawer-width: 260px;
+
+  /* ── 모바일 디자인 토큰 (전 페이지 공통 규격) ── */
+  --m-bg: #f4f5f7;
+  --m-card-bg: #ffffff;
+  --m-divider: #f2f4f6;
+  --m-divider-strong: #e5e8eb;
+  --m-text-primary: #0f172a;
+  --m-text-secondary: #475569;
+  --m-text-tertiary: #8b95a1;
+  --m-accent: #1b2a4a;
+  --m-pending: #f59e0b;
+  --m-pending-bg: #fff7ed;
+  --m-done: #10b981;
+  --m-done-bg: #ecfdf5;
+  --m-danger: #ef4444;
+  --m-danger-bg: #fef2f2;
+  --m-pad-x: 16px;
+  --m-pad-y: 14px;
+  --m-gap: 12px;
+  --m-row-h: 64px;
+  --m-input-h: 48px;
+  --m-btn-h: 48px;
+  --m-radius: 12px;
+  --m-font-title: 15px;
+  --m-font-body: 13px;
+  --m-font-sub: 11px;
 }
 
 html, body {

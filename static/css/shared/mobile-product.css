@@ -470,4 +470,63 @@
   .pls-mobile-sheet__btn--share {
     background: #1b2a4a; color: #fff;
   }
+
+  /* ─── catalog-card 모바일 통일 규격 ─── */
+  .catalog-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1px !important;
+    padding: 0 !important;
+    background: var(--m-divider) !important;
+  }
+  .catalog-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--m-card-bg) !important;
+  }
+  .catalog-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .catalog-card__image-wrap {
+    height: auto !important;
+    aspect-ratio: 4/3 !important;
+  }
+  .catalog-card__body {
+    padding: 10px 12px 12px !important;
+    gap: 2px !important;
+  }
+  .catalog-card__carno {
+    font-size: var(--m-font-sub) !important;
+    color: var(--m-text-tertiary) !important;
+  }
+  .catalog-card__model {
+    font-size: var(--m-font-body) !important;
+    font-weight: 600 !important;
+    color: var(--m-text-primary) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .catalog-card__sub {
+    font-size: var(--m-font-sub) !important;
+    color: var(--m-text-tertiary) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .catalog-card__price {
+    font-size: var(--m-font-body) !important;
+    font-weight: 700 !important;
+    color: var(--m-accent) !important;
+  }
+  .catalog-card__dep {
+    font-size: var(--m-font-sub) !important;
+    color: var(--m-text-tertiary) !important;
+  }
+  .catalog-card__provider { display: none !important; }
+  .catalog-card__badge {
+    font-size: 10px !important;
+    height: 18px !important;
+    padding: 0 6px !important;
+  }
 }
