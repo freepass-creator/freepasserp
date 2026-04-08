@@ -301,11 +301,12 @@ function renderProductDetail(p) {
   const policiesArr = allPolicies && typeof allPolicies === 'object'
     ? Object.values(allPolicies)
     : [];
-  return renderMobileProductDetail(p, {
+  // .m-pd 래퍼로 감싸야 product-detail.css의 변수가 적용됨
+  return `<div class="m-pd">${renderMobileProductDetail(p, {
     policies: policiesArr,
-    showGallery: false, // 갤러리는 catalog의 별도 single-gallery에서 처리
-    showFee: false,     // 수수료 섹션 제외
-  });
+    showGallery: false,
+    showFee: false,
+  })}</div>`;
 }
 
 // ─── 뷰 전환 ──────────────────────────────────────────────────────────────

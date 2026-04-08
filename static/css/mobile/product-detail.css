@@ -1,9 +1,49 @@
 /* ═══════════════════════════════════════════════════════════
    모바일 상품 상세 — 프리미엄 디자인
    섹션 그룹핑 · 아이콘 헤더 · 그라데이션 · 폴리싱
+   .m-pd 컨테이너에 변수 자체 정의 — 카탈로그(공개)에서도 동작
    ═══════════════════════════════════════════════════════════ */
 
 .m-pd {
+  /* 색상 */
+  --m-bg:               #f4f5f7;
+  --m-card-bg:          #ffffff;
+  --m-divider:          #f2f4f6;
+  --m-divider-strong:   #e5e8eb;
+  --m-text-primary:     #0f172a;
+  --m-text-secondary:   #475569;
+  --m-text-tertiary:    #8b95a1;
+  --m-accent:           #1b2a4a;
+  --m-accent-soft:      #eef2ff;
+  --m-pending:          #f59e0b;
+  --m-pending-bg:       #fff7ed;
+  --m-done:             #10b981;
+  --m-done-bg:          #ecfdf5;
+  --m-danger:           #ef4444;
+  --m-danger-bg:        #fef2f2;
+  /* 사이즈/라운드/여백/폰트 */
+  --m-radius-sm: 2px;
+  --m-radius-md: 4px;
+  --m-radius-lg: 6px;
+  --m-radius-xl: 8px;
+  --m-radius-photo: 6px;
+  --m-radius-badge: 2px;
+  --m-radius-pill: 999px;
+  --m-space-1: 0.25rem;
+  --m-space-2: 0.5rem;
+  --m-space-3: 0.75rem;
+  --m-space-4: 1rem;
+  --m-space-5: 1.25rem;
+  --m-space-6: 1.5rem;
+  --m-space-7: 2rem;
+  --m-page-pad: var(--m-space-2);
+  --m-font-display: 1rem;
+  --m-font-title: 0.9375rem;
+  --m-font-body: 0.875rem;
+  --m-font-caption: 0.8125rem;
+  --m-font-micro: 0.75rem;
+  --m-font-sub: var(--m-font-caption);
+
   background: var(--m-card-bg);
   padding: var(--m-page-pad);
 }
