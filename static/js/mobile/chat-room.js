@@ -55,7 +55,7 @@ function buildMessageHtml(m, prevDayTs) {
     return dayMark + `<div class="m-cr__msg m-cr__msg--system"><div class="m-cr__msg-bubble">${escapeHtml(m.text || '')}</div></div>`;
   }
   return dayMark + `<div class="m-cr__msg m-cr__msg--${isMine ? 'mine' : 'other'}">
-    ${!isMine ? `<div class="m-cr__msg-meta">${escapeHtml(m.sender_name || m.sender_code || '')}</div>` : ''}
+    ${!isMine ? `<div class="m-cr__msg-meta">${escapeHtml(m.sender_code || '')}</div>` : ''}
     <div class="m-cr__msg-bubble">${escapeHtml(m.text || '')}</div>
     <div class="m-cr__msg-meta">${fmtTime(m.created_at)}</div>
   </div>`;

@@ -536,6 +536,8 @@ $btnChat?.addEventListener('click', async (e) => {
   e.preventDefault();
   if (!currentProduct) { showToast('상품 정보를 불러오는 중입니다', 'info'); return; }
   if (currentProfile?.role !== 'agent') { showToast('영업자만 문의할 수 있습니다', 'error'); return; }
+  const ok = await showConfirm('이 상품에 대해 문의를 시작하시겠습니까?');
+  if (!ok) return;
   $btnChat.disabled = true;
   try {
     const p = currentProduct;
@@ -597,6 +599,8 @@ $btnContract?.addEventListener('click', async (e) => {
 $btnShare?.addEventListener('click', async (e) => {
   e.preventDefault();
   if (!currentProduct) return;
+  const ok = await showConfirm('이 상품의 공유 링크를 만드시겠습니까?');
+  if (!ok) return;
   const p = currentProduct;
   const url = new URL(location.origin + '/catalog');
   url.searchParams.set('id', p.product_uid || p.product_code || '');
