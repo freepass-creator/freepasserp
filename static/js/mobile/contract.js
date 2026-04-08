@@ -69,6 +69,21 @@ let productMap = new Map();
 let searchQuery = '';
 let activeFilters = { selected: {}, searchText: {} };
 let currentRole = '';
+let currentUser = null;
+let currentProfile = null;
+
+// 역할별 가시성 — 자기 것만
+function isVisibleForRole(c) {
+  if (!currentRole || currentRole === 'admin') return true;
+  if (currentRole === 'agent') {
+    return c.agent_uid === currentUser?.uid || c.agent_code === currentProfile?.user_code;
+  }
+  if (currentRole === 'provider') {
+    const myCode = currentProfile?.company_code || '';
+    return (c.partner_code || '') === myCode || (c.provider_company_code || '') === myCode;
+  }
+  return false;
+}
 
 function visibleGroupsForRole(role) {
   return FILTER_GROUPS.filter(g => {
@@ -170,7 +185,9 @@ function applyAll() {
   if (_applyRaf) cancelAnimationFrame(_applyRaf);
   _applyRaf = requestAnimationFrame(() => {
     _applyRaf = 0;
-    const enriched = allContracts.map(enrichContract);
+    // 역할별 자기 것만 필터
+    const visible = allContracts.filter(isVisibleForRole);
+    const enriched = visible.map(enrichContract);
     let result = applyFilter(enriched, activeFilters, FILTER_GROUPS);
     const q = searchQuery.trim().toLowerCase();
     if (q) {
@@ -228,7 +245,9 @@ function _hydrateProductMap(products) {
       productMap = _hydrateProductMap(cached.products);
     }
 
-    const { profile } = await requireAuth();
+    const { user, profile } = await requireAuth();
+    currentUser = user;
+    currentProfile = profile;
     currentRole = profile?.role || '';
     if (allContracts.length) applyAll();
 

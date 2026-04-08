@@ -35,6 +35,20 @@ let productMap = new Map();
 let searchQuery = '';
 let activeFilters = { selected: {}, searchText: {} };
 let currentRole = '';
+let currentUser = null;
+let currentProfile = null;
+
+// 역할별 가시성 필터 — 자기 것만
+function isVisibleForRole(room) {
+  if (!currentRole || currentRole === 'admin') return true;
+  if (currentRole === 'agent') {
+    return room.agent_uid === currentUser?.uid || room.agent_code === currentProfile?.user_code;
+  }
+  if (currentRole === 'provider') {
+    return (room.provider_company_code || '') === (currentProfile?.company_code || '');
+  }
+  return false;
+}
 
 function visibleGroupsForRole(role) {
   return FILTER_GROUPS.filter(g => {
@@ -132,7 +146,9 @@ function applyAll() {
   if (_applyRaf) cancelAnimationFrame(_applyRaf);
   _applyRaf = requestAnimationFrame(() => {
     _applyRaf = 0;
-    const enriched = allRooms.map(enrichRoom);
+    // 역할별 자기것만 필터
+    const visible = allRooms.filter(isVisibleForRole);
+    const enriched = visible.map(enrichRoom);
     let result = applyFilter(enriched, activeFilters, FILTER_GROUPS);
     const q = searchQuery.trim().toLowerCase();
     if (q) {
@@ -190,7 +206,9 @@ function _hydrateProductMap(products) {
       productMap = _hydrateProductMap(cached.products);
     }
 
-    const { profile } = await requireAuth();
+    const { user, profile } = await requireAuth();
+    currentUser = user;
+    currentProfile = profile;
     currentRole = profile?.role || '';
     if (allRooms.length) applyAll();
 

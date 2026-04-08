@@ -14,30 +14,45 @@ function setBadge(id, count) {
 
 (async () => {
   try {
-    const { profile } = await requireAuth();
+    const { user, profile } = await requireAuth();
     const role = profile?.role || '';
+    const myUid = user?.uid || '';
+    const myCode = profile?.user_code || '';
+    const myCompanyCode = profile?.company_code || '';
 
-    // 대화 안읽음 — 역할별로 다른 카운트 합산
+    // 자기 것만 필터
+    function isMineRoom(r) {
+      if (role === 'admin') return true;
+      if (role === 'agent') return r.agent_uid === myUid || r.agent_code === myCode;
+      if (role === 'provider') return (r.provider_company_code || '') === myCompanyCode;
+      return false;
+    }
+    function isMineContract(c) {
+      if (role === 'admin') return true;
+      if (role === 'agent') return c.agent_uid === myUid || c.agent_code === myCode;
+      if (role === 'provider') {
+        return (c.partner_code || '') === myCompanyCode || (c.provider_company_code || '') === myCompanyCode;
+      }
+      return false;
+    }
+
+    // 대화 안읽음 — 자기 방만 + 역할별 카운트 합산
     watchRooms((rooms) => {
       let total = 0;
       (rooms || []).forEach(r => {
         if (!r) return;
         if (r.hidden_by && Object.keys(r.hidden_by).length) return;
-        if (role === 'agent' || role === 'admin') {
-          total += Number(r.unread_for_agent || 0);
-        } else if (role === 'provider') {
-          total += Number(r.unread_for_provider || 0);
-        } else {
-          total += Number(r.unread_for_agent || 0) + Number(r.unread_for_provider || 0);
-        }
+        if (!isMineRoom(r)) return;
+        if (role === 'agent' || role === 'admin') total += Number(r.unread_for_agent || 0);
+        else if (role === 'provider') total += Number(r.unread_for_provider || 0);
       });
       setBadge('m-tab-chat-badge', total);
     });
 
-    // 계약 처리 대기 — 진행중인 건수 표시
+    // 계약 처리 대기 — 자기 것만
     watchContracts((contracts) => {
       const pending = (contracts || []).filter(c =>
-        c && /대기|진행|신규/.test(String(c.contract_status || ''))
+        c && isMineContract(c) && /대기|진행|신규/.test(String(c.contract_status || ''))
       ).length;
       setBadge('m-tab-contract-badge', pending);
     });
