@@ -30,11 +30,9 @@ def inject_app_version():
 def add_cache_headers(response):
     ctype = response.content_type or ''
     path = request.path or ''
-    # HTML: 캐시 안함 (항상 최신)
+    # HTML: no-cache (재검증 필요하지만 bfcache는 허용 — no-store 제거)
     if 'text/html' in ctype:
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
+        response.headers['Cache-Control'] = 'no-cache'
     # 정적 파일: 1년 캐시 (immutable, ?v= 쿼리로 갱신)
     elif path.startswith('/static/') and not path.endswith('sw.js') and not path.endswith('manifest.json'):
         response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'

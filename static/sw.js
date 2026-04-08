@@ -93,9 +93,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML 페이지: 네트워크 우선
+  // HTML 페이지: /m/* 모바일은 stale-while-revalidate (즉시 표시 + 백그라운드 갱신)
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request).catch(() => caches.match(request)));
+    if (url.includes('/m/')) {
+      event.respondWith(
+        caches.open(CACHE_NAME).then((cache) =>
+          cache.match(request).then((cached) => {
+            const fetched = fetch(request).then((response) => {
+              if (response.ok) cache.put(request, response.clone());
+              return response;
+            }).catch(() => cached);
+            return cached || fetched;
+          })
+        )
+      );
+    } else {
+      event.respondWith(fetch(request).catch(() => caches.match(request)));
+    }
     return;
   }
 
