@@ -128,10 +128,12 @@ $back?.addEventListener('click', () => {
   else location.href = '/m/chat';
 });
 
-// ⚡ 핵심: 전송 버튼이 textarea 포커스를 뺏지 못하게 (모바일 키보드 유지)
+// ⚡ 핵심: 전송 버튼이 textarea 포커스를 뺏지 못하게
 const $send = $form?.querySelector('button[type="submit"]');
-$send?.addEventListener('pointerdown', (e) => { e.preventDefault(); });
-$send?.addEventListener('mousedown', (e) => { e.preventDefault(); });
+if ($send) {
+  // tabindex -1로 포커스 대상에서 제외
+  $send.setAttribute('tabindex', '-1');
+}
 
 function doSend() {
   if (!$text) return;
@@ -139,8 +141,6 @@ function doSend() {
   if (!text) return;
   $text.value = '';
   $text.style.height = 'auto';
-  // 포커스 보장 (이미 포커스 있으면 noop)
-  if (document.activeElement !== $text) $text.focus();
   // 백그라운드 전송 (fire-and-forget)
   sendMessage(roomId, {
     text,
@@ -154,8 +154,29 @@ function doSend() {
   });
 }
 
+// touchstart 단계에서 처리: 포커스 이동 전에 가로채기
+let _sendTouchHandled = false;
+$send?.addEventListener('touchstart', (e) => {
+  // textarea 포커스 보존을 위해 기본 동작 차단 (블러 방지)
+  e.preventDefault();
+  _sendTouchHandled = true;
+  // textarea가 이미 포커스 있으면 그대로, 없으면 다시 포커스
+  if (document.activeElement !== $text) $text?.focus();
+  doSend();
+}, { passive: false });
+
+// 데스크탑/마우스용
+$send?.addEventListener('mousedown', (e) => {
+  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
+  e.preventDefault();
+  if (document.activeElement !== $text) $text?.focus();
+  doSend();
+});
+
+// form submit (Enter키 등) — 키보드/iOS Send 키
 $form?.addEventListener('submit', (e) => {
   e.preventDefault();
+  if (_sendTouchHandled) { _sendTouchHandled = false; return; }
   doSend();
 });
 

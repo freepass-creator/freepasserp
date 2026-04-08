@@ -138,7 +138,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  /* ⚡ 포커스 가로채기 방지 — textarea 키보드 유지 */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
 }
+.m-cr__send:focus { outline: none; }
 .m-cr__send:disabled {
   background: var(--m-divider-strong);
   cursor: default;
