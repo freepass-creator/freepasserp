@@ -128,15 +128,19 @@ $back?.addEventListener('click', () => {
   else location.href = '/m/chat';
 });
 
-$form?.addEventListener('submit', (e) => {
-  e.preventDefault();
+// ⚡ 핵심: 전송 버튼이 textarea 포커스를 뺏지 못하게 (모바일 키보드 유지)
+const $send = $form?.querySelector('button[type="submit"]');
+$send?.addEventListener('pointerdown', (e) => { e.preventDefault(); });
+$send?.addEventListener('mousedown', (e) => { e.preventDefault(); });
+
+function doSend() {
   if (!$text) return;
   const text = ($text.value || '').trim();
   if (!text) return;
-  // ⚡ 동기적으로 입력값 비우고 포커스 유지 (await 전에 → 키보드 안 내려감)
   $text.value = '';
   $text.style.height = 'auto';
-  $text.focus();
+  // 포커스 보장 (이미 포커스 있으면 noop)
+  if (document.activeElement !== $text) $text.focus();
   // 백그라운드 전송 (fire-and-forget)
   sendMessage(roomId, {
     text,
@@ -148,6 +152,11 @@ $form?.addEventListener('submit', (e) => {
     console.error('[mobile/chat-room] send failed', err);
     showToast('전송 실패', 'error');
   });
+}
+
+$form?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  doSend();
 });
 
 // textarea 자동 높이
