@@ -287,7 +287,7 @@ $delete?.addEventListener('click', async () => {
 });
 
 // ⚡ 캐시 즉시 사용
-(function hydrateFromCache() {
+function hydrateFromCache() {
   const cached = window.__appData || {};
   if (Array.isArray(cached.products)) {
     const map = new Map();
@@ -303,8 +303,15 @@ $delete?.addEventListener('click', async () => {
       currentContract = found;
       render(found);
     }
+  } else if (currentContract) {
+    render(currentContract);
   }
-})();
+}
+hydrateFromCache();
+window.addEventListener('fp:data', (e) => {
+  const t = e.detail?.type;
+  if (t === 'contracts' || t === 'products') hydrateFromCache();
+});
 
 (async () => {
   try {

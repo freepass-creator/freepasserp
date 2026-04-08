@@ -636,16 +636,23 @@ function applyRoleVisibility() {
 }
 
 // ⚡ 캐시 즉시 사용 — Firebase 응답 기다리지 않고 첫 페인트 전에 렌더
-(function hydrateFromCache() {
+function hydrateFromCache() {
   const cached = window.__appData || {};
   if (Array.isArray(cached.products)) {
-    currentProduct = cached.products.find(p => p.product_uid === productId || p.product_code === productId);
+    const found = cached.products.find(p => p.product_uid === productId || p.product_code === productId);
+    if (found) currentProduct = found;
   }
   if (Array.isArray(cached.terms)) {
     allPolicies = cached.terms;
   }
   if (currentProduct) render();
-})();
+}
+hydrateFromCache();
+// IDB 비동기 복원/Firebase 응답 도착 시 다시 hydrate
+window.addEventListener('fp:data', (e) => {
+  const t = e.detail?.type;
+  if (t === 'products' || t === 'terms') hydrateFromCache();
+});
 
 (async () => {
   try {
