@@ -3,7 +3,7 @@
  */
 import { requireAuth } from '../core/auth-guard.js';
 import {
-  watchMessages, watchRooms, sendMessage,
+  watchMessages, watchRooms, watchProducts, sendMessage,
   markRoomRead, hideRoomForUser, deleteRoomEverywhere,
 } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
@@ -219,17 +219,29 @@ document.addEventListener('click', _onFirstGesture, { once: true });
     const canDelete = role === 'provider' || role === 'admin';
     if ($delete && !canDelete) $delete.hidden = true;
 
-    // 방 정보 조회 + 상단바 제목 채우기 (차량번호 / 차종)
-    const $titleCar = document.getElementById('m-cr-title-car');
-    const $titleModel = document.getElementById('m-cr-title-model');
+    // 방 정보 + 상품 매칭 → 상단바 제목: "차량번호 세부모델명"
+    const $titleEl = document.getElementById('m-cr-title');
+    let _productMap = new Map();
+    function updateTitle() {
+      if (!currentRoom || !$titleEl) return;
+      const carNo = currentRoom.vehicle_number || currentRoom.car_number || '';
+      const p = _productMap.get(currentRoom.product_uid) || _productMap.get(currentRoom.product_code);
+      const subModel = p?.sub_model || '';
+      $titleEl.textContent = [carNo, subModel].filter(Boolean).join(' ') || '대화방';
+    }
     watchRooms((rooms) => {
       const room = (rooms || []).find(r => r.room_id === roomId || r.chat_code === roomId);
       if (!room) return;
       currentRoom = room;
-      const carNo = room.vehicle_number || room.car_number || '';
-      const model = room.model_name || '';
-      if ($titleCar) $titleCar.textContent = carNo || '대화방';
-      if ($titleModel) $titleModel.textContent = model;
+      updateTitle();
+    });
+    watchProducts((products) => {
+      _productMap = new Map();
+      (products || []).forEach(p => {
+        if (p?.product_uid) _productMap.set(p.product_uid, p);
+        if (p?.product_code) _productMap.set(p.product_code, p);
+      });
+      updateTitle();
     });
 
     // 메시지 구독
