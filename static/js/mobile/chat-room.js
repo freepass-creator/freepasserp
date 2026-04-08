@@ -141,6 +141,8 @@ function doSend() {
   if (!text) return;
   $text.value = '';
   $text.style.height = 'auto';
+  // ⚡ 메모리 패턴: value='' → focus() → sendMessage() 동기 순서 (await 금지)
+  try { $text.focus({ preventScroll: true }); } catch { $text.focus(); }
   // 백그라운드 전송 (fire-and-forget)
   sendMessage(roomId, {
     text,
