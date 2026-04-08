@@ -176,13 +176,13 @@ def catalog_view():
     og_image = req.url_root.rstrip('/') + '/static/icons/icon-512.png'
     suffix = f' | {company}' if company else ''
     if share_id and car_title:
-        title = f'렌터카 {car_title} 상품{suffix}'
+        title = f'{car_title}{suffix}'
     elif share_id:
-        title = f'렌터카 상품 안내{suffix}'
+        title = f'상품 안내{suffix}'
     elif provider:
-        title = f'렌터카 {provider} 상품{suffix}'
+        title = f'{provider} 상품{suffix}'
     else:
-        title = f'렌터카 전체 상품{suffix}'
+        title = f'전체 상품{suffix}'
     og_desc = '렌터카 장기렌트 상품을 검색하고 비교해보세요.'
     return render_template('pages/catalog.html', page_title=title, og_title=title, og_desc=og_desc, og_image=og_image)
 
