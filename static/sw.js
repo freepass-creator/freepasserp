@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v110';
+const CACHE_NAME = 'freepass-v111';
 const IMG_CACHE = 'freepass-img-v1';
 
 // 핵심 자원 — 첫 방문 시 미리 다운로드
@@ -99,7 +99,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 정적 자산 (CSS/JS): stale-while-revalidate
+  // 모바일 JS/CSS: network-first (항상 최신 코드, 오프라인 시만 캐시 fallback)
+  if (url.includes('/static/js/mobile/') || url.includes('/static/css/mobile/') ||
+      url.includes('/static/js/firebase/') || url.includes('/static/js/core/')) {
+    event.respondWith(
+      fetch(request).then((response) => {
+        if (response.ok && response.type === 'basic') {
+          caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+        }
+        return response;
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // 그 외 정적 자산: stale-while-revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
       cache.match(request).then((cached) => {
