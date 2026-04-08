@@ -36,6 +36,12 @@ window.addEventListener('pagehide', () => {
   try { if ($list) sessionStorage.setItem(SS_HTML_KEY, $list.innerHTML); } catch {}
 });
 
+// ⚡ 뒤로가기 → 상품목록(홈)으로
+history.pushState({ tabPage: true }, '', location.href);
+window.addEventListener('popstate', () => {
+  location.href = '/m/product-list';
+});
+
 const RENT_BUCKETS = [
   { value: '50만원 이하', label: '50만원 이하', range: [0,       500000] },
   { value: '50만원~',    label: '50만원~',    range: [500000,  600000] },

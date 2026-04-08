@@ -23,6 +23,12 @@ window.addEventListener('pagehide', () => {
   try { if ($list) sessionStorage.setItem(SS_HTML_KEY, $list.innerHTML); } catch {}
 });
 
+// ⚡ 뒤로가기 → 상품목록(홈)으로
+history.pushState({ tabPage: true }, '', location.href);
+window.addEventListener('popstate', () => {
+  location.href = '/m/product-list';
+});
+
 const DATE_OPTIONS = [
   { value: '1w',   label: '최근 1주',  days: 7 },
   { value: '1m',   label: '최근 1개월', days: 30 },

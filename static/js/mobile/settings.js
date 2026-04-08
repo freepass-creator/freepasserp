@@ -345,6 +345,12 @@ window.addEventListener('pagehide', () => {
   try { if ($st) sessionStorage.setItem(SS_HTML_KEY, $st.innerHTML); } catch {}
 });
 
+// ⚡ 뒤로가기 → 상품목록(홈)으로
+history.pushState({ tabPage: true }, '', location.href);
+window.addEventListener('popstate', () => {
+  location.href = '/m/product-list';
+});
+
 (async () => {
   try {
     const auth = await requireAuth();
