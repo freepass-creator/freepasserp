@@ -543,7 +543,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   min-width: 0;
 }
 .m-topbar__left  { flex: 1 1 0; min-width: 0; overflow: hidden; }
-.m-topbar__right { flex: 0 0 auto; gap: var(--m-space-1); }
+.m-topbar__right { flex: 0 0 auto; margin-left: auto; gap: var(--m-space-1); }
 .m-topbar__left:empty,
 .m-topbar__center:empty,
 .m-topbar__right:empty { display: none; }

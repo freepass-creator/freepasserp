@@ -136,7 +136,7 @@
 .m-st-sheet__panel {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  max-height: 75dvh;
+  top: var(--m-topbar-h);
   background: var(--m-card-bg);
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
@@ -278,12 +278,15 @@
 }
 .m-st-link__btn {
   flex: 0 0 auto;
-  padding: 6px 12px;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   background: var(--m-accent);
   color: #fff;
   border: none;
   border-radius: var(--m-radius-md);
-  font-size: var(--m-font-caption);
-  font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
