@@ -1,19 +1,28 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v100';
+const CACHE_NAME = 'freepass-v101';
+const IMG_CACHE = 'freepass-img-v1';
 
+// 핵심 자원 — 첫 방문 시 미리 다운로드
 const PRECACHE_URLS = [
-  '/static/css/reset.css',
-  '/static/css/base.css',
-  '/static/css/ui_tokens.css',
+  '/static/css/mobile/app.css',
+  '/static/css/mobile/product.css',
+  '/static/css/mobile/chat.css',
+  '/static/css/mobile/contract.css',
+  '/static/css/mobile/settings.css',
   '/static/css/ui_toast.css',
-  '/static/css/mobile-app.css',
-  '/static/css/shared/mobile.css',
-  '/static/css/shared/detail-common.css',
   '/static/css/shared/fullscreen-photo-viewer.css',
-  '/static/css/form.css',
-  '/static/css/button.css',
-  '/static/css/list.css',
-  '/static/css/catalog.css',
+  '/static/js/mobile/product.js',
+  '/static/js/mobile/chat.js',
+  '/static/js/mobile/contract.js',
+  '/static/js/mobile/settings.js',
+  '/static/js/mobile/tab-badges.js',
+  '/static/js/mobile/filter-sheet.js',
+  '/static/js/firebase/firebase-config.js',
+  '/static/js/firebase/firebase-db.js',
+  '/static/js/firebase/firebase-db-helpers.js',
+  '/static/js/firebase/firebase-auth.js',
+  '/static/js/core/auth-guard.js',
+  '/static/js/core/management-format.js',
   '/static/icons/icon-192.png',
 ];
 
@@ -31,18 +40,64 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Stale-while-revalidate: 캐시 먼저 반환, 백그라운드에서 네트워크 업데이트
+// 이미지 캐시 LRU (최대 200개)
+async function trimImageCache() {
+  const cache = await caches.open(IMG_CACHE);
+  const keys = await cache.keys();
+  if (keys.length > 200) {
+    const toDelete = keys.slice(0, keys.length - 150);
+    await Promise.all(toDelete.map(k => cache.delete(k)));
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  // API, Firebase, 외부 요청은 무시
-  if (request.url.includes('/api/') || request.url.includes('firebaseio.com') || request.url.includes('googleapis.com')) return;
   if (request.method !== 'GET') return;
-  // HTML 페이지는 항상 네트워크 우선 (캐시 잔상 방지)
+
+  const url = request.url;
+
+  // API/Realtime DB/Auth API: 캐시 안 함, 그냥 통과
+  if (url.includes('/api/') || url.includes('firebaseio.com') || url.includes('identitytoolkit.googleapis.com')) return;
+
+  // Firebase Storage 이미지: 캐시 우선 (한번 받으면 영구)
+  if (url.includes('firebasestorage.googleapis.com') || url.includes('storage.googleapis.com')) {
+    event.respondWith(
+      caches.open(IMG_CACHE).then(cache =>
+        cache.match(request).then(cached => {
+          if (cached) return cached;
+          return fetch(request).then(response => {
+            if (response.ok) {
+              cache.put(request, response.clone());
+              trimImageCache();
+            }
+            return response;
+          });
+        })
+      )
+    );
+    return;
+  }
+
+  // 외부 CDN (폰트 등): 캐시 우선
+  if (url.includes('cdn.jsdelivr.net') || url.includes('gstatic.com')) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(cache =>
+        cache.match(request).then(cached => cached || fetch(request).then(r => {
+          if (r.ok) cache.put(request, r.clone());
+          return r;
+        }))
+      )
+    );
+    return;
+  }
+
+  // HTML 페이지: 네트워크 우선
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request).catch(() => caches.match(request)));
     return;
   }
 
+  // 정적 자산 (CSS/JS): stale-while-revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
       cache.match(request).then((cached) => {
@@ -52,7 +107,6 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         }).catch(() => cached);
-
         return cached || fetched;
       })
     )

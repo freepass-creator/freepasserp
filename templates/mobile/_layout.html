@@ -7,10 +7,30 @@
   <title>{{ page_title }} — FREEPASS</title>
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/icon.svg') }}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}?v={{ app_version }}">
+
+  <!-- ⚡ 성능: DNS prefetch + preconnect (Firebase, CDN) -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://freepasserp3-default-rtdb.firebaseio.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
+
+  <!-- ⚡ 성능: 폰트는 비차단 로드 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"></noscript>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/app.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}?v={{ app_version }}">
+
+  <!-- ⚡ 성능: Firebase SDK preload (HTML 파싱 중에 다운로드 시작) -->
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/firebase/firebase-config.js') }}?v={{ app_version }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/firebase/firebase-db.js') }}?v={{ app_version }}">
+  <link rel="modulepreload" href="{{ url_for('static', filename='js/firebase/firebase-auth.js') }}?v={{ app_version }}">
+
   {% block page_css %}{% endblock %}
 </head>
 <body class="m-body" data-page="{{ page_title }}">
@@ -57,6 +77,20 @@
       else if (path.startsWith('/m/contract')) document.querySelectorAll('.m-tab').forEach(t => t.classList.toggle('is-active', t.dataset.tab === 'contract'));
       else if (path.startsWith('/m/settings')) document.querySelectorAll('.m-tab').forEach(t => t.classList.toggle('is-active', t.dataset.tab === 'settings'));
     })();
+    // ⚡ 탭 hover/touchstart 시 prefetch (실제 클릭 전에 미리 다운로드)
+    document.querySelectorAll('.m-tab[href]').forEach(tab => {
+      let prefetched = false;
+      const prefetch = () => {
+        if (prefetched) return;
+        prefetched = true;
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = tab.href;
+        document.head.appendChild(link);
+      };
+      tab.addEventListener('touchstart', prefetch, { passive: true });
+      tab.addEventListener('mouseenter', prefetch);
+    });
   </script>
   <script type="module" src="{{ url_for('static', filename='js/mobile/tab-badges.js') }}?v={{ app_version }}"></script>
   {% block page_js %}{% endblock %}

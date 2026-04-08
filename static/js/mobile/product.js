@@ -258,6 +258,16 @@ $grid?.addEventListener('click', (e) => {
       clearTimeout(searchTimer);
       searchTimer = setTimeout(applySearch, 200);
     });
+
+    // ⚡ 다음 페이지 데이터 백그라운드 prefetch (idle 시)
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        import('../firebase/firebase-db.js').then(m => {
+          m.watchRooms?.(() => {});
+          m.watchContracts?.(() => {});
+        }).catch(() => {});
+      }, { timeout: 3000 });
+    }
   } catch (e) {
     console.error('[mobile/product] init failed', e);
   }
