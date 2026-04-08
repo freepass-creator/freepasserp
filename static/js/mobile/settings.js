@@ -84,6 +84,12 @@ function toggleRow(label, key) {
   </label>`;
 }
 
+// 영문 값 → 한글 라벨
+const ROLE_KO = { admin: '관리자', provider: '공급사', agent: '영업자', user: '일반회원' };
+const STATUS_KO = { active: '활성', pending: '승인대기', suspended: '정지', deleted: '삭제됨', inactive: '비활성' };
+function roleKo(v) { return ROLE_KO[String(v || '').toLowerCase()] || v || ''; }
+function statusKo(v) { return STATUS_KO[String(v || '').toLowerCase()] || v || ''; }
+
 function field(label, value, key, readonly = false, isEdit = false) {
   return `<div class="m-st-field">
     <span class="m-st-field__label">${escapeHtml(label)}</span>
@@ -142,9 +148,9 @@ function render() {
       <div class="m-st-group__body">
         <div class="m-st-fields">
           ${field('이메일',   currentUser?.email, 'email',     true, false)}
-          ${field('회원구분', p.role,             'role',      true, false)}
+          ${field('회원구분', roleKo(p.role),     'role',      true, false)}
           ${field('계정코드', p.user_code,        'user_code', true, false)}
-          ${field('계정상태', p.status,           'status',    true, false)}
+          ${field('계정상태', statusKo(p.status), 'status',    true, false)}
         </div>
       </div>
     </section>
