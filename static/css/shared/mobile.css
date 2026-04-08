@@ -181,6 +181,18 @@ html.is-embed .main-shell--new { flex: 1; overflow-y: auto; padding: 0 !importan
 /* 필터 버튼 — 페이지별 기능 정의 후 다시 활성화 예정 */
 .mobile-topbar__filter-btn { display: none !important; }
 
+.mobile-topbar__left,
+.mobile-topbar__right,
+.mobile-topbar__center {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.mobile-topbar__left:empty,
+.mobile-topbar__right:empty,
+.mobile-topbar__center:empty {
+  display: none;
+}
 .mobile-topbar__user-info {
   display: none;
 }

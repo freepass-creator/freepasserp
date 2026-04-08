@@ -373,7 +373,7 @@
     height: auto !important;
   }
 
-  /* 패널 폭 자동 + 모서리/마진 제거 */
+  /* 패널 폭 자동 + 모서리/마진/배경 제거 */
   .work-page > .panel,
   .work-page > .panel-slot,
   .work-page > section {
@@ -383,8 +383,28 @@
     margin: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    background: transparent !important;
+    grid-template-rows: none !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
-  .work-page .panel-head { display: none !important; }
+  /* 데스크탑 패널 헤드/액션 모바일에서 숨김 */
+  .work-page .panel-head,
+  .work-page .panel-head-actions,
+  .work-page .panel-head-default,
+  .work-page .panel-head-list,
+  .work-page .panel-head--meta { display: none !important; }
+  /* 패널 바디 풀너비 + 패딩 0 */
+  .work-page .panel-body,
+  .work-page .panel-body--detail,
+  .work-page .panel-body--form,
+  .work-page .panel-body--filter,
+  .work-page .manage-form-body {
+    padding: 0 !important;
+    background: #fff !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
 
   /* 스켈레톤 모바일에서 숨김 */
   .catalog-skeleton-wrap,
