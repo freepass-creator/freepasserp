@@ -24,6 +24,18 @@ const $list = document.getElementById('m-contract-list');
 const $search = document.getElementById('m-contract-search');
 const $filterBtn = document.getElementById('m-contract-filter-btn');
 
+// ⚡ sessionStorage HTML 캐시 — 재방문 0ms 복원
+const SS_HTML_KEY = 'fp_cl_html';
+(function restoreLastHtml() {
+  try {
+    const cached = sessionStorage.getItem(SS_HTML_KEY);
+    if (cached && $list) $list.innerHTML = cached;
+  } catch {}
+})();
+window.addEventListener('pagehide', () => {
+  try { if ($list) sessionStorage.setItem(SS_HTML_KEY, $list.innerHTML); } catch {}
+});
+
 const RENT_BUCKETS = [
   { value: '50만원 이하', label: '50만원 이하', range: [0,       500000] },
   { value: '50만원~',    label: '50만원~',    range: [500000,  600000] },

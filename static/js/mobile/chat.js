@@ -11,6 +11,18 @@ const $list = document.getElementById('m-chat-list');
 const $search = document.getElementById('m-chat-search');
 const $filterBtn = document.getElementById('m-chat-filter-btn');
 
+// ⚡ sessionStorage HTML 캐시 — 재방문 0ms 복원
+const SS_HTML_KEY = 'fp_chl_html';
+(function restoreLastHtml() {
+  try {
+    const cached = sessionStorage.getItem(SS_HTML_KEY);
+    if (cached && $list) $list.innerHTML = cached;
+  } catch {}
+})();
+window.addEventListener('pagehide', () => {
+  try { if ($list) sessionStorage.setItem(SS_HTML_KEY, $list.innerHTML); } catch {}
+});
+
 const DATE_OPTIONS = [
   { value: '1w',   label: '최근 1주',  days: 7 },
   { value: '1m',   label: '최근 1개월', days: 30 },

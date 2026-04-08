@@ -11,6 +11,18 @@ const $grid = document.getElementById('m-product-grid');
 const $search = document.getElementById('m-product-search');
 const $filterBtn = document.getElementById('m-product-filter-btn');
 
+// ⚡ sessionStorage HTML 캐시 — 재방문 0ms 복원
+const SS_HTML_KEY = 'fp_pl_html';
+(function restoreLastHtml() {
+  try {
+    const cached = sessionStorage.getItem(SS_HTML_KEY);
+    if (cached && $grid) $grid.innerHTML = cached;
+  } catch {}
+})();
+window.addEventListener('pagehide', () => {
+  try { if ($grid) sessionStorage.setItem(SS_HTML_KEY, $grid.innerHTML); } catch {}
+});
+
 // 웹 카탈로그와 동일 — 변경 시 양쪽 같이 업데이트
 const RENT_BUCKETS = [
   { value: '50만원 이하', label: '50만원 이하', range: [0,       500000] },
