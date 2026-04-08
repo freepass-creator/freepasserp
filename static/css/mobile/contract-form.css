@@ -1,0 +1,163 @@
+/* 모바일 계약 폼 */
+.m-cf {
+  background: var(--m-card-bg);
+  padding: var(--m-space-2);
+}
+.m-cf__loading {
+  padding: var(--m-space-7) 0;
+  text-align: center;
+  color: var(--m-text-tertiary);
+  font-size: var(--m-font-caption);
+}
+
+/* 섹션 (상품상세와 동일 룩) */
+.m-cf-group { margin-top: var(--m-space-5); }
+.m-cf-group:first-child { margin-top: var(--m-space-3); }
+.m-cf-group__head {
+  display: flex;
+  align-items: center;
+  gap: var(--m-space-2);
+  margin-bottom: var(--m-space-2);
+  padding: 0 2px;
+}
+.m-cf-group__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--m-text-primary);
+}
+.m-cf-group__title {
+  flex: 1;
+  font-size: var(--m-font-title);
+  font-weight: 800;
+  color: var(--m-text-primary);
+}
+.m-cf-group__body {
+  border: 1px solid #e2e8f0;
+  border-radius: var(--m-radius-md);
+  background: var(--m-card-bg);
+  overflow: hidden;
+}
+
+/* 체크박스 그리드 */
+.m-cf-checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--m-divider);
+}
+.m-cf-check {
+  display: flex;
+  align-items: center;
+  gap: var(--m-space-2);
+  padding: var(--m-space-3) var(--m-space-4);
+  background: var(--m-card-bg);
+  cursor: pointer;
+  font-size: var(--m-font-body);
+  font-weight: 600;
+  color: var(--m-text-secondary);
+}
+.m-cf-check input {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--m-accent);
+  flex: 0 0 auto;
+}
+.m-cf-check.is-checked {
+  color: var(--m-accent);
+  background: #f8fafc;
+}
+
+/* 폼 필드 */
+.m-cf-fields {
+  padding: var(--m-space-2) var(--m-space-4);
+}
+.m-cf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--m-space-3) 0;
+  border-bottom: 1px solid var(--m-divider);
+}
+.m-cf-field:last-child { border-bottom: none; }
+.m-cf-field--row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--m-space-3);
+}
+.m-cf-field__label {
+  font-size: var(--m-font-caption);
+  color: var(--m-text-secondary);
+  font-weight: 600;
+}
+.m-cf-field--row .m-cf-field__label {
+  flex: 0 0 auto;
+}
+.m-cf-field__input,
+.m-cf-field__select {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 var(--m-space-3);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--m-radius-md);
+  font-size: var(--m-font-body);
+  color: var(--m-text-primary);
+  outline: none;
+  font-family: inherit;
+  font-feature-settings: 'tnum';
+}
+.m-cf-field--row .m-cf-field__input,
+.m-cf-field--row .m-cf-field__select {
+  text-align: right;
+  background: transparent;
+  border: none;
+  height: auto;
+  padding: 0;
+  font-weight: 600;
+}
+.m-cf-field__input:focus,
+.m-cf-field__select:focus {
+  border-color: var(--m-accent);
+  background: #fff;
+}
+.m-cf-field__input:read-only {
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  text-align: right;
+  padding: 0;
+  height: auto;
+  color: var(--m-text-primary);
+}
+
+/* 개인정보 열람 버튼 */
+.m-cf-reveal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: var(--m-space-3);
+  padding: var(--m-space-3);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: var(--m-text-secondary);
+  border-radius: var(--m-radius-md);
+  font-size: var(--m-font-caption);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* 읽기 전용 모드 표시 */
+.m-cf.is-readonly .m-cf-field__input:not([readonly]),
+.m-cf.is-readonly .m-cf-field__select {
+  pointer-events: none;
+  background: transparent;
+  border: none;
+  text-align: right;
+  padding: 0;
+  height: auto;
+}
+.m-cf.is-readonly .m-cf-checks { pointer-events: none; opacity: 0.85; }

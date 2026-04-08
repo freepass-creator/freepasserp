@@ -8,7 +8,9 @@
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/icon.svg') }}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/app.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}?v={{ app_version }}">
   {% block page_css %}{% endblock %}
 </head>
 <body class="m-body" data-page="{{ page_title }}">
@@ -56,6 +58,7 @@
       else if (path.startsWith('/m/settings')) document.querySelectorAll('.m-tab').forEach(t => t.classList.toggle('is-active', t.dataset.tab === 'settings'));
     })();
   </script>
+  <script type="module" src="{{ url_for('static', filename='js/mobile/tab-badges.js') }}?v={{ app_version }}"></script>
   {% block page_js %}{% endblock %}
 </body>
 </html>

@@ -1,7 +1,243 @@
-/* 모바일 설정 — 추후 구현 */
+/**
+ * mobile/settings.js — 모바일 설정
+ */
 import { requireAuth } from '../core/auth-guard.js';
+import { updateUserProfile } from '../firebase/firebase-db.js';
+import { logoutCurrentUser, sendPasswordReset } from '../firebase/firebase-auth.js';
+import { escapeHtml } from '../core/management-format.js';
+import { showToast, showConfirm } from '../core/toast.js';
+
+const $st = document.getElementById('m-settings');
+
+let currentUser = null;
+let currentProfile = null;
+let isEditMode = false;
+
+const SVG = (paths) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+const ICO = {
+  user:    SVG('<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>'),
+  shield:  SVG('<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>'),
+  link:    SVG('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'),
+  cog:     SVG('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>'),
+  bell:    SVG('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>'),
+  info:    SVG('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'),
+  chevron: SVG('<path d="m9 18 6-6-6-6"/>'),
+};
+
+// 로컬 설정 (localStorage)
+const PREF_KEY = 'freepass.mobile.prefs';
+function loadPrefs() {
+  try { return JSON.parse(localStorage.getItem(PREF_KEY) || '{}'); } catch { return {}; }
+}
+function savePrefs(prefs) {
+  localStorage.setItem(PREF_KEY, JSON.stringify(prefs));
+}
+const DEFAULTS = {
+  notify_chat: true,
+  notify_contract: true,
+  sound: true,
+};
+let prefs = { ...DEFAULTS, ...loadPrefs() };
+
+function toggleRow(label, key) {
+  return `<label class="m-st-toggle">
+    <span class="m-st-toggle__label">${escapeHtml(label)}</span>
+    <input type="checkbox" data-pref="${key}"${prefs[key] ? ' checked' : ''}>
+    <span class="m-st-toggle__switch"></span>
+  </label>`;
+}
+
+function field(label, value, key, readonly = false, isEdit = false) {
+  return `<div class="m-st-field">
+    <span class="m-st-field__label">${escapeHtml(label)}</span>
+    <input class="m-st-field__input" data-field="${key}" value="${escapeHtml(value || '')}"${(readonly || !isEdit) ? ' readonly' : ''}>
+  </div>`;
+}
+
+function render() {
+  if (!$st || !currentProfile) return;
+  const p = currentProfile;
+  $st.classList.toggle('is-readonly', !isEditMode);
+
+  $st.innerHTML = `
+    <!-- 프로필 -->
+    <section class="m-st-group">
+      <div class="m-st-group__head">
+        <span class="m-st-group__icon">${ICO.user}</span>
+        <span class="m-st-group__title">내 정보</span>
+        ${isEditMode
+          ? `<button class="m-st-group__action" id="m-st-save" type="button">저장</button>`
+          : `<button class="m-st-group__action" id="m-st-edit" type="button">수정</button>`}
+      </div>
+      <div class="m-st-group__body">
+        <div class="m-st-fields">
+          ${field('소속회사', p.company_name, 'company_name', true, false)}
+          ${field('이름',     p.name,         'name',         false, isEditMode)}
+          ${field('직급',     p.position,     'position',     false, isEditMode)}
+          ${field('연락처',   p.phone,        'phone',        false, isEditMode)}
+          ${field('기타정보', p.note,         'note',         false, isEditMode)}
+        </div>
+      </div>
+    </section>
+
+    <!-- 계정 -->
+    <section class="m-st-group">
+      <div class="m-st-group__head">
+        <span class="m-st-group__icon">${ICO.shield}</span>
+        <span class="m-st-group__title">계정 정보</span>
+      </div>
+      <div class="m-st-group__body">
+        <div class="m-st-fields">
+          ${field('이메일',   currentUser?.email, 'email',     true, false)}
+          ${field('회원구분', p.role,             'role',      true, false)}
+          ${field('계정코드', p.user_code,        'user_code', true, false)}
+          ${field('계정상태', p.status,           'status',    true, false)}
+        </div>
+      </div>
+    </section>
+
+    <!-- 알림 -->
+    <section class="m-st-group">
+      <div class="m-st-group__head">
+        <span class="m-st-group__icon">${ICO.bell}</span>
+        <span class="m-st-group__title">알림</span>
+      </div>
+      <div class="m-st-group__body">
+        <div class="m-st-toggles">
+          ${toggleRow('새 대화 알림', 'notify_chat')}
+          ${toggleRow('새 계약 알림', 'notify_contract')}
+          ${toggleRow('알림 효과음', 'sound')}
+        </div>
+      </div>
+    </section>
+
+    <!-- 카탈로그 링크 -->
+    <section class="m-st-group">
+      <div class="m-st-group__head">
+        <span class="m-st-group__icon">${ICO.link}</span>
+        <span class="m-st-group__title">내 카탈로그</span>
+      </div>
+      <div class="m-st-group__body">
+        <div class="m-st-link">
+          <span class="m-st-link__url" id="m-st-catalog-url">${escapeHtml(`${location.origin}/catalog?a=${p.user_code || ''}`)}</span>
+          <button class="m-st-link__btn" id="m-st-catalog-copy" type="button">복사</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 계정 관리 -->
+    <section class="m-st-group">
+      <div class="m-st-group__head">
+        <span class="m-st-group__icon">${ICO.cog}</span>
+        <span class="m-st-group__title">계정 관리</span>
+      </div>
+      <div class="m-st-group__body">
+        <button class="m-st-action" id="m-st-pwreset" type="button">
+          비밀번호 재설정
+          ${ICO.chevron}
+        </button>
+        <button class="m-st-action is-danger" id="m-st-logout" type="button">
+          로그아웃
+          ${ICO.chevron}
+        </button>
+      </div>
+    </section>
+
+    <!-- 정보 -->
+    <section class="m-st-group">
+      <div class="m-st-group__head">
+        <span class="m-st-group__icon">${ICO.info}</span>
+        <span class="m-st-group__title">앱 정보</span>
+      </div>
+      <div class="m-st-group__body">
+        <div class="m-st-fields">
+          <div class="m-st-field">
+            <span class="m-st-field__label">버전</span>
+            <input class="m-st-field__input" value="${escapeHtml(window.APP_VER || '1.0.0')}" readonly>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+
+  // 수정/저장
+  $st.querySelector('#m-st-edit')?.addEventListener('click', () => {
+    isEditMode = true;
+    render();
+  });
+  $st.querySelector('#m-st-save')?.addEventListener('click', async () => {
+    if (!currentUser) return;
+    try {
+      const updates = {};
+      $st.querySelectorAll('[data-field]').forEach(el => {
+        if (!el.readOnly) updates[el.dataset.field] = el.value;
+      });
+      await updateUserProfile(currentUser.uid, updates);
+      Object.assign(currentProfile, updates);
+      isEditMode = false;
+      render();
+      showToast('저장 완료', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('저장 실패', 'error');
+    }
+  });
+
+  // 알림 토글
+  $st.querySelectorAll('[data-pref]').forEach(el => {
+    el.addEventListener('change', () => {
+      prefs[el.dataset.pref] = el.checked;
+      savePrefs(prefs);
+    });
+  });
+
+  // 카탈로그 복사
+  $st.querySelector('#m-st-catalog-copy')?.addEventListener('click', async () => {
+    const url = $st.querySelector('#m-st-catalog-url')?.textContent || '';
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('링크 복사됨', 'success');
+    } catch (e) {
+      showToast('복사 실패', 'error');
+    }
+  });
+
+  // 비밀번호 재설정
+  $st.querySelector('#m-st-pwreset')?.addEventListener('click', async () => {
+    if (!currentUser?.email) return;
+    const ok = await showConfirm('비밀번호 재설정 메일을 받으시겠습니까?');
+    if (!ok) return;
+    try {
+      await sendPasswordReset(currentUser.email);
+      showToast('재설정 메일을 보냈습니다', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('메일 발송 실패', 'error');
+    }
+  });
+
+  // 로그아웃
+  $st.querySelector('#m-st-logout')?.addEventListener('click', async () => {
+    const ok = await showConfirm('로그아웃 하시겠습니까?');
+    if (!ok) return;
+    try {
+      await logoutCurrentUser();
+      location.href = '/login';
+    } catch (e) {
+      console.error(e);
+      showToast('로그아웃 실패', 'error');
+    }
+  });
+}
+
 (async () => {
-  await requireAuth();
-  const $s = document.getElementById('m-settings');
-  if ($s) $s.innerHTML = '<div style="padding:48px 0;text-align:center;color:#8b95a1;">설정 페이지 준비중</div>';
+  try {
+    const auth = await requireAuth();
+    currentUser = auth.user;
+    currentProfile = auth.profile;
+    render();
+  } catch (e) {
+    console.error('[mobile/settings] init failed', e);
+    if ($st) $st.innerHTML = '<div class="m-st__loading">설정을 불러오지 못했습니다</div>';
+  }
 })();

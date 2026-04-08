@@ -1,0 +1,29 @@
+{% extends 'mobile/_layout.html' %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/contract-form.css') }}?v={{ app_version }}">
+{% endblock %}
+{% block topbar_left %}
+  <button class="m-icon-btn" id="m-cf-back" type="button" aria-label="뒤로">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+  </button>
+{% endblock %}
+{% block topbar_center %}{% endblock %}
+{% block topbar_right %}
+  <button class="m-icon-btn" id="m-cf-edit" type="button" aria-label="수정">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+  </button>
+  <button class="m-icon-btn" id="m-cf-save" type="button" aria-label="저장" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg>
+  </button>
+  <button class="m-icon-btn" id="m-cf-delete" type="button" aria-label="삭제" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  </button>
+{% endblock %}
+{% block body %}
+<div class="m-cf" id="m-cf">
+  <div class="m-cf__loading">불러오는 중…</div>
+</div>
+{% endblock %}
+{% block page_js %}
+<script type="module" src="{{ url_for('static', filename='js/mobile/contract-form.js') }}?v={{ app_version }}"></script>
+{% endblock %}

@@ -189,7 +189,9 @@ _MOBILE_ROUTES = [
     ('/product-list', 'mobile/product.html',         '상품목록'),
     ('/product-list/<product_id>', 'mobile/product-detail.html', '상품상세'),
     ('/chat',         'mobile/chat.html',            '대화'),
+    ('/chat/<room_id>', 'mobile/chat-room.html',     '대화방'),
     ('/contract',     'mobile/contract.html',        '계약'),
+    ('/contract/<contract_code>', 'mobile/contract-form.html', '계약상세'),
     ('/settings',     'mobile/settings.html',        '설정'),
 ]
 

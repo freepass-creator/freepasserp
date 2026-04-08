@@ -3,14 +3,64 @@
  * Firebase 직접 조회. 데스크탑 product-list.js와 완전 분리.
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { watchProducts } from '../firebase/firebase-db.js';
+import { watchProducts, watchTerms } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
+import { toggleFilter, applyFilter } from './filter-sheet.js';
 
 const $grid = document.getElementById('m-product-grid');
 const $search = document.getElementById('m-product-search');
+const $filterBtn = document.getElementById('m-product-filter-btn');
+
+// 웹 카탈로그와 동일 — 변경 시 양쪽 같이 업데이트
+const RENT_BUCKETS = [
+  { value: '50만원 이하', label: '50만원 이하', range: [0,       500000] },
+  { value: '50만원~',    label: '50만원~',    range: [500000,  600000] },
+  { value: '60만원~',    label: '60만원~',    range: [600000,  700000] },
+  { value: '70만원~',    label: '70만원~',    range: [700000,  800000] },
+  { value: '80만원~',    label: '80만원~',    range: [800000,  900000] },
+  { value: '90만원~',    label: '90만원~',    range: [900000,  1000000] },
+  { value: '100만원~',   label: '100만원~',   range: [1000000, 1500000] },
+  { value: '150만원~',   label: '150만원~',   range: [1500000, null] },
+];
+const DEP_BUCKETS = [
+  { value: '100만원 이하', label: '100만원 이하', range: [0,        1000000] },
+  { value: '100만원~',    label: '100만원~',    range: [1000000,  2000000] },
+  { value: '200만원~',    label: '200만원~',    range: [2000000,  3000000] },
+  { value: '300만원~',    label: '300만원~',    range: [3000000,  5000000] },
+  { value: '500만원~',    label: '500만원~',    range: [5000000,  null] },
+];
+const MILE_BUCKETS = [
+  { value: '1만Km 이하', label: '1만km 이하', range: [0,      10000] },
+  { value: '1만Km~',    label: '1만km~',    range: [10000,  30000] },
+  { value: '3만Km~',    label: '3만km~',    range: [30000,  50000] },
+  { value: '5만Km~',    label: '5만km~',    range: [50000,  70000] },
+  { value: '7만Km~',    label: '7만km~',    range: [70000,  100000] },
+  { value: '10만Km~',   label: '10만km~',   range: [100000, 150000] },
+  { value: '15만Km~',   label: '15만km~',   range: [150000, null] },
+];
+
+const FILTER_GROUPS = [
+  { key: 'rent',          title: '월 대여료',  icon: 'money',    type: 'range',  buckets: RENT_BUCKETS },
+  { key: 'deposit',       title: '보증금',     icon: 'deposit',  type: 'range',  buckets: DEP_BUCKETS },
+  { key: 'periods',       title: '기간',       icon: 'calendar', type: 'periods', options: ['1','12','24','36','48','60'] },
+  { key: 'maker',         title: '제조사',     icon: 'car',      type: 'check',  field: 'maker' },
+  { key: 'model_name',    title: '모델',       icon: 'layers',   type: 'check',  field: 'model_name' },
+  { key: 'sub_model',     title: '세부모델',   icon: 'rows',     type: 'check',  field: 'sub_model' },
+  { key: 'trim_name',     title: '세부트림',   icon: 'award',    type: 'search', field: 'trim_name', placeholder: '트림명 검색' },
+  { key: 'options',       title: '선택옵션',   icon: 'list',     type: 'search', field: 'options',   placeholder: '옵션명 검색' },
+  { key: 'year',          title: '연식',       icon: 'hash',     type: 'check',  field: 'year', sort: 'desc' },
+  { key: 'mileage',       title: '주행거리',   icon: 'road',     type: 'range',  buckets: MILE_BUCKETS },
+  { key: 'fuel_type',     title: '연료',       icon: 'fuel',     type: 'check',  field: 'fuel_type' },
+  { key: 'color',         title: '색상',       icon: 'palette',  type: 'check',  fields: ['ext_color', 'int_color'] },
+  { key: 'vehicle_class', title: '차종구분',   icon: 'shape',    type: 'check',  field: 'vehicle_class' },
+  { key: 'screening_criteria', title: '심사기준', icon: 'shield', type: 'policyCheck', field: 'screening_criteria' },
+  { key: 'basic_driver_age',   title: '최저연령', icon: 'user',  type: 'policyCheck', field: 'basic_driver_age' },
+];
 
 let allProducts = [];
+let allPolicies = [];
 let searchQuery = '';
+let activeFilters = { selected: {}, searchText: {} };
 
 // 색상 이름 → hex 매핑
 function colorToHex(name) {
@@ -131,14 +181,34 @@ function render(items) {
 }
 
 function applySearch() {
+  let result = allProducts;
+  // 1) 필터 적용
+  result = applyFilter(result, activeFilters, FILTER_GROUPS, allPolicies);
+  // 2) 검색 적용
   const q = searchQuery.trim().toLowerCase();
-  if (!q) return render(allProducts);
-  const filtered = allProducts.filter(p => {
-    const fields = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name];
-    return fields.some(f => String(f || '').toLowerCase().includes(q));
-  });
-  render(filtered);
+  if (q) {
+    result = result.filter(p => {
+      const fields = [p.car_number, p.maker, p.model_name, p.sub_model, p.trim_name];
+      return fields.some(f => String(f || '').toLowerCase().includes(q));
+    });
+  }
+  render(result);
 }
+
+$filterBtn?.addEventListener('click', () => {
+  toggleFilter({
+    groups: FILTER_GROUPS,
+    items: allProducts,
+    policies: allPolicies,
+    filterState: activeFilters,
+    headerLabel: '상품차량',
+    unit: '대',
+    onApply: (fs) => {
+      activeFilters = fs;
+      applySearch();
+    }
+  });
+});
 
 // 카드 클릭 → 상세 페이지
 $grid?.addEventListener('click', (e) => {
@@ -155,6 +225,10 @@ $grid?.addEventListener('click', (e) => {
     await requireAuth();
     watchProducts((products) => {
       allProducts = products.filter(p => p && p.product_uid);
+      applySearch();
+    });
+    watchTerms((terms) => {
+      allPolicies = Array.isArray(terms) ? terms : [];
       applySearch();
     });
     $search?.addEventListener('input', () => {

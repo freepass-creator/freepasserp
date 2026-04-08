@@ -12,6 +12,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { watchProducts, watchTerms } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
+import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
 
 const $content = document.getElementById('m-pd-content');
 const $back = document.getElementById('m-back-btn');
@@ -506,6 +507,17 @@ function render() {
     activePhotoIndex = (activePhotoIndex + 1) % photos.length;
     render();
   });
+
+  // 사진 클릭 → 풀스크린 세로 스크롤 뷰어
+  const $img = $content.querySelector('.m-pd-gallery img');
+  if ($img && photos.length) {
+    $img.style.cursor = 'zoom-in';
+    $img.addEventListener('click', (e) => {
+      // 좌우 nav 버튼 클릭은 제외
+      if (e.target.closest('.m-pd-gallery__nav')) return;
+      openFullscreenViewer(photos, activePhotoIndex);
+    });
+  }
 }
 
 $back?.addEventListener('click', () => {

@@ -2,10 +2,9 @@
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/settings.css') }}?v={{ app_version }}">
 {% endblock %}
-{% block topbar_center %}설정{% endblock %}
 {% block body %}
 <div class="m-settings" id="m-settings">
-  <!-- JS 렌더 -->
+  <div class="m-st__loading">불러오는 중…</div>
 </div>
 {% endblock %}
 {% block page_js %}

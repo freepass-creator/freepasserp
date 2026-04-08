@@ -1,0 +1,34 @@
+{% extends 'mobile/_layout.html' %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/chat-room.css') }}?v={{ app_version }}">
+{% endblock %}
+{% block topbar_left %}
+  <button class="m-icon-btn" id="m-cr-back" type="button" aria-label="뒤로">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+  </button>
+{% endblock %}
+{% block topbar_center %}{% endblock %}
+{% block topbar_right %}
+  <button class="m-icon-btn" id="m-cr-hide" type="button" aria-label="숨김">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+  </button>
+  <button class="m-icon-btn" id="m-cr-delete" type="button" aria-label="삭제">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  </button>
+{% endblock %}
+{% block body %}
+<div class="m-cr">
+  <div class="m-cr__messages" id="m-cr-messages">
+    <div class="m-cr__loading">대화를 불러오는 중…</div>
+  </div>
+  <form class="m-cr__input" id="m-cr-form">
+    <textarea class="m-cr__textarea" id="m-cr-text" rows="1" placeholder="메시지 입력"></textarea>
+    <button class="m-cr__send" type="submit" aria-label="전송">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z"/><path d="M6 12h16"/></svg>
+    </button>
+  </form>
+</div>
+{% endblock %}
+{% block page_js %}
+<script type="module" src="{{ url_for('static', filename='js/mobile/chat-room.js') }}?v={{ app_version }}"></script>
+{% endblock %}
