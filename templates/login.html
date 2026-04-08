@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/login.css') }}">
 <style>
+  /* 데스크탑에선 표시 안 함 — 모바일 전용 */
+  @media (min-width: 769px) { .m-pwa-install { display: none !important; } }
   .m-pwa-install{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:300;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 8px 24px rgba(15,23,42,.12);padding:14px 16px;max-width:440px;margin:0 auto}
   .m-pwa-install__inner{display:flex;flex-direction:column;gap:10px}
   .m-pwa-install__text strong{display:block;font-size:14px;font-weight:700;color:#0f172a}
@@ -59,6 +61,8 @@
 </div>
 <script>
   (function(){
+    // 데스크탑 가드 — 모바일 viewport에서만 배너 동작
+    if (window.matchMedia('(min-width: 769px)').matches) return;
     var deferredPrompt = null;
     var DISMISS_KEY = 'fp_pwa_install_dismiss_until';
     if (window.matchMedia('(display-mode: standalone)').matches) return;
