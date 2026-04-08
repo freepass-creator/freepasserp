@@ -624,12 +624,12 @@ $btnShare?.addEventListener('click', async (e) => {
   const url = new URL(location.origin + '/catalog');
   url.searchParams.set('id', p.product_uid || p.product_code || '');
   if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
-  // 타이틀 조립: "{상품유형} {차량번호} {차종} - {담당자 이름} {직급} ({소속})"
-  // 예: "신차렌트 113허0000 쏘렌토 - 홍길동 팀장 (프리패스)"
+  // 타이틀: "{상품유형} {차량번호} {차종} - {담당자 이름} {직급}"
+  // 예: "신차렌트 113허0000 쏘렌토 - 홍길동 팀장"
   const carPart = [p.product_type, p.car_number, p.model_name || p.sub_model].filter(Boolean).join(' ');
   const agentPart = [currentProfile?.name, currentProfile?.position].filter(Boolean).join(' ');
   const company = currentProfile?.company_name || '';
-  const carTitle = [carPart, agentPart && `- ${agentPart}${company ? ` (${company})` : ''}`].filter(Boolean).join(' ');
+  const carTitle = [carPart, agentPart && `- ${agentPart}`].filter(Boolean).join(' ');
   if (carTitle) url.searchParams.set('t', carTitle);
   if (company) url.searchParams.set('c', company);
   const firstImg = (Array.isArray(p.image_urls) && p.image_urls[0]) || p.image_url || '';
