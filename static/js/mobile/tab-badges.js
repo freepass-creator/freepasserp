@@ -5,11 +5,37 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { watchRooms, watchContracts } from '../firebase/firebase-db.js';
 
+// ⚡ sessionStorage 캐시 — 페이지 이동 시 뱃지 깜빡임 방지
+const BADGE_CACHE_KEY = 'fp_tab_badges_v1';
+function loadBadgeCache() {
+  try { return JSON.parse(sessionStorage.getItem(BADGE_CACHE_KEY) || '{}'); } catch { return {}; }
+}
+function saveBadgeCache(obj) {
+  try { sessionStorage.setItem(BADGE_CACHE_KEY, JSON.stringify(obj)); } catch {}
+}
+const _badgeCache = loadBadgeCache();
+
 function setBadge(id, count) {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = '';
   el.hidden = !(Number(count || 0) > 0);
+  _badgeCache[id] = Number(count || 0);
+  saveBadgeCache(_badgeCache);
+}
+
+// 페이지 로드 즉시 캐시값으로 뱃지 복원 (Firebase 구독 응답 기다리지 않음)
+function restoreBadgesFromCache() {
+  Object.keys(_badgeCache).forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = '';
+    el.hidden = !(Number(_badgeCache[id] || 0) > 0);
+  });
+}
+restoreBadgesFromCache();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', restoreBadgesFromCache, { once: true });
 }
 
 (async () => {
