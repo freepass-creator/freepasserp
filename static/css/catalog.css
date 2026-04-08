@@ -73,7 +73,9 @@ html {
 /* catalog-header-left 제거됨 — 헤더 좌측 정렬로 변경 */
 
 .catalog-header-back,
-.catalog-header-filter {
+.catalog-header-filter,
+.catalog-header-call,
+.catalog-header-share {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -88,11 +90,15 @@ html {
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 .catalog-header-back:hover,
-.catalog-header-filter:hover {
+.catalog-header-filter:hover,
+.catalog-header-call:hover,
+.catalog-header-share:hover {
   background: #f1f5f9;
   color: #1e293b;
 }
-.catalog-header-back[hidden] { display: none; }
+.catalog-header-back[hidden],
+.catalog-header-call[hidden],
+.catalog-header-share[hidden] { display: none; }
 .catalog-header-filter { display: none; }
 .catalog-header-filter[hidden] { display: none !important; }
 

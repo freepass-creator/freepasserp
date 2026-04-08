@@ -338,6 +338,21 @@ async function loadAgent() {
         if (bottomCallText) bottomCallText.textContent = `${name || '담당자'}${position ? ' ' + position : ''}에게 전화하기`;
         bottomBar.hidden = false;
       }
+      // 상단 전화 아이콘
+      const headerCall = qs('catalog-header-call');
+      if (headerCall) { headerCall.href = `tel:${phone}`; headerCall.hidden = false; }
+    }
+    // 상단 공유 아이콘 (전화 유무와 무관)
+    const headerShare = qs('catalog-header-share');
+    if (headerShare) {
+      headerShare.hidden = false;
+      headerShare.addEventListener('click', async () => {
+        const url = location.href;
+        try {
+          if (navigator.share) await navigator.share({ url, title: document.title });
+          else { await navigator.clipboard.writeText(url); alert('링크를 복사했어요'); }
+        } catch (_) {}
+      });
     }
   } catch (e) {
     console.warn('[catalog] agent load failed', e);
@@ -412,6 +427,7 @@ function renderSingleView(p) {
   const carNo = p.car_number || '';
   const suffix = agentCompany?.textContent ? ` | ${agentCompany.textContent}` : '';
   document.title = `렌터카 ${carNo} ${model} 상품${suffix}`.trim();
+
 
   renderSingleGallery(getImages(p));
   singleBody.innerHTML = renderProductDetail(p);

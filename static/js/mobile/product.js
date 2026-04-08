@@ -36,14 +36,30 @@ function render(items) {
       ? `<img class="m-product-card__img" src="${escapeHtml(thumb)}" loading="lazy" alt="">`
       : `<div class="m-product-card__no-img"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
+    const meta = [fuel, year && year + '년', mileage].filter(Boolean).join(' · ');
+    const colors = [ext, intc].filter(v => v && v !== '-').join(' · ');
+    const pr = p.price || {};
+    const num = (v) => Number(String(v ?? '').replace(/[^\d.-]/g, '')) || 0;
+    const months = ['1', '12', '24', '36', '48', '60'];
+    const priceRows = months.map(m => ({
+      m: Number(m),
+      rent: num(pr[m]?.rent) || (m === '48' ? num(p.rental_price_48) || num(p.rental_price) : (m === '60' ? num(p.rental_price_60) : 0)),
+      deposit: num(pr[m]?.deposit) || (m === '48' ? num(p.deposit_48) || num(p.deposit) : (m === '60' ? num(p.deposit_60) : 0)),
+    })).filter(r => r.rent > 0);
+    const cheapest = priceRows.length ? priceRows.reduce((a, b) => (a.rent <= b.rent ? a : b)) : null;
+    const priceLabel = cheapest ? `월 ${cheapest.rent.toLocaleString('ko-KR')}원` : '';
+    const priceSub = cheapest ? `보증금 ${cheapest.deposit ? cheapest.deposit.toLocaleString('ko-KR') + '원' : '-'} · ${cheapest.m}개월` : '';
+
     return `<article class="m-product-card" data-id="${escapeHtml(p.product_uid || p.product_code || '')}">
       ${imgHtml}
       <div class="m-product-card__body">
-        <div style="font-size:13px;font-weight:600;color:var(--m-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(maker)} ${escapeHtml(model)} <span style="font-size:11px;color:var(--m-text-tertiary);">${escapeHtml(carNo)}</span></div>
-        ${subModel ? `<div style="font-size:12px;color:var(--m-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(subModel)}</div>` : ''}
-        ${trim ? `<div style="font-size:11px;color:var(--m-text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(trim)}</div>` : ''}
-        ${[fuel, year && year + '년', mileage].filter(Boolean).length ? `<div style="font-size:11px;color:var(--m-text-tertiary);margin-top:4px;">${[fuel, year && year + '년', mileage].filter(Boolean).join(' · ')}</div>` : ''}
-        ${[ext, intc].filter(v => v && v !== '-').length ? `<div style="font-size:11px;color:var(--m-text-tertiary);">${[ext, intc].filter(v => v && v !== '-').join(' · ')}</div>` : ''}
+        <div class="m-product-card__title">${escapeHtml(maker)} ${escapeHtml(model)}${carNo ? `<span class="m-product-card__carno">${escapeHtml(carNo)}</span>` : ''}</div>
+        ${subModel ? `<div class="m-product-card__sub">${escapeHtml(subModel)}</div>` : ''}
+        ${trim ? `<div class="m-product-card__meta">${escapeHtml(trim)}</div>` : ''}
+        ${meta ? `<div class="m-product-card__meta">${escapeHtml(meta)}</div>` : ''}
+        ${colors ? `<div class="m-product-card__meta">${escapeHtml(colors)}</div>` : ''}
+        ${priceLabel ? `<div class="m-product-card__price">${escapeHtml(priceLabel)}</div>` : ''}
+        ${priceSub ? `<div class="m-product-card__price-sub">${escapeHtml(priceSub)}</div>` : ''}
       </div>
     </article>`;
   }).join('');

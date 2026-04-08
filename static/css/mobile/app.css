@@ -20,27 +20,44 @@
   --m-danger:           #ef4444;
   --m-danger-bg:        #fef2f2;
 
-  /* 사이즈 */
-  --m-topbar-h:         48px;
-  --m-tabbar-h:         56px;
-  --m-pad-x:            16px;
-  --m-pad-y:            14px;
-  --m-gap:              12px;
-  --m-row-h:            64px;
-  --m-input-h:          48px;
-  --m-btn-h:            48px;
+  /* 사이즈 — vw 기반 비율 (clamp로 최소/최대 보호) */
+  --m-topbar-h:         clamp(44px, 12.5vw, 56px);
+  --m-tabbar-h:         clamp(52px, 14.5vw, 64px);
+  --m-pad-x:            clamp(12px, 4.2vw, 18px);
+  --m-pad-y:            clamp(10px, 3.6vw, 16px);
+  --m-gap:              clamp(8px, 3.2vw, 14px);
+  --m-row-h:            clamp(56px, 16.5vw, 72px);
+  --m-input-h:          clamp(42px, 12vw, 52px);
+  --m-btn-h:            clamp(42px, 12vw, 52px);
+  --m-icon-btn:         clamp(32px, 9.4vw, 40px);
 
-  /* 라운드 */
-  --m-radius-sm:        4px;
-  --m-radius-md:        8px;
-  --m-radius-lg:        12px;
+  /* 라운드 — 정제된 느낌 (2/4/6/8) */
+  --m-radius-sm:        2px;    /* 뱃지·칩 */
+  --m-radius-md:        4px;    /* 버튼·인풋 */
+  --m-radius-lg:        6px;    /* 카드·이미지 */
+  --m-radius-xl:        8px;    /* 모달·바텀시트 */
+  --m-radius-photo:     6px;
+  --m-radius-badge:     2px;
   --m-radius-pill:      999px;
   --m-radius-circle:    50%;
 
-  /* 폰트 */
-  --m-font-title:       15px;
-  --m-font-body:        13px;
-  --m-font-sub:         11px;
+  /* 여백 — 8pt grid */
+  --m-space-1:          4px;
+  --m-space-2:          8px;
+  --m-space-3:          12px;
+  --m-space-4:          16px;
+  --m-space-5:          20px;
+  --m-space-6:          24px;
+  --m-space-7:          32px;
+
+  /* 폰트 — 트렌드 스케일 (모바일 본문 14~16px 표준) */
+  --m-font-display:     clamp(20px, 5.6vw, 26px);  /* 페이지 히어로 */
+  --m-font-title:       clamp(16px, 4.4vw, 19px);  /* 섹션 제목 */
+  --m-font-body:        clamp(14px, 3.8vw, 16px);  /* 본문·값 */
+  --m-font-caption:     clamp(12px, 3.2vw, 13px);  /* 라벨·메타 */
+  --m-font-micro:       clamp(11px, 2.9vw, 12px);  /* 뱃지 */
+  /* 호환용 alias */
+  --m-font-sub:         var(--m-font-caption);
 }
 
 /* ── reset ── */
@@ -77,6 +94,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border-bottom: 1px solid var(--m-divider);
   z-index: 100;
 }
+.m-topbar {
+  gap: clamp(8px, 2.4vw, 12px);
+}
 .m-topbar__left,
 .m-topbar__center,
 .m-topbar__right {
@@ -84,6 +104,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   align-items: center;
   min-width: 0;
 }
+.m-topbar__left { flex: 1 1 auto; }
+.m-topbar__right { flex: 0 0 auto; gap: clamp(2px, 1vw, 6px); }
 .m-topbar__left:empty,
 .m-topbar__center:empty,
 .m-topbar__right:empty { display: none; }
@@ -100,9 +122,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: var(--m-bg);
+  background: var(--m-card-bg);
   padding-bottom: calc(var(--m-tabbar-h) + env(safe-area-inset-bottom));
 }
+/* 목록형 페이지(상품 그리드 등)는 회색 배경 */
+.m-page:has(.m-product-grid) { background: var(--m-bg); }
 
 /* 하단 탭바 */
 .m-tabbar {
@@ -156,8 +180,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: var(--m-icon-btn);
+  height: var(--m-icon-btn);
   border: none;
   background: transparent;
   color: var(--m-text-secondary);
