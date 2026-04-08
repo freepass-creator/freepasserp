@@ -121,9 +121,9 @@ export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termF
         <div class="md-vehicle-model">${esc(safe(product.maker))} ${esc(safe(product.model))}</div>
         <div class="md-vehicle-carno">${esc(safe(product.carNo))}</div>
       </div>
-      ${product.subModel && product.subModel !== '-' ? `<div class="md-vehicle-sub">${esc(product.subModel)}</div>` : ''}
-      ${product.trim && product.trim !== '-' ? `<div class="md-vehicle-sub">${esc(product.trim)}</div>` : ''}
-      ${product.optionSummary && product.optionSummary !== '-' ? `<div class="md-vehicle-sub">${esc(product.optionSummary)}</div>` : ''}
+      ${product.subModel && product.subModel !== '-' ? `<div class="md-vehicle-row"><span class="md-vehicle-label">세부모델</span><span class="md-vehicle-value">${esc(product.subModel)}</span></div>` : ''}
+      ${product.trim && product.trim !== '-' ? `<div class="md-vehicle-row"><span class="md-vehicle-label">세부트림</span><span class="md-vehicle-value">${esc(product.trim)}</span></div>` : ''}
+      ${product.optionSummary && product.optionSummary !== '-' ? `<div class="md-vehicle-row"><span class="md-vehicle-label">선택옵션</span><span class="md-vehicle-value">${esc(product.optionSummary)}</span></div>` : ''}
       <div class="md-vehicle-meta">${esc(safe(product.fuel))} · ${esc(safe(product.year))}년식 · ${esc(safe(product.mileageDisplay))} ${colorBadge(product.extColor)}${colorBadge(product.intColor)}</div>
     </div>`;
 
