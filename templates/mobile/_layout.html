@@ -19,9 +19,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"></noscript>
 
+  <!-- ⚡ Critical CSS 인라인 — 첫 페인트 0 round-trip -->
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;padding:0;height:100%;background:#f4f5f7;color:#0f172a;font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+    .m-body{display:flex;flex-direction:column;height:100dvh;overflow:hidden;background:#f4f5f7}
+    .m-topbar{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:48px;min-height:48px;padding:0 16px;background:#fff;border-bottom:1px solid #f2f4f6;flex-shrink:0;gap:12px}
+    .m-topbar__left,.m-topbar__center,.m-topbar__right{display:flex;align-items:center;min-width:0}
+    .m-topbar__left:empty,.m-topbar__center:empty,.m-topbar__right:empty{display:none}
+    .m-page{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff;padding-bottom:calc(56px + env(safe-area-inset-bottom));contain:layout style}
+    .m-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:stretch;justify-content:space-around;height:calc(56px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid #f2f4f6}
+    .m-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;border:none;background:transparent;text-decoration:none;color:#8b95a1;font-size:11px;font-weight:500;padding:6px 0 0;position:relative}
+    .m-tab.is-active{color:#1b2a4a;font-weight:600}
+    .m-tab svg{width:22px;height:22px;stroke-width:1.5}
+    .m-tab.is-active svg{stroke-width:2}
+    .m-tab__badge{position:absolute;top:4px;left:calc(50% + 4px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#ef4444;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
+    .m-tab__badge[hidden]{display:none}
+    .m-skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e9eef5 50%,#f1f5f9 75%);background-size:400% 100%;animation:m-shimmer 1.4s ease infinite;border-radius:8px}
+    @keyframes m-shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+  </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/app.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}?v={{ app_version }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}?v={{ app_version }}" media="print" onload="this.media='all'">
 
   <!-- ⚡ 성능: Firebase SDK preload (HTML 파싱 중에 다운로드 시작) -->
   <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js">
