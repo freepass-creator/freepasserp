@@ -59,6 +59,18 @@ function applySearch() {
   render(filtered);
 }
 
+// 카드 클릭 → 상세 페이지
+$grid?.addEventListener('click', (e) => {
+  const card = e.target.closest('.m-product-card[data-id]');
+  if (!card) return;
+  const id = card.dataset.id;
+  if (id) {
+    const url = new URL(location.href);
+    url.searchParams.set('id', id);
+    location.href = url.toString();
+  }
+});
+
 (async () => {
   try {
     await requireAuth();

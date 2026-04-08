@@ -150,6 +150,24 @@ _MOBILE_TEMPLATE_MAP = {
     'pages/settings.html': 'mobile/settings.html',
 }
 
+def _make_new_view_with_detail_check(template: str, title: str, detail_template: str = None):
+    """상품 페이지: 모바일 + ?id= 가 있으면 상세 페이지 렌더"""
+    def view():
+        if _is_mobile():
+            if detail_template and request.args.get('id'):
+                try:
+                    return render_template(detail_template, page_title=title)
+                except Exception:
+                    pass
+            mobile_tpl = _MOBILE_TEMPLATE_MAP.get(template)
+            if mobile_tpl:
+                try:
+                    return render_template(mobile_tpl, page_title=title)
+                except Exception:
+                    pass
+        return render_template(template, page_title=title)
+    return view
+
 def _make_new_view(template: str, title: str):
     def view():
         # 모바일이면 모바일 전용 템플릿 우선 시도
@@ -186,7 +204,12 @@ def catalog_view():
 
 for _path, _tpl, _title in _NEW_ROUTES:
     _ep = _path.lstrip('/').replace('-', '_').replace('/', '_')
-    pages_bp.add_url_rule(_path, endpoint=_ep, view_func=_make_new_view(_tpl, _title))
+    # 상품목록은 ?id= 있으면 모바일 상세로
+    if _path == '/product-list':
+        pages_bp.add_url_rule(_path, endpoint=_ep,
+            view_func=_make_new_view_with_detail_check(_tpl, _title, 'mobile/product-detail.html'))
+    else:
+        pages_bp.add_url_rule(_path, endpoint=_ep, view_func=_make_new_view(_tpl, _title))
 
 
 # ─── Blueprint: API ───────────────────────────────────────────────────────────

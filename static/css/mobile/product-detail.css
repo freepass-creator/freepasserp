@@ -1,0 +1,184 @@
+/* 모바일 상품 상세 */
+
+.m-pd {
+  padding-bottom: 80px; /* 하단 액션 영역 공간 */
+}
+
+/* 갤러리 */
+.m-pd-gallery {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #0f172a;
+  overflow: hidden;
+}
+.m-pd-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.m-pd-gallery__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--m-radius-circle);
+  background: rgba(255, 255, 255, 0.85);
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.m-pd-gallery__nav--prev { left: 10px; }
+.m-pd-gallery__nav--next { right: 10px; }
+.m-pd-gallery__counter {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  border-radius: var(--m-radius-pill);
+  background: rgba(15, 23, 42, 0.6);
+  color: #fff;
+  font-size: 11px;
+}
+.m-pd-gallery__badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 4px;
+}
+.m-pd-gallery__badge {
+  padding: 3px 8px;
+  border-radius: var(--m-radius-pill);
+  background: rgba(15, 23, 42, 0.7);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+/* 섹션 */
+.m-pd-section {
+  background: var(--m-card-bg);
+  margin-top: 8px;
+  padding: 16px;
+}
+.m-pd-section:first-of-type { margin-top: 0; }
+.m-pd-section__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--m-text-tertiary);
+  letter-spacing: 0.03em;
+  margin-bottom: 12px;
+}
+.m-pd-section__head svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* 차량정보 카드 */
+.m-pd-vehicle-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--m-text-primary);
+  margin-bottom: 2px;
+}
+.m-pd-vehicle-carno {
+  font-size: 12px;
+  color: var(--m-text-tertiary);
+  margin-bottom: 12px;
+}
+.m-pd-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.m-pd-row__label {
+  flex: 0 0 70px;
+  color: var(--m-text-tertiary);
+  font-size: 12px;
+}
+.m-pd-row__value {
+  flex: 1;
+  color: var(--m-text-primary);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* 가격 테이블 */
+.m-pd-price-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.m-pd-price-table th,
+.m-pd-price-table td {
+  padding: 10px 0;
+  text-align: center;
+  border-bottom: 1px solid var(--m-divider);
+  font-size: 13px;
+}
+.m-pd-price-table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--m-text-tertiary);
+}
+.m-pd-price-table td:first-child {
+  color: var(--m-text-tertiary);
+  font-size: 12px;
+}
+.m-pd-price-table td strong {
+  color: var(--m-accent);
+  font-weight: 700;
+}
+
+/* 하단 액션 */
+.m-pd-foot {
+  position: fixed;
+  bottom: var(--m-tabbar-h);
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: var(--m-card-bg);
+  border-top: 1px solid var(--m-divider);
+  z-index: 50;
+}
+.m-pd-foot-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  border: none;
+  border-radius: var(--m-radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.m-pd-foot-btn--chat {
+  background: var(--m-accent-soft);
+  color: var(--m-accent);
+}
+.m-pd-foot-btn--contract {
+  background: var(--m-accent);
+  color: #fff;
+}
+
+/* 탭바 위에 foot 있으니 m-page padding 추가 */
+.m-body:has(.m-pd-foot) .m-page {
+  padding-bottom: calc(var(--m-tabbar-h) + 64px + env(safe-area-inset-bottom));
+}
