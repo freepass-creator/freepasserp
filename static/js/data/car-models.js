@@ -146,6 +146,40 @@ export const CAR_MODELS = [
   { maker: '기아', model: '봉고3', sub: '봉고3 EV PU EV 20~', year_start: '20', year_end: '현재', code: 'PU', category: '소형 EV 트럭' },
   { maker: '기아', model: '타스만', sub: '타스만 TK 25~', year_start: '25', year_end: '현재', code: 'TK', category: '픽업트럭' },
   { maker: 'KGM', model: '액티언', sub: '더 뉴 액티언 J120 24~', year_start: '24', year_end: '현재', code: 'J120', category: '중형 SUV' },
+
+  // ─── 추가: 기아 K7 (단종, 데이터 31건) ──────────────
+  { maker: '기아', model: 'K7', sub: '올 뉴 K7 YG 16~', year_start: '16', year_end: '19', code: 'YG', category: '준대형 세단' },
+  { maker: '기아', model: 'K7', sub: 'K7 프리미어 YG (페리) 19~', year_start: '19', year_end: '21', code: 'YG', category: '준대형 세단' },
+  // ─── 추가: 기아 모하비 ──────────────
+  { maker: '기아', model: '모하비', sub: '모하비 HM 08~', year_start: '08', year_end: '15', code: 'HM', category: '대형 SUV' },
+  { maker: '기아', model: '모하비', sub: '더 마스터 모하비 HM (페리) 19~', year_start: '19', year_end: '23', code: 'HM', category: '대형 SUV' },
+  // ─── 추가: 쉐보레 스파크 ──────────────
+  { maker: '쉐보레', model: '스파크', sub: '스파크 M400 15~', year_start: '15', year_end: '22', code: 'M400', category: '경차' },
+  { maker: '쉐보레', model: '스파크', sub: '더 뉴 스파크 M400 (페리) 18~', year_start: '18', year_end: '22', code: 'M400', category: '경차' },
+  // ─── 추가: 벤츠 S-클래스 / GLS / CLE / EQS / AMG GT / G-클래스 / A-클래스 ──────────────
+  { maker: '벤츠', model: 'S-클래스', sub: 'S-클래스 W222 13~', year_start: '13', year_end: '20', code: 'W222', category: '대형 세단' },
+  { maker: '벤츠', model: 'S-클래스', sub: 'S-클래스 W223 20~', year_start: '20', year_end: '현재', code: 'W223', category: '대형 세단' },
+  { maker: '벤츠', model: 'GLS', sub: 'GLS X167 19~', year_start: '19', year_end: '현재', code: 'X167', category: '대형 SUV' },
+  { maker: '벤츠', model: 'CLE', sub: 'CLE 카브리올레 A236 24~', year_start: '24', year_end: '현재', code: 'A236', category: '준중형 컨버터블' },
+  { maker: '벤츠', model: 'EQS', sub: 'EQS V297 21~', year_start: '21', year_end: '현재', code: 'V297', category: '대형 EV 세단' },
+  { maker: '벤츠', model: 'AMG GT', sub: 'AMG GT 15~', year_start: '15', year_end: '현재', code: '-', category: '준중형 쿠페' },
+  { maker: '벤츠', model: 'G-클래스', sub: 'G-클래스 W463 18~', year_start: '18', year_end: '현재', code: 'W463', category: '중형 SUV' },
+  { maker: '벤츠', model: 'A-클래스', sub: 'A-클래스 W177 18~', year_start: '18', year_end: '현재', code: 'W177', category: '준중형 해치백' },
+  // ─── 추가: 아우디 A3/A4/A5/A7/A8/Q3/Q5/Q7/Q8 ──────────────
+  { maker: '아우디', model: 'A3', sub: 'A3 8Y 20~', year_start: '20', year_end: '현재', code: '8Y', category: '준중형 세단' },
+  { maker: '아우디', model: 'A4', sub: 'A4 B9 15~', year_start: '15', year_end: '24', code: 'B9', category: '준중형 세단' },
+  { maker: '아우디', model: 'A5', sub: 'A5 F5 16~', year_start: '16', year_end: '24', code: 'F5', category: '준중형 쿠페' },
+  { maker: '아우디', model: 'A7', sub: 'A7 C8 18~', year_start: '18', year_end: '현재', code: 'C8', category: '중형 세단' },
+  { maker: '아우디', model: 'A8', sub: 'A8 D5 17~', year_start: '17', year_end: '현재', code: 'D5', category: '대형 세단' },
+  { maker: '아우디', model: 'Q3', sub: 'Q3 F3 18~', year_start: '18', year_end: '현재', code: 'F3', category: '소형 SUV' },
+  { maker: '아우디', model: 'Q5', sub: 'Q5 FY 17~', year_start: '17', year_end: '현재', code: 'FY', category: '중형 SUV' },
+  { maker: '아우디', model: 'Q7', sub: 'Q7 4M 15~', year_start: '15', year_end: '현재', code: '4M', category: '대형 SUV' },
+  { maker: '아우디', model: 'Q8', sub: 'Q8 4M 18~', year_start: '18', year_end: '현재', code: '4M', category: '대형 SUV' },
+  // ─── 추가: BMW Z4 / M4 ──────────────
+  { maker: 'BMW', model: 'Z4', sub: 'Z4 G29 18~', year_start: '18', year_end: '현재', code: 'G29', category: '소형 컨버터블' },
+  { maker: 'BMW', model: 'M4', sub: 'M4 G82 20~', year_start: '20', year_end: '현재', code: 'G82', category: '준중형 쿠페' },
+  // ─── 추가: 현대 스타렉스 ──────────────
+  { maker: '현대', model: '스타렉스', sub: '그랜드 스타렉스 TQ 07~', year_start: '07', year_end: '21', code: 'TQ', category: '대형 MPV' },
 ];
 
 // 인기 제조사 순위 (엔카 인기 차종 기준)
