@@ -13,7 +13,6 @@ import { ensureRoom, watchProducts, resolveTermForProduct } from "../firebase/fi
 import { showConfirm, showToast } from "../core/toast.js";
 import { bindProductDetailPhotoEvents, extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
 import { renderMobileProductDetail } from "../shared/mobile-product-detail-markup.js";
-import { open as openFullscreenViewer } from "../shared/fullscreen-photo-viewer.js";
 import { renderBadgeRow } from "../shared/badge.js";
 
 const _isMobile = { get matches() { return window.matchMedia('(max-width: 768px)').matches; } };
