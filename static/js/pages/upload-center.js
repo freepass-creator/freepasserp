@@ -174,9 +174,17 @@ function buildRowContext(row, input) {
   // 입력 sub_model에서도 추출 시도
   if (yy == null) yy = extractYearFromText(input);
 
-  // 주행거리 → 신차 가능성 신호 (5천km 이하 = 사실상 신차 → 최신 모델 우선)
+  // 주행거리 → 운행 연수 추정 (1년에 25,000km 가정 → 등록 연도 역산)
   const mileage = Number(String(row.mileage || '').replace(/[^\d]/g, '')) || 0;
   const looksLikeNew = mileage > 0 && mileage < 5000;
+  // 주행거리로 추정 등록 연도 (yy가 아직 없을 때만 fallback)
+  let mileageYy = null;
+  if (mileage > 0) {
+    const curYy = new Date().getFullYear() % 100;
+    const years = Math.round(mileage / 25000);
+    mileageYy = curYy - years;
+  }
+  if (yy == null && mileageYy != null) yy = mileageYy;
 
   // 엔진 cc — sub_model의 배기량 토큰과 매칭용
   const engineCc = Number(String(row.engine_cc || '').replace(/[^\d]/g, '')) || 0;
@@ -206,6 +214,7 @@ function buildRowContext(row, input) {
   return {
     yy, fuel, isEV, isHybrid, isDiesel, isGasoline,
     trimLow, trimTokens, looksLikeNew, engineCc, vehiclePrice, trimSignals,
+    mileageYy,
   };
 }
 
@@ -1470,11 +1479,42 @@ $confirmBtn?.addEventListener('click', async () => {
 
     // freepass 차종 마스터 구독 (vehicle_master)
     watchVehicleMaster((data) => {
-      // sub_model 끝 연도를 두자리 'YY~' 형태로 통일
-      vmEntries = (data?.items || []).map(e => ({
-        ...e,
-        sub_model: normalizeSubYear(e.sub_model),
-      }));
+      // CAR_MODELS lookup 인덱스 — (maker|model|sub) 정확 일치 + (maker|model) fuzzy
+      const cmExact = new Map();
+      const cmByModel = new Map(); // maker|model → 후보들
+      CAR_MODELS.forEach(c => {
+        const k = `${c.maker}|${c.model}|${c.sub}`;
+        cmExact.set(k, c);
+        const mk = `${c.maker}|${c.model}`;
+        if (!cmByModel.has(mk)) cmByModel.set(mk, []);
+        cmByModel.get(mk).push(c);
+      });
+      // sub_model 끝 연도를 두자리 'YY~' 형태로 통일 + CAR_MODELS year_start/year_end 머지
+      vmEntries = (data?.items || []).map(e => {
+        const merged = {
+          ...e,
+          sub_model: normalizeSubYear(e.sub_model),
+        };
+        // CAR_MODELS에서 일치하는 항목 찾아서 year_start/year_end 채우기 (없는 경우만)
+        if (!merged.year_start || !merged.year_end) {
+          const exact = cmExact.get(`${e.maker}|${e.model_name}|${e.sub_model}`);
+          if (exact) {
+            merged.year_start = merged.year_start || exact.year_start;
+            merged.year_end = merged.year_end || exact.year_end;
+            if (!merged.vehicle_category) merged.vehicle_category = exact.category;
+          } else {
+            // sub 부분일치 fallback
+            const candidates = cmByModel.get(`${e.maker}|${e.model_name}`) || [];
+            const partial = candidates.find(c => normLow(e.sub_model).includes(normLow(c.sub)) || normLow(c.sub).includes(normLow(e.sub_model)));
+            if (partial) {
+              merged.year_start = merged.year_start || partial.year_start;
+              merged.year_end = merged.year_end || partial.year_end;
+              if (!merged.vehicle_category) merged.vehicle_category = partial.category;
+            }
+          }
+        }
+        return merged;
+      });
       console.log('[upload-center] vehicle_master 로드됨:', vmEntries.length, '건');
       console.log('[upload-center] makers:', getVmMakers());
       console.log('[upload-center] sample:', vmEntries.slice(0, 5));
