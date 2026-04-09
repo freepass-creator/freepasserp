@@ -781,9 +781,21 @@ function validateRow(rawRow, idx) {
       let inferredFromSub = null;
       if (makerOk && row.sub_model) {
         const subLow = normLow(row.sub_model);
+        // 영→한 약식 매핑 (테슬라 등 영문 sub 케이스 대응)
+        const enToKo = {
+          'model y': '모델 y', 'model3': '모델 3', 'model 3': '모델 3',
+          'model x': '모델 x', 'model s': '모델 s',
+        };
+        let normSub = subLow;
+        for (const [en, ko] of Object.entries(enToKo)) {
+          if (normSub.includes(en)) normSub = normSub.replace(en, ko);
+        }
         // maker의 모든 모델 중 sub에 포함되는 것 (긴 모델명 우선)
         const candidates = pool
-          .filter(m => subLow.includes(normLow(m)))
+          .filter(m => {
+            const ml = normLow(m);
+            return normSub.includes(ml) || subLow.includes(ml);
+          })
           .sort((a, b) => b.length - a.length);
         if (candidates.length) inferredFromSub = candidates[0];
       }
