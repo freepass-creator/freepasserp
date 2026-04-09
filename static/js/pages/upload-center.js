@@ -777,27 +777,41 @@ function validateRow(rawRow, idx) {
       ? mergedModels(row.maker)
       : [...new Set(vmEntries.map(e => e.model_name))].filter(Boolean);
     if (!makerOk || !isExactModel(row.maker, row.model_name)) {
-      // ⚡ sub_model 입력에서 model 역추론 — sub에 모델명이 포함되어 있으면 그게 정답
+      // ⚡ sub_model 입력에서 model 역추론 — 토큰 단위 비교 (한/영/공백 무시)
       let inferredFromSub = null;
       if (makerOk && row.sub_model) {
-        const subLow = normLow(row.sub_model);
-        // 영→한 약식 매핑 (테슬라 등 영문 sub 케이스 대응)
-        const enToKo = {
-          'model y': '모델 y', 'model3': '모델 3', 'model 3': '모델 3',
-          'model x': '모델 x', 'model s': '모델 s',
+        // 모델명과 sub를 모두 토큰화: 공백/특수문자 제거 + 한영 분리
+        const tokenize = (s) => {
+          const t = String(s || '').toLowerCase().replace(/[^\w가-힣]/g, ' ').trim();
+          return t.split(/\s+/).filter(Boolean);
         };
-        let normSub = subLow;
-        for (const [en, ko] of Object.entries(enToKo)) {
-          if (normSub.includes(en)) normSub = normSub.replace(en, ko);
-        }
-        // maker의 모든 모델 중 sub에 포함되는 것 (긴 모델명 우선)
-        const candidates = pool
-          .filter(m => {
-            const ml = normLow(m);
-            return normSub.includes(ml) || subLow.includes(ml);
-          })
-          .sort((a, b) => b.length - a.length);
-        if (candidates.length) inferredFromSub = candidates[0];
+        const subTokens = new Set(tokenize(row.sub_model));
+        // pool의 각 모델에 대해 → 모델명 토큰이 sub 토큰에 모두 포함되는지 검사
+        // ex) "모델 Y" → ["모델", "y"] → sub "Model Y Premium RWD" → ["model", "y", "premium", "rwd"]
+        //     'y'는 매칭되지만 '모델' ↔ 'model'은 별도 매핑 필요
+        // → 한 글자 이상 코드 토큰(y, x, 3, m6 등)이 매칭되면 1점
+        const scored = pool.map(m => {
+          const mTokens = tokenize(m);
+          let score = 0;
+          let hasCodeMatch = false;
+          for (const mt of mTokens) {
+            if (subTokens.has(mt)) score += 2;
+            // 한글 토큰이 영문 토큰의 의미와 매칭되는지 (model ↔ 모델 등 — 일반화 어려워서 약한 보너스)
+            // 단일 영문/숫자 토큰은 강한 식별자
+            if (/^[a-z0-9]+$/.test(mt) && subTokens.has(mt)) {
+              hasCodeMatch = true;
+              score += 1;
+            }
+          }
+          return { model: m, score, hasCodeMatch, len: m.length };
+        }).filter(x => x.score > 0);
+        // 정렬: 코드매치 우선 → 점수 높은 순 → 모델명 긴 순
+        scored.sort((a, b) =>
+          (b.hasCodeMatch - a.hasCodeMatch) ||
+          (b.score - a.score) ||
+          (b.len - a.len)
+        );
+        if (scored.length) inferredFromSub = scored[0].model;
       }
       if (inferredFromSub) {
         // 모델 자동 보정
