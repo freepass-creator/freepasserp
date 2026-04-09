@@ -3,7 +3,7 @@
  * - 구글시트 또는 CSV 업로드 → 검증 → 보완 → 업로드
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { saveProduct, fetchProductsOnce, saveCodeItem, watchCodeItems, watchVehicleMaster, watchPartners, watchTerms } from '../firebase/firebase-db.js';
+import { saveProduct, fetchProductsOnce, saveCodeItem, watchCodeItems, watchVehicleMaster, watchPartners, watchTerms, addVehicleMasterEntry } from '../firebase/firebase-db.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { CAR_MODELS, getMakers, getModels, getSubModels, getCategory } from '../data/car-models.js';
@@ -297,6 +297,7 @@ function suggestSubsByContext(input, maker, model, row) {
 
 // 공급사 코드 마스터
 let partnerCodes = []; // ['RP001', 'RP002', ...]
+let partnersFull = []; // [{partner_code, partner_name, account, ...}, ...]
 // 정책 코드 마스터
 let policyCodes = []; // ['T001', ...]
 
@@ -1198,8 +1199,16 @@ function validateRow(rawRow, idx) {
     }
   });
 
+  // 신규 차종 후보 마킹 — maker가 정확하고, model+sub가 모두 있는데 vehicle_master에 없을 때
+  let isNewVehicle = false;
+  if (row.maker && isExactMaker(row.maker) && row.model_name && row.sub_model) {
+    if (!isExactSub(row.maker, row.model_name, row.sub_model)) {
+      isNewVehicle = true;
+    }
+  }
+
   return {
-    idx, row, errors, warnings, suggestions,
+    idx, row, errors, warnings, suggestions, isNewVehicle,
     status: errors.length ? 'error' : (warnings.length ? 'warn' : 'ok'),
   };
 }
@@ -1322,12 +1331,52 @@ function renderPreview(keys, rows) {
   const errN = validatedRows.filter(v => v.status === 'error').length;
   $summary.textContent = `OK ${okN} · 경고 ${warnN} · 오류 ${errN}`;
   $resultSection.hidden = false;
+  // 신규 차종 후보 추출
+  const newVehicleSet = new Set();
+  validatedRows.forEach(v => {
+    if (v.isNewVehicle) {
+      const k = `${v.row.maker}|${v.row.model_name}|${v.row.sub_model}`;
+      newVehicleSet.add(k);
+    }
+  });
+  const newVehicles = [...newVehicleSet].map(k => {
+    const [maker, model_name, sub_model] = k.split('|');
+    return { maker, model_name, sub_model };
+  });
+  const newBanner = newVehicles.length
+    ? `<div class="up-result-row is-new">
+        신규 차종: ${newVehicles.length}건 발견
+        <button type="button" class="up-btn-inline" id="upRegisterNewVm">차종마스터에 일괄 등록</button>
+      </div>
+      <div class="up-newvm-list">${newVehicles.map(v =>
+        `<div class="up-newvm-item">[${escapeHtml(v.maker)}] ${escapeHtml(v.model_name)} / ${escapeHtml(v.sub_model)}</div>`
+      ).join('')}</div>`
+    : '';
   $result.innerHTML = `
     <div class="up-result-row is-ok">정상: ${okN}건</div>
     <div class="up-result-row is-warn">경고: ${warnN}건 (그대로 업로드 가능)</div>
     <div class="up-result-row is-error">오류: ${errN}건 (업로드 제외)</div>
+    ${newBanner}
   `;
   $confirmBtn.disabled = (okN + warnN) === 0;
+  // 신규 차종 일괄 등록 핸들러
+  document.getElementById('upRegisterNewVm')?.addEventListener('click', async () => {
+    if (!newVehicles.length) return;
+    if (!confirm(`신규 차종 ${newVehicles.length}건을 차종마스터에 등록하시겠습니까?`)) return;
+    let ok = 0, fail = 0;
+    for (const v of newVehicles) {
+      try {
+        await addVehicleMasterEntry({
+          maker: v.maker,
+          model_name: v.model_name,
+          sub_model: v.sub_model,
+        }, { updatedBy: 'upload-center', updatedByName: '업로드센터' });
+        ok++;
+      } catch (e) { console.error('vm add fail', e); fail++; }
+    }
+    showToast(`등록 완료: ${ok}건${fail ? ` · 실패 ${fail}건` : ''}`, ok ? 'success' : 'error');
+    // watchVehicleMaster가 자동으로 vmEntries 갱신 → validatedRows 재검증은 그 콜백에서 처리됨
+  });
 }
 
 function escapeHtml(s) {
@@ -1575,7 +1624,9 @@ $confirmBtn?.addEventListener('click', async () => {
 
     // 공급사 / 정책 마스터 구독
     watchPartners((items) => {
-      partnerCodes = (items || []).map(p => p?.partner_code || p?.code || '').filter(Boolean);
+      partnersFull = items || [];
+      partnerCodes = partnersFull.map(p => p?.partner_code || p?.code || '').filter(Boolean);
+      console.log('[upload-center] partners:', partnersFull.length, '건', partnersFull[0]);
     });
     watchTerms((items) => {
       policyCodes = (items || []).map(t => t?.term_code || t?.policy_code || '').filter(Boolean);

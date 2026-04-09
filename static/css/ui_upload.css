@@ -604,6 +604,11 @@
 .up-result-row.is-error { color:#ef4444; }
 .up-result-row.is-warn { color:#f59e0b; }
 .up-result-row.is-ok { color:#16a34a; }
+.up-result-row.is-new { color:#0284c7; font-weight:600; }
+.up-btn-inline { padding:4px 10px; background:#0284c7; color:#fff; border:none; border-radius:4px; font-size:11px; cursor:pointer; }
+.up-btn-inline:hover { background:#0369a1; }
+.up-newvm-list { margin-top:6px; padding:8px; background:#f0f9ff; border-radius:4px; max-height:120px; overflow-y:auto; }
+.up-newvm-item { font-size:11px; color:#075985; padding:2px 0; }
 .pls-table .up-row-error td { background:#fef2f2; }
 .pls-table .up-row-warn td { background:#fffbeb; }
 .pls-table .up-row-ok td { background:transparent; }
