@@ -179,6 +179,123 @@ export const CAR_MODELS = [
   { maker: '지프', model: '어벤저', sub: '어벤저', year_start: '23', year_end: '현재', code: '-', category: '소형 SUV' },
   { maker: '지프', model: '랭글러', sub: '랭글러 JL', year_start: '18', year_end: '현재', code: 'JL', category: '중형 SUV' },
   { maker: '지프', model: '체로키', sub: '체로키 KL', year_start: '14', year_end: '23', code: 'KL', category: '중형 SUV' },
+
+  // ─── 추가: 시트 데이터 매칭용 누락 차종 ─────────────────────
+  // 기아 K7 (단종 모델)
+  { maker: '기아', model: 'K7', sub: 'K7 VG', year_start: '09', year_end: '16', code: 'VG', category: '준대형 세단' },
+  { maker: '기아', model: 'K7', sub: '올 뉴 K7 YG', year_start: '16', year_end: '19', code: 'YG', category: '준대형 세단' },
+  { maker: '기아', model: 'K7', sub: 'K7 프리미어 YG (페리)', year_start: '19', year_end: '21', code: 'YG', category: '준대형 세단' },
+  // 현대 그랜저 IG (페리 추가)
+  { maker: '현대', model: '그랜저', sub: '그랜저 IG', year_start: '16', year_end: '19', code: 'IG', category: '준대형 세단' },
+  // 르노 아르카나 LJB
+  { maker: '르노', model: '아르카나', sub: '아르카나 LJB', year_start: '24', year_end: '현재', code: 'LJB', category: '소형 SUV' },
+  // 르노 SM6
+  { maker: '르노', model: 'SM6', sub: 'SM6 LFD', year_start: '16', year_end: '현재', code: 'LFD', category: '중형 세단' },
+  // 르노 콜레오스
+  { maker: '르노', model: '콜레오스', sub: '그랑 콜레오스 OV6', year_start: '24', year_end: '현재', code: 'OV6', category: '중형 SUV' },
+  // 기아 카니발 KA4 하이리무진/특장
+  { maker: '기아', model: '카니발', sub: '카니발 KA4 하이리무진', year_start: '20', year_end: '23', code: 'KA4', category: '대형 MPV' },
+  { maker: '기아', model: '카니발', sub: '더 뉴 카니발 KA4 하이리무진 (페리)', year_start: '23', year_end: '현재', code: 'KA4', category: '대형 MPV' },
+  // 기아 EV6
+  { maker: '기아', model: 'EV6', sub: 'EV6 CV', year_start: '21', year_end: '현재', code: 'CV', category: '준중형 EV' },
+  // 현대 캐스퍼
+  { maker: '현대', model: '캐스퍼', sub: '캐스퍼 AX1', year_start: '21', year_end: '현재', code: 'AX1', category: '경 SUV' },
+  // 현대 코나
+  { maker: '현대', model: '코나', sub: '코나 OS', year_start: '17', year_end: '23', code: 'OS', category: '소형 SUV' },
+  { maker: '현대', model: '코나', sub: '코나 SX2', year_start: '23', year_end: '현재', code: 'SX2', category: '소형 SUV' },
+  // 현대 스타리아
+  { maker: '현대', model: '스타리아', sub: '스타리아 US4', year_start: '21', year_end: '현재', code: 'US4', category: '대형 MPV' },
+  { maker: '현대', model: '스타리아', sub: '스타리아 투어러 US4', year_start: '21', year_end: '현재', code: 'US4', category: '대형 MPV' },
+  { maker: '현대', model: '스타리아', sub: '스타리아 라운지 US4', year_start: '21', year_end: '현재', code: 'US4', category: '대형 MPV' },
+  // 현대 싼타페 MX5
+  { maker: '현대', model: '싼타페', sub: '싼타페 MX5', year_start: '23', year_end: '현재', code: 'MX5', category: '중형 SUV' },
+  { maker: '현대', model: '싼타페', sub: '싼타페 TM', year_start: '18', year_end: '20', code: 'TM', category: '중형 SUV' },
+  // 현대 투싼
+  { maker: '현대', model: '투싼', sub: '투싼 NX4', year_start: '20', year_end: '24', code: 'NX4', category: '준중형 SUV' },
+  { maker: '현대', model: '투싼', sub: '더 뉴 투싼 NX4 (페리)', year_start: '24', year_end: '현재', code: 'NX4', category: '준중형 SUV' },
+  // 현대 아반떼 PE / N라인
+  { maker: '현대', model: '아반떼', sub: '아반떼 CN7 (페리)', year_start: '23', year_end: '현재', code: 'CN7', category: '준중형 세단' },
+  { maker: '현대', model: '아반떼', sub: '아반떼 N CN7', year_start: '21', year_end: '현재', code: 'CN7', category: '준중형 세단' },
+  // 제네시스 G90
+  { maker: '제네시스', model: 'G90', sub: 'G90 RS4', year_start: '22', year_end: '현재', code: 'RS4', category: '대형 세단' },
+  // 제네시스 G70
+  { maker: '제네시스', model: 'G70', sub: 'G70 IK', year_start: '17', year_end: '현재', code: 'IK', category: '준중형 세단' },
+  // 르노 필랑트
+  { maker: '르노', model: '필랑트', sub: '필랑트 E-Tech', year_start: '24', year_end: '현재', code: '-', category: '소형 SUV' },
+  // 쉐보레 스파크
+  { maker: '쉐보레', model: '스파크', sub: '스파크 M400', year_start: '15', year_end: '22', code: 'M400', category: '경차' },
+  { maker: '쉐보레', model: '스파크', sub: '더 뉴 스파크 M400 (페리)', year_start: '18', year_end: '22', code: 'M400', category: '경차' },
+  // 쉐보레 트랙스
+  { maker: '쉐보레', model: '트랙스', sub: '트랙스 크로스오버 CUV', year_start: '23', year_end: '현재', code: 'CUV', category: '소형 SUV' },
+  // KGM 액티언
+  { maker: 'KGM', model: '액티언', sub: '액티언', year_start: '24', year_end: '현재', code: '-', category: '중형 SUV' },
+  // BMW 시리즈 추가
+  { maker: 'BMW', model: '4시리즈', sub: '4시리즈 F32', year_start: '13', year_end: '20', code: 'F32', category: '준중형 쿠페' },
+  { maker: 'BMW', model: '4시리즈', sub: '4시리즈 G22', year_start: '20', year_end: '현재', code: 'G22', category: '준중형 쿠페' },
+  { maker: 'BMW', model: '5시리즈', sub: '5시리즈 G30', year_start: '17', year_end: '23', code: 'G30', category: '중형 세단' },
+  { maker: 'BMW', model: '5시리즈', sub: '5시리즈 G60', year_start: '23', year_end: '현재', code: 'G60', category: '중형 세단' },
+  { maker: 'BMW', model: '7시리즈', sub: '7시리즈 G70', year_start: '22', year_end: '현재', code: 'G70', category: '대형 세단' },
+  { maker: 'BMW', model: 'X1', sub: 'X1 F48', year_start: '15', year_end: '22', code: 'F48', category: '소형 SUV' },
+  { maker: 'BMW', model: 'X1', sub: 'X1 U11', year_start: '22', year_end: '현재', code: 'U11', category: '소형 SUV' },
+  { maker: 'BMW', model: 'X3', sub: 'X3 G01', year_start: '17', year_end: '24', code: 'G01', category: '중형 SUV' },
+  { maker: 'BMW', model: 'X4', sub: 'X4 G02', year_start: '18', year_end: '현재', code: 'G02', category: '중형 SUV' },
+  { maker: 'BMW', model: 'X5', sub: 'X5 G05', year_start: '18', year_end: '현재', code: 'G05', category: '대형 SUV' },
+  { maker: 'BMW', model: 'X6', sub: 'X6 G06', year_start: '19', year_end: '현재', code: 'G06', category: '대형 SUV' },
+  { maker: 'BMW', model: 'X7', sub: 'X7 G07', year_start: '19', year_end: '현재', code: 'G07', category: '대형 SUV' },
+  { maker: 'BMW', model: 'Z4', sub: 'Z4 G29', year_start: '18', year_end: '현재', code: 'G29', category: '소형 컨버터블' },
+  { maker: 'BMW', model: 'M4', sub: 'M4 G82', year_start: '20', year_end: '현재', code: 'G82', category: '준중형 쿠페' },
+  // 벤츠 시리즈 추가 (E시리즈 등 별칭 지원)
+  { maker: '벤츠', model: 'E-클래스', sub: 'E-클래스 W214', year_start: '24', year_end: '현재', code: 'W214', category: '중형 세단' },
+  { maker: '벤츠', model: 'GLC', sub: 'GLC 쿠페 X254', year_start: '23', year_end: '현재', code: 'X254', category: '중형 SUV' },
+  { maker: '벤츠', model: 'GLE', sub: 'GLE 쿠페 C167', year_start: '19', year_end: '현재', code: 'C167', category: '준대형 SUV' },
+  { maker: '벤츠', model: 'GLS', sub: 'GLS X167', year_start: '19', year_end: '현재', code: 'X167', category: '대형 SUV' },
+  { maker: '벤츠', model: 'S-클래스', sub: 'S-클래스 W222', year_start: '13', year_end: '20', code: 'W222', category: '대형 세단' },
+  { maker: '벤츠', model: 'S-클래스', sub: 'S-클래스 W223', year_start: '20', year_end: '현재', code: 'W223', category: '대형 세단' },
+  { maker: '벤츠', model: 'A-클래스', sub: 'A-클래스 W177', year_start: '18', year_end: '현재', code: 'W177', category: '준중형 해치백' },
+  { maker: '벤츠', model: 'CLE', sub: 'CLE 카브리올레 A236', year_start: '24', year_end: '현재', code: 'A236', category: '준중형 컨버터블' },
+  { maker: '벤츠', model: 'EQS', sub: 'EQS V297', year_start: '21', year_end: '현재', code: 'V297', category: '대형 EV 세단' },
+  { maker: '벤츠', model: 'AMG GT', sub: 'AMG GT', year_start: '15', year_end: '현재', code: '-', category: '준중형 쿠페' },
+  { maker: '벤츠', model: 'G-클래스', sub: 'G-클래스 W463', year_start: '18', year_end: '현재', code: 'W463', category: '중형 SUV' },
+  // 아우디 시리즈 추가
+  { maker: '아우디', model: 'A3', sub: 'A3 8Y', year_start: '20', year_end: '현재', code: '8Y', category: '준중형 세단' },
+  { maker: '아우디', model: 'A4', sub: 'A4 B9', year_start: '15', year_end: '24', code: 'B9', category: '준중형 세단' },
+  { maker: '아우디', model: 'A5', sub: 'A5 F5', year_start: '16', year_end: '24', code: 'F5', category: '준중형 쿠페' },
+  { maker: '아우디', model: 'A6', sub: 'A6 C8', year_start: '18', year_end: '현재', code: 'C8', category: '중형 세단' },
+  { maker: '아우디', model: 'A7', sub: 'A7 C8', year_start: '18', year_end: '현재', code: 'C8', category: '중형 세단' },
+  { maker: '아우디', model: 'A8', sub: 'A8 D5', year_start: '17', year_end: '현재', code: 'D5', category: '대형 세단' },
+  { maker: '아우디', model: 'Q3', sub: 'Q3 F3', year_start: '18', year_end: '현재', code: 'F3', category: '소형 SUV' },
+  { maker: '아우디', model: 'Q5', sub: 'Q5 FY', year_start: '17', year_end: '현재', code: 'FY', category: '중형 SUV' },
+  { maker: '아우디', model: 'Q7', sub: 'Q7 4M', year_start: '15', year_end: '현재', code: '4M', category: '대형 SUV' },
+  { maker: '아우디', model: 'Q8', sub: 'Q8 4M', year_start: '18', year_end: '현재', code: '4M', category: '대형 SUV' },
+  // 포르쉐 추가
+  { maker: '포르쉐', model: '박스터', sub: '박스터 982', year_start: '16', year_end: '현재', code: '982', category: '소형 컨버터블' },
+  { maker: '포르쉐', model: '카이엔', sub: '카이엔 PO536', year_start: '17', year_end: '현재', code: 'PO536', category: '대형 SUV' },
+  { maker: '포르쉐', model: '카이엔 쿠페', sub: '카이엔 쿠페 PO536', year_start: '19', year_end: '현재', code: 'PO536', category: '대형 SUV' },
+  { maker: '포르쉐', model: '타이칸', sub: '타이칸 J1', year_start: '20', year_end: '현재', code: 'J1', category: '중형 EV 세단' },
+  // 폭스바겐 아테온
+  { maker: '폭스바겐', model: '아테온', sub: '아테온', year_start: '17', year_end: '현재', code: '-', category: '중형 세단' },
+  // 도요타 알파드
+  { maker: '토요타', model: '알파드', sub: '알파드', year_start: '15', year_end: '현재', code: '-', category: '대형 MPV' },
+  // 렉서스 LM
+  { maker: '렉서스', model: 'LM', sub: 'LM500h', year_start: '23', year_end: '현재', code: '-', category: '대형 MPV' },
+  // 마세라티 기블리
+  { maker: '마세라티', model: '기블리', sub: '기블리', year_start: '13', year_end: '현재', code: '-', category: '중형 세단' },
+  // 페라리 SF90
+  { maker: '페라리', model: 'SF90', sub: 'SF90 스파이더', year_start: '19', year_end: '현재', code: '-', category: '슈퍼카' },
+  // 람보르기니
+  { maker: '람보르기니', model: '우르스', sub: '우르스', year_start: '18', year_end: '현재', code: '-', category: '대형 SUV' },
+  { maker: '람보르기니', model: '가야르도', sub: '가야르도 LP550-2', year_start: '03', year_end: '13', code: '-', category: '슈퍼카' },
+  // 벤틀리
+  { maker: '벤틀리', model: '컨티넨탈 GT', sub: '컨티넨탈 GT', year_start: '03', year_end: '현재', code: '-', category: '대형 쿠페' },
+  // 캐딜락
+  { maker: '캐딜락', model: '에스컬레이드', sub: '에스컬레이드', year_start: '06', year_end: '현재', code: '-', category: '대형 SUV' },
+  // 롤스로이스
+  { maker: '롤스로이스', model: '컬리넌', sub: '컬리넌', year_start: '18', year_end: '현재', code: '-', category: '대형 SUV' },
+  // 포드 머스탱
+  { maker: '포드', model: '머스탱', sub: '머스탱 GT', year_start: '15', year_end: '현재', code: '-', category: '대형 쿠페' },
+  // GM대우 (구형) → 쉐보레로 통합
+  // 기아 팰리세이드 — 현대 모델인데 데이터에 잘못 들어옴 → MAKER_FIX에서 처리
+  // 기아 K5 / 카니발 / 모하비 / 모닝 / 레이 / 셀토스 / 쏘렌토 / 스포티지 등 trim 정보 포함된 sub는 SUB_FIX에서 처리
 ];
 
 // 인기 제조사 순위
