@@ -18,9 +18,12 @@ const MAKER_ALIAS = {
   'kgm': 'KGM', 'ssangyong': 'KGM', '쌍용': 'KGM', '쌍용자동차': 'KGM',
   'gm': '쉐보레', 'gmkorea': '쉐보레', 'chevrolet': '쉐보레', 'gm대우': '쉐보레',
   'renault': '르노', '르노삼성': '르노', '르노코리아': '르노', 'rsm': '르노',
+  '르노(삼성)': '르노', '르노 삼성': '르노',
   'bmw': 'BMW', '비엠더블유': 'BMW',
-  'benz': '메르세데스-벤츠', 'mercedes': '메르세데스-벤츠', '벤츠': '메르세데스-벤츠',
-  'mercedesbenz': '메르세데스-벤츠', 'mercedes-benz': '메르세데스-벤츠',
+  // CAR_MODELS는 '벤츠'로 정의됨 — 모든 별칭이 '벤츠'로 통일
+  'benz': '벤츠', 'mercedes': '벤츠', '메르세데스': '벤츠',
+  '메르세데스-벤츠': '벤츠', '메르세데스벤츠': '벤츠',
+  'mercedesbenz': '벤츠', 'mercedes-benz': '벤츠', 'mercedes benz': '벤츠',
   'audi': '아우디', 'volkswagen': '폭스바겐', 'vw': '폭스바겐',
   'porsche': '포르쉐', 'mini': '미니', 'tesla': '테슬라', 'volvo': '볼보',
   'lexus': '렉서스', 'toyota': '토요타', 'honda': '혼다',
@@ -390,6 +393,43 @@ function getDropdownSubs()   { return getCodeNames('PRODUCT_SUB_MODEL'); }
 function isExactMaker(v)              { return getVmMakers().includes(v); }
 function isExactModel(maker, v)       { return getVmModels(maker).includes(v); }
 function isExactSub(maker, model, v)  { return getVmSubs(maker, model).includes(v); }
+
+// 강한 정규화 — 한/영 대소문자, 공백, 하이픈, 특수문자, 제조사 접두 모두 제거
+function strongNorm(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[\s\-_·•‧／/]+/g, '') // 공백/하이픈/구분자
+    .replace(/[()[\]{}]/g, '');     // 괄호
+}
+// maker 접두 제거: "BMW 3시리즈" → "3시리즈", "벤츠 E클래스" → "E클래스"
+function stripMakerPrefix(makerLow, modelStr) {
+  const m = String(modelStr || '').trim();
+  if (!makerLow) return m;
+  const pat = new RegExp('^' + makerLow + '[\\s\\-]*', 'i');
+  return m.replace(pat, '').trim();
+}
+// maker 안에서 model 강한 매칭 (정규화 비교 + 접두 제거)
+function findModelLoose(maker, modelStr) {
+  if (!maker || !modelStr) return null;
+  const all = getVmModels(maker);
+  if (!all.length) return null;
+  // 1차: 정확 일치
+  if (all.includes(modelStr)) return modelStr;
+  // 2차: 강한 정규화 일치
+  const target = strongNorm(modelStr);
+  for (const m of all) if (strongNorm(m) === target) return m;
+  // 3차: maker 접두 제거 후 일치
+  const stripped = strongNorm(stripMakerPrefix(maker.toLowerCase(), modelStr));
+  if (stripped) {
+    for (const m of all) if (strongNorm(m) === stripped) return m;
+    // 4차: 부분 포함 (sub가 model을 감싸는 경우)
+    const candidates = all
+      .filter(m => strongNorm(m).includes(stripped) || stripped.includes(strongNorm(m)))
+      .sort((a, b) => b.length - a.length);
+    if (candidates.length) return candidates[0];
+  }
+  return null;
+}
 function mergedMakers()               { return getVmMakers(); }
 function mergedModels(maker)          { return getVmModels(maker); }
 function mergedSubs(maker, model)     { return getVmSubs(maker, model); }
@@ -758,10 +798,20 @@ function validateRow(rawRow, idx) {
     return suggestBest(input || '', allCandidates, max);
   }
 
-  // 1) 제조사 — alias 즉시 변환, 매칭 안 되면 무조건 추천
+  // 1) 제조사 — alias + 강한 정규화 + 괄호 제거
   if (row.maker) {
-    const lower = normLow(row.maker);
+    const raw = String(row.maker).trim();
+    // 괄호 제거 (예: "르노(삼성)" → "르노")
+    const noBrackets = raw.replace(/\s*\([^)]*\)\s*/g, '').trim();
+    const lower = noBrackets.toLowerCase().replace(/\s+/g, '');
     if (MAKER_ALIAS[lower]) row.maker = MAKER_ALIAS[lower];
+    else if (MAKER_ALIAS[noBrackets.toLowerCase()]) row.maker = MAKER_ALIAS[noBrackets.toLowerCase()];
+    else {
+      // 강한 정규화 후 maker 목록과 비교
+      const target = strongNorm(noBrackets);
+      const found = mergedMakers().find(m => strongNorm(m) === target);
+      if (found) row.maker = found;
+    }
     if (!isExactMaker(row.maker)) {
       const cands = suggestOrAll(row.maker, mergedMakers());
       if (cands.length) {
@@ -770,9 +820,15 @@ function validateRow(rawRow, idx) {
       }
     }
   }
-  // 2) 모델 — maker 매칭 여부와 무관하게 추천 (maker가 정확하면 그 범위, 아니면 전체)
+  // 2) 모델 — findModelLoose로 자동 보정 우선
   if (row.model_name) {
     const makerOk = row.maker && isExactMaker(row.maker);
+    if (makerOk) {
+      const looseMatch = findModelLoose(row.maker, row.model_name);
+      if (looseMatch && looseMatch !== row.model_name) {
+        row.model_name = looseMatch;
+      }
+    }
     const pool = makerOk
       ? mergedModels(row.maker)
       : [...new Set(vmEntries.map(e => e.model_name))].filter(Boolean);
@@ -786,23 +842,23 @@ function validateRow(rawRow, idx) {
           return t.split(/\s+/).filter(Boolean);
         };
         const subTokens = new Set(tokenize(row.sub_model));
+        const subNorm = strongNorm(row.sub_model);
         // pool의 각 모델에 대해 → 모델명 토큰이 sub 토큰에 모두 포함되는지 검사
-        // ex) "모델 Y" → ["모델", "y"] → sub "Model Y Premium RWD" → ["model", "y", "premium", "rwd"]
-        //     'y'는 매칭되지만 '모델' ↔ 'model'은 별도 매핑 필요
-        // → 한 글자 이상 코드 토큰(y, x, 3, m6 등)이 매칭되면 1점
         const scored = pool.map(m => {
           const mTokens = tokenize(m);
           let score = 0;
           let hasCodeMatch = false;
           for (const mt of mTokens) {
             if (subTokens.has(mt)) score += 2;
-            // 한글 토큰이 영문 토큰의 의미와 매칭되는지 (model ↔ 모델 등 — 일반화 어려워서 약한 보너스)
-            // 단일 영문/숫자 토큰은 강한 식별자
             if (/^[a-z0-9]+$/.test(mt) && subTokens.has(mt)) {
               hasCodeMatch = true;
               score += 1;
             }
           }
+          // 강한 정규화 부분 포함 — 한/영/공백 다 무시
+          // ex) model='3시리즈' 정규화 '3시리즈' / sub='BMW 320i' 정규화 'bmw320i'
+          //     → 직접 매칭은 어렵지만 model='K5' '3시리즈' '카니발' 등은 sub에 그대로 들어있음
+          if (subNorm.includes(strongNorm(m))) score += 4;
           return { model: m, score, hasCodeMatch, len: m.length };
         }).filter(x => x.score > 0);
         // 정렬: 코드매치 우선 → 점수 높은 순 → 모델명 긴 순
