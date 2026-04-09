@@ -762,13 +762,14 @@ function validateRow(rawRow, idx) {
     const makerOk = row.maker && isExactMaker(row.maker);
     const modelOk = makerOk && row.model_name && isExactModel(row.maker, row.model_name);
     const alreadyExact = modelOk && isExactSub(row.maker, row.model_name, row.sub_model);
-    // ⚡ 신차렌트는 가장 최신 모델 — 무조건 그 모델의 최신 sub로 자동 결정 (고민 X)
+    // ⚡ 신차렌트는 그 모델의 최신 sub를 1순위로 추천 (사용자가 보고 확정)
     const isNewCar = String(row.product_type || '').includes('신차');
-    if (isNewCar && modelOk) {
+    if (isNewCar && modelOk && !alreadyExact) {
       const subs = getVmSubs(row.maker, row.model_name);
       const newest = sortByRecentSub(subs)[0];
-      if (newest && newest !== row.sub_model) {
-        row.sub_model = newest; // 행 자체를 덮어씀
+      if (newest) {
+        suggestions.push({ col: 'sub_model', candidates: [{ value: newest, score: 0 }] });
+        if (!row.sub_model) warnings.push('신차렌트 — 최신 모델 추천');
       }
     } else if (!alreadyExact && (row.sub_model || row.model_name)) {
       // 후보 풀 — 가능한 가장 좁은 범위로
