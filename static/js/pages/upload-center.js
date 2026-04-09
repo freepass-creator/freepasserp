@@ -156,9 +156,10 @@ function extractYearFromText(s) {
   return null;
 }
 
-// 행 전체에서 추론 컨텍스트 추출 (연식·연료·트림·등록일자 등)
+// 행 전체에서 추론 컨텍스트 추출 (연식·연료·트림·등록일자·cc·가격·옵션 등)
 function buildRowContext(row, input) {
-  // 연식 — year 우선, 없으면 first_registration_date, 그 다음 trim_name, 마지막으로 input
+  // 연식 — year 우선, 없으면 first_registration_date, 그 다음 trim_name, input 순
+  // (한국 번호판 앞 숫자는 차종분류번호이지 연도가 아님)
   let yy = null;
   const yearRaw = String(row.year || '').replace(/[^\d]/g, '');
   if (yearRaw.length >= 4) yy = Number(yearRaw.slice(2, 4));
@@ -172,6 +173,17 @@ function buildRowContext(row, input) {
   if (yy == null) yy = extractYearFromText(row.trim_name);
   // 입력 sub_model에서도 추출 시도
   if (yy == null) yy = extractYearFromText(input);
+
+  // 주행거리 → 신차 가능성 신호 (5천km 이하 = 사실상 신차 → 최신 모델 우선)
+  const mileage = Number(String(row.mileage || '').replace(/[^\d]/g, '')) || 0;
+  const looksLikeNew = mileage > 0 && mileage < 5000;
+
+  // 엔진 cc — sub_model의 배기량 토큰과 매칭용
+  const engineCc = Number(String(row.engine_cc || '').replace(/[^\d]/g, '')) || 0;
+
+  // 차량가격 — 같은 모델 후보들 가격 범위에서 트림 위치 추정
+  const vehiclePrice = Number(String(row.vehicle_price || '').replace(/[^\d]/g, '')) || 0;
+
   // 연료 — fuel_type + trim + 입력 + sub_model 텍스트 종합
   const trim = String(row.trim_name || '');
   const fuel = String(row.fuel_type || '').toLowerCase();
@@ -180,9 +192,21 @@ function buildRowContext(row, input) {
   const isHybrid = /하이브리드|hybrid|hev/.test(blob);
   const isDiesel = /디젤|diesel/.test(blob);
   const isGasoline = /가솔린|gasoline|휘발/.test(blob);
+
+  // 옵션 텍스트 → 트림 추정 키워드 (특정 트림 표식)
+  const optionsText = String(row.options || row.option_summary || '').toLowerCase();
+  const trimSignals = []; // sub에 이 키워드 있으면 가산
+  if (/드라이브.*와이즈|adas|hda/.test(optionsText)) trimSignals.push('노블레스', '시그니처', '프레스티지');
+  if (/12\.?3.*클러스터|디지털.*키|nappa|나파/.test(optionsText)) trimSignals.push('시그니처', '익스클루시브', '럭셔리');
+  if (/통풍시트|레인보우|hud|헤드업/.test(optionsText)) trimSignals.push('프레스티지', '시그니처');
+  if (/파노라마|파노/.test(optionsText)) trimSignals.push('프리미엄', '익스클루시브');
+
   const trimLow = normLow(`${trim} ${input || ''}`);
   const trimTokens = (trimLow.match(/[a-z0-9가-힣]+/g) || []).filter(t => t.length >= 2);
-  return { yy, fuel, isEV, isHybrid, isDiesel, isGasoline, trimLow, trimTokens };
+  return {
+    yy, fuel, isEV, isHybrid, isDiesel, isGasoline,
+    trimLow, trimTokens, looksLikeNew, engineCc, vehiclePrice, trimSignals,
+  };
 }
 
 // 연식·연료·트림 컨텍스트로 sub_model 후보 점수
@@ -766,7 +790,7 @@ function validateRow(rawRow, idx) {
       const subInput = row.sub_model || row.trim_name || '';
       const inLow = normLow(subInput);
       const ctx = buildRowContext(row, subInput);
-      const { yy, fuel, isEV, isHybrid, isDiesel, isGasoline, trimTokens } = ctx;
+      const { yy, fuel, isEV, isHybrid, isDiesel, isGasoline, trimTokens, looksLikeNew, engineCc, trimSignals } = ctx;
       const inCodeTokens = [
         ...new Set([
           ...alnumCodeTokens(row.sub_model || ''),
@@ -810,6 +834,28 @@ function validateRow(rawRow, idx) {
         if (trimTokens.length) {
           const overlap = trimTokens.filter(t => subLow.includes(t)).length;
           if (overlap) score -= Math.min(0.3, overlap * 0.1);
+        }
+        // 주행거리 5천km 이하 → 신차에 가까움 → 최신 연식 가산
+        if (looksLikeNew) {
+          const m = sub.match(/(\d{2})~?$/);
+          if (m) {
+            const ys = Number(m[1]);
+            const curYy = new Date().getFullYear() % 100;
+            if (ys >= curYy - 1) score -= 0.2; // 작년~올해 모델만 가산
+          }
+        }
+        // 엔진 cc 매칭 — sub_model에 1.6/2.0 등 배기량 토큰 있으면
+        if (engineCc) {
+          const ccM = sub.match(/(\d\.\d|\d{4})/);
+          if (ccM) {
+            const subCc = ccM[1].includes('.') ? Math.round(parseFloat(ccM[1]) * 1000) : Number(ccM[1]);
+            if (subCc && Math.abs(subCc - engineCc) <= 100) score -= 0.2;
+          }
+        }
+        // 옵션 키워드 → 트림 신호 매칭
+        if (trimSignals && trimSignals.length) {
+          const sigHit = trimSignals.some(sig => subLow.includes(normLow(sig)));
+          if (sigHit) score -= 0.2;
         }
         return { value: sub, score };
       });
