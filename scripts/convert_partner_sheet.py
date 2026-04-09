@@ -690,8 +690,20 @@ for gid, tab, partner in target:
                 maker, model_norm = SUB_TO_MM[sub_norm]
             trim_clean = clean_trim(get('trim_name')[0], maker, model_norm, sub_norm)
 
-            short_dep = parse_money(get('_short_dep')[0])
-            long_dep = parse_money(get('_long_dep')[0])
+            # 단기/장기 보증금 — '20/50'(자기부담금) 같은 형식은 무시
+            raw_short = get('_short_dep')[0]
+            raw_long = get('_long_dep')[0]
+            # 슬래시 포함되거나 값이 100,000 미만이면 보증금 아님 (자기부담금 등)
+            short_dep = ''
+            if raw_short and '/' not in raw_short:
+                v = parse_money(raw_short)
+                if v and int(v) >= 100000:
+                    short_dep = v
+            long_dep = ''
+            if raw_long and '/' not in raw_long:
+                v = parse_money(raw_long)
+                if v and int(v) >= 100000:
+                    long_dep = v
 
             row = {
                 'partner_code': partner,
