@@ -762,29 +762,9 @@ function validateRow(rawRow, idx) {
     const makerOk = row.maker && isExactMaker(row.maker);
     const modelOk = makerOk && row.model_name && isExactModel(row.maker, row.model_name);
     const alreadyExact = modelOk && isExactSub(row.maker, row.model_name, row.sub_model);
-    // ⚡ 최초등록일이 있으면 그 연도와 정확히 일치하는 sub를 1순위로 강력 추천
-    const regRaw = String(row.first_registration_date || '').replace(/[^\d]/g, '');
-    let regYy = null;
-    if (regRaw.length === 8) regYy = Number(regRaw.slice(2, 4));      // YYYYMMDD
-    else if (regRaw.length === 6) regYy = Number(regRaw.slice(0, 2)); // YYMMDD
-    if (regYy != null && modelOk && !alreadyExact) {
-      const subs = getVmSubs(row.maker, row.model_name);
-      // 후보 중 끝의 'XX~' 연도가 regYy 이하 + 가장 가까운 것 선택
-      const matched = subs
-        .map(s => {
-          const m = s.match(/(\d{2})~?$/);
-          return m ? { sub: s, yy: Number(m[1]) } : null;
-        })
-        .filter(x => x && x.yy <= regYy)
-        .sort((a, b) => b.yy - a.yy)[0];
-      if (matched) {
-        suggestions.push({ col: 'sub_model', candidates: [{ value: matched.sub, score: 0 }] });
-        if (!row.sub_model) warnings.push(`최초등록 ${regYy}년식 → 매칭`);
-      }
-    }
-    // ⚡ 신차렌트면서 등록일 매칭 못 했을 때 — 그 모델의 최신 sub 1순위 추천
+    // ⚡ 신차렌트는 그 모델의 최신 sub를 1순위로 추천 (사용자 확정)
     const isNewCar = String(row.product_type || '').includes('신차');
-    if (isNewCar && modelOk && !alreadyExact && regYy == null) {
+    if (isNewCar && modelOk && !alreadyExact) {
       const subs = getVmSubs(row.maker, row.model_name);
       const newest = sortByRecentSub(subs)[0];
       if (newest) {
@@ -811,6 +791,11 @@ function validateRow(rawRow, idx) {
       const inLow = normLow(subInput);
       const ctx = buildRowContext(row, subInput);
       const { yy, fuel, isEV, isHybrid, isDiesel, isGasoline, trimTokens, looksLikeNew, engineCc, trimSignals } = ctx;
+      // 최초등록일 — 매칭에 약한 보정 (등록 후 신차로 출고할 수 있어 강제 X)
+      const regRaw = String(row.first_registration_date || '').replace(/[^\d]/g, '');
+      let regYy = null;
+      if (regRaw.length === 8) regYy = Number(regRaw.slice(2, 4));
+      else if (regRaw.length === 6) regYy = Number(regRaw.slice(0, 2));
       const inCodeTokens = [
         ...new Set([
           ...alnumCodeTokens(row.sub_model || ''),
@@ -876,6 +861,16 @@ function validateRow(rawRow, idx) {
         if (trimSignals && trimSignals.length) {
           const sigHit = trimSignals.some(sig => subLow.includes(normLow(sig)));
           if (sigHit) score -= 0.2;
+        }
+        // 최초등록일 보정 — 등록 연도 이하 모델에 약한 가산 (등록 후 신차 가능성 고려)
+        if (regYy != null) {
+          const m2 = sub.match(/(\d{2})~?$/);
+          if (m2) {
+            const ys = Number(m2[1]);
+            if (ys === regYy) score -= 0.15;        // 정확 일치
+            else if (ys === regYy - 1) score -= 0.1; // 한 해 전
+            else if (ys > regYy + 1) score += 0.1;   // 등록보다 많이 미래는 약한 페널티
+          }
         }
         return { value: sub, score };
       });
