@@ -35,13 +35,29 @@
 
 .product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 0; }
 .product-list-page-shell .panel-body--detail { padding: 0 !important; }
-/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 여백 최소화만 (라운드는 .m-pd가 자체 변수로 처리) */
+/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 좌우/상하 여백 최소화 */
 .product-list-page-shell .panel-body--detail .m-pd {
   padding: 0;
   background: var(--new-bg-panel, #fff);
+  /* 데스크탑은 폭이 좁으니 모바일보다 더 컴팩트하게 */
+  --m-space-3: 0.5rem;   /* 12 → 8 */
+  --m-space-4: 0.625rem; /* 16 → 10 */
+  --m-space-5: 0.75rem;  /* 20 → 12 */
+  --m-space-6: 0.875rem; /* 24 → 14 */
 }
-.product-list-page-shell .panel-body--detail .m-pd-group { margin: 0; box-shadow: none; }
+.product-list-page-shell .panel-body--detail .m-pd-group { margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
 .product-list-page-shell .panel-body--detail .m-pd-group + .m-pd-group { border-top: 1px solid rgba(0, 0, 0, 0.06); }
+.product-list-page-shell .panel-body--detail .m-pd-group__head { padding: 6px 10px 0; margin-bottom: 4px; }
+.product-list-page-shell .panel-body--detail .m-pd-group__body { border: none; border-radius: 0; padding: 0 10px 6px; }
+/* 차량정보 행 — 좌우 패딩 줄이고 상하 컴팩트 */
+.product-list-page-shell .panel-body--detail .m-pd-vinfo__row { padding: 4px 0; }
+/* kv 리스트 행 컴팩트 */
+.product-list-page-shell .panel-body--detail .m-pd-kv__row { padding: 3px 0; }
+/* 갤러리 — 패널 폭 가득 + 컴팩트 */
+.product-list-page-shell .panel-body--detail .m-pd-gallery { aspect-ratio: 16/9; border-radius: 0; }
+/* 가격/보험 표 — 좌우 마진 제거 */
+.product-list-page-shell .panel-body--detail .m-pd-price-table,
+.product-list-page-shell .panel-body--detail .m-pd-tbl { margin: 0; }
 .product-list-page-shell .plist-detail__summary-top { display: flex; flex-direction: column; gap: var(--space-1); }
 .product-list-page-shell .plist-detail__summary-line { min-width: 0; font-size: var(--font-size-base); line-height: 1.5; color: var(--text-main); word-break: break-word; }
 .product-list-page-shell .plist-detail__summary-line--top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
