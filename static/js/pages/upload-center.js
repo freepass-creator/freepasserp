@@ -1331,72 +1331,12 @@ function renderPreview(keys, rows) {
   const errN = validatedRows.filter(v => v.status === 'error').length;
   $summary.textContent = `OK ${okN} · 경고 ${warnN} · 오류 ${errN}`;
   $resultSection.hidden = false;
-  // 신규 차종 후보 추출
-  const newVehicleSet = new Set();
-  validatedRows.forEach(v => {
-    if (v.isNewVehicle) {
-      const k = `${v.row.maker}|${v.row.model_name}|${v.row.sub_model}`;
-      newVehicleSet.add(k);
-    }
-  });
-  const newVehicles = [...newVehicleSet].map(k => {
-    const [maker, model_name, sub_model] = k.split('|');
-    return { maker, model_name, sub_model };
-  });
-  const newBanner = newVehicles.length
-    ? `<div class="up-result-row is-new">
-        신규 차종: ${newVehicles.length}건 발견
-        <button type="button" class="up-btn-inline" id="upRegisterNewVm">차종마스터에 일괄 등록</button>
-      </div>
-      <div class="up-newvm-list">${newVehicles.map(v =>
-        `<div class="up-newvm-item">[${escapeHtml(v.maker)}] ${escapeHtml(v.model_name)} / ${escapeHtml(v.sub_model)}</div>`
-      ).join('')}</div>`
-    : '';
   $result.innerHTML = `
     <div class="up-result-row is-ok">정상: ${okN}건</div>
     <div class="up-result-row is-warn">경고: ${warnN}건 (그대로 업로드 가능)</div>
     <div class="up-result-row is-error">오류: ${errN}건 (업로드 제외)</div>
-    ${newBanner}
   `;
   $confirmBtn.disabled = (okN + warnN) === 0;
-  // 신규 차종 일괄 등록 핸들러 — 강한 경고 + 확인 입력 + 연도 누락 차단
-  document.getElementById('upRegisterNewVm')?.addEventListener('click', async () => {
-    if (!newVehicles.length) return;
-    // 1차 확인: sub_model 끝에 연도(XX~) 있는 것만 통과
-    const valid = newVehicles.filter(v => /\d{2}~?\s*$/.test(String(v.sub_model || '').trim()));
-    const invalid = newVehicles.filter(v => !/\d{2}~?\s*$/.test(String(v.sub_model || '').trim()));
-    if (invalid.length) {
-      const msg = `세부모델 끝에 연도(예: SP2 22~)가 없는 항목 ${invalid.length}건은 등록 차단됩니다.\n\n` +
-        `예시:\n` + invalid.slice(0, 5).map(v => `· ${v.maker} | ${v.model_name} | ${v.sub_model}`).join('\n');
-      alert(msg);
-    }
-    if (!valid.length) {
-      showToast('등록 가능한 신규 차종이 없습니다 (모두 연도 누락)', 'error');
-      return;
-    }
-    // 2차 확인: 사용자가 직접 입력해야 진행
-    const word = prompt(
-      `신규 차종 ${valid.length}건을 차종마스터에 영구 등록합니다.\n` +
-      `취소 불가능합니다.\n\n` +
-      `진행하려면 "등록"이라고 정확히 입력하세요:`
-    );
-    if (word !== '등록') {
-      showToast('취소됨', 'info');
-      return;
-    }
-    let ok = 0, fail = 0;
-    for (const v of valid) {
-      try {
-        await addVehicleMasterEntry({
-          maker: v.maker,
-          model_name: v.model_name,
-          sub_model: v.sub_model,
-        }, { updatedBy: 'upload-center', updatedByName: '업로드센터' });
-        ok++;
-      } catch (e) { console.error('vm add fail', e); fail++; }
-    }
-    showToast(`등록 완료: ${ok}건${fail ? ` · 실패 ${fail}건` : ''}`, ok ? 'success' : 'error');
-  });
 }
 
 function escapeHtml(s) {
