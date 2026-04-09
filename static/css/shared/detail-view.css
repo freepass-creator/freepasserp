@@ -35,6 +35,10 @@
 
 .product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 0; }
 .product-list-page-shell .panel-body--detail { padding: 0 !important; }
+/* === [TEST MARKER 빨간 배경 — 보이면 CSS 도달 OK, 안 보이면 캐시 박힘] === */
+.product-list-page-shell .panel-body--detail .m-pd {
+  outline: 3px solid red !important;
+}
 /* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 좌우/상하 여백 최소화 + 웹 폰트 규격 */
 .product-list-page-shell .panel-body--detail .m-pd {
   padding: 0;
