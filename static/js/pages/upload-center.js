@@ -334,6 +334,24 @@ function subYear(sub) {
   const m = String(sub || '').match(/(\d{2})~?\s*$/);
   return m ? Number(m[1]) : -1;
 }
+// vehicle_master 엔트리에서 출시 시작 연도(YY) 추출 — sub 끝 패턴 fallback
+function entryStartYear(e) {
+  if (!e) return -1;
+  const ys = String(e.year_start || '').replace(/[^\d]/g, '');
+  if (ys.length === 2) return Number(ys);
+  if (ys.length === 4) return Number(ys.slice(2));
+  return subYear(e.sub_model);
+}
+// vehicle_master 엔트리 종료 연도 ('현재' → 99)
+function entryEndYear(e) {
+  if (!e) return 99;
+  const ye = String(e.year_end || '').trim();
+  if (!ye || ye === '현재') return 99;
+  const n = ye.replace(/[^\d]/g, '');
+  if (n.length === 2) return Number(n);
+  if (n.length === 4) return Number(n.slice(2));
+  return 99;
+}
 function sortByRecentSub(arr) {
   return [...arr].sort((a, b) => subYear(b) - subYear(a) || String(a).localeCompare(String(b)));
 }
@@ -806,6 +824,9 @@ function validateRow(rawRow, idx) {
         const sub = e.sub_model;
         const subLow = normLow(sub);
         const subCodeTokens = alnumCodeTokens(sub);
+        // 출시 연도 — entry의 year_start 우선, 없으면 sub 끝 패턴
+        const ys = entryStartYear(e);
+        const ye = entryEndYear(e);
         let score = 1.0;
         if (inLow) {
           if (subLow.includes(inLow) || inLow.includes(subLow)) score -= 0.5;
@@ -821,15 +842,12 @@ function validateRow(rawRow, idx) {
           const hits = inCodeTokens.filter(t => subCodeTokens.includes(t));
           if (hits.length) score -= Math.min(0.5, hits.length * 0.25);
         }
-        if (yy != null) {
-          const m = sub.match(/(\d{2})~?$/);
-          if (m) {
-            const ys = Number(m[1]);
-            const gap = yy - ys;
-            if (gap >= 0) score -= (0.5 - gap * 0.06);
-            else if (gap === -1) score -= 0.1;
-            else score += 0.2;
-          }
+        if (yy != null && ys >= 0) {
+          // 입력 연식이 [ys, ye] 범위 안이면 강한 보너스, 밖이면 거리 비례 페널티
+          if (yy >= ys && yy <= ye) score -= 0.5;
+          else if (yy === ys - 1) score -= 0.1;
+          else if (yy < ys) score += 0.3; // 입력이 모델 출시보다 과거 → 페널티
+          else score -= Math.max(0, 0.3 - (yy - ye) * 0.1);
         }
         if (isEV && /ev/i.test(sub)) score -= 0.3;
         if (!isEV && /ev/i.test(sub) && fuel) score += 0.3;
@@ -840,14 +858,10 @@ function validateRow(rawRow, idx) {
           const overlap = trimTokens.filter(t => subLow.includes(t)).length;
           if (overlap) score -= Math.min(0.3, overlap * 0.1);
         }
-        // 주행거리 5천km 이하 → 신차에 가까움 → 최신 연식 가산
-        if (looksLikeNew) {
-          const m = sub.match(/(\d{2})~?$/);
-          if (m) {
-            const ys = Number(m[1]);
-            const curYy = new Date().getFullYear() % 100;
-            if (ys >= curYy - 1) score -= 0.2; // 작년~올해 모델만 가산
-          }
+        // 주행거리 5천km 이하 → 신차에 가까움 → 최신 모델(현재 진행 중) 가산
+        if (looksLikeNew && ys >= 0) {
+          const curYy = new Date().getFullYear() % 100;
+          if (ye === 99 || ye >= curYy - 1) score -= 0.2;
         }
         // 엔진 cc 매칭 — sub_model에 1.6/2.0 등 배기량 토큰 있으면
         if (engineCc) {
@@ -862,14 +876,16 @@ function validateRow(rawRow, idx) {
           const sigHit = trimSignals.some(sig => subLow.includes(normLow(sig)));
           if (sigHit) score -= 0.2;
         }
-        // 최초등록일 보정 — 등록 연도 이하 모델에 약한 가산 (등록 후 신차 가능성 고려)
-        if (regYy != null) {
-          const m2 = sub.match(/(\d{2})~?$/);
-          if (m2) {
-            const ys = Number(m2[1]);
-            if (ys === regYy) score -= 0.15;        // 정확 일치
-            else if (ys === regYy - 1) score -= 0.1; // 한 해 전
-            else if (ys > regYy + 1) score += 0.1;   // 등록보다 많이 미래는 약한 페널티
+        // 최초등록일 보정 — 강력한 신호: 등록 연도가 모델 [ys, ye] 범위 안이면 큰 가산
+        if (regYy != null && ys >= 0) {
+          if (regYy >= ys && regYy <= ye) {
+            score -= 0.6; // 등록일이 모델 판매 기간 안 — 매우 강함
+          } else if (regYy === ys - 1) {
+            score -= 0.2; // 출시 직전 한 해
+          } else if (regYy < ys - 1) {
+            score += 0.4; // 등록일이 모델 출시 한참 전 — 강한 페널티 (불가능)
+          } else if (regYy > ye + 1) {
+            score -= 0.05; // 단종 후 등록도 가능하긴 함
           }
         }
         return { value: sub, score };
