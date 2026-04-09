@@ -112,12 +112,19 @@ export function renderGallery(p, activePhotoIndex = 0) {
     ? `<div class="m-pd-gallery__dots">${photos.map((_, i) => `<span class="m-pd-gallery__dot${i === idx ? ' is-active' : ''}"></span>`).join('')}</div>`
     : '';
 
+  const photoLink = (p.photo_link || '').trim();
+  const photoLinkHtml = photoLink
+    ? `<a class="m-pd-gallery__external" href="${escapeHtml(photoLink)}" target="_blank" rel="noopener noreferrer">
+         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+         사진 더보기
+       </a>`
+    : '';
   return `<div class="m-pd-gallery">
     <img src="${escapeHtml(photos[idx])}" alt="">
     ${counter}
     ${navs}
     ${dots}
-  </div>`;
+  </div>${photoLinkHtml}`;
 }
 
 function statusTone(v) {
