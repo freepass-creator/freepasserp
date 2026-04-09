@@ -149,8 +149,30 @@ const MAKER_POPULARITY = [
   'BMW', '벤츠', '아우디', '미니', '폭스바겐', '포르쉐', '테슬라',
 ];
 
+// maker별 model 인기순 (엔카 기준 — 안 들어간 model은 알파벳 순)
+const MODEL_POPULARITY = {
+  '현대': ['그랜저', '쏘나타', '아반떼', '싼타페', '팰리세이드', '투싼', '코나', '캐스퍼', '스타리아', '아이오닉5', '아이오닉6', '아이오닉9', '베뉴', '넥쏘', '포터2'],
+  '기아': ['카니발', 'K5', 'K8', '쏘렌토', '스포티지', '셀토스', 'K3', 'K9', 'K7', '레이', '모닝', '니로', '모하비', 'EV6', 'EV9', 'EV3', '봉고3', '타스만', '스팅어', '팰리세이드'],
+  '제네시스': ['G80', 'G70', 'G90', 'GV80', 'GV70', 'GV60', 'EQ900'],
+  '르노': ['아르카나', '그랑 콜레오스', '콜레오스', 'QM6', 'SM6', 'XM3'],
+  'KGM': ['토레스', '액티언', '렉스턴', '티볼리', '렉스턴 스포츠', '코란도'],
+  '쉐보레': ['트레일블레이저', '트랙스', '스파크'],
+  'BMW': ['5시리즈', '3시리즈', 'X3', 'X5', '4시리즈', 'X1', 'X4', 'X6', 'X7', 'Z4', 'M4', 'M3'],
+  '벤츠': ['E-클래스', 'C-클래스', 'S-클래스', 'GLC', 'GLE', 'GLS', 'A-클래스', 'CLE', 'EQS', 'AMG GT', 'G-클래스'],
+  '아우디': ['A6', 'A4', 'A5', 'A3', 'A7', 'A8', 'Q5', 'Q3', 'Q7', 'Q8'],
+  '테슬라': ['모델 Y', '모델 3', '모델 S', '모델 X'],
+  '폭스바겐': ['티구안', '제타', '아테온', '골프', '파사트'],
+  '포르쉐': ['카이엔', '카이엔 쿠페', '마칸', '파나메라', '타이칸', '911', '박스터'],
+  '미니': ['쿠퍼', '컨트리맨', '클럽맨'],
+};
+
 const _makerRank = new Map(MAKER_POPULARITY.map((m, i) => [m, i]));
 const _rank = (m) => _makerRank.has(m) ? _makerRank.get(m) : 9999;
+const _modelRank = (maker, model) => {
+  const arr = MODEL_POPULARITY[maker] || [];
+  const i = arr.indexOf(model);
+  return i === -1 ? 9999 : i;
+};
 
 /** 제조사 목록 — 인기 순 정렬 */
 export function getMakers() {
@@ -158,16 +180,14 @@ export function getMakers() {
   return all.sort((a, b) => _rank(a) - _rank(b) || a.localeCompare(b, 'ko'));
 }
 
-/** 특정 제조사의 모델명 목록 — 등록 항목 수가 많은 순 */
+/** 특정 제조사의 모델명 목록 — 인기 순 (MODEL_POPULARITY) 우선, 그 외 가나다순 */
 export function getModels(maker) {
   if (!maker) return [];
-  const counts = new Map();
-  CAR_MODELS.filter(m => m.maker === maker).forEach(m => {
-    counts.set(m.model, (counts.get(m.model) || 0) + 1);
-  });
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ko'))
-    .map(([name]) => name);
+  const all = [...new Set(CAR_MODELS.filter(m => m.maker === maker).map(m => m.model))];
+  return all.sort((a, b) =>
+    _modelRank(maker, a) - _modelRank(maker, b) ||
+    a.localeCompare(b, 'ko')
+  );
 }
 
 /** 특정 제조사+모델명의 세부모델 목록 — 연식 큰(최신) 것이 위 */
