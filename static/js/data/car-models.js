@@ -167,18 +167,11 @@ export const CAR_MODELS = [
   { maker: '쉐보레', model: '스파크', sub: '스파크 M300', year_start: '11', year_end: '15', code: 'M300', category: '경차' },
   { maker: '쉐보레', model: '스파크', sub: '더 넥스트 스파크 M400', year_start: '15', year_end: '22', code: 'M400', category: '경차' },
   { maker: '쉐보레', model: '카마로', sub: '카마로 SS A1XX', year_start: '16', year_end: '24', code: 'A1XX', category: '스포츠 쿠페' },
-  { maker: '포드', model: '머스탱', sub: '머스탱 GT S550', year_start: '14', year_end: '23', code: 'S550', category: '스포츠 쿠페' },
   { maker: '포르쉐', model: '카이엔', sub: '카이엔 E3', year_start: '17', year_end: '23', code: 'E3', category: '중형 SUV' },
   { maker: '포르쉐', model: '카이엔', sub: '카이엔 E3 (페리)', year_start: '23', year_end: '현재', code: 'E3', category: '중형 SUV' },
-  { maker: '마세라티', model: '기블리', sub: '기블리 M157', year_start: '13', year_end: '현재', code: 'M157', category: '준대형 세단' },
-  { maker: '마세라티', model: '콰트로포르테', sub: '콰트로포르테 M156', year_start: '13', year_end: '현재', code: 'M156', category: '대형 세단' },
-  { maker: '마세라티', model: '르반떼', sub: '르반떼', year_start: '16', year_end: '현재', code: '-', category: '중형 SUV' },
   { maker: '미니', model: '컨트리맨', sub: '컨트리맨 F60', year_start: '17', year_end: '24', code: 'F60', category: '소형 SUV' },
   { maker: '미니', model: '컨트리맨', sub: '컨트리맨 U25', year_start: '24', year_end: '현재', code: 'U25', category: '소형 SUV' },
   { maker: '미니', model: '쿠퍼', sub: '쿠퍼 F56', year_start: '14', year_end: '24', code: 'F56', category: '소형 해치백' },
-  { maker: '지프', model: '어벤저', sub: '어벤저', year_start: '23', year_end: '현재', code: '-', category: '소형 SUV' },
-  { maker: '지프', model: '랭글러', sub: '랭글러 JL', year_start: '18', year_end: '현재', code: 'JL', category: '중형 SUV' },
-  { maker: '지프', model: '체로키', sub: '체로키 KL', year_start: '14', year_end: '23', code: 'KL', category: '중형 SUV' },
 
   // ─── 추가: 시트 데이터 매칭용 누락 차종 ─────────────────────
   // 기아 K7 (단종 모델)
@@ -275,36 +268,23 @@ export const CAR_MODELS = [
   // 폭스바겐 아테온
   { maker: '폭스바겐', model: '아테온', sub: '아테온', year_start: '17', year_end: '현재', code: '-', category: '중형 세단' },
   // 도요타 알파드
-  { maker: '토요타', model: '알파드', sub: '알파드', year_start: '15', year_end: '현재', code: '-', category: '대형 MPV' },
   // 렉서스 LM
-  { maker: '렉서스', model: 'LM', sub: 'LM500h', year_start: '23', year_end: '현재', code: '-', category: '대형 MPV' },
   // 마세라티 기블리
-  { maker: '마세라티', model: '기블리', sub: '기블리', year_start: '13', year_end: '현재', code: '-', category: '중형 세단' },
   // 페라리 SF90
-  { maker: '페라리', model: 'SF90', sub: 'SF90 스파이더', year_start: '19', year_end: '현재', code: '-', category: '슈퍼카' },
   // 람보르기니
-  { maker: '람보르기니', model: '우르스', sub: '우르스', year_start: '18', year_end: '현재', code: '-', category: '대형 SUV' },
-  { maker: '람보르기니', model: '가야르도', sub: '가야르도 LP550-2', year_start: '03', year_end: '13', code: '-', category: '슈퍼카' },
   // 벤틀리
-  { maker: '벤틀리', model: '컨티넨탈 GT', sub: '컨티넨탈 GT', year_start: '03', year_end: '현재', code: '-', category: '대형 쿠페' },
   // 캐딜락
-  { maker: '캐딜락', model: '에스컬레이드', sub: '에스컬레이드', year_start: '06', year_end: '현재', code: '-', category: '대형 SUV' },
   // 롤스로이스
-  { maker: '롤스로이스', model: '컬리넌', sub: '컬리넌', year_start: '18', year_end: '현재', code: '-', category: '대형 SUV' },
   // 포드 머스탱
-  { maker: '포드', model: '머스탱', sub: '머스탱 GT', year_start: '15', year_end: '현재', code: '-', category: '대형 쿠페' },
   // GM대우 (구형) → 쉐보레로 통합
   // 기아 팰리세이드 — 현대 모델인데 데이터에 잘못 들어옴 → MAKER_FIX에서 처리
   // 기아 K5 / 카니발 / 모하비 / 모닝 / 레이 / 셀토스 / 쏘렌토 / 스포티지 등 trim 정보 포함된 sub는 SUB_FIX에서 처리
 ];
 
-// 인기 제조사 순위
+// 인기 제조사 순위 (엔카 인기 차종 기준)
 const MAKER_POPULARITY = [
-  '현대', '기아', '제네시스', 'KGM', '쌍용', '르노코리아', '르노', '르노삼성', '쉐보레', 'GM',
-  'BMW', '메르세데스-벤츠', '벤츠', '아우디', '폭스바겐', '포르쉐', '미니',
-  '테슬라', '볼보', '재규어', '랜드로버', '렉서스', '토요타', '혼다', '닛산',
-  '인피니티', '캐딜락', '포드', '링컨', '크라이슬러', '지프', '닷지',
-  '푸조', '시트로엥', '피아트', '마세라티', '람보르기니', '페라리', '벤틀리', '롤스로이스',
+  '현대', '기아', '제네시스', '르노', 'KGM', '쉐보레',
+  'BMW', '벤츠', '아우디', '미니', '폭스바겐', '포르쉐', '테슬라',
 ];
 
 const _makerRank = new Map(MAKER_POPULARITY.map((m, i) => [m, i]));
