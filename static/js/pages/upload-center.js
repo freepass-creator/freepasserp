@@ -1626,7 +1626,12 @@ $confirmBtn?.addEventListener('click', async () => {
     watchPartners((items) => {
       partnersFull = items || [];
       partnerCodes = partnersFull.map(p => p?.partner_code || p?.code || '').filter(Boolean);
-      console.log('[upload-center] partners:', partnersFull.length, '건', partnersFull[0]);
+      window.__partners = partnersFull; // 콘솔 디버그용
+      console.log('[upload-center] partners:', partnersFull.length, '건');
+      console.table(partnersFull.map(p => ({
+        code: p.partner_code, name: p.partner_name, biznum: p.business_number,
+        manager: p.manager_name, phone: p.company_phone,
+      })));
     });
     watchTerms((items) => {
       policyCodes = (items || []).map(t => t?.term_code || t?.policy_code || '').filter(Boolean);
