@@ -12,9 +12,9 @@
 
 .panel {
   border: none;
-  border-radius: var(--radius-ui);
+  border-radius: var(--radius-md);
   background: var(--panel-bg);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--panel-shadow, 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04));
   display: grid;
   grid-template-rows: var(--panel-head-height) minmax(0, 1fr);
   min-height: 0;

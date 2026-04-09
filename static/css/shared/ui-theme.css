@@ -47,7 +47,7 @@
   --interactive-active-border: #c4c7cc;
   --interactive-selected-bg:   rgba(27, 42, 74, 0.06);
   --interactive-shadow-focus:  0 0 0 2px rgba(27, 42, 74, 0.15);
-  --radius-ui: 8px;
+  /* --radius-ui는 base.css의 토큰을 그대로 사용 */
   --list-badge-radius: var(--radius-xs); /* 4px — jpkerp 스타일 각진 톤 */
   --font-size-main: 12px;
   --font-size-sub: 11px;

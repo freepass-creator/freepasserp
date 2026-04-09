@@ -12,14 +12,14 @@
   --space-6: 24px;
   --space-8: 32px;
 
-  /* ── 곡률 — jpkerp 스타일(살짝 각진) ── */
+  /* ── 곡률 — 4px 통일 ── */
   --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
   --radius-pill: 999px;
   --radius-circle: 50%;
-  --radius-ui: var(--radius-xs);
+  --radius-ui: 4px;
 
   /* ── 타이포그래피 (M3 기준) ── */
   --font-size-xs: 11px;

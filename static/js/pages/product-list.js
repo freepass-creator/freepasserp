@@ -1202,8 +1202,9 @@ async function init(){
   state.profile = profile;
   state.role = profile.role;
   state.companyCode = profile.company_code || '';
+  // 설정의 기간이 항상 우선 — localStorage 상태 무시
   const savedPeriods = profile.settings?.periods;
-  if (savedPeriods?.length) state.filters.periods = savedPeriods.slice();
+  state.filters.periods = (savedPeriods && savedPeriods.length) ? savedPeriods.slice() : DEFAULT_PERIODS.slice();
   renderRoleMenu(menu, profile.role);
   applyRoleActions();
   bindMobile();

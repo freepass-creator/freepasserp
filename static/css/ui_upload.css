@@ -581,3 +581,141 @@
   width: 100%;
   flex-basis: 100%;
 }
+
+/* ═════════ 업로드 센터 (jpkerp 스타일) ═════════ */
+.up-schema-box { font-size:12px; color:#475569; padding:8px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:var(--radius-ui); line-height:1.5; max-height:120px; overflow:auto; }
+.up-schema-actions { display:flex; gap:6px; margin-top:6px; }
+.up-link-btn { display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:transparent; border:1px solid #e2e8f0; border-radius:var(--radius-ui); font-size:12px; color:#475569; cursor:pointer; }
+.up-link-btn:hover { background:#f1f5f9; }
+.up-source-tabs { display:flex; gap:4px; margin-bottom:8px; }
+.up-source-tab { flex:1; padding:8px 0; background:#f8fafc; border:1px solid #e2e8f0; border-radius:var(--radius-ui); font-size:12px; font-weight:600; color:#64748b; cursor:pointer; }
+.up-source-tab.is-active { background:var(--m-accent,#1b2a4a); border-color:var(--m-accent,#1b2a4a); color:#fff; }
+.up-source-pane[hidden] { display:none; }
+.up-sheet-hint { font-size:11px; color:#64748b; margin:4px 0 8px; }
+.up-confirm-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; background:var(--m-accent,#1b2a4a); border:none; border-radius:var(--radius-ui); color:#fff; font-size:13px; font-weight:700; cursor:pointer; }
+.up-confirm-btn:disabled { opacity:0.5; cursor:default; }
+.up-reset-btn { padding:8px 14px; background:#f1f5f9; border:none; border-radius:var(--radius-ui); color:#64748b; font-size:13px; font-weight:700; cursor:pointer; }
+.up-actions-row { display:flex; gap:6px; }
+.up-drop { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:32px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:var(--radius-ui); cursor:pointer; }
+.up-drop:hover { background:#f1f5f9; border-color:var(--m-accent,#1b2a4a); }
+.up-drop-text { font-size:13px; color:#64748b; }
+.up-summary { font-size:12px; color:#475569; font-weight:600; }
+.up-result-row { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:12px; }
+.up-result-row.is-error { color:#ef4444; }
+.up-result-row.is-warn { color:#f59e0b; }
+.up-result-row.is-ok { color:#16a34a; }
+.pls-table .up-row-error td { background:#fef2f2; }
+.pls-table .up-row-warn td { background:#fffbeb; }
+.pls-table .up-row-ok td { background:transparent; }
+.up-cell-fix { display:inline-block; padding:2px 6px; background:#fef3c7; color:#b45309; border-radius:3px; font-size:10px; font-weight:700; margin-left:4px; }
+
+/* 미리보기 표 — 글자 줄바꿈 막고 가로 스크롤 */
+#upPreviewTable { table-layout:auto; width:auto; min-width:100%; }
+#upPreviewTable th, #upPreviewTable td {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 200px;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+#upPreviewTable th {
+  background: #f8fafc;
+  font-weight: 700;
+  color: #475569;
+}
+
+/* 미리보기 표 강제 — 한 줄 노출 */
+.pls-grid-panel .pls-table#upPreviewTable,
+.pls-grid-panel .pls-table#upPreviewTable th,
+.pls-grid-panel .pls-table#upPreviewTable td {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+}
+.pls-grid-panel .pls-table#upPreviewTable th,
+.pls-grid-panel .pls-table#upPreviewTable td {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+.pls-grid-panel:has(#upPreviewTable) .pls-grid-scroll {
+  overflow-x: auto;
+}
+
+/* 인라인 셀 수정 */
+.up-cell-edit { cursor: pointer; }
+.up-cell-edit:hover { background: rgba(27,42,74,0.04); }
+.up-cell-input { width: 100%; padding: 2px 6px; border: 1px solid #1b2a4a; border-radius: 3px; font-size: 12px; outline: none; background: #fff; }
+
+/* 추천 칩 — 셀 아래 */
+.up-cell-wrap { display: flex; flex-direction: column; gap: 4px; }
+.up-cell-val { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.up-cell-sugs { display: flex; flex-wrap: wrap; gap: 3px; }
+.up-sug-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 6px;
+  background: #ecfdf5; border: 1px solid #bbf7d0;
+  border-radius: 3px; color: #15803d;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+.up-sug-chip:hover { background: #d1fae5; }
+.up-sug-chip svg { color: #16a34a; }
+.up-undo-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 6px; margin-right: 4px;
+  background: #fef3c7; border: 1px solid #fde68a;
+  border-radius: 3px; color: #92400e;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+.up-undo-chip:hover { background: #fde68a; }
+.up-undo-chip svg { color: #b45309; }
+.up-cell-edit.is-changed .up-cell-val { color: #b45309; font-weight: 600; }
+.up-addvm-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 6px; margin-right: 4px;
+  background: #eff6ff; border: 1px solid #bfdbfe;
+  border-radius: 3px; color: #1d4ed8;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+.up-addvm-chip:hover { background: #dbeafe; }
+.up-addvm-chip svg { color: #2563eb; }
+
+/* 차종마스터 인라인 추가 모달 */
+.up-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.up-modal {
+  background: #fff; border-radius: 8px; width: 420px; max-width: 92vw;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  display: flex; flex-direction: column;
+}
+.up-modal-head {
+  padding: 14px 18px; font-size: 15px; font-weight: 700;
+  border-bottom: 1px solid #e5e7eb;
+}
+.up-modal-body {
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+}
+.up-modal-body label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 12px; color: #475569; font-weight: 600;
+}
+.up-modal-body input {
+  padding: 7px 9px; border: 1px solid #cbd5e1; border-radius: 4px;
+  font-size: 13px; color: #0f172a;
+}
+.up-modal-body input:focus { outline: none; border-color: #2563eb; }
+.up-modal-row { display: flex; gap: 10px; }
+.up-modal-row label { flex: 1; }
+.up-modal-hint { font-size: 11px; color: #94a3b8; }
+.up-modal-actions {
+  padding: 12px 18px; border-top: 1px solid #e5e7eb;
+  display: flex; gap: 8px; justify-content: flex-end;
+}

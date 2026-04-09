@@ -160,7 +160,9 @@ export function buildDisplaySubModelName(row = {}) {
   const modelCode = String(row.model_code || '').trim();
   const baseName = explicit || [modelName, modelCode].filter(Boolean).join(' ').trim();
   const startYear = extractProductionStartYear(row.production_period || row.sub_model_year || '');
-  return [baseName, startYear ? `${startYear}~` : ''].filter(Boolean).join(' ').trim();
+  // 4자리 연도 → 2자리로 (예: 2022 → 22)
+  const yy = startYear ? String(startYear).slice(-2) : '';
+  return [baseName, yy ? `${yy}~` : ''].filter(Boolean).join(' ').trim();
 }
 export function normalizeVehicleMasterRows(rows = []) {
   const uniqueMap = new Map();

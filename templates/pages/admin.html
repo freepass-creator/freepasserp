@@ -18,6 +18,8 @@
         <button class="admin-menu-item is-active" data-tab="settlement" type="button">정산서 관리</button>
         <button class="admin-menu-item" data-tab="stock" type="button">재고 일괄삭제</button>
         <button class="admin-menu-item" data-tab="notice" type="button">안내사항 관리</button>
+        <button class="admin-menu-item" data-tab="vehicle" type="button">차종 관리</button>
+        <button class="admin-menu-item" data-tab="color" type="button">색상 관리</button>
       </nav>
     </div>
   </section>
@@ -67,6 +69,59 @@
           <button type="button" class="inline-button btn-sm btn-danger" id="adminStockDeleteSelected">선택 삭제</button>
         </div>
         <div id="adminStockList" class="admin-tab-scroll"></div>
+      </div>
+
+      <!-- 차종 관리 -->
+      <div class="admin-tab-panel" data-tab-panel="vehicle" hidden>
+        <div class="admin-vm-form">
+          <div class="admin-vm-row">
+            <label>제조사<input type="text" id="vmMaker" placeholder="예: 현대"></label>
+            <label>모델명<input type="text" id="vmModel" placeholder="예: 그랜저"></label>
+            <label>세부모델<input type="text" id="vmSub" placeholder="예: 그랜저 GN7 22~"></label>
+            <label>분류<input type="text" id="vmCat" placeholder="예: 준대형 세단"></label>
+            <button type="button" class="inline-button btn-sm btn-primary" id="vmSaveBtn">저장하기</button>
+            <button type="button" class="inline-button btn-sm" id="vmImportBtn" title="기존 등록된 상품에서 제조사/모델/세부모델을 자동 추출해 채웁니다">기존 상품에서 가져오기</button>
+          </div>
+          <div class="admin-vm-search">
+            <select id="vmFilterMaker" class="admin-filter-select"><option value="">전체 제조사</option></select>
+            <select id="vmFilterModel" class="admin-filter-select"><option value="">전체 모델</option></select>
+            <input type="search" id="vmSearch" placeholder="제조사·모델·세부모델 검색">
+            <span id="vmCount" class="admin-tab-bar__count"></span>
+          </div>
+        </div>
+        <div class="admin-tab-scroll">
+          <table class="pls-table" id="vmTable" style="min-width:800px">
+            <thead><tr><th>제조사</th><th>모델</th><th>세부모델</th><th>분류</th><th style="width:90px">작업</th></tr></thead>
+            <tbody id="vmList"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 색상 관리 -->
+      <div class="admin-tab-panel" data-tab-panel="color" hidden>
+        <div class="admin-tab-bar">
+          <button type="button" class="inline-button btn-sm" id="colorImportBtn" title="기존 등록된 상품의 외부/내부 색상을 자동 추출해 채웁니다">기존 상품에서 가져오기</button>
+        </div>
+        <div class="admin-color-form">
+          <div class="admin-color-section">
+            <div class="admin-color-title">외부 색상 <span id="extColorCount" class="admin-tab-bar__count"></span></div>
+            <div class="admin-color-row">
+              <input type="text" id="extColorInput" placeholder="예: 화이트">
+              <button type="button" class="inline-button btn-sm btn-primary" id="extColorAddBtn">저장하기</button>
+              <input type="search" id="extColorSearch" placeholder="검색">
+            </div>
+            <div id="extColorList" class="admin-color-chips"></div>
+          </div>
+          <div class="admin-color-section">
+            <div class="admin-color-title">내부 색상 <span id="intColorCount" class="admin-tab-bar__count"></span></div>
+            <div class="admin-color-row">
+              <input type="text" id="intColorInput" placeholder="예: 블랙">
+              <button type="button" class="inline-button btn-sm btn-primary" id="intColorAddBtn">저장하기</button>
+              <input type="search" id="intColorSearch" placeholder="검색">
+            </div>
+            <div id="intColorList" class="admin-color-chips"></div>
+          </div>
+        </div>
       </div>
 
       <!-- 안내사항 관리 -->

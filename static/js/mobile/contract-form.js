@@ -119,13 +119,31 @@ function render(c) {
             <span class="m-cf-field__label">차량번호</span>
             <input class="m-cf-field__input" value="${escapeHtml(c.car_number || '')}" readonly>
           </div>
-          <div class="m-cf-field m-cf-field--row">
-            <span class="m-cf-field__label">세부모델</span>
-            <input class="m-cf-field__input" value="${escapeHtml((() => {
-              const p = productMap.get(c.product_uid) || productMap.get(c.product_code);
-              return p?.sub_model || c.sub_model || '';
-            })())}" readonly>
-          </div>
+          ${(() => {
+            const p = productMap.get(c.product_uid) || productMap.get(c.product_code);
+            const maker = c.maker || p?.maker || '';
+            const model = c.model_name || p?.model_name || '';
+            const sub   = c.sub_model || p?.sub_model || '';
+            const trim  = c.trim_name || p?.trim_name || '';
+            return `
+            <div class="m-cf-field m-cf-field--row">
+              <span class="m-cf-field__label">제조사</span>
+              <input class="m-cf-field__input" value="${escapeHtml(maker || '-')}" readonly>
+            </div>
+            <div class="m-cf-field m-cf-field--row">
+              <span class="m-cf-field__label">모델</span>
+              <input class="m-cf-field__input" value="${escapeHtml(model || '-')}" readonly>
+            </div>
+            <div class="m-cf-field m-cf-field--row">
+              <span class="m-cf-field__label">세부모델</span>
+              <input class="m-cf-field__input" value="${escapeHtml(sub || '-')}" readonly>
+            </div>
+            <div class="m-cf-field m-cf-field--row">
+              <span class="m-cf-field__label">세부트림</span>
+              <input class="m-cf-field__input" value="${escapeHtml(trim || '-')}" readonly>
+            </div>
+          `;
+          })()}
           <div class="m-cf-field m-cf-field--row">
             <span class="m-cf-field__label">대여기간</span>
             <input class="m-cf-field__input" type="text" inputmode="numeric" value="${escapeHtml(c.rent_month || '')}" data-field="rent_month" placeholder="36">

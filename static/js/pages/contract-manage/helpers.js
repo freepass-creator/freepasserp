@@ -30,25 +30,33 @@ export function buildVehicleDetail(seed) {
   return seed.detail_vehicle_name || [seed.model_name, seed.sub_model, seed.trim_name].filter(Boolean).join(' ') || buildVehicleName(seed);
 }
 
-export function deriveVehicleDisplayName(contract = {}) {
-  const explicit = [contract.model_name, contract.sub_model, contract.trim_name].filter(Boolean).join(' ');
-  if (explicit) return explicit;
-  const raw = String(contract.detail_vehicle_name || contract.vehicle_name || '').trim();
-  if (!raw) return '-';
-  const tokens = raw.split(/\s+/).filter(Boolean);
-  if (tokens.length >= 2) return tokens.slice(1).join(' ');
-  return raw;
+// 제조사 단독
+export function deriveMakerDisplay(contract = {}) {
+  return String(contract.maker || '').trim() || '-';
 }
 
-export function deriveSubModelDisplay(contract = {}) {
-  const preferred = [
-    contract.sub_model,
-    contract.detail_model,
-    contract.detail_vehicle_model,
-    contract.model_detail_name
-  ].find((value) => String(value || '').trim());
-  if (preferred) return String(preferred).trim();
+// 모델 단독 (예: 쏘렌토)
+export function deriveModelDisplay(contract = {}) {
   return String(contract.model_name || '').trim() || '-';
+}
+
+// 세부모델 단독 (예: 1.6하이브리드 2WD)
+export function deriveSubModelDisplay(contract = {}) {
+  return String(contract.sub_model || '').trim() || '-';
+}
+
+// 세부트림 단독
+export function deriveTrimDisplay(contract = {}) {
+  return String(contract.trim_name || '').trim() || '-';
+}
+
+// 차량 종합 표시 (제조사+모델+세부+트림) — 부득이한 통짜 표시용
+export function deriveVehicleDisplayName(contract = {}) {
+  const parts = [contract.maker, contract.model_name, contract.sub_model, contract.trim_name]
+    .map(v => String(v || '').trim()).filter(Boolean);
+  if (parts.length) return parts.join(' ');
+  const raw = String(contract.vehicle_name || contract.detail_vehicle_name || '').trim();
+  return raw || '-';
 }
 
 export function deriveAgentChannelCode(contract = {}) {
@@ -88,6 +96,7 @@ export function seedToPayload(seed, currentProfile = {}) {
     car_number: seed.car_number || '',
     vehicle_name: buildVehicleName(seed),
     detail_vehicle_name: buildVehicleDetail(seed),
+    maker: seed.maker || '',
     model_name: seed.model_name || '',
     sub_model: seed.sub_model || '',
     trim_name: seed.trim_name || '',

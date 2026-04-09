@@ -287,7 +287,17 @@ async function fillForm(contract) {
   fields.policy_code.value = contract.policy_code || '';
   fields.product_code.value = contract.product_uid || contract.product_code || contract.seed_product_key || '';
   fields.car_number.value = contract.car_number || '';
-  fields.vehicle_name.value = deriveSubModelDisplay(contract) || deriveVehicleDisplayName(contract);
+  // 분리된 4개 필드 표시
+  const $maker = qs('#contract_maker');
+  const $model = qs('#contract_model');
+  const $sub   = qs('#contract_sub_model');
+  const $trim  = qs('#contract_trim');
+  if ($maker) $maker.value = contract.maker || '';
+  if ($model) $model.value = contract.model_name || '';
+  if ($sub)   $sub.value   = contract.sub_model || '';
+  if ($trim)  $trim.value  = contract.trim_name || '';
+  // hidden vehicle_name 통짜 — 기존 호환용
+  fields.vehicle_name.value = deriveVehicleDisplayName(contract);
   await populateRentMonthOptions(contract);
   const rm = String(contract.rent_month || '').replace(/[^\d]/g, '');
   ensureSelectValue(fields.rent_month, rm);
@@ -397,7 +407,9 @@ const CONTRACT_COLS = [
   { key: 'agent',         label: '영업자코드',   align: 'c', filterable: true },
   { key: 'code',          label: '계약코드',     align: 'c', searchable: true },
   { key: 'car',           label: '차량번호',     align: 'c', searchable: true },
-  { key: 'model',         label: '세부모델',     align: 'c', searchable: true },
+  { key: 'maker',         label: '제조사',       align: 'c', filterable: true },
+  { key: 'model',         label: '모델',         align: 'c', filterable: true, searchable: true },
+  { key: 'subModel',      label: '세부모델',     align: 'c', searchable: true },
   { key: 'month',         label: '기간',         align: 'c', searchable: true },
   { key: 'customer',      label: '고객명',       align: 'c', searchable: true },
   { key: 'date',          label: '계약일자',     align: 'c', filterable: true },
@@ -430,7 +442,9 @@ function renderList() {
         case 'channel': return escapeHtml(c.agent_channel_code || c.agent_company_code || '');
         case 'agent': return escapeHtml(c.agent_code || '');
         case 'car': return escapeHtml(c.car_number || '');
-        case 'model': return escapeHtml(c.model_name || c.sub_model || c.vehicle_name || '');
+        case 'maker':    return escapeHtml(c.maker || '-');
+        case 'model':    return escapeHtml(c.model_name || '-');
+        case 'subModel': return escapeHtml(c.sub_model || '-');
         case 'month': return escapeHtml(c.rent_month ? `${c.rent_month}개월` : '');
         case 'rent': return escapeHtml(c.rent_amount ? Number(c.rent_amount).toLocaleString('ko-KR') : '');
         case 'deposit': return escapeHtml(c.deposit_amount ? Number(c.deposit_amount).toLocaleString('ko-KR') : '');
@@ -448,7 +462,9 @@ function renderList() {
         case 'channel': return c.agent_channel_code || c.agent_company_code || '';
         case 'agent': return c.agent_code || '';
         case 'car': return c.car_number || '';
-        case 'model': return c.sub_model || c.model_name || c.vehicle_name || '';
+        case 'maker':    return c.maker || '';
+        case 'model':    return c.model_name || '';
+        case 'subModel': return c.sub_model || '';
         case 'month': return c.rent_month ? `${c.rent_month}개월` : '';
         case 'rent': return c.rent_amount ? String(c.rent_amount) : '';
         case 'deposit': return c.deposit_amount ? String(c.deposit_amount) : '';

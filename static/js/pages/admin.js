@@ -7,6 +7,8 @@ import { renderSkeletonRows } from '../core/management-list.js';
 import { createSettlementController } from './admin/settlement.js';
 import { createStockController } from './admin/stock.js';
 import { createNoticeController } from './admin/notice.js';
+import { createVehicleMasterAdminController } from './admin/vehicle-master.js';
+import { createColorAdminController } from './admin/colors.js';
 
 let menu, adminMenu;
 let currentProfile = null;
@@ -30,6 +32,10 @@ const stock = createStockController({
 const notice = createNoticeController({
   getCurrentProfile: () => currentProfile,
 });
+const vehicleMaster = createVehicleMasterAdminController({
+  getCurrentProfile: () => currentProfile,
+});
+const colorAdmin = createColorAdminController();
 
 function bindDOM() {
   menu = qs('#sidebar-menu');
@@ -48,6 +54,8 @@ const TAB_TITLES = {
   settlement: '정산서 관리',
   stock: '재고 일괄삭제',
   notice: '안내사항 관리',
+  vehicle: '차종 관리',
+  color: '색상 관리',
 };
 
 function switchTab(tabKey) {
@@ -64,6 +72,8 @@ function switchTab(tabKey) {
   if (tabKey === 'settlement') settlement.onTabEnter();
   if (tabKey === 'stock') stock.onTabEnter();
   if (tabKey === 'notice') notice.onTabEnter();
+  if (tabKey === 'vehicle') vehicleMaster.onTabEnter();
+  if (tabKey === 'color') colorAdmin.onTabEnter();
 
   const identity = document.getElementById('topBarIdentity');
   const sep = document.getElementById('topBarStateSep');
@@ -86,6 +96,8 @@ async function bootstrap() {
     settlement.bind();
     stock.bind();
     notice.bind();
+    vehicleMaster.bind();
+    colorAdmin.bind();
 
     renderSkeletonRows(document.getElementById('adminStlList'), ADMIN_STL_COLS_PLACEHOLDER, 8);
 

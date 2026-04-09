@@ -267,6 +267,45 @@ export async function replaceVehicleMaster({ entries = [], fileName = '', update
   return payload;
 }
 
+// 단일 차종 추가/수정 — 전체 교체 없이 entries/{entry_id}만 갱신
+export async function addVehicleMasterEntry(entry, { updatedBy = '', updatedByName = '' } = {}) {
+  const normalized = normalizeVehicleMasterEntry(entry, 0);
+  if (!normalized) throw new Error('제조사·모델명·세부모델명은 필수입니다.');
+  const payload = { ...normalized, updated_at: Date.now() };
+  await update(ref(db, `vehicle_master/entries/${normalized.entry_id}`), payload);
+  await update(ref(db, 'vehicle_master'), {
+    updated_at: Date.now(),
+    updated_by: String(updatedBy || ''),
+    updated_by_name: String(updatedByName || ''),
+  });
+  return normalized;
+}
+
+export async function deleteVehicleMasterEntry(entryId) {
+  if (!entryId) throw new Error('entry_id가 없습니다.');
+  await remove(ref(db, `vehicle_master/entries/${entryId}`));
+}
+
+// ─── 색상 마스터 ───────────────────────────────────────────────────────────────
+// 구조: color_master/{ext_colors:[...], int_colors:[...], updated_at}
+export function watchColorMaster(callback) {
+  return onValue(ref(db, 'color_master'), (snapshot) => {
+    const data = snapshot.val() || {};
+    callback({
+      ext_colors: Array.isArray(data.ext_colors) ? data.ext_colors : [],
+      int_colors: Array.isArray(data.int_colors) ? data.int_colors : [],
+      updated_at: data.updated_at || 0,
+    });
+  });
+}
+
+export async function setColorMaster({ ext_colors, int_colors }) {
+  const payload = { updated_at: Date.now() };
+  if (Array.isArray(ext_colors)) payload.ext_colors = ext_colors.filter(Boolean);
+  if (Array.isArray(int_colors)) payload.int_colors = int_colors.filter(Boolean);
+  await update(ref(db, 'color_master'), payload);
+}
+
 export function watchVehicleMaster(callback) {
   return onValue(ref(db, 'vehicle_master'), (snapshot) => {
     const data = snapshot.val() || {};

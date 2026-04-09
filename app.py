@@ -119,7 +119,8 @@ def _download_text(url: str) -> str:
         charset = response.headers.get_content_charset() or 'utf-8'
         content_type = response.headers.get('Content-Type', '')
         body = response.read().decode(charset, errors='replace')
-        if 'text/csv' in content_type or body.lstrip().startswith(('제조사,', 'maker,', '"제조사"', '"maker"')):
+        # CSV로 명시되거나, HTML이 아니면 통과
+        if 'text/csv' in content_type:
             return body
         if '<!DOCTYPE html' in body or '<html' in body.lower():
             raise ValueError('링크 공개 범위를 확인하세요. 링크가 있는 사용자에게 공개된 구글시트여야 합니다.')
@@ -173,6 +174,7 @@ _NEW_ROUTES = [
     ('/settings',      'pages/settings.html',   '설정'),
     ('/codes',         'code-manage.html',              '코드관리'),
     ('/request',       'request-manage.html',           '요청하기'),
+    ('/upload-center', 'pages/upload-center.html',      '업로드센터'),
 ]
 
 def _make_new_view(template: str, title: str):

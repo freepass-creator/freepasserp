@@ -11,9 +11,8 @@
   min-height: 0;
   overflow: hidden;
   border: none;
-  border-radius: var(--radius-ui, 8px);
+  border-radius: var(--radius-md);
   background: var(--new-bg-panel, #fff);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .pls-grid-scroll {
@@ -64,6 +63,10 @@
 .pls-table td:first-child { padding-left: var(--panel-head-px) !important; }
 .pls-table th:last-child,
 .pls-table td:last-child { padding-right: var(--panel-head-px) !important; }
+
+/* 헤더 첫/끝 th의 모서리 라운드 — 컨테이너 라운드 살리기 */
+.pls-table thead tr:first-child th:first-child { border-top-left-radius: var(--radius-md); }
+.pls-table thead tr:first-child th:last-child  { border-top-right-radius: var(--radius-md); }
 
 .pls-th--sticky {
   position: sticky;

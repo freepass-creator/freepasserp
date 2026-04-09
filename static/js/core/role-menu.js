@@ -25,6 +25,7 @@ const ROUTE_REGISTRY = [
   { href: '/partner',      label: '파트너사 관리',  pageTitle: '파트너관리', icon: 'building',    roles: ['admin'],                      group: 'g4' },
   { href: '/member',       label: '사용자 관리',    pageTitle: '사용자관리', icon: 'users',       roles: ['admin'],                      group: 'g4' },
   { href: '/admin',        label: '관리자 페이지',  pageTitle: '관리자',     icon: 'lock-keyhole', roles: ['admin'],                     group: 'g4' },
+  { href: '/upload-center',label: '업로드 센터',    pageTitle: '업로드센터', icon: 'upload',       roles: ['admin'],                     group: 'g4' },
   // 환경설정 (맨 하단)
   { href: '/settings',     label: '설정',           pageTitle: '설정',       icon: 'settings',  roles: ['provider', 'agent', 'admin'], group: 'bottom' },
 ];
@@ -60,6 +61,11 @@ const ICON_PATHS = {
     <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
     <path d="m3.3 7 8.7 5 8.7-5"/>
     <path d="M12 22V12"/>
+  `,
+  upload: `
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="17 8 12 3 7 8"/>
+    <line x1="12" x2="12" y1="3" y2="15"/>
   `,
   shield: `
     <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
