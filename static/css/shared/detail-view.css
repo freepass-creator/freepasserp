@@ -35,15 +35,41 @@
 
 .product-list-page-shell .plist-detail { display: flex; flex-direction: column; gap: 0; }
 .product-list-page-shell .panel-body--detail { padding: 0 !important; }
-/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 좌우/상하 여백 최소화 */
+/* 데스크탑 상세 패널 안의 모바일 마크업(.m-pd) — 좌우/상하 여백 최소화 + 웹 폰트 규격 */
 .product-list-page-shell .panel-body--detail .m-pd {
   padding: 0;
   background: var(--new-bg-panel, #fff);
+  font-size: var(--font-size-base);
   /* 데스크탑은 폭이 좁으니 모바일보다 더 컴팩트하게 */
-  --m-space-3: 0.5rem;   /* 12 → 8 */
-  --m-space-4: 0.625rem; /* 16 → 10 */
-  --m-space-5: 0.75rem;  /* 20 → 12 */
-  --m-space-6: 0.875rem; /* 24 → 14 */
+  --m-space-3: 6px;
+  --m-space-4: 8px;
+  --m-space-5: 10px;
+  --m-space-6: 12px;
+  /* 폰트 — 웹 규격(12px) 통일 */
+  --m-font-display: var(--font-size-md);    /* 14px */
+  --m-font-title: var(--font-size-base);    /* 12px */
+  --m-font-body: var(--font-size-base);     /* 12px */
+  --m-font-caption: var(--font-size-xs);    /* 11px */
+  --m-font-micro: var(--font-size-xs);
+  --m-font-sub: var(--font-size-xs);
+}
+/* m-pd 안 모든 텍스트가 웹 base 폰트 따르도록 강제 (rem 기반 직접 지정 덮어쓰기) */
+.product-list-page-shell .panel-body--detail .m-pd,
+.product-list-page-shell .panel-body--detail .m-pd * {
+  font-size: inherit;
+  letter-spacing: -0.02em;
+}
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-group__title,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-vinfo__head-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-heavy);
+}
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-kv__key,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-vinfo__label,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-tbl__th,
+.product-list-page-shell .panel-body--detail .m-pd .m-pd-price-table__th {
+  font-size: var(--font-size-xs);
+  color: var(--text-subtle);
 }
 .product-list-page-shell .panel-body--detail .m-pd-group { margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
 .product-list-page-shell .panel-body--detail .m-pd-group + .m-pd-group { border-top: 1px solid rgba(0, 0, 0, 0.06); }
