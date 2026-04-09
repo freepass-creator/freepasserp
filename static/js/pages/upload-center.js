@@ -762,9 +762,29 @@ function validateRow(rawRow, idx) {
     const makerOk = row.maker && isExactMaker(row.maker);
     const modelOk = makerOk && row.model_name && isExactModel(row.maker, row.model_name);
     const alreadyExact = modelOk && isExactSub(row.maker, row.model_name, row.sub_model);
-    // ⚡ 신차렌트는 그 모델의 최신 sub를 1순위로 추천 (사용자가 보고 확정)
+    // ⚡ 최초등록일이 있으면 그 연도와 정확히 일치하는 sub를 1순위로 강력 추천
+    const regRaw = String(row.first_registration_date || '').replace(/[^\d]/g, '');
+    let regYy = null;
+    if (regRaw.length === 8) regYy = Number(regRaw.slice(2, 4));      // YYYYMMDD
+    else if (regRaw.length === 6) regYy = Number(regRaw.slice(0, 2)); // YYMMDD
+    if (regYy != null && modelOk && !alreadyExact) {
+      const subs = getVmSubs(row.maker, row.model_name);
+      // 후보 중 끝의 'XX~' 연도가 regYy 이하 + 가장 가까운 것 선택
+      const matched = subs
+        .map(s => {
+          const m = s.match(/(\d{2})~?$/);
+          return m ? { sub: s, yy: Number(m[1]) } : null;
+        })
+        .filter(x => x && x.yy <= regYy)
+        .sort((a, b) => b.yy - a.yy)[0];
+      if (matched) {
+        suggestions.push({ col: 'sub_model', candidates: [{ value: matched.sub, score: 0 }] });
+        if (!row.sub_model) warnings.push(`최초등록 ${regYy}년식 → 매칭`);
+      }
+    }
+    // ⚡ 신차렌트면서 등록일 매칭 못 했을 때 — 그 모델의 최신 sub 1순위 추천
     const isNewCar = String(row.product_type || '').includes('신차');
-    if (isNewCar && modelOk && !alreadyExact) {
+    if (isNewCar && modelOk && !alreadyExact && regYy == null) {
       const subs = getVmSubs(row.maker, row.model_name);
       const newest = sortByRecentSub(subs)[0];
       if (newest) {
