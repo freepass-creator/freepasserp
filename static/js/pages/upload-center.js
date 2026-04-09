@@ -141,9 +141,24 @@ function alnumCodeTokens(s) {
   return splitTokens(s).filter(t => /^[a-z0-9]+$/.test(t));
 }
 
+// 트림 텍스트에서 연식 추출 — "26MY", "23년형", "2024년식", "'24" 등
+function extractYearFromText(s) {
+  const t = String(s || '');
+  // 1) 4자리 연도 (2019~2099)
+  let m = t.match(/(20\d{2})\s*(?:년|년식|년형|MY|my)?/);
+  if (m) return Number(m[1].slice(2, 4));
+  // 2) 'YY 형식 (예: '24)
+  m = t.match(/'(\d{2})\b/);
+  if (m) return Number(m[1]);
+  // 3) YY MY / YY년형 / YY년식 (예: 26MY, 23년형) — 단독 2자리는 제외
+  m = t.match(/\b(\d{2})\s*(?:MY|my|년형|년식)/);
+  if (m) return Number(m[1]);
+  return null;
+}
+
 // 행 전체에서 추론 컨텍스트 추출 (연식·연료·트림·등록일자 등)
 function buildRowContext(row, input) {
-  // 연식 — year 우선, 없으면 first_registration_date(YYMMDD/YYYYMMDD/YY-MM-DD 등)
+  // 연식 — year 우선, 없으면 first_registration_date, 그 다음 trim_name, 마지막으로 input
   let yy = null;
   const yearRaw = String(row.year || '').replace(/[^\d]/g, '');
   if (yearRaw.length >= 4) yy = Number(yearRaw.slice(2, 4));
@@ -153,6 +168,10 @@ function buildRowContext(row, input) {
     if (reg.length === 8) yy = Number(reg.slice(2, 4));
     else if (reg.length === 6) yy = Number(reg.slice(0, 2));
   }
+  // 트림에서 연식 단서 — "26MY", "23년형", "'24"
+  if (yy == null) yy = extractYearFromText(row.trim_name);
+  // 입력 sub_model에서도 추출 시도
+  if (yy == null) yy = extractYearFromText(input);
   // 연료 — fuel_type + trim + 입력 + sub_model 텍스트 종합
   const trim = String(row.trim_name || '');
   const fuel = String(row.fuel_type || '').toLowerCase();
@@ -734,9 +753,10 @@ function validateRow(rawRow, idx) {
       } else {
         pool = vmEntries.slice();
       }
-      // 컨텍스트 점수 (suggestSubsByContext의 로직을 풀에 직접 적용)
-      const inLow = normLow(row.sub_model || '');
-      const ctx = buildRowContext(row, row.sub_model || '');
+      // 컨텍스트 점수 — sub_model 비어있으면 trim_name도 fuzzy 입력으로 사용
+      const subInput = row.sub_model || row.trim_name || '';
+      const inLow = normLow(subInput);
+      const ctx = buildRowContext(row, subInput);
       const { yy, fuel, isEV, isHybrid, isDiesel, isGasoline, trimTokens } = ctx;
       const inCodeTokens = [
         ...new Set([
