@@ -19,29 +19,37 @@ import io, re, zipfile
 app = Flask(__name__)
 
 import os, time
-# 서버 시작 시각을 버전으로 사용 — 운영 배포 시
+# 서버 시작 시각 — 운영 배포 시 fallback
 APP_VERSION = str(int(time.time()))
+# static/ 폴더 최신 mtime 캐시 (요청마다 walk 비용 줄임, 5초 캐시)
+_static_mtime_cache = {'value': 0, 'computed_at': 0}
+
+def _compute_static_mtime():
+    now = time.time()
+    if now - _static_mtime_cache['computed_at'] < 5:
+        return _static_mtime_cache['value']
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
+    latest = 0
+    try:
+        for root, dirs, files in os.walk(static_dir):
+            dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'node_modules']
+            for f in files:
+                try:
+                    mt = os.path.getmtime(os.path.join(root, f))
+                    if mt > latest: latest = mt
+                except OSError:
+                    pass
+    except Exception:
+        pass
+    _static_mtime_cache['value'] = latest
+    _static_mtime_cache['computed_at'] = now
+    return latest
 
 @app.context_processor
 def inject_app_version():
-    # 개발 모드: static/ 폴더의 가장 최근 수정 시각을 매 요청마다 계산 → CSS만 바꿔도 즉시 캐시 무효화
-    if app.debug or os.environ.get('FLASK_ENV') == 'development':
-        try:
-            static_dir = os.path.join(os.path.dirname(__file__), 'static')
-            latest = 0
-            for root, dirs, files in os.walk(static_dir):
-                # node_modules, .git 등 큰 폴더 스킵
-                dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'node_modules']
-                for f in files:
-                    try:
-                        mt = os.path.getmtime(os.path.join(root, f))
-                        if mt > latest: latest = mt
-                    except OSError:
-                        pass
-            return {'app_version': str(int(latest)) if latest else APP_VERSION}
-        except Exception:
-            pass
-    return {'app_version': APP_VERSION}
+    # 항상 static mtime 사용 (운영도 큰 부담 없음 — 5초 캐시)
+    mtime = _compute_static_mtime()
+    return {'app_version': str(int(mtime)) if mtime else APP_VERSION}
 
 @app.after_request
 def add_cache_headers(response):
