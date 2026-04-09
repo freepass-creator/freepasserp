@@ -765,7 +765,7 @@ function validateRow(rawRow, idx) {
     // ⚡ 신차렌트는 가장 최신 모델 — 별도 로직으로 sub_model 후보 1순위 자동 선택
     const isNewCar = String(row.product_type || '').includes('신차');
     if (isNewCar && modelOk && !alreadyExact) {
-      const subs = getVmSubModels(row.maker, row.model_name);
+      const subs = getVmSubs(row.maker, row.model_name);
       const recent = sortByRecentSub(subs).slice(0, 3);
       if (recent.length) {
         suggestions.push({ col: 'sub_model', candidates: recent.map(v => ({ value: v, score: 0 })) });
