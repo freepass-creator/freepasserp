@@ -3,7 +3,7 @@
  * - 구글시트 또는 CSV 업로드 → 검증 → 보완 → 업로드
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { saveProduct, fetchProductsOnce, saveCodeItem, watchCodeItems, watchVehicleMaster, watchPartners, watchTerms, addVehicleMasterEntry } from '../firebase/firebase-db.js';
+import { saveProduct, fetchProductsOnce, saveCodeItem, watchCodeItems, watchVehicleMaster, watchPartners, watchTerms } from '../firebase/firebase-db.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { CAR_MODELS, getMakers, getModels, getSubModels, getCategory } from '../data/car-models.js';
@@ -1199,16 +1199,8 @@ function validateRow(rawRow, idx) {
     }
   });
 
-  // 신규 차종 후보 마킹 — maker가 정확하고, model+sub가 모두 있는데 vehicle_master에 없을 때
-  let isNewVehicle = false;
-  if (row.maker && isExactMaker(row.maker) && row.model_name && row.sub_model) {
-    if (!isExactSub(row.maker, row.model_name, row.sub_model)) {
-      isNewVehicle = true;
-    }
-  }
-
   return {
-    idx, row, errors, warnings, suggestions, isNewVehicle,
+    idx, row, errors, warnings, suggestions,
     status: errors.length ? 'error' : (warnings.length ? 'warn' : 'ok'),
   };
 }
@@ -1348,7 +1340,6 @@ function escapeHtml(s) {
 async function loadCsv(text) {
   const { headers: rawHeaders, rows: rawRows } = parseCsv(text);
   const mapping = normalizeHeaders(rawHeaders); // [key|null,...]
-  console.log('[upload-center] 헤더 매핑:', rawHeaders.map((h, i) => `${h} → ${mapping[i] || '(무시)'}`));
 
   // 인식 못한 컬럼 경고
   const unrecognized = rawHeaders
@@ -1356,7 +1347,6 @@ async function loadCsv(text) {
     .filter(x => !x.key && String(x.h || '').trim());
   if (unrecognized.length) {
     showToast(`인식 못한 컬럼 ${unrecognized.length}개: ${unrecognized.map(x => `"${x.h}"`).slice(0, 3).join(', ')}${unrecognized.length > 3 ? ' …' : ''}`, 'error');
-    console.warn('[upload-center] 인식 못한 헤더:', unrecognized);
   }
 
   parsedRows = rawRows.map(cells => {
@@ -1369,10 +1359,6 @@ async function loadCsv(text) {
   originalRows = parsedRows.map(r => ({ ...r }));
   assignedNewCarByRow.clear();
   validatedRows = parsedRows.map((row, i) => validateRow(row, i));
-  // 디버그용 — 콘솔에서 확인
-  window.__parsedRows = parsedRows;
-  window.__validatedRows = validatedRows;
-  console.log('[upload-center] 첫 행 검증:', validatedRows[0]);
   // 미리보기 컬럼 순서 = 스키마 순서 (재고 폼 순서)
   const schemaOrder = [...PRODUCT_SCHEMA.required, ...PRODUCT_SCHEMA.optional];
   const present = new Set(mapping.filter(Boolean));
@@ -1586,12 +1572,6 @@ $confirmBtn?.addEventListener('click', async () => {
     watchPartners((items) => {
       partnersFull = items || [];
       partnerCodes = partnersFull.map(p => p?.partner_code || p?.code || '').filter(Boolean);
-      window.__partners = partnersFull; // 콘솔 디버그용
-      console.log('[upload-center] partners:', partnersFull.length, '건');
-      console.table(partnersFull.map(p => ({
-        code: p.partner_code, name: p.partner_name, biznum: p.business_number,
-        manager: p.manager_name, phone: p.company_phone,
-      })));
     });
     watchTerms((items) => {
       policyCodes = (items || []).map(t => t?.term_code || t?.policy_code || '').filter(Boolean);
@@ -1635,9 +1615,6 @@ $confirmBtn?.addEventListener('click', async () => {
         }
         return merged;
       });
-      console.log('[upload-center] vehicle_master 로드됨:', vmEntries.length, '건');
-      console.log('[upload-center] makers:', getVmMakers());
-      console.log('[upload-center] sample:', vmEntries.slice(0, 5));
       window.__vmEntries = vmEntries;
       // 마스터가 늦게 도착해도 이미 로드된 행 재검증
       if (parsedRows.length) {
@@ -1657,14 +1634,6 @@ $confirmBtn?.addEventListener('click', async () => {
         is_active: c.is_active !== false,
       }));
       // 디버그 — 어떤 그룹이 있고 몇 개씩인지
-      const groups = {};
-      codeItems.forEach(c => {
-        if (!groups[c.group_code]) groups[c.group_code] = [];
-        groups[c.group_code].push(c.item_name);
-      });
-      console.log('[upload-center] input_codes 로드됨:', groups);
-      window.__codeItems = codeItems;
-      window.__codeGroups = groups;
     });
   } catch (e) {
     console.error('[upload-center] init failed', e);
