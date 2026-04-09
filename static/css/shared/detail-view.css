@@ -59,6 +59,39 @@
   font-size: inherit;
   letter-spacing: -0.02em;
 }
+/* 컨테이너/표 폭 100% — 가운데 몰림 방지 */
+.product-list-page-shell .panel-body--detail .m-pd,
+.product-list-page-shell .panel-body--detail .m-pd-group,
+.product-list-page-shell .panel-body--detail .m-pd-group__body,
+.product-list-page-shell .panel-body--detail .m-pd-vinfo,
+.product-list-page-shell .panel-body--detail .m-pd-kv,
+.product-list-page-shell .panel-body--detail .m-pd-tbl,
+.product-list-page-shell .panel-body--detail .m-pd-price-table {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+/* 가격/보험 표 — 패딩 컴팩트, grid는 폭 100% 활용 */
+.product-list-page-shell .panel-body--detail .m-pd-price-table__th,
+.product-list-page-shell .panel-body--detail .m-pd-price-table__row {
+  padding: 5px 8px;
+  gap: 8px;
+}
+.product-list-page-shell .panel-body--detail .m-pd-tbl__th,
+.product-list-page-shell .panel-body--detail .m-pd-tbl__row {
+  padding: 5px 8px;
+  gap: 8px;
+}
+/* 차량정보 행 좌우 패딩 */
+.product-list-page-shell .panel-body--detail .m-pd-vinfo__row {
+  padding: 4px 8px;
+}
+/* 그룹 body는 패딩 0 — 표가 패널 폭 가득 */
+.product-list-page-shell .panel-body--detail .m-pd-group__body {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+}
 .product-list-page-shell .panel-body--detail .m-pd .m-pd-group__title,
 .product-list-page-shell .panel-body--detail .m-pd .m-pd-vinfo__head-title {
   font-size: var(--font-size-md);
