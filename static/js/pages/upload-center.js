@@ -777,10 +777,26 @@ function validateRow(rawRow, idx) {
       ? mergedModels(row.maker)
       : [...new Set(vmEntries.map(e => e.model_name))].filter(Boolean);
     if (!makerOk || !isExactModel(row.maker, row.model_name)) {
-      const cands = suggestOrAll(row.model_name, pool);
-      if (cands.length) {
-        suggestions.push({ col: 'model_name', candidates: cands });
-        warnings.push(`모델 미매칭: ${row.model_name}`);
+      // ⚡ sub_model 입력에서 model 역추론 — sub에 모델명이 포함되어 있으면 그게 정답
+      let inferredFromSub = null;
+      if (makerOk && row.sub_model) {
+        const subLow = normLow(row.sub_model);
+        // maker의 모든 모델 중 sub에 포함되는 것 (긴 모델명 우선)
+        const candidates = pool
+          .filter(m => subLow.includes(normLow(m)))
+          .sort((a, b) => b.length - a.length);
+        if (candidates.length) inferredFromSub = candidates[0];
+      }
+      if (inferredFromSub) {
+        // 모델 자동 보정
+        row.model_name = inferredFromSub;
+        warnings.push(`모델 자동보정: ${rawRow.model_name} → ${inferredFromSub}`);
+      } else {
+        const cands = suggestOrAll(row.model_name, pool);
+        if (cands.length) {
+          suggestions.push({ col: 'model_name', candidates: cands });
+          warnings.push(`모델 미매칭: ${row.model_name}`);
+        }
       }
     }
   }
