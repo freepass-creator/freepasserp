@@ -101,19 +101,32 @@ function collectStyleHrefs(doc) {
   return [...doc.querySelectorAll(PAGE_STYLE_SELECTOR)].map((l) => l.href);
 }
 
+// 파일명만으로 동일 CSS 판단 (?v= 다르면 다른 URL이지만 같은 파일)
+function styleKey(href) {
+  try { return new URL(href, location.origin).pathname; } catch { return href; }
+}
 function ensureStyles(hrefs) {
-  const currentHrefs = [...document.querySelectorAll(PAGE_STYLE_SELECTOR)].map((l) => l.href);
-  const promises = hrefs
-    .filter((href) => !currentHrefs.includes(href))
-    .map((href) => new Promise((resolve) => {
+  const currentLinks = [...document.querySelectorAll(PAGE_STYLE_SELECTOR)];
+  const currentByKey = new Map(currentLinks.map((l) => [styleKey(l.href), l]));
+  const promises = hrefs.map((href) => {
+    const key = styleKey(href);
+    const existing = currentByKey.get(key);
+    // 같은 파일이고 같은 URL → 그대로 둠
+    if (existing && existing.href === href) return Promise.resolve();
+    return new Promise((resolve) => {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = href;
       link.dataset.pageStyle = 'true';
-      link.onload = resolve;
-      link.onerror = resolve;
+      link.onload = () => {
+        // 새 CSS 로드 완료 후 옛 링크 제거 (FOUC 방지)
+        if (existing && existing !== link) existing.remove();
+        resolve();
+      };
+      link.onerror = () => { resolve(); };
       document.head.appendChild(link);
-    }));
+    });
+  });
   return Promise.all(promises);
 }
 
@@ -174,6 +187,9 @@ async function loadPage(url, options = {}) {
       if (cached.module && typeof cached.module.onShow === 'function') {
         try { cached.module.onShow(); } catch (_) {}
       }
+      // CSS 갱신: 재방문 시 캐시된 styles와 현재 DOM에 박힌 styles가 다를 수 있음
+      // app_version이 바뀌면 새 CSS가 필요하므로 ensureStyles 다시 호출
+      if (cached.styles?.length) ensureStyles(cached.styles);
     } else {
       // ── 처음 방문: HTML fetch + mount (1회) ──
       prefetchModule(nextPathname);
