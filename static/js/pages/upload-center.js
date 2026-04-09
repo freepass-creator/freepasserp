@@ -738,7 +738,16 @@ function validateRow(rawRow, idx) {
     const makerOk = row.maker && isExactMaker(row.maker);
     const modelOk = makerOk && row.model_name && isExactModel(row.maker, row.model_name);
     const alreadyExact = modelOk && isExactSub(row.maker, row.model_name, row.sub_model);
-    if (!alreadyExact && (row.sub_model || row.model_name)) {
+    // ⚡ 신차렌트는 가장 최신 모델 — 별도 로직으로 sub_model 후보 1순위 자동 선택
+    const isNewCar = String(row.product_type || '').includes('신차');
+    if (isNewCar && modelOk && !alreadyExact) {
+      const subs = getVmSubModels(row.maker, row.model_name);
+      const recent = sortByRecentSub(subs).slice(0, 3);
+      if (recent.length) {
+        suggestions.push({ col: 'sub_model', candidates: recent.map(v => ({ value: v, score: 0 })) });
+        if (!row.sub_model) warnings.push('신차렌트 — 최신 모델 자동 추천');
+      }
+    } else if (!alreadyExact && (row.sub_model || row.model_name)) {
       // 후보 풀 — 가능한 가장 좁은 범위로
       let pool;
       if (modelOk) pool = vmEntries.filter(e => e.maker === row.maker && e.model_name === row.model_name);
