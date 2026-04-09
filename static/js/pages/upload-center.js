@@ -174,17 +174,17 @@ function buildRowContext(row, input) {
   // 입력 sub_model에서도 추출 시도
   if (yy == null) yy = extractYearFromText(input);
 
-  // 주행거리 → 운행 연수 추정 (1년에 25,000km 가정 → 등록 연도 역산)
+  // 주행거리 → 참고용 약한 신호만 (편차 큼: 주행 적게/많게 타는 차 있음)
+  // 1년 25,000km 기준 운행 연수 추정 — 다른 모든 연식 신호가 없을 때만 약하게 활용
   const mileage = Number(String(row.mileage || '').replace(/[^\d]/g, '')) || 0;
   const looksLikeNew = mileage > 0 && mileage < 5000;
-  // 주행거리로 추정 등록 연도 (yy가 아직 없을 때만 fallback)
   let mileageYy = null;
   if (mileage > 0) {
     const curYy = new Date().getFullYear() % 100;
     const years = Math.round(mileage / 25000);
     mileageYy = curYy - years;
   }
-  if (yy == null && mileageYy != null) yy = mileageYy;
+  // ⚠ yy fallback에는 사용 안 함 — 점수 계산 시 약한 가산으로만
 
   // 엔진 cc — sub_model의 배기량 토큰과 매칭용
   const engineCc = Number(String(row.engine_cc || '').replace(/[^\d]/g, '')) || 0;
@@ -817,7 +817,7 @@ function validateRow(rawRow, idx) {
       const subInput = row.sub_model || row.trim_name || '';
       const inLow = normLow(subInput);
       const ctx = buildRowContext(row, subInput);
-      const { yy, fuel, isEV, isHybrid, isDiesel, isGasoline, trimTokens, looksLikeNew, engineCc, trimSignals } = ctx;
+      const { yy, fuel, isEV, isHybrid, isDiesel, isGasoline, trimTokens, looksLikeNew, engineCc, trimSignals, mileageYy } = ctx;
       // 최초등록일 — 매칭에 약한 보정 (등록 후 신차로 출고할 수 있어 강제 X)
       const regRaw = String(row.first_registration_date || '').replace(/[^\d]/g, '');
       let regYy = null;
@@ -896,6 +896,12 @@ function validateRow(rawRow, idx) {
           } else if (regYy > ye + 1) {
             score -= 0.05; // 단종 후 등록도 가능하긴 함
           }
+        }
+        // 주행거리 추정 연식 — 약한 참고용 (편차 큼)
+        if (mileageYy != null && ys >= 0 && yy == null && regYy == null) {
+          // 다른 강한 연식 신호가 전혀 없을 때만 작동
+          if (mileageYy >= ys && mileageYy <= ye) score -= 0.1;
+          else if (Math.abs(mileageYy - ys) <= 1) score -= 0.05;
         }
         return { value: sub, score };
       });
