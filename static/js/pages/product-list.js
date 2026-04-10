@@ -567,8 +567,16 @@ function renderList(){
         const newRow = $list.querySelector(`tr[data-key="${String(nextId).replace(/"/g, '\\"')}"]`);
         if (newRow) newRow.classList.add('is-selected');
       }
-      renderDetail();
-      if ($detailPanel && $detailPanel.hidden) showDetailPanel();
+      // 패널이 이미 열려있으면 → 바로 닫고 슬라이딩으로 새로 열기
+      if ($detailPanel && !$detailPanel.hidden) {
+        $detailPanel.classList.remove('is-open');
+        $detailPanel.hidden = true;
+        renderDetail();
+        showDetailPanel();
+      } else {
+        renderDetail();
+        showDetailPanel();
+      }
     },
     getCellValue: (col, item) => {
       if (col.priceMonth) {
