@@ -709,6 +709,7 @@ async function handleSubmit() {
   payload.image_urls = imageUrls;
   payload.image_url = imageUrls[0] || '';
   payload.image_count = imageUrls.length;
+  console.log('[product-manage] 저장 payload.price:', JSON.stringify(payload.price));
 
   const validationErrors = validateProduct(payload);
   if (validationErrors.length) {
