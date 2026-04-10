@@ -4,7 +4,15 @@
 .m-body[data-page="카탈로그"] .m-tabbar { display: none !important; }
 .m-body[data-page="카탈로그"] .m-pwa-install { display: none !important; }
 .m-body[data-page="카탈로그"] .m-page {
-  padding-bottom: 0; /* 탭바 자리 없앰 — CTA 바가 대신 */
+  padding-bottom: 0;
+}
+/* 필터 패널 — 탭바 없으니 바닥까지 내림 */
+.m-body[data-page="카탈로그"] .m-fs {
+  bottom: 0;
+}
+/* 필터 backdrop도 바닥까지 */
+.m-body[data-page="카탈로그"] .m-fs-backdrop {
+  bottom: 0;
 }
 
 /* 상단 에이전트 뱃지 */
