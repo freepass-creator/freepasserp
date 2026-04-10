@@ -128,7 +128,7 @@ html {
 .catalog-header-search input::placeholder { color: #94a3b8; }
 
 .catalog-header-agent {
-  display: none; /* 소속/이름/직급 숨김 */
+  display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
