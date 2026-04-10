@@ -896,7 +896,6 @@ function renderDetail(){
       activePhotoIndex: state.activePhotoIndex,
       policy: termFields,
       showFee: true,
-      showProvider: false,
     })}</div>`;
     _detailHtmlCache.set(product.id, { html, termVer, photoIdx: state.activePhotoIndex });
     // 캐시 크기 제한 (최근 30개)

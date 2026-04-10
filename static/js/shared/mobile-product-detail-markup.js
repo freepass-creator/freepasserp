@@ -417,7 +417,7 @@ export function renderProvider(p) {
   return `<section class="m-pd-group">
     ${groupHead(ICO.bldg, '공급사')}
     <div class="m-pd-group__body">${kvList([
-      ['공급사명',   p.provider_name || p.partner_name],
+      ['공급사코드', p.provider_company_code || p.partner_code],
       ['공급사 메모', p.partner_memo || p.note],
     ])}</div>
   </section>`;
