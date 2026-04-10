@@ -591,7 +591,13 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
     const text = typeof getCellText === 'function' ? getCellText(col, item) : '';
     if (text && text !== '-') counts.set(text, (counts.get(text) || 0) + 1);
   });
-  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  // 숫자 컬럼(대여료/주행거리 등)은 원래 순서(금액·거리순), 나머지는 count 내림차순
+  const isNumCol = col.num || col.priceMonth;
+  const sorted = [...counts.entries()].sort((a, b) =>
+    isNumCol
+      ? (parseFloat(a[0].replace(/[^\d.-]/g, '')) || 0) - (parseFloat(b[0].replace(/[^\d.-]/g, '')) || 0)
+      : b[1] - a[1]
+  );
 
   if (!gf.active[colKey]) gf.active[colKey] = new Set();
   const selected = gf.active[colKey];
