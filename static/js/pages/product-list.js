@@ -559,27 +559,16 @@ function renderList(){
         return;
       }
       const nextId = item.id;
-      const openNext = () => {
-        state.selectedId = nextId;
-        state.activePhotoIndex = 0;
-        if ($list) {
-          $list.querySelectorAll('tr.is-selected').forEach(tr => tr.classList.remove('is-selected'));
-          const newRow = $list.querySelector(`tr[data-key="${String(nextId).replace(/"/g, '\\"')}"]`);
-          if (newRow) newRow.classList.add('is-selected');
-        }
-        renderDetail();
-        showDetailPanel();
-      };
-      // 이미 열려있으면 → 짧게 닫혔다가 다시 열리는 모션
-      if ($detailPanel && !$detailPanel.hidden) {
-        $detailPanel.classList.remove('is-open'); // 슬라이드 아웃 트리거
-        setTimeout(() => {
-          $detailPanel.hidden = true;
-          openNext();
-        }, 100); // transition 시간과 맞춤
-      } else {
-        openNext();
+      state.selectedId = nextId;
+      state.activePhotoIndex = 0;
+      // 선택 하이라이트 즉시 DOM 업데이트
+      if ($list) {
+        $list.querySelectorAll('tr.is-selected').forEach(tr => tr.classList.remove('is-selected'));
+        const newRow = $list.querySelector(`tr[data-key="${String(nextId).replace(/"/g, '\\"')}"]`);
+        if (newRow) newRow.classList.add('is-selected');
       }
+      renderDetail();
+      if ($detailPanel && $detailPanel.hidden) showDetailPanel();
     },
     getCellValue: (col, item) => {
       if (col.priceMonth) {
