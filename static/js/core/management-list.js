@@ -402,7 +402,7 @@ export function renderTableGrid(options = {}) {
   const selected = String(selectedKey ?? '').trim();
   tbody.innerHTML = filtered.map((item, index) => {
     const key = String(typeof getKey === 'function' ? getKey(item, index) ?? '' : '');
-    const active = key === selected ? ' is-active' : '';
+    const active = key === selected ? ' is-selected' : '';
     const extraClass = typeof getRowClass === 'function' ? (getRowClass(item, index) || '') : '';
     const rowCls = `pls-row${active}${extraClass ? ' ' + extraClass : ''}`;
     const cells = columns.map(col => {
