@@ -17,6 +17,7 @@
 <meta name="twitter:title" content="{{ og_title or '렌터카 상품 안내' }}">
 <meta name="twitter:description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
 <meta name="description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/ui-theme.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/catalog.css') }}?v={{ app_version }}">
@@ -35,16 +36,11 @@
   <button class="catalog-header-back" id="catalog-back-btn" type="button" hidden>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
   </button>
-  <div class="catalog-header-agent" id="catalog-agent-card">
-    <img class="catalog-header-ci" id="catalog-agent-ci" src="" alt="" hidden>
-    <span class="catalog-header-company" id="catalog-agent-company"></span>
-    <span class="catalog-header-name" id="catalog-agent-name"></span>
-    <span class="catalog-header-position" id="catalog-agent-position"></span>
+  <div class="catalog-header-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="search" id="catalog-header-search" placeholder="모델·차량번호 검색">
   </div>
   <div class="catalog-header-right">
-    <button class="catalog-header-filter" id="catalog-filter-btn" type="button" hidden>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg>
-    </button>
     <a class="catalog-header-call" id="catalog-header-call" href="tel:" hidden aria-label="전화">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
     </a>

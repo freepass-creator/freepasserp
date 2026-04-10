@@ -102,8 +102,33 @@ html {
 .catalog-header-filter { display: none; }
 .catalog-header-filter[hidden] { display: none !important; }
 
-.catalog-header-agent {
+/* 헤더 검색창 */
+.catalog-header-search {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 400px;
+  height: 32px;
+  padding: 0 10px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+.catalog-header-search svg { flex-shrink: 0; color: #94a3b8; }
+.catalog-header-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #0f172a;
+  outline: none;
+  font-family: inherit;
+}
+.catalog-header-search input::placeholder { color: #94a3b8; }
+
+.catalog-header-agent {
+  display: none; /* 소속/이름/직급 숨김 */
   align-items: center;
   gap: 6px;
   min-width: 0;
