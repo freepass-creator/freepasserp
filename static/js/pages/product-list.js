@@ -361,6 +361,8 @@ function depositBucketLabel(v) {
   if (n < 5000000)  return '300만원~';
   return '500만원~';
 }
+// management-list.js에서 보증금 구간 필터용으로 전역 노출
+window._depositBucketLabel = depositBucketLabel;
 function applyRoleFilter(products){
   return products;
 }

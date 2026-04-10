@@ -325,3 +325,11 @@
 
 .pls-filter-dd label.is-checked { background: #f1f5f9; }
 .pls-filter-dd label.is-checked .pls-fdd__count { color: #475569; }
+
+.pls-fdd__section-title {
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.02em;
+}
