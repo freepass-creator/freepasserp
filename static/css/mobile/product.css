@@ -17,6 +17,10 @@
   contain: layout style paint;
   content-visibility: auto;
   contain-intrinsic-size: 0 280px;
+  /* anchor 태그용 — 링크 기본 스타일 제거 */
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 .m-product-card:active { background: var(--m-divider); }
 

@@ -195,7 +195,9 @@ function render(items) {
     const depositMan = cheapest && cheapest.deposit ? Math.round(cheapest.deposit / 10000) + '만원' : '-';
     const priceSub = cheapest ? `보증금 ${depositMan} ${cheapest.m}개월` : '';
 
-    return `<article class="m-product-card" data-id="${escapeHtml(p.product_uid || p.product_code || '')}">
+    const pid = p.product_uid || p.product_code || '';
+    if (!pid) return ''; // ID 없는 카드는 아예 렌더 안 함 (잘못된 라우트 방지)
+    return `<a class="m-product-card" data-id="${escapeHtml(pid)}" href="/m/product-list/${encodeURIComponent(pid)}">
       ${imgHtml}
       <div class="m-product-card__body">
         <div class="m-product-card__title">${escapeHtml(maker)} ${escapeHtml(model)}${carNo ? `<span class="m-product-card__carno">${escapeHtml(carNo)}</span>` : ''}</div>
@@ -206,7 +208,7 @@ function render(items) {
         ${priceLabel ? `<div class="m-product-card__price">${escapeHtml(priceLabel)}</div>` : ''}
         ${priceSub ? `<div class="m-product-card__price-sub">${escapeHtml(priceSub)}</div>` : ''}
       </div>
-    </article>`;
+    </a>`;
     })();
     _cardCache.set(key, html);
     return html;
@@ -252,15 +254,8 @@ $filterBtn?.addEventListener('click', () => {
   });
 });
 
-// 카드 클릭 → 상세 페이지
-$grid?.addEventListener('click', (e) => {
-  const card = e.target.closest('.m-product-card[data-id]');
-  if (!card) return;
-  const id = card.dataset.id;
-  if (id) {
-    location.href = `/m/product-list/${encodeURIComponent(id)}`;
-  }
-});
+// 카드는 이제 <a href> 자체이므로 브라우저가 알아서 navigate.
+// 추가 핸들러는 필요 없음. (카톡 인앱에서 location.href 가로채는 문제 회피)
 
 (async () => {
   try {
