@@ -56,23 +56,26 @@
   font-weight: 500;
 }
 
-/* ─── 그룹 — 카드형, 동일 라운드 ─────────────── */
+/* ─── 그룹 — 섹션 타이틀 + 가로 라인 구조 ──────── */
 .m-pd--desktop .m-pd-group {
-  margin-top: 48px;
-  background: #fff;
-  border: 1px solid #e5e8eb;
-  border-radius: 8px;
-  padding: 14px 16px 16px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  margin-top: 36px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
 .m-pd--desktop .m-pd-group:first-of-type {
   margin-top: 20px;
 }
+/* 섹션 타이틀 — 카드 밖, 아이콘 + 텍스트 */
 .m-pd--desktop .m-pd-group__head {
-  margin: -2px 0 10px;
-  padding: 0 0 10px;
-  border-bottom: 1px solid #eef0f3;
+  display: flex;
+  align-items: center;
   gap: 8px;
+  margin: 0 0 10px;
+  padding: 0;
+  border: none;
 }
 .m-pd--desktop .m-pd-group__icon,
 .m-pd--desktop .m-pd-group__icon svg {
@@ -85,16 +88,20 @@
   letter-spacing: -0.005em;
   color: #1f2937;
 }
+/* 섹션 본문 — 얇은 상하 가로 라인만 */
 .m-pd--desktop .m-pd-group__body {
-  border: none;
+  border-top: 1px solid #e5e8eb;
+  border-bottom: 1px solid #e5e8eb;
   border-radius: 0;
-  background: transparent;
+  background: #fff;
+  padding: 4px 0;
 }
 
 /* 갤러리 바로 다음 그룹은 조금 덜 */
 .m-pd--desktop .m-pd-gallery + .m-pd-group,
-.m-pd--desktop .m-pd-gallery__external + .m-pd-group {
-  margin-top: 36px;
+.m-pd--desktop .m-pd-gallery__external + .m-pd-group,
+.m-pd--desktop .m-pd-gallery--textonly + .m-pd-group {
+  margin-top: 28px;
 }
 
 /* ─── 차량 정보 ──────────────────────────────── */
