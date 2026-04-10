@@ -373,15 +373,17 @@ export function renderTableGrid(options = {}) {
       const alignCls = col.align === 'r' ? ' pls--right' : col.align === 'c' ? ' pls--center' : '';
       const isFilterable = col.filterable || col.searchable;
       const filterable = isFilterable ? ' pls-th--filterable' : '';
-      const hasCheckFilter = col.filterable && (activeFilters[col.key]?.size || (col.priceMonth && activeFilters[`_dep_${col.key}`]?.size));
+      const checkCount = col.filterable ? (activeFilters[col.key]?.size || 0) + (col.priceMonth ? (activeFilters[`_dep_${col.key}`]?.size || 0) : 0) : 0;
       const hasSearchFilter = col.searchable && searchFilters[col.key];
-      const hasFilter = (hasCheckFilter || hasSearchFilter) ? ' pls-th--has-filter' : '';
+      const filterCount = checkCount + (hasSearchFilter ? 1 : 0);
+      const hasFilter = filterCount > 0 ? ' pls-th--has-filter' : '';
+      const filterBadge = filterCount > 0 ? `<span class="pls-th__filter-count">${filterCount}</span>` : '';
       const dataAttr = ` data-col-key="${escapeHtml(col.key)}"`;
       const isSorted = gf.sortCol === col.key && gf.sortDir;
       const sortCls = isSorted ? (gf.sortDir === 1 ? ' pls-th--sort-asc' : ' pls-th--sort-desc') : '';
       const sortIndicator = isSorted ? `<span class="pls-th__sort">${gf.sortDir === 1 ? '˄' : '˅'}</span>` : '';
       const sortableCls = (sortable && !isFilterable) ? ' pls-th--sortable' : '';
-      return `<th class="pls-th${alignCls}${filterable}${hasFilter}${sortCls}${sortableCls}"${dataAttr}${sAttr}><span class="pls-th__label">${escapeHtml(col.label)}</span>${sortIndicator}</th>`;
+      return `<th class="pls-th${alignCls}${filterable}${hasFilter}${sortCls}${sortableCls}"${dataAttr}${sAttr}><span class="pls-th__label">${escapeHtml(col.label)}</span>${filterBadge}${sortIndicator}</th>`;
     }).join('');
     const actionTh = hasActions ? '<th class="pls-th pls--center" style="width:56px"></th>' : '';
     thead.innerHTML = `<tr>${ths}${actionTh}</tr>`;
@@ -571,7 +573,14 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
         const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
         renderTableGrid({ ...latest, _bodyOnly: true });
         const th = thead.querySelector(`[data-col-key="${colKey}"]`);
-        if (th) th.classList.toggle('pls-th--has-filter', !!q);
+        if (th) {
+          th.classList.toggle('pls-th--has-filter', !!q);
+          let badge = th.querySelector('.pls-th__filter-count');
+          if (q) {
+            if (!badge) { badge = document.createElement('span'); badge.className = 'pls-th__filter-count'; th.appendChild(badge); }
+            badge.textContent = '1';
+          } else if (badge) { badge.remove(); }
+        }
       }, 150);
     });
     dd.addEventListener('click', (e) => {
@@ -678,11 +687,16 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
     input.closest('label')?.classList.toggle('is-checked', input.checked);
     const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
     renderTableGrid({ ...latest, _bodyOnly: true });
-    // 헤더 필터 표시 즉시 업데이트
+    // 헤더 필터 뱃지 즉시 업데이트
     const th = thead.querySelector(`[data-col-key="${colKey}"]`);
     if (th) {
-      const hasAny = selected.size || (depSelected && depSelected.size);
-      th.classList.toggle('pls-th--has-filter', !!hasAny);
+      const cnt = (selected.size || 0) + (depSelected ? depSelected.size : 0);
+      th.classList.toggle('pls-th--has-filter', cnt > 0);
+      let badge = th.querySelector('.pls-th__filter-count');
+      if (cnt > 0) {
+        if (!badge) { badge = document.createElement('span'); badge.className = 'pls-th__filter-count'; th.appendChild(badge); }
+        badge.textContent = cnt;
+      } else if (badge) { badge.remove(); }
     }
   });
 
