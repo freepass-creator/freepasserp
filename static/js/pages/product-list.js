@@ -383,11 +383,25 @@ function renderFilterAccordion(baseSets){
   $accordion.innerHTML = FILTER_SCHEMA.map(group=>{
     const baseSet = group.key==='periods' ? state.allProducts : (bs.get(group.key)||[]);
     const options = getGroupOptions(group, baseSet);
-    // 옵션별 카운트 계산 + 많은 순 정렬 (전체 타입 동일)
-    const counted = options.map(option => {
-      const count = group.key === 'periods' ? state.allProducts.length : baseSet.filter(item => matchSingle(group, option.value, item)).length;
-      return { ...option, count };
-    }).filter(o => group.key === 'periods' || o.count > 0);
+    // 옵션별 카운트 — range는 한 번 순회로 전부 계산 (성능)
+    let counted;
+    if (group.type === 'range') {
+      const buckets = RANGE_BUCKETS[group.key];
+      const counts = new Array(buckets.length).fill(0);
+      for (const item of baseSet) {
+        const v = getValueForRange(group.key, item);
+        for (let bi = 0; bi < buckets.length; bi++) {
+          if (buckets[bi].match(v)) { counts[bi]++; break; }
+        }
+      }
+      counted = buckets.map((b, i) => ({ value: b.value, label: b.label, count: counts[i] }))
+        .filter(o => o.count > 0);
+    } else {
+      counted = options.map(option => {
+        const count = group.key === 'periods' ? state.allProducts.length : baseSet.filter(item => matchSingle(group, option.value, item)).length;
+        return { ...option, count };
+      }).filter(o => group.key === 'periods' || o.count > 0);
+    }
     counted.sort((a, b) => b.count - a.count);
     const body = counted.map(option => {
       const checked = state.filters[group.key].includes(option.value);
