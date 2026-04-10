@@ -1,0 +1,166 @@
+/* ═════════════════════════════════════════════════════
+   데스크탑 우측 상세 패널 — .m-pd--desktop 스코프
+   웹 타이포 토큰(12/14/15)에 맞춰 오버라이드
+   모바일 상품 상세는 영향 없음
+   ═════════════════════════════════════════════════════ */
+
+.m-pd--desktop {
+  padding: 0 18px 24px;
+  background: #fff;
+  /* 웹 규격 토큰에 맞춤 */
+  --m-font-display: var(--font-size-xl, 17px);   /* 차량 헤드 */
+  --m-font-title:   var(--font-size-md, 14px);   /* 그룹 타이틀 */
+  --m-font-body:    var(--font-size-base, 12px); /* 본문 값 */
+  --m-font-caption: var(--font-size-sm, 12px);   /* 라벨 */
+  --m-font-micro:   var(--font-size-xs, 11px);
+  --m-text-primary: #0f172a;
+  --m-text-secondary: #475569;
+  --m-text-tertiary: #94a3b8;
+}
+
+/* ─── 갤러리 ─────────────────────────────────── */
+.m-pd--desktop .m-pd-gallery {
+  aspect-ratio: 16 / 10;
+  border-radius: 6px;
+  margin-top: 14px;
+}
+
+/* ─── 그룹 ───────────────────────────────────── */
+.m-pd--desktop .m-pd-group {
+  margin-top: 22px;
+}
+.m-pd--desktop .m-pd-group:first-of-type {
+  margin-top: 18px;
+}
+.m-pd--desktop .m-pd-group__head {
+  margin-bottom: 10px;
+  padding: 0 0 6px;
+  border-bottom: 1px solid #e5e8eb;
+  gap: 8px;
+}
+.m-pd--desktop .m-pd-group__icon,
+.m-pd--desktop .m-pd-group__icon svg {
+  width: 16px;
+  height: 16px;
+}
+.m-pd--desktop .m-pd-group__title {
+  font-size: var(--font-size-md, 14px);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: #1f2937;
+}
+.m-pd--desktop .m-pd-group__body {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* ─── 차량 정보 ──────────────────────────────── */
+.m-pd--desktop .m-pd-vinfo__row--head {
+  padding: 6px 0 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.m-pd--desktop .m-pd-vinfo__head-title {
+  font-size: var(--font-size-xl, 17px);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+.m-pd--desktop .m-pd-vinfo__head-sub {
+  font-size: var(--font-size-sm, 12px);
+  margin-left: 6px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+.m-pd--desktop .m-pd-vinfo__row {
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.m-pd--desktop .m-pd-vinfo__row:last-child {
+  border-bottom: none;
+}
+.m-pd--desktop .m-pd-vinfo__row--grid2 {
+  padding: 12px 0 6px;
+  gap: 10px 24px;
+}
+.m-pd--desktop .m-pd-vinfo__label {
+  font-size: var(--font-size-sm, 12px);
+  color: #64748b;
+  font-weight: 600;
+}
+.m-pd--desktop .m-pd-vinfo__value {
+  font-size: var(--font-size-base, 12px);
+  color: #0f172a;
+  font-weight: 600;
+}
+.m-pd--desktop .m-pd-vinfo__value--block {
+  font-size: var(--font-size-base, 12px);
+  line-height: 1.55;
+  font-weight: 500;
+  color: #334155;
+}
+.m-pd--desktop .m-pd-vinfo__cell .m-pd-vinfo__value {
+  font-size: var(--font-size-base, 12px);
+  font-weight: 700;
+}
+
+/* ─── KV 리스트 ──────────────────────────────── */
+.m-pd--desktop .m-pd-kv {
+  padding: 0;
+}
+.m-pd--desktop .m-pd-kv__row {
+  padding: 9px 0;
+  border-bottom: 1px solid #f1f5f9;
+  gap: 14px;
+}
+.m-pd--desktop .m-pd-kv__row:last-child {
+  border-bottom: none;
+}
+.m-pd--desktop .m-pd-kv__key {
+  flex: 0 0 130px;
+  font-size: var(--font-size-sm, 12px);
+  font-weight: 600;
+  color: #64748b;
+}
+.m-pd--desktop .m-pd-kv__val {
+  font-size: var(--font-size-base, 12px);
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* ─── 표 (가격/보험) ─────────────────────────── */
+.m-pd--desktop .m-pd-price-table__th,
+.m-pd--desktop .m-pd-price-table__row,
+.m-pd--desktop .m-pd-tbl__th,
+.m-pd--desktop .m-pd-tbl__row {
+  padding: 9px 12px;
+  font-size: var(--font-size-base, 12px);
+}
+.m-pd--desktop .m-pd-price-table__th,
+.m-pd--desktop .m-pd-tbl__th {
+  background: #f8fafc;
+  border-radius: 4px 4px 0 0;
+  font-size: var(--font-size-sm, 12px);
+  font-weight: 700;
+  color: #64748b;
+}
+.m-pd--desktop .m-pd-price-table__row.is-cheapest strong {
+  font-size: var(--font-size-lg, 15px);
+  font-weight: 800;
+}
+.m-pd--desktop .m-pd-price-table__row strong,
+.m-pd--desktop .m-pd-tbl__row strong {
+  font-weight: 700;
+}
+
+/* ─── 빈 상태 ────────────────────────────────── */
+.m-pd--desktop .m-pd-empty {
+  padding: 14px;
+  font-size: var(--font-size-sm, 12px);
+}
+
+/* ─── 뱃지 (차량 상태/상품 유형) ────────────── */
+.m-pd--desktop .m-pd-badge {
+  font-size: var(--font-size-xs, 11px);
+  padding: 3px 8px;
+}

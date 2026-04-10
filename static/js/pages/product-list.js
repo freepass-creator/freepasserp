@@ -474,6 +474,9 @@ function renderList(){
     },
     getCellValue: (col, item) => {
       if (col.priceMonth) {
+        const rentNum = moneyToNumber(item.price[col.priceMonth]?.rent);
+        // 대여료 없으면 보증금도 표기 안 함
+        if (!rentNum) return `<span class="pls-price-rent">-</span><span class="pls-price-dep">-</span>`;
         const rent = fmtPrice(item.price[col.priceMonth]?.rent);
         const depNum = moneyToNumber(item.price[col.priceMonth]?.deposit);
         const dep = depNum ? depNum.toLocaleString('ko-KR') : '0';
@@ -747,7 +750,7 @@ function renderDetail(){
   syncTopBarIdentity(product);
   // 모바일 상품 상세와 동일한 마크업 사용
   const rawProduct = product._raw || product;
-  $detail.innerHTML = `<div class="m-pd">${renderMobileProductDetail(rawProduct, {
+  $detail.innerHTML = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
     activePhotoIndex: state.activePhotoIndex,
     policy: getTermFields(product),
   })}</div>`;
