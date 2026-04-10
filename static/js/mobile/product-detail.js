@@ -175,6 +175,23 @@ $btnShare?.addEventListener('click', async (e) => {
   const company = currentProfile?.company_name || '';
   const title = [carPart, agentPart && `- ${agentPart}`, company && `| ${company}`].filter(Boolean).join(' ');
   if (title) url.searchParams.set('t', title);
+  // OG 설명: "48개월 월 79만원 · 보증금 100만원 · 24년식 · 가솔린"
+  const num = (v) => Number(String(v ?? '').replace(/[^\d.-]/g, '')) || 0;
+  const fmtMan = (n) => n >= 10000 && n % 10000 === 0 ? `${(n/10000).toLocaleString('ko-KR')}만원` : `${n.toLocaleString('ko-KR')}원`;
+  let cheapest = null;
+  for (const m of [1, 12, 24, 36, 48, 60]) {
+    const slot = (p.price && (p.price[m] || p.price[String(m)])) || {};
+    const rent = num(slot.rent);
+    if (rent && (!cheapest || rent < cheapest.rent)) cheapest = { m, rent, deposit: num(slot.deposit) };
+  }
+  const desc = [];
+  if (cheapest) {
+    desc.push(`${cheapest.m}개월 월 ${fmtMan(cheapest.rent)}`);
+    if (cheapest.deposit) desc.push(`보증금 ${fmtMan(cheapest.deposit)}`);
+  }
+  if (p.year) desc.push(`${String(p.year).slice(-2)}년식`);
+  if (p.fuel_type) desc.push(String(p.fuel_type));
+  if (desc.length) url.searchParams.set('d', desc.join(' · '));
   // 차량 대표 이미지 → 서버 인메모리 캐시에 저장 (await로 캐시 보장)
   const firstImg = (Array.isArray(p.image_urls) && p.image_urls[0]) || p.image_url || '';
   const productKey = p.product_uid || p.product_code || '';
