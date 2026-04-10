@@ -11,7 +11,7 @@ import { renderRoleMenu } from "../core/role-menu.js";
 import { pushEsc, removeEsc } from "../core/esc-stack.js";
 import { ensureRoom, watchProducts, resolveTermForProduct } from "../firebase/firebase-db.js";
 import { showConfirm, showToast } from "../core/toast.js";
-import { bindProductDetailPhotoEvents, extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
+import { extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
 import { renderMobileProductDetail } from "../shared/mobile-product-detail-markup.js";
 import { renderBadgeRow } from "../shared/badge.js";
 
