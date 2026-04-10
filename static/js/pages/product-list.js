@@ -456,7 +456,6 @@ function renderList(){
     sortable: true,
     getKey: (item) => item.id,
     onSelect: (item) => {
-      // 다른 행 클릭 → 내용만 교체 (패널은 열린 상태 유지)
       // 같은 행 재클릭 → 패널 닫기
       const isSame = state.selectedId === item.id && $detailPanel && !$detailPanel.hidden;
       if (isSame) {
@@ -466,8 +465,19 @@ function renderList(){
       state.selectedId = item.id;
       state.activePhotoIndex = 0;
       renderList();
-      renderDetail();
-      if (!$detailPanel || $detailPanel.hidden) showDetailPanel();
+      // 패널이 이미 열려있으면 슬라이드 재진입 효과
+      if ($detailPanel && !$detailPanel.hidden) {
+        $detailPanel.classList.remove('is-open');
+        $detail?.scrollTo?.(0, 0);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          renderDetail();
+          $detailPanel.classList.add('is-open', 'is-reveal');
+          setTimeout(() => $detailPanel.classList.remove('is-reveal'), 260);
+        }));
+      } else {
+        renderDetail();
+        showDetailPanel();
+      }
     },
     getCellValue: (col, item) => {
       if (col.priceMonth) {
