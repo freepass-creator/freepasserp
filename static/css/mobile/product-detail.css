@@ -536,8 +536,9 @@
 
 /* ─── 키밸류 리스트 (kv) ─────────────────────────── */
 .m-pd-kv {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
   padding: 0 var(--m-space-4);
 }
 .m-pd-kv__row {
@@ -546,8 +547,14 @@
   gap: var(--m-space-3);
   padding: var(--m-space-3) 0;
   border-bottom: 1px solid var(--m-divider);
+  min-width: 0;
 }
-.m-pd-kv__row:last-child { border-bottom: none; }
+/* 홀수 행 오른쪽에 살짝 왼쪽 패딩 */
+.m-pd-kv__row:nth-child(even) { padding-left: var(--m-space-3); }
+/* 행이 홀수 개일 때 마지막 행만 1열 full width */
+.m-pd-kv__row:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* 마지막 두 행 하단 보더 제거 */
+.m-pd-kv__row:nth-last-child(-n+2) { border-bottom: none; }
 .m-pd-kv__key {
   flex: 0 0 28%;
   font-size: var(--m-font-caption);
