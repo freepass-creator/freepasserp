@@ -116,6 +116,16 @@ form?.addEventListener('submit', async (event) => {
       throw profileError;
     }
   } catch (error) {
-    message.textContent = `계정 생성 실패: ${error.message}`;
+    const code = error?.code || '';
+    if (code === 'auth/email-already-in-use') {
+      message.textContent = '이미 가입된 이메일입니다. 로그인 페이지에서 로그인하세요.';
+    } else if (code === 'auth/weak-password') {
+      message.textContent = '비밀번호가 너무 짧습니다. 8자 이상 입력하세요.';
+    } else if (code === 'auth/invalid-email') {
+      message.textContent = '올바른 이메일 형식이 아닙니다.';
+    } else {
+      message.textContent = `계정 생성 실패: ${error.message || error}`;
+      console.error('[signup] error:', code, error);
+    }
   }
 });
