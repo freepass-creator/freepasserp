@@ -385,7 +385,6 @@ async function bootstrap() {
     });
 
     setIdleMode();
-    console.log('[policy] bootstrap done, submitButton:', submitButton, 'disabled:', submitButton?.disabled);
   } catch (error) {
     console.error('[policy] bootstrap error', error);
     showToast(error.message, 'error');

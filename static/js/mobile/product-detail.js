@@ -165,7 +165,6 @@ $btnShare?.addEventListener('click', async (e) => {
   const ok = await showConfirm('이 상품의 공유 링크를 만드시겠습니까?');
   if (!ok) return;
   const p = currentProduct;
-  const p = currentProduct;
   const url = new URL(location.origin + '/catalog');
   url.searchParams.set('id', p.product_uid || p.product_code || '');
   if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
