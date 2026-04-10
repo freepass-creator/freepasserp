@@ -807,6 +807,11 @@ function renderDetail(){
     }
   }
   $detail.innerHTML = html;
+  // 새 상품 열 때는 스크롤 맨 위부터
+  if ($detail.scrollTo) $detail.scrollTo(0, 0);
+  else $detail.scrollTop = 0;
+  const scrollHost = $detail.closest('.panel-body--detail') || $detail.closest('.pls-detail-panel');
+  if (scrollHost) scrollHost.scrollTop = 0;
   bindMobileGalleryEvents($detail, rawProduct);
   ensureTermLoaded(product);
 }
