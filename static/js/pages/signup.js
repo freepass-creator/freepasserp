@@ -25,16 +25,22 @@ async function updatePartnerPreview() {
     partnerPreview.textContent = '매칭 대기';
     return;
   }
-  const partner = await getPartnerByBusinessNumber(businessNumber);
-  if (!partner) {
+  try {
+    const partner = await getPartnerByBusinessNumber(businessNumber);
+    if (!partner) {
+      partnerPreview.className = 'auth-match-badge auth-match-badge--unmatched';
+      partnerPreview.textContent = '매칭되는 코드 없음';
+      return;
+    }
+    matchedPartner = partner;
+    const typeLabel = partner.partner_type === 'provider' ? '공급사' : partner.partner_type === 'sales_channel' ? '영업채널' : partner.partner_type;
+    partnerPreview.className = 'auth-match-badge auth-match-badge--matched';
+    partnerPreview.textContent = `${partner.partner_name} / ${typeLabel} / ${partner.partner_code}`;
+  } catch {
+    // 미로그인 상태에서 partners 읽기 권한 없음 — 가입 후 관리자가 매칭
     partnerPreview.className = 'auth-match-badge auth-match-badge--unmatched';
-    partnerPreview.textContent = '매칭되는 코드 없음';
-    return;
+    partnerPreview.textContent = '가입 후 자동 매칭됩니다';
   }
-  matchedPartner = partner;
-  const typeLabel = partner.partner_type === 'provider' ? '공급사' : partner.partner_type === 'sales_channel' ? '영업채널' : partner.partner_type;
-  partnerPreview.className = 'auth-match-badge auth-match-badge--matched';
-  partnerPreview.textContent = `${partner.partner_name} / ${typeLabel} / ${partner.partner_code}`;
 }
 
 businessNumberInput?.addEventListener('input', updatePartnerPreview);
