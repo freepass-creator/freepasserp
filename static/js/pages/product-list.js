@@ -383,13 +383,12 @@ function renderFilterAccordion(baseSets){
   $accordion.innerHTML = FILTER_SCHEMA.map(group=>{
     const baseSet = group.key==='periods' ? state.allProducts : (bs.get(group.key)||[]);
     const options = getGroupOptions(group, baseSet);
-    // 옵션별 카운트 계산 + 많은 순 정렬 (기간/범위/연식은 원래 순서 유지)
-    const keepOrder = group.type === 'periods' || group.type === 'range' || group.type === 'year';
+    // 옵션별 카운트 계산 + 많은 순 정렬 (모바일 filter-sheet와 동일)
     const counted = options.map(option => {
       const count = group.key === 'periods' ? state.allProducts.length : baseSet.filter(item => matchSingle(group, option.value, item)).length;
       return { ...option, count };
     }).filter(o => group.key === 'periods' || o.count > 0);
-    if (!keepOrder) counted.sort((a, b) => b.count - a.count);
+    counted.sort((a, b) => b.count - a.count);
     const body = counted.map(option => {
       const checked = state.filters[group.key].includes(option.value);
       return `<label class="filter-option"><span class="filter-check"><input type="checkbox" data-group="${group.key}" data-value="${option.value}" ${checked?'checked':''}><span>${option.label}</span></span><span class="filter-count">(${option.count})</span></label>`;
