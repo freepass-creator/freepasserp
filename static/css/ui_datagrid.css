@@ -90,6 +90,8 @@
 .pls-row:nth-child(odd) td { background: #ffffff; }
 .pls-row:hover td { background: #f8f9fa; }
 .pls-row.is-active td { background: #f0f4f9; }
+.pls-row.is-selected td { background: #eef2ff; }
+.pls-row.is-selected:hover td { background: #e0e7ff; }
 
 /* ─── 데이터 셀 (td) ─────────────────────────────────────────────────────── */
 
