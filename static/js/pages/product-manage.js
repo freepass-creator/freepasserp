@@ -567,12 +567,13 @@ function renderList(products) {
 }
 
 
-// ─── 우클릭 → 차량상태 변경 컨텍스트 메뉴 ──────────────────
+// ─── 우클릭 컨텍스트 메뉴 (정보수정 / 상태변경 / 등록삭제) ──────────
 const VEHICLE_STATUS_OPTIONS = ['출고가능', '출고협의', '출고불가', '계약대기', '계약완료'];
 let _ctxMenu = null;
 function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.remove(); _ctxMenu = null; } }
 document.addEventListener('click', removeCtxMenu);
 document.addEventListener('scroll', removeCtxMenu, true);
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
 
 listBody?.addEventListener('contextmenu', (e) => {
   const row = e.target.closest('tr[data-key]');
@@ -580,33 +581,74 @@ listBody?.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   removeCtxMenu();
   const productKey = row.dataset.key;
+  const product = (allProducts || []).find(p => (p.product_uid || p.product_code) === productKey);
+
   const menu = document.createElement('div');
   menu.className = 'pm-ctx-menu';
-  menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:4px 0;min-width:140px;`;
-  menu.innerHTML = `<div style="padding:6px 14px;font-size:11px;color:#94a3b8;font-weight:700;">차량상태 변경</div>` +
-    VEHICLE_STATUS_OPTIONS.map(s =>
-      `<button type="button" class="pm-ctx-item" data-status="${escapeHtml(s)}" style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:transparent;font-size:12px;color:#0f172a;cursor:pointer;">${escapeHtml(s)}</button>`
-    ).join('');
+  menu.innerHTML = `
+    <button type="button" class="pm-ctx-item" data-action="edit">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+      정보수정
+    </button>
+    <div class="pm-ctx-sub">
+      <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        상태변경
+        <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div class="pm-ctx-submenu">
+        ${VEHICLE_STATUS_OPTIONS.map(s =>
+          `<button type="button" class="pm-ctx-item" data-action="status" data-status="${escapeHtml(s)}">${escapeHtml(s)}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="pm-ctx-divider"></div>
+    <button type="button" class="pm-ctx-item pm-ctx-item--danger" data-action="delete">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+      등록삭제
+    </button>
+  `;
   document.body.appendChild(menu);
   _ctxMenu = menu;
-  // 화면 밖 보정
-  const rect = menu.getBoundingClientRect();
-  if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 8}px`;
-  if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 8}px`;
-  // hover 효과
-  menu.querySelectorAll('.pm-ctx-item').forEach(btn => {
-    btn.addEventListener('mouseenter', () => { btn.style.background = '#f1f5f9'; });
-    btn.addEventListener('mouseleave', () => { btn.style.background = 'transparent'; });
-    btn.addEventListener('click', async () => {
+  // 위치
+  menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;`;
+  requestAnimationFrame(() => {
+    const rect = menu.getBoundingClientRect();
+    if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 8}px`;
+    if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 8}px`;
+  });
+
+  // 이벤트
+  menu.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+
+    if (action === 'edit') {
       removeCtxMenu();
-      const newStatus = btn.dataset.status;
+      if (product) fillProductForm(product, { ...adapterContext, currentProfile });
+    }
+    if (action === 'status') {
+      removeCtxMenu();
       try {
-        await updateProduct(productKey, { vehicle_status: newStatus });
-        showToast(`차량상태 → ${newStatus}`, 'success');
+        await updateProduct(productKey, { vehicle_status: btn.dataset.status });
+        showToast(`차량상태 → ${btn.dataset.status}`, 'success');
       } catch (err) {
         showToast('상태 변경 실패: ' + (err.message || err), 'error');
       }
-    });
+    }
+    if (action === 'delete') {
+      removeCtxMenu();
+      if (!await showConfirm('이 상품을 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.')) return;
+      try {
+        await deleteProduct(productKey);
+        showToast('삭제 완료', 'success');
+        resetForm();
+        applyFormMode('idle');
+      } catch (err) {
+        showToast('삭제 실패: ' + (err.message || err), 'error');
+      }
+    }
   });
 });
 
