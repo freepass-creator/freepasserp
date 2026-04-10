@@ -24,6 +24,20 @@
   border-radius: 8px;
   margin-top: 14px;
 }
+.m-pd--desktop .m-pd-gallery__external {
+  display: inline-flex !important;
+  margin-top: 8px;
+  padding: 7px 12px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: var(--font-size-sm, 12px);
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+  align-items: center;
+  gap: 6px;
+}
+.m-pd--desktop .m-pd-gallery__external:hover { background: #e2e8f0; }
 
 /* ─── 그룹 — 카드형, 동일 라운드 ─────────────── */
 .m-pd--desktop .m-pd-group {
