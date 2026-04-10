@@ -6,13 +6,9 @@
 .m-body[data-page="카탈로그"] .m-page {
   padding-bottom: 0;
 }
-/* 필터 패널 — 탭바 없으니 바닥까지 내림 */
+/* 필터 패널 — 탭바 대신 CTA 바 높이(68px + safe-area) 위에 맞닿도록 */
 .m-body[data-page="카탈로그"] .m-fs {
-  bottom: 0;
-}
-/* 필터 backdrop도 바닥까지 */
-.m-body[data-page="카탈로그"] .m-fs-backdrop {
-  bottom: 0;
+  bottom: calc(68px + env(safe-area-inset-bottom));
 }
 
 /* 상단 에이전트 뱃지 */
