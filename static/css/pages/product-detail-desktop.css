@@ -27,7 +27,7 @@
 
 /* ─── 그룹 — 카드형, 동일 라운드 ─────────────── */
 .m-pd--desktop .m-pd-group {
-  margin-top: 32px;
+  margin-top: 48px;
   background: #fff;
   border: 1px solid #e5e8eb;
   border-radius: 8px;
@@ -60,10 +60,10 @@
   background: transparent;
 }
 
-/* 갤러리는 카드가 아니므로 아래 그룹과 간격만 확보 */
+/* 갤러리 바로 다음 그룹은 조금 덜 */
 .m-pd--desktop .m-pd-gallery + .m-pd-group,
 .m-pd--desktop .m-pd-gallery__external + .m-pd-group {
-  margin-top: 28px;
+  margin-top: 36px;
 }
 
 /* ─── 차량 정보 ──────────────────────────────── */
