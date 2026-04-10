@@ -12,35 +12,8 @@
 {% block workspace_body %}
 <div class="work-page min-h-work product-list-page-shell" id="productListShell">
 
-<!-- ━━━ 데스크탑: 필터 오버레이 ━━━ -->
-<aside class="filter-overlay panel--filter" id="filterOverlay" aria-hidden="true">
-  <div class="panel-head panel-head-default">
-    <div class="panel-head-title-wrap"><div class="panel-head-title">필터</div></div>
-    <div class="panel-head-actions">
-      <button class="inline-button btn-sm" id="resetFilterBtn" type="button">초기화</button>
-      <button class="inline-button btn-sm" id="applyFilterBtn" type="button">적용</button>
-      <input type="search" class="filter-search-input" id="filterSearchInput" placeholder="검색...">
-    </div>
-  </div>
-  <div class="panel-body">
-    <div id="selectedPeriodsHead"></div>
-    <div id="filterAccordion"></div>
-  </div>
-</aside>
-
 <!-- ━━━ 데스크탑: 엑셀 데이터 그리드 ━━━ -->
 <section class="panel pls-grid-panel">
-<div class="panel-head panel-head-default">
-  <div class="panel-head-actions" style="margin-left:auto;gap:6px;">
-    <button class="inline-button btn-sm" id="openFilterBtn" type="button">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg>
-      필터
-    </button>
-    <button class="inline-button btn-sm btn-icon-only" id="toggleAllGroupsBtn" type="button" title="전체 열기/닫기">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-    </button>
-  </div>
-</div>
 <div class="pls-grid-scroll" id="plsGridScroll">
   <table class="pls-table" id="plsTable">
     <thead id="plsGridHeader"></thead>

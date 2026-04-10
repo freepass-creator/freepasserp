@@ -583,7 +583,7 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
     const text = typeof getCellText === 'function' ? getCellText(col, item) : '';
     if (text && text !== '-') counts.set(text, (counts.get(text) || 0) + 1);
   });
-  const sorted = [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0], 'ko'));
+  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
 
   if (!gf.active[colKey]) gf.active[colKey] = new Set();
   const selected = gf.active[colKey];
