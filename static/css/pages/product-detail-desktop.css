@@ -39,6 +39,23 @@
 }
 .m-pd--desktop .m-pd-gallery__external:hover { background: #e2e8f0; }
 
+/* 사진 없음 — 텍스트만 표기 */
+.m-pd--desktop .m-pd-gallery--textonly {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.m-pd--desktop .m-pd-gallery__empty-line {
+  font-size: var(--font-size-sm, 12px);
+  color: #94a3b8;
+  font-weight: 500;
+}
+
 /* ─── 그룹 — 카드형, 동일 라운드 ─────────────── */
 .m-pd--desktop .m-pd-group {
   margin-top: 48px;

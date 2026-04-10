@@ -99,9 +99,23 @@ function kvList(rows) {
 /* ─── 1. 갤러리 ───────────────────────────────────── */
 export function renderGallery(p, activePhotoIndex = 0) {
   const photos = (Array.isArray(p.image_urls) && p.image_urls.length ? p.image_urls : null) || (p.image_url ? [p.image_url] : []);
+  const photoLink = (p.photo_link || '').trim();
+
+  // 사진 없으면 텍스트만
   if (!photos.length) {
-    return `<div class="m-pd-gallery m-pd-gallery--empty">사진이 등록되지 않았습니다</div>`;
+    const linkRow = photoLink
+      ? `<a class="m-pd-gallery__external" href="${escapeHtml(photoLink)}" target="_blank" rel="noopener noreferrer">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+           사진링크 보기
+         </a>`
+      : `<div class="m-pd-gallery__empty-line">사진링크 없음</div>`;
+    return `<div class="m-pd-gallery--textonly">
+      <div class="m-pd-gallery__empty-line">등록사진 없음</div>
+      ${linkRow}
+    </div>`;
   }
+
+  // 사진 있으면 사진만
   const idx = Math.min(activePhotoIndex, photos.length - 1);
   const counter = photos.length > 1 ? `<div class="m-pd-gallery__counter">${idx + 1} / ${photos.length}</div>` : '';
   const navs = photos.length > 1 ? `
@@ -111,20 +125,12 @@ export function renderGallery(p, activePhotoIndex = 0) {
   const dots = photos.length > 1
     ? `<div class="m-pd-gallery__dots">${photos.map((_, i) => `<span class="m-pd-gallery__dot${i === idx ? ' is-active' : ''}"></span>`).join('')}</div>`
     : '';
-
-  const photoLink = (p.photo_link || '').trim();
-  const photoLinkHtml = photoLink
-    ? `<a class="m-pd-gallery__external" href="${escapeHtml(photoLink)}" target="_blank" rel="noopener noreferrer">
-         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-         사진링크 보기
-       </a>`
-    : '';
   return `<div class="m-pd-gallery">
     <img src="${escapeHtml(photos[idx])}" alt="">
     ${counter}
     ${navs}
     ${dots}
-  </div>${photoLinkHtml}`;
+  </div>`;
 }
 
 function statusTone(v) {

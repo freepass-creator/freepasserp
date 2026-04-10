@@ -456,7 +456,10 @@ function renderList(){
     sortable: true,
     getKey: (item) => item.id,
     onSelect: (item) => {
-      if ($detailPanel && !$detailPanel.hidden) {
+      // 다른 행 클릭 → 내용만 교체 (패널은 열린 상태 유지)
+      // 같은 행 재클릭 → 패널 닫기
+      const isSame = state.selectedId === item.id && $detailPanel && !$detailPanel.hidden;
+      if (isSame) {
         hideDetailPanel();
         return;
       }
@@ -464,13 +467,7 @@ function renderList(){
       state.activePhotoIndex = 0;
       renderList();
       renderDetail();
-      if ($detailPanel && !$detailPanel.hidden) {
-        $detailPanel.classList.remove('is-open');
-        $detailPanel.hidden = true;
-        setTimeout(() => showDetailPanel(), 0);
-      } else {
-        showDetailPanel();
-      }
+      if (!$detailPanel || $detailPanel.hidden) showDetailPanel();
     },
     getCellValue: (col, item) => {
       if (col.priceMonth) {
