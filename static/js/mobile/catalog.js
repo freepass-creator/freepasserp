@@ -22,6 +22,10 @@ const $filterBtn  = $('m-catalog-filter-btn');
 const $detail     = $('m-catalog-detail');
 const $gallery    = $('m-catalog-gallery');
 const $body       = $('m-catalog-body');
+const $topLeft    = document.querySelector('.m-topbar__left');
+const $topRight   = document.querySelector('.m-topbar__right');
+let _topLeftHtml  = '';
+let _topRightHtml = '';
 // CTA 바는 .m-page 밖에 동적 삽입 (CSS 형제 선택자 호환)
 let $cta, $ctaCall, $ctaText;
 function ensureCta() {
@@ -81,6 +85,7 @@ const MILE_BUCKETS = [
   { value: '10만Km~', label: '10만km~', range: [100000, 150000] },
   { value: '15만Km~', label: '15만km~', range: [150000, null] },
 ];
+// ERP 모바일(product.js)과 완전 동일한 필터 그룹
 const FILTER_GROUPS = [
   { key: 'rent', title: '월 대여료', icon: 'money', type: 'range', buckets: RENT_BUCKETS },
   { key: 'deposit', title: '보증금', icon: 'deposit', type: 'range', buckets: DEP_BUCKETS },
@@ -88,11 +93,15 @@ const FILTER_GROUPS = [
   { key: 'maker', title: '제조사', icon: 'car', type: 'check', field: 'maker' },
   { key: 'model_name', title: '모델', icon: 'layers', type: 'check', field: 'model_name' },
   { key: 'sub_model', title: '세부모델', icon: 'rows', type: 'check', field: 'sub_model' },
+  { key: 'trim_name', title: '세부트림', icon: 'award', type: 'search', field: 'trim_name', placeholder: '트림명 검색' },
+  { key: 'options', title: '선택옵션', icon: 'list', type: 'search', field: 'options', placeholder: '옵션명 검색' },
   { key: 'year', title: '연식', icon: 'hash', type: 'check', field: 'year', sort: 'desc' },
   { key: 'mileage', title: '주행거리', icon: 'road', type: 'range', buckets: MILE_BUCKETS },
   { key: 'fuel_type', title: '연료', icon: 'fuel', type: 'check', field: 'fuel_type' },
   { key: 'color', title: '색상', icon: 'palette', type: 'check', fields: ['ext_color', 'int_color'] },
   { key: 'vehicle_class', title: '차종구분', icon: 'shape', type: 'check', field: 'vehicle_class' },
+  { key: 'screening_criteria', title: '심사기준', icon: 'shield', type: 'policyCheck', field: 'screening_criteria' },
+  { key: 'basic_driver_age', title: '최저연령', icon: 'user', type: 'policyCheck', field: 'basic_driver_age' },
 ];
 
 // ─── 렌더 ─────────────────────────────────────────
@@ -170,9 +179,58 @@ function renderDetailGallery(p) {
   $gallery.querySelector('img')?.addEventListener('click', () => openViewer(photos, idx));
 }
 
+// ─── 상단바 전환 ──────────────────────────────────
+function switchTopbarToDetail(p) {
+  if (!_topLeftHtml && $topLeft) _topLeftHtml = $topLeft.innerHTML;
+  if (!_topRightHtml && $topRight) _topRightHtml = $topRight.innerHTML;
+  const carNo = p.car_number || '';
+  const sub = p.sub_model || p.model_name || '';
+  const title = [carNo, sub].filter(Boolean).join(' ');
+  if ($topLeft) $topLeft.innerHTML = `
+    <button class="m-icon-btn" id="m-cat-back" type="button" aria-label="뒤로">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="m-page-title">${escapeHtml(title)}</div>`;
+  if ($topRight) $topRight.innerHTML = `
+    <button class="m-icon-btn" id="m-cat-share" type="button" aria-label="공유">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+    </button>`;
+  $('m-cat-back')?.addEventListener('click', () => { history.back(); });
+  $('m-cat-share')?.addEventListener('click', () => shareCurrent());
+}
+function switchTopbarToList() {
+  if (_topLeftHtml && $topLeft) $topLeft.innerHTML = _topLeftHtml;
+  if (_topRightHtml && $topRight) $topRight.innerHTML = _topRightHtml;
+  // 검색 이벤트 재바인딩
+  const newSearch = $('m-catalog-search');
+  if (newSearch) {
+    newSearch.value = searchQuery;
+    newSearch.addEventListener('input', () => {
+      searchQuery = newSearch.value;
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(applySearch, 200);
+    });
+  }
+  $('m-catalog-filter-btn')?.addEventListener('click', handleFilterClick);
+}
+function shareCurrent() {
+  if (!detailProduct) return;
+  const p = detailProduct;
+  const pid = p._key || p.product_uid || '';
+  const carTitle = [p.car_number, p.maker, p.model_name].filter(Boolean).join(' ');
+  const url = new URL(location.origin + '/catalog');
+  if (agentCode) url.searchParams.set('a', agentCode);
+  if (pid) url.searchParams.set('id', pid);
+  if (carTitle) url.searchParams.set('t', carTitle);
+  navigator.clipboard?.writeText(url.toString())
+    .then(() => { /* TODO: toast */ })
+    .catch(() => { window.prompt('링크를 복사하세요', url.toString()); });
+}
+
 function showDetail(p) {
   detailProduct = p;
   galleryIndex = 0;
+  switchTopbarToDetail(p);
   renderDetailGallery(p);
   const policiesArr = allPolicies && typeof allPolicies === 'object'
     ? (Array.isArray(allPolicies) ? allPolicies : Object.values(allPolicies))
@@ -193,6 +251,7 @@ function hideDetail() {
   $detail.hidden = true;
   $grid.hidden = false;
   detailProduct = null;
+  switchTopbarToList();
 }
 
 // ─── 이벤트 ───────────────────────────────────────
@@ -206,7 +265,7 @@ $grid?.addEventListener('click', (e) => {
 });
 
 // 필터 버튼
-$filterBtn?.addEventListener('click', () => {
+function handleFilterClick() {
   toggleFilter({
     groups: FILTER_GROUPS,
     items: allProducts,
@@ -219,7 +278,8 @@ $filterBtn?.addEventListener('click', () => {
       applySearch();
     }
   });
-});
+}
+$filterBtn?.addEventListener('click', handleFilterClick);
 
 // 검색
 let _searchTimer;
