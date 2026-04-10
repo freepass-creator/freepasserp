@@ -23,9 +23,23 @@ const $detail     = $('m-catalog-detail');
 const $gallery    = $('m-catalog-gallery');
 const $body       = $('m-catalog-body');
 const $agentLabel = $('m-catalog-agent');
-const $cta        = $('m-catalog-cta');
-const $ctaCall    = $('m-catalog-call');
-const $ctaText    = $('m-catalog-call-text');
+// CTA 바는 .m-page 밖에 동적 삽입 (CSS 형제 선택자 호환)
+let $cta, $ctaCall, $ctaText;
+function ensureCta() {
+  if ($cta) return;
+  const html = `<div class="m-catalog-cta" id="m-catalog-cta" hidden>
+    <a class="m-catalog-cta__btn" id="m-catalog-call" href="tel:">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span id="m-catalog-call-text">연락하기</span>
+    </a>
+  </div>`;
+  const tabbar = document.getElementById('m-tabbar');
+  if (tabbar) tabbar.insertAdjacentHTML('beforebegin', html);
+  else document.body.insertAdjacentHTML('beforeend', html);
+  $cta = $('m-catalog-cta');
+  $ctaCall = $('m-catalog-call');
+  $ctaText = $('m-catalog-call-text');
+}
 
 // ─── URL 파라미터 ─────────────────────────────────
 const params      = new URLSearchParams(location.search);
@@ -83,7 +97,9 @@ const FILTER_GROUPS = [
 ];
 
 // ─── 렌더 ─────────────────────────────────────────
+let _lastRendered = [];
 function renderGrid(items) {
+  _lastRendered = items;
   if (!$grid) return;
   if (!items.length) {
     $grid.innerHTML = '<div style="grid-column:1/-1;padding:48px 0;text-align:center;color:#94a3b8;">상품이 없습니다</div>';
@@ -187,8 +203,7 @@ $grid?.addEventListener('click', (e) => {
   if (!card) return;
   e.preventDefault();
   const idx = Number(card.dataset.index);
-  const products = getFiltered();
-  if (products[idx]) showDetail(products[idx]);
+  if (_lastRendered[idx]) showDetail(_lastRendered[idx]);
 });
 
 // 필터 버튼
@@ -249,10 +264,11 @@ async function loadAgent() {
       $agentLabel.textContent = parts.join(' ');
     }
     // 하단 CTA
-    if (phone && $cta && $ctaCall) {
-      $ctaCall.href = `tel:${phone}`;
+    if (phone) {
+      ensureCta();
+      if ($ctaCall) $ctaCall.href = `tel:${phone}`;
       if ($ctaText) $ctaText.textContent = `${name || '담당자'}${position ? ' ' + position : ''}에게 전화하기`;
-      $cta.hidden = false;
+      if ($cta) $cta.hidden = false;
     }
   } catch (e) {
     console.warn('[catalog] agent load failed', e);

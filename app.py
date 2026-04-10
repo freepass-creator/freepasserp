@@ -245,8 +245,9 @@ def catalog_view():
         title = f'전체상품{agent_suffix}{company_suffix}'
     custom_desc = req.args.get('d', '')
     og_desc = custom_desc or '장기렌터카 구독서비스 영업전용 ERP'
-    template = 'mobile/catalog.html' if _is_mobile() else 'pages/catalog.html'
-    return render_template(template, page_title=title, og_title=title, og_desc=og_desc, og_image=og_image)
+    if _is_mobile():
+        return render_template('mobile/catalog.html', page_title='카탈로그', og_title=title, og_desc=og_desc, og_image=og_image)
+    return render_template('pages/catalog.html', page_title=title, og_title=title, og_desc=og_desc, og_image=og_image)
 
 for _path, _tpl, _title in _NEW_ROUTES:
     _ep = _path.lstrip('/').replace('-', '_').replace('/', '_')

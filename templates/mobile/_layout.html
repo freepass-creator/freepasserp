@@ -281,9 +281,11 @@
       tab.addEventListener('mouseenter', prefetch);
     });
   </script>
-  <!-- ⚡ 모든 페이지에서 글로벌 데이터 prefetcher 실행 -->
+  <!-- ⚡ 글로벌 prefetcher + 뱃지 (카탈로그 등 인증 불필요 페이지에서 오버라이드 가능) -->
+  {% block global_scripts %}
   <script type="module" src="{{ url_for('static', filename='js/mobile/prefetch.js') }}?v={{ app_version }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/mobile/tab-badges.js') }}?v={{ app_version }}"></script>
+  {% endblock %}
   {% block page_js %}{% endblock %}
 </body>
 </html>

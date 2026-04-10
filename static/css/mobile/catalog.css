@@ -49,15 +49,9 @@
 .m-catalog-cta__btn:active { opacity: 0.85; transform: scale(0.98); }
 .m-catalog-cta__btn svg { flex-shrink: 0; }
 
-/* CTA 바 있을 때 페이지 하단 패딩 확보 */
-.m-body[data-page="카탈로그"] .m-page:has(~ .m-catalog-cta:not([hidden])) {
+/* CTA 바 있을 때 페이지 하단 패딩 확보 — CTA는 .m-page 형제 */
+.m-body[data-page="카탈로그"] .m-page {
   padding-bottom: calc(68px + env(safe-area-inset-bottom));
-}
-/* :has 미지원 폴백 */
-@supports not (selector(:has(*))) {
-  .m-body[data-page="카탈로그"] .m-page {
-    padding-bottom: calc(68px + env(safe-area-inset-bottom));
-  }
 }
 
 /* 상세 뷰 */
