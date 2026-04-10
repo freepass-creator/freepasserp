@@ -798,6 +798,7 @@ function renderDetail(){
     html = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
       activePhotoIndex: state.activePhotoIndex,
       policy: termFields,
+      showFee: true, // 영업자/공급사/관리자 전부 마지막 섹션에 수수료 노출
     })}</div>`;
     _detailHtmlCache.set(product.id, { html, termVer, photoIdx: state.activePhotoIndex });
     // 캐시 크기 제한 (최근 30개)
@@ -807,11 +808,19 @@ function renderDetail(){
     }
   }
   $detail.innerHTML = html;
-  // 새 상품 열 때는 스크롤 맨 위부터
-  if ($detail.scrollTo) $detail.scrollTo(0, 0);
-  else $detail.scrollTop = 0;
-  const scrollHost = $detail.closest('.panel-body--detail') || $detail.closest('.pls-detail-panel');
-  if (scrollHost) scrollHost.scrollTop = 0;
+  // 새 상품 열 때는 스크롤 맨 위부터 — 모든 가능한 스크롤 호스트 리셋
+  const resetScroll = () => {
+    $detail.scrollTop = 0;
+    let host = $detail.parentElement;
+    while (host && host !== document.body) {
+      if (host.scrollHeight > host.clientHeight) host.scrollTop = 0;
+      if (host.classList?.contains('pls-detail-panel')) break;
+      host = host.parentElement;
+    }
+  };
+  resetScroll();
+  // 패널 슬라이드 트랜지션 후에도 한 번 더 (브라우저가 layout 후 복원하는 경우 방지)
+  requestAnimationFrame(resetScroll);
   bindMobileGalleryEvents($detail, rawProduct);
   ensureTermLoaded(product);
 }

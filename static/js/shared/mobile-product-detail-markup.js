@@ -379,7 +379,7 @@ export function renderScreening(policy) {
   </section>`;
 }
 
-export function renderFee(p, policies) {
+export function renderFee(p, policies, policyFields = null) {
   const months = [1, 12, 24, 36, 48, 60];
   const num = (v) => {
     const n = Number(String(v ?? '').replace(/[^\d.-]/g, ''));
@@ -390,8 +390,14 @@ export function renderFee(p, policies) {
     const slot = price[m] || price[String(m)] || {};
     return { m, fee: num(slot.fee) || num(p[`fee_${m}`]) };
   }).filter(r => r.fee > 0);
-  if (!rows.length) return '';
-  const clawback = findPolicy(p, policies)?.commission_clawback_condition || '';
+  const clawback = (policyFields && policyFields.commission_clawback_condition)
+    || findPolicy(p, policies)?.commission_clawback_condition || '';
+  if (!rows.length && !has(clawback)) {
+    return `<section class="m-pd-group">
+      ${groupHead(ICO.fee, '수수료 안내')}
+      <div class="m-pd-group__body"><div class="m-pd-empty">등록된 수수료가 없습니다</div></div>
+    </section>`;
+  }
   return `<section class="m-pd-group">
     ${groupHead(ICO.fee, '수수료 안내')}
     <div class="m-pd-group__body">${kvList([
@@ -469,6 +475,6 @@ export function renderMobileProductDetail(p, opts = {}) {
     ${showProductMeta ? renderProductMeta(p) : ''}
     ${showVehiclePrice ? renderVehiclePrice(p) : ''}
     ${showProvider ? renderProvider(p) : ''}
-    ${showFee ? renderFee(p, policies) : ''}
+    ${showFee ? renderFee(p, policies, policy) : ''}
   `;
 }
