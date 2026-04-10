@@ -1503,7 +1503,14 @@ $confirmBtn?.addEventListener('click', async () => {
         const r = num(row[`rent_${m}`]);
         const d = num(row[`deposit_${m}`]);
         const f = num(row[`fee_${m}`]);
-        if (r || d || f) hasPrice = true;
+        // 대여료(rent) 없으면 그 개월수는 통째로 미반영 (보증금/수수료만 있어도 무시)
+        if (!r) {
+          row[`rent_${m}`] = '';
+          row[`deposit_${m}`] = '';
+          row[`fee_${m}`] = '';
+          continue;
+        }
+        hasPrice = true;
         priceObj[m] = { rent: r, deposit: d, fee: f };
       }
       if (hasPrice) row.price = priceObj;

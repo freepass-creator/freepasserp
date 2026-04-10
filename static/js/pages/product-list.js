@@ -462,19 +462,22 @@ function renderList(){
         hideDetailPanel();
         return;
       }
-      state.selectedId = item.id;
-      state.activePhotoIndex = 0;
-      renderList();
-      // 패널이 이미 열려있으면 슬라이드 재진입 효과
+      const nextId = item.id;
+      // 패널이 열려있으면 → 완전히 닫았다가 다시 열기
       if ($detailPanel && !$detailPanel.hidden) {
         $detailPanel.classList.remove('is-open');
-        $detail?.scrollTo?.(0, 0);
-        requestAnimationFrame(() => requestAnimationFrame(() => {
+        $detailPanel.hidden = true;
+        setTimeout(() => {
+          state.selectedId = nextId;
+          state.activePhotoIndex = 0;
+          renderList();
           renderDetail();
-          $detailPanel.classList.add('is-open', 'is-reveal');
-          setTimeout(() => $detailPanel.classList.remove('is-reveal'), 260);
-        }));
+          showDetailPanel();
+        }, 180);
       } else {
+        state.selectedId = nextId;
+        state.activePhotoIndex = 0;
+        renderList();
         renderDetail();
         showDetailPanel();
       }
