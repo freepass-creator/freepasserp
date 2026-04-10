@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v125';
+const CACHE_NAME = 'freepass-v126';
 const IMG_CACHE = 'freepass-img-v1';
 
 // 핵심 자원 — 첫 방문 시 미리 다운로드
@@ -36,9 +36,15 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys().then((keys) => {
+      const old = keys.filter((k) => k !== CACHE_NAME && k !== IMG_CACHE);
+      return Promise.all(old.map((k) => caches.delete(k)));
+    }).then(() => self.clients.claim()).then(() => {
+      // 새 SW 활성화 시 모든 탭에 reload 메시지
+      return self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(client => client.postMessage({ type: 'SW_UPDATED' }));
+      });
+    })
   );
 });
 
