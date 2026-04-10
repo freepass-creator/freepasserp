@@ -5,6 +5,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { watchProducts, watchTerms } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
+import { colorToHex } from '../shared/mobile-product-card.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
 import { showConfirm } from '../core/toast.js';
 import { wireHtmlCache } from './page-cache.js';
@@ -83,28 +84,7 @@ let allPolicies = [];
 let searchQuery = '';
 let activeFilters = { selected: {}, searchText: {} };
 
-// 색상 이름 → hex 매핑
-function colorToHex(name) {
-  const s = String(name || '').toLowerCase().trim();
-  if (!s || s === '-') return null;
-  const map = [
-    [/펄|화이트|흰|white/,   '#f8fafc'],
-    [/블랙|검정|black/,      '#0f172a'],
-    [/실버|silver/,          '#c0c0c0'],
-    [/그레이|회색|gray|grey/, '#6b7280'],
-    [/레드|빨강|red/,        '#ef4444'],
-    [/블루|파랑|navy|blue/,  '#1e3a8a'],
-    [/그린|초록|green/,      '#16a34a'],
-    [/옐로우|노랑|yellow/,   '#eab308'],
-    [/오렌지|주황|orange/,   '#f97316'],
-    [/브라운|갈색|brown/,    '#7c2d12'],
-    [/베이지|beige/,         '#d6c8a8'],
-    [/카키|khaki/,           '#78716c'],
-    [/와인|버건디|wine/,     '#7f1d1d'],
-  ];
-  for (const [re, hex] of map) if (re.test(s)) return hex;
-  return '#cbd5e1';
-}
+// colorToHex → shared/mobile-product-card.js에서 import
 
 // 차량상태/상품구분 뱃지 톤
 function statusTone(v) {

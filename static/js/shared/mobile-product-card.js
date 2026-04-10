@@ -6,7 +6,7 @@
  */
 import { escapeHtml } from '../core/management-format.js';
 
-function colorToHex(name) {
+export function colorToHex(name) {
   const s = String(name || '').toLowerCase().trim();
   if (!s || s === '-') return null;
   const map = [

@@ -15,6 +15,7 @@
  *   });
  */
 import { escapeHtml } from '../core/management-format.js';
+import { colorToHex } from './mobile-product-card.js';
 
 /* ── 아이콘 (Lucide, stroke 2) ─────────────────────── */
 const SVG = (paths) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
@@ -40,27 +41,6 @@ export const ICO = {
 const has = (v) => v !== null && v !== undefined && String(v).trim() && String(v).trim() !== '-';
 const dash = (v) => has(v) ? String(v) : '-';
 
-function colorToHex(name) {
-  const s = String(name || '').toLowerCase().trim();
-  if (!s || s === '-') return null;
-  const map = [
-    [/펄|화이트|흰|white/, '#f8fafc'],
-    [/블랙|검정|black/, '#0f172a'],
-    [/실버|silver/, '#c0c0c0'],
-    [/그레이|회색|gray|grey/, '#6b7280'],
-    [/레드|빨강|red/, '#ef4444'],
-    [/블루|파랑|navy|blue/, '#1e3a8a'],
-    [/그린|초록|green/, '#16a34a'],
-    [/옐로우|노랑|yellow/, '#eab308'],
-    [/오렌지|주황|orange/, '#f97316'],
-    [/브라운|갈색|brown/, '#7c2d12'],
-    [/베이지|beige/, '#d6c8a8'],
-    [/카키|khaki/, '#78716c'],
-    [/와인|버건디|wine/, '#7f1d1d'],
-  ];
-  for (const [re, hex] of map) if (re.test(s)) return hex;
-  return '#cbd5e1';
-}
 function isLightColor(hex) {
   if (!hex) return true;
   const r = parseInt(hex.slice(1, 3), 16);
