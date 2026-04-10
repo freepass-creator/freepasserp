@@ -135,11 +135,19 @@ export function fillProductForm(product, context = {}) {
     if (!value && id === 'policy_code') value = product.policy_code || product.term_code || '';
     if (!value && id === 'partner_memo') value = product.partner_memo || product.note || '';
     if (id === 'first_registration_date' || id === 'vehicle_age_expiry_date') value = normalizeDateText(value || '');
-    if (!value && id === 'rent_48') value = product.rent_48 ?? product.rental_price_48 ?? product.rental_price ?? '';
-    if (!value && id === 'deposit_48') value = product.deposit_48 ?? product.deposit_48 ?? product.deposit ?? '';
-    if (!value && id.startsWith('rent_')) value = product.price?.[id.split('_')[1]]?.rent ?? '';
-    if (!value && id.startsWith('deposit_')) value = product.price?.[id.split('_')[1]]?.deposit ?? '';
-    if (!value && id.startsWith('fee_')) value = product.price?.[id.split('_')[1]]?.fee ?? '';
+    // price 객체 우선 (수정 후 저장된 최신값), 없으면 평탄 필드 폴백
+    if (id.startsWith('rent_')) {
+      const m = id.split('_')[1];
+      value = product.price?.[m]?.rent ?? product[id] ?? (m === '48' ? product.rental_price_48 ?? product.rental_price : '') ?? '';
+    }
+    if (id.startsWith('deposit_')) {
+      const m = id.split('_')[1];
+      value = product.price?.[m]?.deposit ?? product[id] ?? (m === '48' ? product.deposit : '') ?? '';
+    }
+    if (id.startsWith('fee_')) {
+      const m = id.split('_')[1];
+      value = product.price?.[m]?.fee ?? product[id] ?? '';
+    }
     if (field.tagName === 'SELECT') {
       ensureSelectValue(field, value ?? '');
     } else if (FIELD_NUMBERS?.has(id)) {
