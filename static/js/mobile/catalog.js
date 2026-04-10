@@ -238,7 +238,9 @@ function showDetail(p) {
     ? (Array.isArray(allPolicies) ? allPolicies : Object.values(allPolicies))
     : [];
   // 갤러리+본문 모두 renderMobileProductDetail에서 통합 렌더 (ERP 모바일과 동일)
+  // $gallery 요소는 비우고 숨김 — 갤러리는 renderMobileProductDetail이 처리
   $gallery.innerHTML = '';
+  $gallery.hidden = true;
   $body.innerHTML = `<div class="m-pd">${renderMobileProductDetail(p, {
     policies: policiesArr,
     showGallery: true,
