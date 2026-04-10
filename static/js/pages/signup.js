@@ -62,10 +62,6 @@ form?.addEventListener('submit', async (event) => {
   const position = qs('#position').value.trim();
   const phone = qs('#phone').value.trim();
 
-  if (!name) {
-    message.textContent = '이름을 입력하세요.';
-    return;
-  }
   if (!email) {
     message.textContent = '이메일을 입력하세요.';
     return;
