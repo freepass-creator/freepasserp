@@ -58,7 +58,7 @@
 
 /* ─── 그룹 — 섹션 타이틀 + 가로 라인 구조 ──────── */
 .m-pd--desktop .m-pd-group {
-  margin-top: 32px;
+  margin-top: 22px;
   background: transparent;
   border: none;
   border-radius: 0;
@@ -66,7 +66,7 @@
   box-shadow: none;
 }
 .m-pd--desktop .m-pd-group:first-of-type {
-  margin-top: 18px;
+  margin-top: 14px;
 }
 /* 섹션 타이틀 — 아이콘 + 텍스트 */
 .m-pd--desktop .m-pd-group__head {
@@ -97,7 +97,7 @@
   border: 1px solid #e5e8eb;
   border-radius: var(--radius-ui, 4px);
   background: #fff;
-  padding: 8px 16px;
+  padding: 4px 14px;
 }
 
 /* ─── 차량정보(첫 섹션) Hero 카드 — 타이틀은 유지 ─── */
@@ -105,7 +105,7 @@
   border: 1px solid #e2e8f0;
   border-radius: var(--radius-ui, 4px);
   background: #fafbfc;
-  padding: 14px 16px;
+  padding: 8px 14px;
 }
 
 /* 갤러리 바로 다음 그룹은 조금 덜 */
@@ -133,15 +133,15 @@
   color: #94a3b8;
 }
 .m-pd--desktop .m-pd-vinfo__row {
-  padding: 10px 0;
+  padding: 6px 0;
   border-bottom: 1px solid #f1f5f9;
 }
 .m-pd--desktop .m-pd-vinfo__row:last-child {
   border-bottom: none;
 }
 .m-pd--desktop .m-pd-vinfo__row--grid2 {
-  padding: 12px 0 6px;
-  gap: 10px 24px;
+  padding: 8px 0 4px;
+  gap: 6px 20px;
 }
 .m-pd--desktop .m-pd-vinfo__label {
   font-size: var(--font-size-sm, 12px);
@@ -169,7 +169,7 @@
   padding: 0;
 }
 .m-pd--desktop .m-pd-kv__row {
-  padding: 8px 0;
+  padding: 5px 0;
   border-bottom: 1px solid #f1f5f9;
   gap: 14px;
 }
@@ -200,7 +200,7 @@
 .m-pd--desktop .m-pd-price-table__row,
 .m-pd--desktop .m-pd-tbl__th,
 .m-pd--desktop .m-pd-tbl__row {
-  padding: 9px 4px;
+  padding: 5px 4px;
   font-size: var(--font-size-base, 12px);
 }
 .m-pd--desktop .m-pd-price-table__th,
