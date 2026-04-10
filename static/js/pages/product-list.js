@@ -341,8 +341,25 @@ function mileageBucketLabel(v) {
 }
 function rentBucketLabel(v) {
   const n = Number(v || 0);
-  for (const b of RANGE_BUCKETS.rent) { if (b.match(n)) return b.label; }
-  return '';
+  if (!n) return '';
+  if (n < 500000)   return '50만원 미만';
+  if (n < 600000)   return '50만원~';
+  if (n < 700000)   return '60만원~';
+  if (n < 800000)   return '70만원~';
+  if (n < 900000)   return '80만원~';
+  if (n < 1000000)  return '90만원~';
+  if (n < 1500000)  return '100만원~';
+  if (n < 2000000)  return '150만원~';
+  return '200만원~';
+}
+function depositBucketLabel(v) {
+  const n = Number(v || 0);
+  if (!n) return '';
+  if (n < 1000000)  return '100만원 미만';
+  if (n < 2000000)  return '100만원~';
+  if (n < 3000000)  return '200만원~';
+  if (n < 5000000)  return '300만원~';
+  return '500만원~';
 }
 function applyRoleFilter(products){
   return products;
