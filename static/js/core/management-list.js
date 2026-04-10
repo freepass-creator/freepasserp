@@ -570,6 +570,8 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
         updateMatchCount(q);
         const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
         renderTableGrid({ ...latest, _bodyOnly: true });
+        const th = thead.querySelector(`[data-col-key="${colKey}"]`);
+        if (th) th.classList.toggle('pls-th--has-filter', !!q);
       }, 150);
     });
     dd.addEventListener('click', (e) => {
@@ -676,6 +678,12 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
     input.closest('label')?.classList.toggle('is-checked', input.checked);
     const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
     renderTableGrid({ ...latest, _bodyOnly: true });
+    // 헤더 필터 표시 즉시 업데이트
+    const th = thead.querySelector(`[data-col-key="${colKey}"]`);
+    if (th) {
+      const hasAny = selected.size || (depSelected && depSelected.size);
+      th.classList.toggle('pls-th--has-filter', !!hasAny);
+    }
   });
 
   // 적용/초기화
