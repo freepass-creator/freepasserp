@@ -1,4 +1,4 @@
-import { bindProductDetailPhotoEvents, renderProductDetailMarkup } from '../../shared/product-list-detail-view.js';
+import { renderMobileProductDetail } from '../../shared/mobile-product-detail-markup.js';
 import { open as openFullscreenViewer } from '../../shared/fullscreen-photo-viewer.js';
 import { escapeHtml } from './room-list.js';
 
@@ -58,14 +58,14 @@ export function createChatRoomSelectionController({
     }
     const carNo = String(product.carNo || '').trim();
     if (detailTitle) detailTitle.textContent = carNo && carNo !== '-' ? `상세정보(${carNo})` : '상세정보';
-    detailCard.innerHTML = renderProductDetailMarkup(product, {
+    const rawProduct = product._raw || product;
+    const termFields = getTermFields(product);
+    detailCard.innerHTML = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
       activePhotoIndex: getActivePhotoIndex(),
-      termFields: getTermFields(product)
-    });
-    bindProductDetailPhotoEvents(detailCard, (index) => {
-      setActivePhotoIndex(index);
-      renderCurrentDetail();
-    });
+      policy: termFields,
+      showFee: true,
+    })}</div>`;
+    // 갤러리 이벤트
     bindChatDetailGallery(detailCard);
     ensureChatTermLoaded(product);
   }
