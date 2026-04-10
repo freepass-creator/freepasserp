@@ -287,9 +287,8 @@ function showDetailPanel() {
   if (!$detailPanel) return;
   $detailPanel.hidden = false;
   $detailPanel.classList.remove('is-open');
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    $detailPanel.classList.add('is-open');
-  }));
+  // 1프레임만 대기 (이전 2프레임 → 1프레임)
+  requestAnimationFrame(() => { $detailPanel.classList.add('is-open'); });
   // 상단바에 선택 항목 표시
   const selected = state.filteredProducts.find(p => p.id === state.selectedId);
   _syncTopBar(selected);
@@ -483,23 +482,21 @@ function renderList(){
         return;
       }
       const nextId = item.id;
-      // 패널이 열려있으면 → 완전히 닫았다가 다시 열기
-      if ($detailPanel && !$detailPanel.hidden) {
-        $detailPanel.classList.remove('is-open');
-        $detailPanel.hidden = true;
-        setTimeout(() => {
-          state.selectedId = nextId;
-          state.activePhotoIndex = 0;
-          renderList();
-          renderDetail();
-          showDetailPanel();
-        }, 0);
-      } else {
-        state.selectedId = nextId;
-        state.activePhotoIndex = 0;
-        renderList();
-        renderDetail();
+      state.selectedId = nextId;
+      state.activePhotoIndex = 0;
+      // 선택 하이라이트 즉시 DOM 직접 업데이트 (renderList 호출 X)
+      if ($list) {
+        $list.querySelectorAll('tr.is-selected').forEach(tr => tr.classList.remove('is-selected'));
+        const newRow = $list.querySelector(`tr[data-key="${String(nextId).replace(/"/g, '\\"')}"]`);
+        if (newRow) newRow.classList.add('is-selected');
+      }
+      renderDetail();
+      if ($detailPanel && $detailPanel.hidden) {
         showDetailPanel();
+      } else {
+        // 이미 열려있으면 상단바 동기화만
+        const selected = state.filteredProducts.find(p => p.id === nextId);
+        _syncTopBar(selected);
       }
     },
     getCellValue: (col, item) => {
