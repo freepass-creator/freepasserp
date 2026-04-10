@@ -53,6 +53,7 @@ function render() {
     policies: allPolicies,
     activePhotoIndex,
     showFee: true,
+    showProvider: false,
   });
 
   // 갤러리 인터랙션

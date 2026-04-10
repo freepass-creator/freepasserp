@@ -307,6 +307,7 @@ function renderProductDetail(p) {
     policies: policiesArr,
     showGallery: false,
     showFee: false,
+    showProvider: false,
   })}</div>`;
 }
 

@@ -245,6 +245,7 @@ function showDetail(p) {
     policies: policiesArr,
     showGallery: true,
     showFee: false,
+    showProvider: false,
   })}</div>`;
   $grid.hidden = true;
   $detail.hidden = false;
