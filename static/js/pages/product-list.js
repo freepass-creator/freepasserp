@@ -330,8 +330,14 @@ function joinWithMainDot(values){ return values.map((value)=>safe(value)).join('
 function formatMileage(value){const n=Number(value||0); return n?`${n.toLocaleString('ko-KR')}km`:'-';}
 function mileageBucketLabel(v) {
   const n = Number(v || 0);
-  for (const b of RANGE_BUCKETS.mileage) { if (b.match(n)) return b.label; }
-  return '';
+  if (!n) return '';
+  if (n < 10000)  return '1만Km 이하';
+  if (n < 30000)  return '1만Km~';
+  if (n < 50000)  return '3만Km~';
+  if (n < 70000)  return '5만Km~';
+  if (n < 100000) return '7만Km~';
+  if (n < 150000) return '10만Km~';
+  return '15만Km~';
 }
 function rentBucketLabel(v) {
   const n = Number(v || 0);
