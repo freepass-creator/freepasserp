@@ -133,12 +133,13 @@ function inDateRange(item, group, value) {
 }
 
 function buildOptions(group) {
+  // 모든 타입: count 내림차순 정렬 (많은 값이 위)
   if (group.type === 'dateRange') {
     return (group.options || []).map(o => ({
       value: o.value,
       label: o.label,
       count: state.items.filter(it => inDateRange(it, group, o.value)).length,
-    }));
+    })).sort((a, b) => b.count - a.count);
   }
   if (group.type === 'periods') {
     return (group.options || ['1','12','24','36','48','60']).map(m => {
@@ -149,7 +150,7 @@ function buildOptions(group) {
         return v > 0;
       }).length;
       return { value: m, label: `${m}개월`, count };
-    });
+    }).sort((a, b) => b.count - a.count);
   }
   if (group.type === 'range') {
     return (group.buckets || []).map(b => {
@@ -161,7 +162,7 @@ function buildOptions(group) {
         return inBucket(v, b);
       }).length;
       return { value: b.value, label: b.label, count };
-    });
+    }).filter(o => o.count > 0).sort((a, b) => b.count - a.count);
   }
   if (group.type === 'check') {
     const counts = new Map();

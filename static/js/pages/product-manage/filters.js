@@ -18,7 +18,13 @@ export function createProductFilterController(deps = {}) {
   };
 
   function getFilterGroupOptions(key) {
-    return [...new Set(getAllProducts().map((product) => safeText(getProductFilterFieldValue(product, key), '')).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ko'));
+    // count 내림차순 — 많은 값이 위
+    const counts = new Map();
+    getAllProducts().forEach(product => {
+      const v = safeText(getProductFilterFieldValue(product, key), '');
+      if (v) counts.set(v, (counts.get(v) || 0) + 1);
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([v]) => v);
   }
 
   function isProductMatched(product) {
