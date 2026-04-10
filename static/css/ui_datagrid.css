@@ -89,9 +89,9 @@
 .pls-row:nth-child(even) td { background: #ffffff; }
 .pls-row:nth-child(odd) td { background: #ffffff; }
 .pls-row:hover td { background: #f8f9fa; cursor: pointer; }
-.pls-row.is-selected td { background: #dbeafe; }
-.pls-row.is-selected td:first-child { border-left: 3px solid #2563eb; }
-.pls-row.is-selected:hover td { background: #bfdbfe; }
+.pls-row.is-selected td { background: #eef2ff !important; }
+.pls-row.is-selected td:first-child { border-left: 3px solid #4338ca; }
+.pls-row.is-selected:hover td { background: #e0e7ff !important; }
 
 /* ─── 데이터 셀 (td) ─────────────────────────────────────────────────────── */
 
