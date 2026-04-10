@@ -473,7 +473,7 @@ function renderList(){
           renderList();
           renderDetail();
           showDetailPanel();
-        }, 180);
+        }, 0);
       } else {
         state.selectedId = nextId;
         state.activePhotoIndex = 0;
