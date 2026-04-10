@@ -328,6 +328,16 @@ function priceCell(v){return`<span class="price-full">${moneyToFull(v)}</span><s
 function safe(v){return v!==null&&v!==undefined&&String(v).trim()!==''?String(v):'-';}
 function joinWithMainDot(values){ return values.map((value)=>safe(value)).join('&nbsp;·&nbsp;'); }
 function formatMileage(value){const n=Number(value||0); return n?`${n.toLocaleString('ko-KR')}km`:'-';}
+function mileageBucketLabel(v) {
+  const n = Number(v || 0);
+  for (const b of RANGE_BUCKETS.mileage) { if (b.match(n)) return b.label; }
+  return '';
+}
+function rentBucketLabel(v) {
+  const n = Number(v || 0);
+  for (const b of RANGE_BUCKETS.rent) { if (b.match(n)) return b.label; }
+  return '';
+}
 function applyRoleFilter(products){
   return products;
 }
@@ -560,10 +570,14 @@ function renderList(){
       return cv.html || escapeHtml(cv.text || '');
     },
     getCellText: (col, item) => {
+      // 대여료 → 구간 라벨 (필터 드롭다운용)
       if (col.priceMonth) {
         const rent = moneyToNumber(item.price[col.priceMonth]?.rent);
-        return rent ? rent.toString() : '';
+        if (!rent) return '';
+        return rentBucketLabel(rent);
       }
+      // 주행거리 → 구간 라벨
+      if (col.key === 'mileage') return mileageBucketLabel(item.mileageValue || 0);
       const cv = cellValue(col, item);
       return cv.text || '';
     },

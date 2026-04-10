@@ -335,6 +335,14 @@ export function renderTableGrid(options = {}) {
       filtered = [...filtered].sort((a, b) => {
         const aText = typeof getCellText === 'function' ? getCellText(sortCol, a) : '';
         const bText = typeof getCellText === 'function' ? getCellText(sortCol, b) : '';
+        // 숫자 컬럼 — getCellValue에서 숫자 추출 시도, 없으면 텍스트에서 파싱
+        if (sortCol.num || sortCol.priceMonth) {
+          const aVal = typeof getCellValue === 'function' ? getCellValue(sortCol, a) : aText;
+          const bVal = typeof getCellValue === 'function' ? getCellValue(sortCol, b) : bText;
+          const aNum = parseFloat(String(aVal).replace(/[^\d.-]/g, '')) || 0;
+          const bNum = parseFloat(String(bVal).replace(/[^\d.-]/g, '')) || 0;
+          return gf.sortDir * (aNum - bNum);
+        }
         return gf.sortDir * aText.localeCompare(bText, 'ko');
       });
     }
