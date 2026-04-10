@@ -6,23 +6,15 @@
     </linearGradient>
     <style>
       @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-      .brand-bold { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; fill: #ffffff; font-weight: 700; letter-spacing: -0.04em; }
-      .brand-thin { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; fill: #ffffff; font-weight: 200; letter-spacing: -0.02em; }
-      .desc       { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; fill: #cbd5e1; font-weight: 500; letter-spacing: -0.01em; }
+      .b { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; font-weight: 700; fill: #ffffff; letter-spacing: -0.04em; }
+      .t { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; font-weight: 200; fill: #ffffff; letter-spacing: -0.02em; }
     </style>
   </defs>
 
-  <!-- 배경 -->
   <rect width="1200" height="630" fill="url(#bg)"/>
 
-  <!-- 메인 로고 — FREEPASS(두께 700) + ERP(두께 200), 한 줄 가운데 정렬 -->
-  <text x="600" y="320" font-size="160" text-anchor="middle">
-    <tspan class="brand-bold">FREEPASS</tspan><tspan class="brand-thin"> ERP</tspan>
+  <!-- FREEPASS(700) ERP(200) 한 줄, 정중앙 -->
+  <text x="600" y="355" font-size="180" text-anchor="middle">
+    <tspan class="b">FREEPASS</tspan><tspan class="t"> ERP</tspan>
   </text>
-
-  <!-- 구분선 -->
-  <rect x="500" y="380" width="200" height="3" fill="#60a5fa"/>
-
-  <!-- 슬로건 -->
-  <text class="desc" x="600" y="450" font-size="40" text-anchor="middle">장기렌터카 구독서비스 영업전용 ERP</text>
 </svg>
