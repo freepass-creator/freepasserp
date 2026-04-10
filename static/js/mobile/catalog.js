@@ -22,7 +22,6 @@ const $filterBtn  = $('m-catalog-filter-btn');
 const $detail     = $('m-catalog-detail');
 const $gallery    = $('m-catalog-gallery');
 const $body       = $('m-catalog-body');
-const $agentLabel = $('m-catalog-agent');
 // CTA 바는 .m-page 밖에 동적 삽입 (CSS 형제 선택자 호환)
 let $cta, $ctaCall, $ctaText;
 function ensureCta() {
@@ -257,11 +256,6 @@ async function loadAgent() {
         const partner = pSnap.val();
         if (partner?.partner_name) companyName = partner.partner_name;
       } catch {}
-    }
-    // 상단바 에이전트
-    if ($agentLabel) {
-      const parts = [companyName, name, position].filter(Boolean);
-      $agentLabel.textContent = parts.join(' ');
     }
     // 하단 CTA
     if (phone) {

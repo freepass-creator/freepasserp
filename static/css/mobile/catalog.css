@@ -56,6 +56,7 @@
 
 /* 상세 뷰 */
 .m-catalog-detail[hidden] { display: none; }
+#m-catalog-grid[hidden] { display: none !important; }
 .m-catalog-detail__gallery {
   position: relative;
   width: 100%;
