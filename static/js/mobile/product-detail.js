@@ -169,8 +169,8 @@ $btnShare?.addEventListener('click', async (e) => {
   const url = new URL(location.origin + '/catalog');
   url.searchParams.set('id', p.product_uid || p.product_code || '');
   if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
-  // OG 타이틀용 — 짧게 (설명 d는 제거)
-  const carPart = [p.product_type, p.car_number, p.model_name || p.sub_model].filter(Boolean).join(' ');
+  // OG 타이틀: "123허1234 쏘렌토 - 홍길동 팀장 | 소속"
+  const carPart = [p.car_number, p.model_name || p.sub_model].filter(Boolean).join(' ');
   const agentPart = [currentProfile?.name, currentProfile?.position].filter(Boolean).join(' ');
   const company = currentProfile?.company_name || '';
   const title = [carPart, agentPart && `- ${agentPart}`, company && `| ${company}`].filter(Boolean).join(' ');
