@@ -294,7 +294,7 @@ def match_partner_by_biz_number():
         return jsonify({'ok': True, 'partner': None})
     try:
         import urllib.request, json
-        fb_url = f'https://freepasserp3-default-rtdb.firebaseio.com/partners.json'
+        fb_url = f'https://freepasserp3-default-rtdb.asia-southeast1.firebasedatabase.app/partners.json'
         req_obj = urllib.request.Request(fb_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req_obj, timeout=10) as resp:
             data = json.loads(resp.read().decode('utf-8')) or {}
