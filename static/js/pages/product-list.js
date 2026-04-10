@@ -895,7 +895,8 @@ function renderDetail(){
     html = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
       activePhotoIndex: state.activePhotoIndex,
       policy: termFields,
-      showFee: true, // 영업자/공급사/관리자 전부 마지막 섹션에 수수료 노출
+      showFee: true,
+      showProvider: false,
     })}</div>`;
     _detailHtmlCache.set(product.id, { html, termVer, photoIdx: state.activePhotoIndex });
     // 캐시 크기 제한 (최근 30개)
