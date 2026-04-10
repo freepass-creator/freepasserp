@@ -296,7 +296,9 @@
 .pls-fdd__sort-row { display: flex; gap: 3px; padding: 3px 6px; border-bottom: 1px solid #e2e8f0; }
 .pls-fdd__sort-btn { flex: 1; height: 22px; border: 1px solid #e2e8f0; border-radius: var(--radius-xs); background: #fff; font-size: var(--font-size-xs); color: #64748b; cursor: pointer; letter-spacing: -0.02em; }
 .pls-fdd__sort-btn:hover { background: #f1f5f9; color: #1e293b; }
-.pls-fdd__sort-btn.is-active { background: #eef2ff; border-color: #a5b4fc; color: #4338ca; font-weight: var(--font-weight-heavy); }
+.pls-fdd__sort-btn.is-active { font-weight: var(--font-weight-heavy); }
+.pls-fdd__sort-btn.is-active[data-sort-dir="1"] { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+.pls-fdd__sort-btn.is-active[data-sort-dir="-1"] { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
 
 .pls-fdd__count { margin-left: auto; font-size: 9px; color: #94a3b8; font-variant-numeric: tabular-nums; flex-shrink: 0; }
 
