@@ -23,6 +23,7 @@
   aspect-ratio: 16 / 10;
   border-radius: var(--radius-ui, 4px);
   margin-top: 14px;
+  background: #f1f5f9;
 }
 .m-pd--desktop .m-pd-gallery--empty {
   background: #f1f5f9;
