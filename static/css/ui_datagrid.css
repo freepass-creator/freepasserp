@@ -241,23 +241,28 @@
 .pls-th { position: relative; }
 .pls-th--has-filter { background: #eef2ff; }
 .pls-th--has-filter .pls-th__label { color: #4338ca; font-weight: var(--font-weight-heavy); }
-/* 필터 개수 뱃지 — 라벨 옆 인라인 원형 */
+/* 필터 개수 뱃지 — 텍스트 우측 상단 걸침 (사이드바 뱃지 축소판) */
 .pls-th__filter-count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  margin-left: 4px;
-  border-radius: 8px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: var(--radius-pill, 999px);
   background: #f59e0b;
   color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1;
-  vertical-align: middle;
+  font-size: 9px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
+  pointer-events: none;
+  z-index: 1;
 }
+.pls-th { position: relative; overflow: visible; }
 /* 정렬 걸린 컬럼 */
 .pls-th--sort-asc { background: #fef2f2; }
 .pls-th--sort-asc .pls-th__label { color: #dc2626; font-weight: var(--font-weight-heavy); }
