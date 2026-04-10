@@ -515,14 +515,22 @@ function renderList(products) {
     selectedKey: editingCodeInput?.value || '',
     getKey: (item) => item?.product_uid || item?.product_code || '',
     onSelect: async (product) => {
-      if ((mode === 'edit' || mode === 'create') && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
-      if (mode === 'view' || mode === 'edit' || mode === 'create') {
+      if (!product) return;
+      const currentCode = editingCodeInput?.value || '';
+      const nextCode = product.product_uid || product.product_code || '';
+      const isSame = currentCode && currentCode === nextCode;
+      // 같은 행 재클릭 → 폼 닫기
+      if (isSame && mode === 'view') {
         resetForm();
         applyFormMode('idle');
         renderFilteredList();
         return;
       }
-      if (product) fillProductForm(product, { ...adapterContext, currentProfile });
+      // 수정/등록 중 → 확인
+      if ((mode === 'edit' || mode === 'create') && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
+      // 다른 행 클릭 또는 idle 상태 → 바로 보여주기
+      resetForm();
+      fillProductForm(product, { ...adapterContext, currentProfile });
     },
     getCellValue: (col, p) => {
       switch (col.key) {
