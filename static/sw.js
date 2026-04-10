@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v122';
+const CACHE_NAME = 'freepass-v123';
 const IMG_CACHE = 'freepass-img-v1';
 
 // 핵심 자원 — 첫 방문 시 미리 다운로드
@@ -93,23 +93,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML 페이지: /m/* 모바일은 stale-while-revalidate (즉시 표시 + 백그라운드 갱신)
+  // HTML 페이지(navigate): 항상 network-first (캐시 잘못 매칭 방지)
+  // — stale-while-revalidate가 다른 경로의 HTML을 반환하는 케이스가 있어
+  //   카톡 인앱 등에서 의도와 다른 페이지로 점프하는 문제 발생
   if (request.mode === 'navigate') {
-    if (url.includes('/m/')) {
-      event.respondWith(
-        caches.open(CACHE_NAME).then((cache) =>
-          cache.match(request).then((cached) => {
-            const fetched = fetch(request).then((response) => {
-              if (response.ok) cache.put(request, response.clone());
-              return response;
-            }).catch(() => cached);
-            return cached || fetched;
-          })
-        )
-      );
-    } else {
-      event.respondWith(fetch(request).catch(() => caches.match(request)));
-    }
+    event.respondWith(
+      fetch(request).then((response) => {
+        // 같은 URL만 캐시 (정확 매칭)
+        if (response.ok && url.includes('/m/')) {
+          caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+        }
+        return response;
+      }).catch(() => caches.match(request, { ignoreSearch: false }))
+    );
     return;
   }
 
