@@ -26,7 +26,14 @@ async function updatePartnerPreview() {
     return;
   }
   try {
-    const partner = await getPartnerByBusinessNumber(businessNumber);
+    // 서버 API로 매칭 (미로그인 허용)
+    const res = await fetch('/api/partner/match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ business_number: businessNumber }),
+    });
+    const json = await res.json();
+    const partner = json?.partner;
     if (!partner) {
       partnerPreview.className = 'auth-match-badge auth-match-badge--unmatched';
       partnerPreview.textContent = '매칭되는 코드 없음';
@@ -37,9 +44,8 @@ async function updatePartnerPreview() {
     partnerPreview.className = 'auth-match-badge auth-match-badge--matched';
     partnerPreview.textContent = `${partner.partner_name} / ${typeLabel} / ${partner.partner_code}`;
   } catch {
-    // 미로그인 상태에서 partners 읽기 권한 없음 — 가입 후 관리자가 매칭
     partnerPreview.className = 'auth-match-badge auth-match-badge--unmatched';
-    partnerPreview.textContent = '가입 후 자동 매칭됩니다';
+    partnerPreview.textContent = '매칭 확인 중 오류';
   }
 }
 

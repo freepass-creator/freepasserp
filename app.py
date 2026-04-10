@@ -283,6 +283,35 @@ for _mp in _MOBILE_ROUTES:
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+@api_bp.route('/partner/match', methods=['POST'])
+def match_partner_by_biz_number():
+    """사업자등록번호로 파트너 매칭 (미로그인 허용 — 회원가입용)"""
+    err = _require_json()
+    if err: return err
+    payload = request.get_json(silent=True) or {}
+    biz = str(payload.get('business_number') or '').replace('-', '').strip()
+    if not biz:
+        return jsonify({'ok': True, 'partner': None})
+    try:
+        import urllib.request, json
+        fb_url = f'https://freepasserp3-default-rtdb.firebaseio.com/partners.json'
+        req_obj = urllib.request.Request(fb_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req_obj, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8')) or {}
+        for code, p in data.items():
+            if not p or p.get('status') == 'deleted':
+                continue
+            pb = str(p.get('business_number') or '').replace('-', '').strip()
+            if pb == biz:
+                return jsonify({'ok': True, 'partner': {
+                    'partner_code': p.get('partner_code', code),
+                    'partner_name': p.get('partner_name', ''),
+                    'partner_type': p.get('partner_type', ''),
+                }})
+        return jsonify({'ok': True, 'partner': None})
+    except Exception as e:
+        return jsonify({'ok': False, 'message': str(e)}), 500
+
 @api_bp.route('/vehicle-master/fetch', methods=['POST'])
 def fetch_vehicle_master_source():
     err = _require_json()
