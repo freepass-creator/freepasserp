@@ -1,6 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+      .b { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; font-weight: 700; fill: #ffffff; letter-spacing: -4px; }
+      .t { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; font-weight: 200; fill: #ffffff; letter-spacing: 4px; }
+    </style>
+  </defs>
   <rect width="512" height="512" rx="96" fill="#1b2a4a"/>
-  <text x="256" y="200" text-anchor="middle" font-family="system-ui, sans-serif" font-size="120" font-weight="800" fill="#ffffff" letter-spacing="-4">FREE</text>
-  <text x="256" y="320" text-anchor="middle" font-family="system-ui, sans-serif" font-size="120" font-weight="800" fill="#93c5fd" letter-spacing="-4">PASS</text>
-  <text x="256" y="410" text-anchor="middle" font-family="system-ui, sans-serif" font-size="72" font-weight="600" fill="#64748b" letter-spacing="8">ERP</text>
+  <text class="b" x="256" y="200" text-anchor="middle" font-size="130">FREE</text>
+  <text class="b" x="256" y="320" text-anchor="middle" font-size="130">PASS</text>
+  <text class="t" x="256" y="420" text-anchor="middle" font-size="80">ERP</text>
 </svg>
