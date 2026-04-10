@@ -685,10 +685,21 @@ html {
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
-  padding: 0 12px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  padding: 0 10px 24px;
 }
+/* 모바일 카드가 데스크탑 그리드에서 자연스럽게 보이도록 */
+.catalog-grid .m-product-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.catalog-grid .m-product-card__media { width: 100%; }
+.catalog-grid .m-product-card__img { aspect-ratio: 4/3; width: 100%; object-fit: cover; }
 
 .catalog-card {
   border-radius: var(--radius-lg);
