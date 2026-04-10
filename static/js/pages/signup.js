@@ -66,8 +66,8 @@ form?.addEventListener('submit', async (event) => {
     message.textContent = '이메일을 입력하세요.';
     return;
   }
-  if (password.length < 8) {
-    message.textContent = '비밀번호는 8자 이상이어야 합니다.';
+  if (password.length < 6) {
+    message.textContent = '비밀번호는 6자리 이상이어야 합니다.';
     return;
   }
   if (password !== passwordConfirm) {
