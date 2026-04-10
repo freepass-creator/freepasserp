@@ -383,11 +383,16 @@ function renderFilterAccordion(baseSets){
   $accordion.innerHTML = FILTER_SCHEMA.map(group=>{
     const baseSet = group.key==='periods' ? state.allProducts : (bs.get(group.key)||[]);
     const options = getGroupOptions(group, baseSet);
-    const body = options.map(option=>{
-      const count = group.key==='periods' ? state.allProducts.length : baseSet.filter(item=>matchSingle(group,option.value,item)).length;
-      if(group.key!=='periods'&&count===0) return '';
+    // 옵션별 카운트 계산 + 많은 순 정렬 (기간/범위/연식은 원래 순서 유지)
+    const keepOrder = group.type === 'periods' || group.type === 'range' || group.type === 'year';
+    const counted = options.map(option => {
+      const count = group.key === 'periods' ? state.allProducts.length : baseSet.filter(item => matchSingle(group, option.value, item)).length;
+      return { ...option, count };
+    }).filter(o => group.key === 'periods' || o.count > 0);
+    if (!keepOrder) counted.sort((a, b) => b.count - a.count);
+    const body = counted.map(option => {
       const checked = state.filters[group.key].includes(option.value);
-      return `<label class="filter-option"><span class="filter-check"><input type="checkbox" data-group="${group.key}" data-value="${option.value}" ${checked?'checked':''}><span>${option.label}</span></span><span class="filter-count">(${count})</span></label>`;
+      return `<label class="filter-option"><span class="filter-check"><input type="checkbox" data-group="${group.key}" data-value="${option.value}" ${checked?'checked':''}><span>${option.label}</span></span><span class="filter-count">(${option.count})</span></label>`;
     }).join('');
     return `<section class="filter-group ${state.openGroups[group.key]?'is-open':''}" data-filter-group="${group.key}"><button type="button" class="filter-group-head" data-toggle-group="${group.key}" aria-expanded="${state.openGroups[group.key]?'true':'false'}"><span class="filter-group-title">${group.title}</span><span class="filter-group-caret">${state.openGroups[group.key]?'닫기':'열기'}</span></button><div class="filter-group-body" ${state.openGroups[group.key]?'':'hidden'}>${body}</div></section>`;
   }).join('');
