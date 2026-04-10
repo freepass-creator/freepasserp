@@ -228,19 +228,26 @@ def catalog_view():
     # 이미지: 개별 매물은 차량 사진 캐시, 없으면 카탈로그 기본 썸네일 (FREE/PASS)
     cached_img = _share_image_cache.get(share_id) if share_id else None
     og_image = cached_img or (req.url_root.rstrip('/') + '/static/og-catalog.svg')
-    # 양식 통일:
-    #   상품별:  "상품구분 차량번호 차종 - 홍길동 팀장 | 소속회사"
-    #   공급사:  "공급코드 상품 - 홍길동 팀장 | 소속회사"
-    #   전체:    "전체상품 - 홍길동 팀장 | 소속회사"
+    # 공급사 코드 → 공급사명 조회
+    provider_name = ''
+    if provider:
+        try:
+            import urllib.request as _ur, json as _js
+            _fb = f'https://freepasserp3-default-rtdb.asia-southeast1.firebasedatabase.app/partners/{provider}/partner_name.json'
+            with _ur.urlopen(_ur.Request(_fb, headers={'User-Agent': 'Mozilla/5.0'}), timeout=5) as _r:
+                provider_name = _js.loads(_r.read().decode('utf-8')) or ''
+        except Exception:
+            provider_name = ''
     agent_part = ' '.join([s for s in [agent_name, agent_position] if s])
     agent_suffix = f' - {agent_part}' if agent_part else ''
-    company_suffix = f' | {company}' if company else ''
+    company_suffix = ''
     if share_id and car_title:
         title = f'{car_title}{company_suffix}'
     elif share_id:
         title = f'상품 안내{agent_suffix}{company_suffix}'
     elif provider:
-        title = f'{provider} 상품{agent_suffix}{company_suffix}'
+        display_provider = provider_name or provider
+        title = f'{display_provider} 상품{agent_suffix}{company_suffix}'
     else:
         title = f'전체상품{agent_suffix}{company_suffix}'
     custom_desc = req.args.get('d', '')
