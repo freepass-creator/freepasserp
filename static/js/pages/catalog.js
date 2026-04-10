@@ -19,6 +19,7 @@ import {
   esc, has, fmt,
   renderCatalogCard,
 } from '../shared/catalog-card.js';
+import { renderMobileProductCard } from '../shared/mobile-product-card.js';
 import { normalizeProduct } from '../shared/product-list-detail-data.js';
 import { renderProductDetailMarkup } from '../shared/product-list-detail-markup.js';
 import { renderMobileProductDetail } from '../shared/mobile-product-detail-markup.js';
@@ -796,8 +797,10 @@ function renderGrid() {
   }
 
   grid.innerHTML = products.map((p, i) =>
-    renderCatalogCard(p, { dataAttr: `data-index="${i}"` })
+    renderMobileProductCard(p, { href: `#detail-${i}` })
   ).join('');
+  // data-index 추가 (카드 클릭용)
+  grid.querySelectorAll('.m-product-card').forEach((el, i) => { el.dataset.index = i; });
 }
 
 // ─── 카드 클릭 → 단일 상품 뷰 전환 ──────────────────────────────────────
@@ -869,19 +872,12 @@ backBtn.addEventListener('click', () => {
 });
 
 grid.addEventListener('click', (e) => {
-  const card = e.target.closest('.catalog-card');
+  const card = e.target.closest('.m-product-card');
   if (!card) return;
+  e.preventDefault(); // <a> 기본 navigate 방지 (카탈로그 내 상세 뷰 전환)
   const idx = Number(card.dataset.index);
   const products = getFiltered();
   if (products[idx]) showDetailView(products[idx]);
-});
-
-grid.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter' && e.key !== ' ') return;
-  const card = e.target.closest('.catalog-card');
-  if (!card) return;
-  e.preventDefault();
-  card.click();
 });
 
 // 모바일 필터 패널

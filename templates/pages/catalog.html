@@ -23,6 +23,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/detail-common.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/fullscreen-photo-viewer.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/shared/mobile.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/app.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/product.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/product-detail.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/product-detail-desktop.css') }}?v={{ app_version }}">
 </head>
@@ -95,7 +97,7 @@
   </aside>
   <!-- 우측: 상품 그리드 -->
   <div class="catalog-content">
-    <div class="catalog-grid" id="catalog-grid">
+    <div class="catalog-grid m-product-grid" id="catalog-grid">
       <div class="catalog-skeleton-wrap">
         <div class="catalog-skeleton-card"></div>
         <div class="catalog-skeleton-card"></div>
