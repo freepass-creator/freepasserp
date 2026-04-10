@@ -684,10 +684,10 @@ html {
 /* ─── Product Grid ────────────────────────────────────────────────────────── */
 
 .catalog-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 0 8px 24px;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 8px !important;
+  padding: 0 8px 24px !important;
 }
 /* 모바일 카드가 데스크탑 그리드에서 컴팩트하게 */
 .catalog-grid .m-product-card {
