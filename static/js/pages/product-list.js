@@ -373,11 +373,17 @@ function getGroupOptions(group,source){ if(group.type==='periods') return group.
 function matchRange(groupKey,optionValue,item){const bucket=RANGE_BUCKETS[groupKey].find(x=>x.value===optionValue); return bucket?bucket.match(getValueForRange(groupKey,item)):false;}
 function matchSingle(group,optionValue,item){ if(group.type==='periods') return true; if(group.type==='range') return matchRange(group.key, optionValue, item); if(group.type==='year') return String(item.year)===String(optionValue); if(group.type==='termSelect') return String(getTermVal(group,item))===String(optionValue); if(group.type==='policySelect') return String(item[group.field]||'')===String(optionValue); return String(item[group.key]||'')===String(optionValue); }
 function passesGroup(group,item,selected){ if(group.key==='periods') return true; if(!selected||!selected.length) return true; return selected.some(v=>matchSingle(group,v,item)); }
+// 검색 인덱스 — 상품 로드 시 한 번만 생성
+function buildSearchIndex(item) {
+  if (!item._searchIdx) {
+    item._searchIdx = [item.carNo, item.maker, item.model, item.subModel, item.trim, item.fuel, item.extColor, item.intColor, item.vehicleClass, item.partnerCode, item.productCode, item.optionSummary, item.vehicleStatus, item.productType, item.year]
+      .filter(Boolean).join(' ').toLowerCase();
+  }
+  return item._searchIdx;
+}
 function passesSearch(item, query) {
   if (query) {
-    const q = query.toLowerCase();
-    const fields = [item.carNo, item.maker, item.model, item.subModel, item.trim, item.fuel, item.extColor, item.intColor, item.vehicleClass, item.partnerCode, item.productCode, item.optionSummary, item.vehicleStatus, item.productType, item.year];
-    if (!fields.some(f => String(f || '').toLowerCase().includes(q))) return false;
+    if (!buildSearchIndex(item).includes(query.toLowerCase())) return false;
   }
   return true;
 }
@@ -407,9 +413,14 @@ function safeFilterAll(items) {
 function invalidateFilterCache() { _filterCache = { key: '', items: null, products: null }; }
 function renderPeriodsHead(){ /* 기간 헤더는 그리드 내장으로 이동 — 호환성 유지 */ if($periodHead) $periodHead.innerHTML=''; }
 function summarizeOptionText(text){ const raw=safe(text); if(raw==='-') return raw; return raw.length>18 ? `${raw.slice(0,18)}...` : raw; }
+let _baseSetsCache = { filters: '', sets: null };
 function buildBaseSets(){
+  // 필터 상태가 같으면 캐시 재사용
+  const fKey = JSON.stringify(state.filters) + state.searchQuery;
+  if (_baseSetsCache.filters === fKey && _baseSetsCache.sets) return _baseSetsCache.sets;
   const map=new Map();
   FILTER_SCHEMA.forEach(g=>{ if(g.key!=='periods') map.set(g.key, state.allProducts.filter(item=>passesAllFilters(item,g.key))); });
+  _baseSetsCache = { filters: fKey, sets: map };
   return map;
 }
 function renderFilterAccordion(baseSets){
@@ -431,11 +442,19 @@ function renderFilterAccordion(baseSets){
       }
       counted = buckets.map((b, i) => ({ value: b.value, label: b.label, count: counts[i] }))
         .filter(o => o.count > 0);
+    } else if (group.key === 'periods') {
+      counted = options.map(option => ({ ...option, count: state.allProducts.length }));
     } else {
-      counted = options.map(option => {
-        const count = group.key === 'periods' ? state.allProducts.length : baseSet.filter(item => matchSingle(group, option.value, item)).length;
-        return { ...option, count };
-      }).filter(o => group.key === 'periods' || o.count > 0);
+      // 1회 순회로 전체 카운트 계산 (옵션별 filter 제거 — 성능)
+      const counts = new Map();
+      for (const item of baseSet) {
+        const val = group.type === 'year' ? String(item.year || '')
+          : group.type === 'termSelect' ? String(getTermVal(group, item) || '')
+          : group.type === 'policySelect' ? String(item[group.field] || '')
+          : String(item[group.key] || '');
+        if (val && val !== '-') counts.set(val, (counts.get(val) || 0) + 1);
+      }
+      counted = options.map(o => ({ ...o, count: counts.get(o.value) || 0 })).filter(o => o.count > 0);
     }
     // 정렬: range는 금액 오름/내림 토글, 나머지는 count 내림
     const sortDir = state.rangeSortDir?.[group.key]; // 'asc' | 'desc' | undefined
