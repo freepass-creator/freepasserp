@@ -268,7 +268,10 @@ document.addEventListener('contextmenu', (e) => {
     const action = btn.dataset.action;
     if (action === 'edit') {
       removeCtxMenu();
-      if (member) fillForm(member);
+      if (member) {
+        fillForm(member);
+        applyMode('edit');
+      }
     }
     if (action === 'status') {
       removeCtxMenu();

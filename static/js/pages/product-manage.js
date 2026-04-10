@@ -626,7 +626,10 @@ document.addEventListener('contextmenu', (e) => {
 
     if (action === 'edit') {
       removeCtxMenu();
-      if (product) fillProductForm(product, { ...adapterContext, currentProfile });
+      if (product) {
+        fillProductForm(product, { ...adapterContext, currentProfile });
+        applyFormMode('edit');
+      }
     }
     if (action === 'status') {
       removeCtxMenu();
