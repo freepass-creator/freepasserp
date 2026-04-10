@@ -5,7 +5,7 @@
    ═════════════════════════════════════════════════════ */
 
 .m-pd--desktop {
-  padding: 0 18px 24px;
+  padding: 8px 28px 32px;
   background: #fff;
   /* 웹 규격 토큰에 맞춤 */
   --m-font-display: var(--font-size-xl, 17px);   /* 차량 헤드 */
@@ -88,13 +88,17 @@
   letter-spacing: -0.005em;
   color: #1f2937;
 }
-/* 섹션 본문 — 얇은 상하 가로 라인만 */
+/* 섹션 본문 — 얇은 상하 가로 라인 + 안쪽 좌우 패딩 */
 .m-pd--desktop .m-pd-group__body {
   border-top: 1px solid #e5e8eb;
   border-bottom: 1px solid #e5e8eb;
   border-radius: 0;
   background: #fff;
-  padding: 4px 0;
+  padding: 6px 4px;
+}
+/* 섹션 타이틀도 본문과 좌우 정렬 맞춤 */
+.m-pd--desktop .m-pd-group__head {
+  padding-left: 4px;
 }
 
 /* 갤러리 바로 다음 그룹은 조금 덜 */
