@@ -605,12 +605,14 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
     const text = typeof getCellText === 'function' ? getCellText(col, item) : '';
     if (text && text !== '-') counts.set(text, (counts.get(text) || 0) + 1);
   });
-  // 숫자 컬럼(대여료/주행거리 등)은 원래 순서(금액·거리순), 나머지는 count 내림차순
+  // 숫자 컬럼(대여료/주행거리 등)은 금액순 ("미만"이 같은 숫자보다 위), 나머지는 count 내림차순
   const isNumCol = col.num || col.priceMonth;
+  const numSortKey = (s) => {
+    const n = parseFloat(String(s).replace(/[^\d.-]/g, '')) || 0;
+    return String(s).includes('미만') || String(s).includes('이하') ? n - 0.5 : n;
+  };
   const sorted = [...counts.entries()].sort((a, b) =>
-    isNumCol
-      ? (parseFloat(a[0].replace(/[^\d.-]/g, '')) || 0) - (parseFloat(b[0].replace(/[^\d.-]/g, '')) || 0)
-      : b[1] - a[1]
+    isNumCol ? numSortKey(a[0]) - numSortKey(b[0]) : b[1] - a[1]
   );
 
   if (!gf.active[colKey]) gf.active[colKey] = new Set();
@@ -647,9 +649,7 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
       const label = typeof window._depositBucketLabel === 'function' ? window._depositBucketLabel(depNum) : '';
       if (label) depCounts.set(label, (depCounts.get(label) || 0) + 1);
     });
-    const depSorted = [...depCounts.entries()].sort((a, b) =>
-      (parseFloat(a[0].replace(/[^\d.-]/g, '')) || 0) - (parseFloat(b[0].replace(/[^\d.-]/g, '')) || 0)
-    );
+    const depSorted = [...depCounts.entries()].sort((a, b) => numSortKey(a[0]) - numSortKey(b[0]));
     if (depSorted.length) {
       html += `<div class="pls-fdd__section-title" style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e8eb;">보증금</div>`;
       html += depSorted.map(([val, cnt]) => {
