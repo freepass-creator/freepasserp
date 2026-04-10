@@ -13,7 +13,7 @@
           ".validate": "!data.exists() || newData.val() === data.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'"
         },
         "status": {
-          ".validate": "root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.val() === data.val()"
+          ".validate": "root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.val() === data.val() || (!data.exists() && newData.val() === 'pending')"
         }
       },
       // admin만 전체 사용자 목록 조회
