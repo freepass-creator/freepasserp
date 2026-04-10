@@ -378,7 +378,7 @@ export function renderTableGrid(options = {}) {
       const hasFilter = (hasCheckFilter || hasSearchFilter) ? ' pls-th--has-filter' : '';
       const dataAttr = ` data-col-key="${escapeHtml(col.key)}"`;
       const isSorted = sortable && gf.sortCol === col.key && gf.sortDir;
-      const sortIndicator = isSorted ? `<span class="pls-th__sort">${gf.sortDir === 1 ? '▲' : '▼'}</span>` : '';
+      const sortIndicator = isSorted ? `<span class="pls-th__sort">${gf.sortDir === 1 ? '˄' : '˅'}</span>` : '';
       const sortableCls = (sortable && !isFilterable) ? ' pls-th--sortable' : '';
       return `<th class="pls-th${alignCls}${filterable}${hasFilter}${sortableCls}"${dataAttr}${sAttr}><span class="pls-th__label">${escapeHtml(col.label)}</span>${sortIndicator}</th>`;
     }).join('');
@@ -460,8 +460,8 @@ function _buildSortRow(gf, colKey) {
   const isAsc = gf.sortCol === colKey && gf.sortDir === 1;
   const isDesc = gf.sortCol === colKey && gf.sortDir === -1;
   return `<div class="pls-fdd__sort-row">`
-    + `<button type="button" class="pls-fdd__sort-btn${isAsc ? ' is-active' : ''}" data-sort-dir="1">▲ 오름차순</button>`
-    + `<button type="button" class="pls-fdd__sort-btn${isDesc ? ' is-active' : ''}" data-sort-dir="-1">▼ 내림차순</button>`
+    + `<button type="button" class="pls-fdd__sort-btn${isAsc ? ' is-active' : ''}" data-sort-dir="1">˄ 오름차순</button>`
+    + `<button type="button" class="pls-fdd__sort-btn${isDesc ? ' is-active' : ''}" data-sort-dir="-1">˅ 내림차순</button>`
     + `</div>`;
 }
 

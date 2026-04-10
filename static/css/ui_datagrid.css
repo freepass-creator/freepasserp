@@ -237,16 +237,16 @@
 .pls-th--filterable:hover { background: #e2e8f0; color: #1e293b; }
 .pls-th--filterable.is-filtering { background: #e2e8f0; color: #1e293b; }
 
-.pls-th--has-filter { background: #e2e8f0; }
-.pls-th--has-filter .pls-th__label { color: #1e293b; font-weight: var(--font-weight-heavy); }
-.pls-th--has-filter::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 4px;
-  right: 4px;
-  height: 2px;
-  background: #475569;
+.pls-th--has-filter { background: #eef2ff; }
+.pls-th--has-filter .pls-th__label { color: #4338ca; font-weight: var(--font-weight-heavy); }
+.pls-th--has-filter .pls-th__label::after {
+  content: '●';
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 6px;
+  color: #4338ca;
+  vertical-align: middle;
+  line-height: 1;
   border-radius: 1px;
 }
 
