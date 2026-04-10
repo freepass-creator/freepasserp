@@ -302,7 +302,7 @@ function renderProductDetail(p) {
     ? Object.values(allPolicies)
     : [];
   // .m-pd 래퍼로 감싸야 product-detail.css의 변수가 적용됨
-  return `<div class="m-pd">${renderMobileProductDetail(p, {
+  return `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(p, {
     policies: policiesArr,
     showGallery: false,
     showFee: false,

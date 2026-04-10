@@ -47,13 +47,13 @@ export async function requireAuth(options = {}) {
         getUserProfile(user.uid).then(fresh => { if (fresh) setCachedProfile(user.uid, fresh); }).catch(() => {});
       }
       if (!profile) {
-        window.location.href = '/settings';
+        window.location.href = '/login';
         unsubscribe?.();
         reject(new Error('사용자 정보가 없습니다.'));
         return;
       }
       if (profile.role !== 'admin' && profile.status !== 'active') {
-        window.location.href = '/settings';
+        window.location.href = '/login';
         unsubscribe?.();
         reject(new Error('활성 상태의 계정만 사용할 수 있습니다.'));
         return;
