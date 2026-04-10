@@ -98,13 +98,17 @@ function field(label, value, key, readonly = false, isEdit = false) {
   </div>`;
 }
 
-// 내 카탈로그 URL 빌더 — 짧은 URL (a + provider만)
+// 내 카탈로그 URL 빌더
 function buildMyCatalogUrl(p) {
   const url = new URL(location.origin + '/catalog');
   if (p.user_code) url.searchParams.set('a', p.user_code);
   if (p.role === 'provider' && p.company_code) {
     url.searchParams.set('provider', p.company_code);
   }
+  // OG 타이틀용
+  const agent = [p.name, p.position].filter(Boolean).join(' ');
+  if (agent) url.searchParams.set('t', `전체상품 - ${agent}`);
+  if (p.company_name) url.searchParams.set('c', p.company_name);
   return url.toString();
 }
 

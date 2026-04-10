@@ -165,15 +165,16 @@ $btnShare?.addEventListener('click', async (e) => {
   const ok = await showConfirm('이 상품의 공유 링크를 만드시겠습니까?');
   if (!ok) return;
   const p = currentProduct;
-  // URL은 짧게 — id + a만
+  const p = currentProduct;
   const url = new URL(location.origin + '/catalog');
   url.searchParams.set('id', p.product_uid || p.product_code || '');
   if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
-  // 공유 타이틀/설명은 Web Share API의 title/text로만 전달 (URL에 안 넣음)
+  // OG 타이틀용 — 짧게 (설명 d는 제거)
   const carPart = [p.product_type, p.car_number, p.model_name || p.sub_model].filter(Boolean).join(' ');
   const agentPart = [currentProfile?.name, currentProfile?.position].filter(Boolean).join(' ');
   const company = currentProfile?.company_name || '';
   const title = [carPart, agentPart && `- ${agentPart}`, company && `| ${company}`].filter(Boolean).join(' ');
+  if (title) url.searchParams.set('t', title);
   // 차량 대표 이미지 → 서버 인메모리 캐시에 저장 (await로 캐시 보장)
   const firstImg = (Array.isArray(p.image_urls) && p.image_urls[0]) || p.image_url || '';
   const productKey = p.product_uid || p.product_code || '';
