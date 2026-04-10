@@ -220,8 +220,8 @@ document.addEventListener('click', removeCtxMenu);
 document.addEventListener('scroll', removeCtxMenu, true);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
 
-list?.addEventListener('contextmenu', (e) => {
-  const row = e.target.closest('tr[data-key]');
+document.addEventListener('contextmenu', (e) => {
+  const row = e.target.closest('#member-list tr[data-key]');
   if (!row) return;
   e.preventDefault();
   removeCtxMenu();
