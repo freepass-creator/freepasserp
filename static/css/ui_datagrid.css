@@ -237,8 +237,7 @@
 .pls-th--filterable:hover { background: #e2e8f0; color: #1e293b; }
 .pls-th--filterable.is-filtering { background: #e2e8f0; color: #1e293b; }
 
-.pls-th--has-filter { background: #eef2ff; }
-.pls-th--has-filter .pls-th__label { color: #4338ca; font-weight: var(--font-weight-heavy); }
+/* 필터 걸린 컬럼 — 보라 배경 + 라벨 옆 ● 도트 */
 .pls-th--has-filter .pls-th__label::after {
   content: '●';
   display: inline-block;
@@ -247,6 +246,19 @@
   color: #4338ca;
   vertical-align: middle;
   line-height: 1;
+}
+.pls-th--has-filter { background: #eef2ff; }
+.pls-th--has-filter .pls-th__label { color: #4338ca; font-weight: var(--font-weight-heavy); }
+/* 정렬 걸린 컬럼 */
+.pls-th--sort-asc { background: #fef2f2; }
+.pls-th--sort-asc .pls-th__label { color: #dc2626; font-weight: var(--font-weight-heavy); }
+.pls-th--sort-asc .pls-th__sort { color: #dc2626; }
+.pls-th--sort-desc { background: #eff6ff; }
+.pls-th--sort-desc .pls-th__label { color: #2563eb; font-weight: var(--font-weight-heavy); }
+.pls-th--sort-desc .pls-th__sort { color: #2563eb; }
+/* 필터 + 정렬 동시 */
+.pls-th--has-filter.pls-th--sort-asc { background: linear-gradient(135deg, #eef2ff 50%, #fef2f2 50%); }
+.pls-th--has-filter.pls-th--sort-desc { background: linear-gradient(135deg, #eef2ff 50%, #eff6ff 50%);
   border-radius: 1px;
 }
 

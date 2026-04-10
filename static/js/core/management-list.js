@@ -373,14 +373,15 @@ export function renderTableGrid(options = {}) {
       const alignCls = col.align === 'r' ? ' pls--right' : col.align === 'c' ? ' pls--center' : '';
       const isFilterable = col.filterable || col.searchable;
       const filterable = isFilterable ? ' pls-th--filterable' : '';
-      const hasCheckFilter = col.filterable && activeFilters[col.key]?.size;
+      const hasCheckFilter = col.filterable && (activeFilters[col.key]?.size || (col.priceMonth && activeFilters[`_dep_${col.key}`]?.size));
       const hasSearchFilter = col.searchable && searchFilters[col.key];
       const hasFilter = (hasCheckFilter || hasSearchFilter) ? ' pls-th--has-filter' : '';
       const dataAttr = ` data-col-key="${escapeHtml(col.key)}"`;
-      const isSorted = sortable && gf.sortCol === col.key && gf.sortDir;
+      const isSorted = gf.sortCol === col.key && gf.sortDir;
+      const sortCls = isSorted ? (gf.sortDir === 1 ? ' pls-th--sort-asc' : ' pls-th--sort-desc') : '';
       const sortIndicator = isSorted ? `<span class="pls-th__sort">${gf.sortDir === 1 ? '˄' : '˅'}</span>` : '';
       const sortableCls = (sortable && !isFilterable) ? ' pls-th--sortable' : '';
-      return `<th class="pls-th${alignCls}${filterable}${hasFilter}${sortableCls}"${dataAttr}${sAttr}><span class="pls-th__label">${escapeHtml(col.label)}</span>${sortIndicator}</th>`;
+      return `<th class="pls-th${alignCls}${filterable}${hasFilter}${sortCls}${sortableCls}"${dataAttr}${sAttr}><span class="pls-th__label">${escapeHtml(col.label)}</span>${sortIndicator}</th>`;
     }).join('');
     const actionTh = hasActions ? '<th class="pls-th pls--center" style="width:56px"></th>' : '';
     thead.innerHTML = `<tr>${ths}${actionTh}</tr>`;
