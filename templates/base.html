@@ -49,6 +49,38 @@
 </head>
 <body data-page="{{ page_title }}">
   {% block body %}{% endblock %}
+  <!-- 카카오톡/인앱 브라우저 감지 → 외부 브라우저 유도 -->
+  <script>
+  (function(){
+    var ua = navigator.userAgent || '';
+    var isKakao = /KAKAOTALK/i.test(ua);
+    var isLine  = /Line\//i.test(ua);
+    var isFB    = /FB[AI]V|FBAN|FBAV/i.test(ua);
+    var isInsta = /Instagram/i.test(ua);
+    var isInApp = isKakao || isLine || isFB || isInsta;
+    if (!isInApp) return;
+    var isAndroid = /Android/i.test(ua);
+    var url = location.href;
+    if (isKakao && isAndroid) {
+      // 카카오톡 안드로이드 → 외부 브라우저로 자동 이동
+      location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+      return;
+    }
+    if (isAndroid) {
+      // 기타 안드로이드 인앱 → Chrome 인텐트로 점프
+      var clean = url.replace(/^https?:\/\//, '');
+      location.href = 'intent://' + clean + '#Intent;scheme=https;package=com.android.chrome;end';
+      return;
+    }
+    // iOS 인앱 — 자동 이동 불가, 안내 배너 표시
+    document.addEventListener('DOMContentLoaded', function(){
+      var bar = document.createElement('div');
+      bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;padding:14px 16px;background:#1b2a4a;color:#fff;font-size:13px;font-weight:600;line-height:1.5;text-align:center;font-family:Pretendard,-apple-system,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,0.25);';
+      bar.innerHTML = '⚠ 인앱 브라우저에서는 정상 동작하지 않습니다.<br><span style="font-weight:500;font-size:12px;opacity:.9">우측 상단 메뉴(⋯) → <b>Safari로 열기</b>를 눌러주세요</span>';
+      document.body.insertBefore(bar, document.body.firstChild);
+    });
+  })();
+  </script>
   <script>
     window.APP_VER='{{ app_version }}';
     requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove('no-transition')));
