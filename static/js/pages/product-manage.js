@@ -567,6 +567,49 @@ function renderList(products) {
 }
 
 
+// ─── 우클릭 → 차량상태 변경 컨텍스트 메뉴 ──────────────────
+const VEHICLE_STATUS_OPTIONS = ['출고가능', '출고협의', '출고불가', '계약대기', '계약완료'];
+let _ctxMenu = null;
+function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.remove(); _ctxMenu = null; } }
+document.addEventListener('click', removeCtxMenu);
+document.addEventListener('scroll', removeCtxMenu, true);
+
+listBody?.addEventListener('contextmenu', (e) => {
+  const row = e.target.closest('tr[data-key]');
+  if (!row) return;
+  e.preventDefault();
+  removeCtxMenu();
+  const productKey = row.dataset.key;
+  const menu = document.createElement('div');
+  menu.className = 'pm-ctx-menu';
+  menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:4px 0;min-width:140px;`;
+  menu.innerHTML = `<div style="padding:6px 14px;font-size:11px;color:#94a3b8;font-weight:700;">차량상태 변경</div>` +
+    VEHICLE_STATUS_OPTIONS.map(s =>
+      `<button type="button" class="pm-ctx-item" data-status="${escapeHtml(s)}" style="display:block;width:100%;text-align:left;padding:8px 14px;border:none;background:transparent;font-size:12px;color:#0f172a;cursor:pointer;">${escapeHtml(s)}</button>`
+    ).join('');
+  document.body.appendChild(menu);
+  _ctxMenu = menu;
+  // 화면 밖 보정
+  const rect = menu.getBoundingClientRect();
+  if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 8}px`;
+  if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 8}px`;
+  // hover 효과
+  menu.querySelectorAll('.pm-ctx-item').forEach(btn => {
+    btn.addEventListener('mouseenter', () => { btn.style.background = '#f1f5f9'; });
+    btn.addEventListener('mouseleave', () => { btn.style.background = 'transparent'; });
+    btn.addEventListener('click', async () => {
+      removeCtxMenu();
+      const newStatus = btn.dataset.status;
+      try {
+        await updateProduct(productKey, { vehicle_status: newStatus });
+        showToast(`차량상태 → ${newStatus}`, 'success');
+      } catch (err) {
+        showToast('상태 변경 실패: ' + (err.message || err), 'error');
+      }
+    });
+  });
+});
+
 async function handleSubmit() {
   setActionButtonBusy(submitButton);
   setActionButtonBusy(deleteButton);
