@@ -98,19 +98,13 @@ function field(label, value, key, readonly = false, isEdit = false) {
   </div>`;
 }
 
-// 내 카탈로그 URL 빌더 — 담당자 이름/직급/소속을 query에 포함
-// 공급사 역할이면 provider 파라미터에 본인 회사코드를 넣어 자기 상품만 보이도록
+// 내 카탈로그 URL 빌더 — 짧은 URL (a + provider만)
 function buildMyCatalogUrl(p) {
   const url = new URL(location.origin + '/catalog');
   if (p.user_code) url.searchParams.set('a', p.user_code);
-  // 공급사 → 자기 상품만 (provider 파라미터)
   if (p.role === 'provider' && p.company_code) {
     url.searchParams.set('provider', p.company_code);
   }
-  // 담당자/직급/소속 → catalog OG 타이틀 조립용
-  if (p.name) url.searchParams.set('n', p.name);
-  if (p.position) url.searchParams.set('pos', p.position);
-  if (p.company_name) url.searchParams.set('c', p.company_name);
   return url.toString();
 }
 

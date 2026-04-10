@@ -165,44 +165,15 @@ $btnShare?.addEventListener('click', async (e) => {
   const ok = await showConfirm('이 상품의 공유 링크를 만드시겠습니까?');
   if (!ok) return;
   const p = currentProduct;
+  // URL은 짧게 — id + a만
   const url = new URL(location.origin + '/catalog');
   url.searchParams.set('id', p.product_uid || p.product_code || '');
   if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
-  // 타이틀: "{상품유형} {차량번호} {차종} - {담당자 이름} {직급}"
-  // 예: "신차렌트 113허0000 쏘렌토 - 홍길동 팀장"
+  // 공유 타이틀/설명은 Web Share API의 title/text로만 전달 (URL에 안 넣음)
   const carPart = [p.product_type, p.car_number, p.model_name || p.sub_model].filter(Boolean).join(' ');
   const agentPart = [currentProfile?.name, currentProfile?.position].filter(Boolean).join(' ');
   const company = currentProfile?.company_name || '';
-  const carTitle = [carPart, agentPart && `- ${agentPart}`].filter(Boolean).join(' ');
-  if (carTitle) url.searchParams.set('t', carTitle);
-  if (company) url.searchParams.set('c', company);
-  // 설명: 가격 위주 — "48개월 월 79만원 · 보증금 100만원"
-  const num = (v) => Number(String(v ?? '').replace(/[^\d.-]/g, '')) || 0;
-  const months = [1, 12, 24, 36, 48, 60];
-  let cheapest = null;
-  for (const m of months) {
-    const slot = (p.price && (p.price[m] || p.price[String(m)])) || {};
-    const rent = num(slot.rent);
-    if (rent && (!cheapest || rent < cheapest.rent)) cheapest = { m, rent, deposit: num(slot.deposit) };
-  }
-  // 형식: "48개월 월 79만원 · 보증금 100만원 · 24년식 · 1.2만km · 가솔린"
-  const fmtMan = (n) => {
-    if (n >= 10000 && n % 10000 === 0) return `${(n/10000).toLocaleString('ko-KR')}만원`;
-    return `${n.toLocaleString('ko-KR')}원`;
-  };
-  const fmtKm = (n) => {
-    if (n >= 10000) return `${(n/10000).toFixed(1).replace(/\.0$/, '')}만km`;
-    return `${n.toLocaleString('ko-KR')}km`;
-  };
-  const descParts = [];
-  if (cheapest) {
-    descParts.push(`${cheapest.m}개월 월 ${fmtMan(cheapest.rent)}`);
-    if (cheapest.deposit) descParts.push(`보증금 ${fmtMan(cheapest.deposit)}`);
-  }
-  if (p.year) descParts.push(`${String(p.year).slice(-2)}년식`);
-  if (p.mileage) descParts.push(fmtKm(num(p.mileage)));
-  if (p.fuel_type) descParts.push(String(p.fuel_type));
-  if (descParts.length) url.searchParams.set('d', descParts.join(' · '));
+  const title = [carPart, agentPart && `- ${agentPart}`, company && `| ${company}`].filter(Boolean).join(' ');
   // 차량 대표 이미지 → 서버 인메모리 캐시에 저장 (await로 캐시 보장)
   const firstImg = (Array.isArray(p.image_urls) && p.image_urls[0]) || p.image_url || '';
   const productKey = p.product_uid || p.product_code || '';
@@ -216,7 +187,6 @@ $btnShare?.addEventListener('click', async (e) => {
     } catch {}
   }
   const shareUrl = url.toString();
-  const title = carTitle || [p.maker, p.model_name].filter(Boolean).join(' ') || '상품';
   // Web Share API 우선
   if (navigator.share) {
     try { await navigator.share({ title, url: shareUrl }); return; }
