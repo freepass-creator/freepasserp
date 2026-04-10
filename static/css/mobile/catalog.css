@@ -1,28 +1,19 @@
-/* 카탈로그 전용 오버라이드 — 모바일 레이아웃 기반 */
+/* 카탈로그 전용 — ERP 모바일과 동일하되 탭바→CTA만 다름 */
 
-/* 탭바 숨김, CTA 바로 대체 */
+/* 탭바·PWA 배너 숨김 */
 .m-body[data-page="카탈로그"] .m-tabbar { display: none !important; }
 .m-body[data-page="카탈로그"] .m-pwa-install { display: none !important; }
+
+/* 페이지 하단 패딩 — CTA 바 높이만큼 (ERP는 탭바 56px, 카탈로그는 CTA 68px) */
 .m-body[data-page="카탈로그"] .m-page {
-  padding-bottom: 0;
+  padding-bottom: calc(68px + env(safe-area-inset-bottom));
 }
-/* 필터 패널 — 탭바 대신 CTA 바 높이(68px + safe-area) 위에 맞닿도록 */
+/* 필터 패널 하단 — CTA 바 위에 맞닿도록 */
 .m-body[data-page="카탈로그"] .m-fs {
   bottom: calc(68px + env(safe-area-inset-bottom));
 }
 
-/* 상단 에이전트 뱃지 */
-.m-catalog-agent {
-  font-size: 11px;
-  color: var(--m-text-secondary, #475569);
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
-}
-
-/* 하단 CTA 바 */
+/* ─── 하단 CTA 바 ─────────────────────────── */
 .m-catalog-cta {
   position: fixed;
   bottom: 0;
@@ -48,17 +39,11 @@
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
-  cursor: pointer;
 }
 .m-catalog-cta__btn:active { opacity: 0.85; transform: scale(0.98); }
 .m-catalog-cta__btn svg { flex-shrink: 0; }
 
-/* CTA 바 있을 때 페이지 하단 패딩 확보 — CTA는 .m-page 형제 */
-.m-body[data-page="카탈로그"] .m-page {
-  padding-bottom: calc(68px + env(safe-area-inset-bottom));
-}
-
-/* 상세 뷰 */
+/* ─── 상세 뷰 ────────────────────────────── */
 .m-catalog-detail[hidden] { display: none; }
 #m-catalog-grid[hidden] { display: none !important; }
 .m-catalog-detail__gallery {
@@ -95,7 +80,6 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
-  cursor: pointer;
 }
 .m-catalog-detail__nav--prev { left: 10px; }
 .m-catalog-detail__nav--next { right: 10px; }

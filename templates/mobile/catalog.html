@@ -2,9 +2,7 @@
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/product.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/product-detail.css') }}?v={{ app_version }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/product-detail-desktop.css') }}?v={{ app_version }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/catalog.css') }}?v={{ app_version }}">
-<!-- OG 메타 (카카오톡 미리보기) -->
 {% set _og_img = og_image or url_for('static', filename='og-catalog.svg', _external=True) %}
 <meta property="og:title" content="{{ og_title or '렌터카 상품 안내' }}">
 <meta property="og:description" content="{{ og_desc or '장기렌터카 구독서비스 영업전용 ERP' }}">

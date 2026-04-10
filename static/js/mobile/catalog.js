@@ -235,7 +235,7 @@ function showDetail(p) {
   const policiesArr = allPolicies && typeof allPolicies === 'object'
     ? (Array.isArray(allPolicies) ? allPolicies : Object.values(allPolicies))
     : [];
-  $body.innerHTML = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(p, {
+  $body.innerHTML = `<div class="m-pd">${renderMobileProductDetail(p, {
     policies: policiesArr,
     showGallery: false,
     showFee: false,
