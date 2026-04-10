@@ -617,7 +617,6 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
 
   if (!gf.active[colKey]) gf.active[colKey] = new Set();
   const selected = gf.active[colKey];
-  const isNumCol = col.num || col.priceMonth;
 
   let html = '';
 

@@ -354,7 +354,7 @@ function rentBucketLabel(v) {
 }
 function depositBucketLabel(v) {
   const n = Number(v || 0);
-  if (!n) return '';
+  if (n === 0) return '무보증';
   if (n < 1000000)  return '100만원 미만';
   if (n < 2000000)  return '100만원~';
   if (n < 3000000)  return '200만원~';
