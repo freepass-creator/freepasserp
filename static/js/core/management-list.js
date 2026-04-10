@@ -575,9 +575,10 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
         const th = thead.querySelector(`[data-col-key="${colKey}"]`);
         if (th) {
           th.classList.toggle('pls-th--has-filter', !!q);
-          let badge = th.querySelector('.pls-th__filter-count');
+          const label = th.querySelector('.pls-th__label') || th;
+          let badge = label.querySelector('.pls-th__filter-count');
           if (q) {
-            if (!badge) { badge = document.createElement('span'); badge.className = 'pls-th__filter-count'; th.appendChild(badge); }
+            if (!badge) { badge = document.createElement('span'); badge.className = 'pls-th__filter-count'; label.appendChild(badge); }
             badge.textContent = '1';
           } else if (badge) { badge.remove(); }
         }
@@ -692,9 +693,10 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
     if (th) {
       const cnt = (selected.size || 0) + (depSelected ? depSelected.size : 0);
       th.classList.toggle('pls-th--has-filter', cnt > 0);
-      let badge = th.querySelector('.pls-th__filter-count');
+      const label = th.querySelector('.pls-th__label') || th;
+      let badge = label.querySelector('.pls-th__filter-count');
       if (cnt > 0) {
-        if (!badge) { badge = document.createElement('span'); badge.className = 'pls-th__filter-count'; th.appendChild(badge); }
+        if (!badge) { badge = document.createElement('span'); badge.className = 'pls-th__filter-count'; label.appendChild(badge); }
         badge.textContent = cnt;
       } else if (badge) { badge.remove(); }
     }
