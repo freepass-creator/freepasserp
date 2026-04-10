@@ -348,7 +348,17 @@ function passesSearch(item, query) {
   return true;
 }
 function passesAllFilters(item,skip){ if(!passesSearch(item, state.searchQuery)) return false; return FILTER_SCHEMA.every(group=>{ if(group.key==='periods') return true; if(group.key===skip) return true; return passesGroup(group,item,state.filters[group.key]);}); }
+// 필터 결과 캐시 — 같은 입력이면 재필터링 스킵
+let _filterCache = { key: '', items: null, products: null };
+function _filterSnapshotKey() {
+  const f = FILTER_SCHEMA.map(g => `${g.key}:${(state.filters[g.key] || []).join(',')}`).join('|');
+  return `${state.searchQuery}||${f}`;
+}
 function safeFilterAll(items) {
+  const key = _filterSnapshotKey();
+  if (_filterCache.items === items && _filterCache.key === key && _filterCache.products) {
+    return _filterCache.products;
+  }
   let result = items.filter(item => passesSearch(item, state.searchQuery));
   FILTER_SCHEMA.forEach(group => {
     if (group.key === 'periods') return;
@@ -357,8 +367,10 @@ function safeFilterAll(items) {
     const candidate = result.filter(item => passesGroup(group, item, selected));
     if (candidate.length) result = candidate;
   });
+  _filterCache = { key, items, products: result };
   return result;
 }
+function invalidateFilterCache() { _filterCache = { key: '', items: null, products: null }; }
 function renderPeriodsHead(){ /* 기간 헤더는 그리드 내장으로 이동 — 호환성 유지 */ if($periodHead) $periodHead.innerHTML=''; }
 function summarizeOptionText(text){ const raw=safe(text); if(raw==='-') return raw; return raw.length>18 ? `${raw.slice(0,18)}...` : raw; }
 function buildBaseSets(){
@@ -402,7 +414,8 @@ function bindFilterAccordion(){
     else current.delete(input.dataset.value);
     if(key === 'periods' && current.size === 0) current.add(DEFAULT_PERIODS[0]);
     state.filters[key] = [...current];
-    applyFilters();
+    invalidateFilterCache();
+    scheduleApplyFilters();
   });
 }
 function badgeClass(value) {
@@ -441,6 +454,13 @@ let _renderListRaf = 0;
 function scheduleRenderList() {
   if (_renderListRaf) return;
   _renderListRaf = requestAnimationFrame(() => { _renderListRaf = 0; renderList(); });
+}
+
+// applyFilters rAF 배치 — 짧은 시간 안에 여러 번 호출되면 1회만 실행
+let _applyFiltersRaf = 0;
+function scheduleApplyFilters() {
+  if (_applyFiltersRaf) return;
+  _applyFiltersRaf = requestAnimationFrame(() => { _applyFiltersRaf = 0; applyFilters(); });
 }
 
 function renderList(){
@@ -743,6 +763,12 @@ function syncDetailBadges(product) {
   el.innerHTML = '';
 }
 
+// 상세 HTML 캐시 — 동일 product+termVer+photoIdx면 재사용
+const _detailHtmlCache = new Map(); // id → { html, termVer, photoIdx }
+function invalidateDetailCache(productId) {
+  if (productId) _detailHtmlCache.delete(productId);
+  else _detailHtmlCache.clear();
+}
 function renderDetail(){
   if (_isMobile.matches) return; // 모바일은 모바일 상세 사용
   const product=state.filteredProducts.find(i=>i.id===state.selectedId);
@@ -760,10 +786,25 @@ function renderDetail(){
   syncTopBarIdentity(product);
   // 모바일 상품 상세와 동일한 마크업 사용
   const rawProduct = product._raw || product;
-  $detail.innerHTML = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
-    activePhotoIndex: state.activePhotoIndex,
-    policy: getTermFields(product),
-  })}</div>`;
+  const termFields = getTermFields(product);
+  const termVer = JSON.stringify(termFields).length; // 가벼운 버전 키
+  const cached = _detailHtmlCache.get(product.id);
+  let html;
+  if (cached && cached.termVer === termVer && cached.photoIdx === state.activePhotoIndex) {
+    html = cached.html;
+  } else {
+    html = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
+      activePhotoIndex: state.activePhotoIndex,
+      policy: termFields,
+    })}</div>`;
+    _detailHtmlCache.set(product.id, { html, termVer, photoIdx: state.activePhotoIndex });
+    // 캐시 크기 제한 (최근 30개)
+    if (_detailHtmlCache.size > 30) {
+      const firstKey = _detailHtmlCache.keys().next().value;
+      _detailHtmlCache.delete(firstKey);
+    }
+  }
+  $detail.innerHTML = html;
   bindMobileGalleryEvents($detail, rawProduct);
   ensureTermLoaded(product);
 }
@@ -784,7 +825,7 @@ function applyFilters(){
   renderPeriodsHead();
   if (state.filterOverlayOpen) { renderFilterAccordion(baseSets); _accordionDirty = false; } else { _accordionDirty = true; }
   syncPeriodChips();
-  if (!_isMobile.matches) { renderList(); renderDetail(); }
+  if (!_isMobile.matches) { scheduleRenderList(); renderDetail(); }
   if (_isMobile.matches) { renderMobileCatalogGrid(); }
   persistFilterState();
 }
@@ -1242,8 +1283,10 @@ async function init(){
 
   const unsubscribe = watchProducts((products) => {
     state.allProducts = applyRoleFilter(products.map((p) => Object.assign(normalizeProduct(p), { _raw: p }))).filter(item => item.id);
-    state.allProducts.forEach(item => ensureTermLoaded(item));
-    applyFilters();
+    invalidateFilterCache();
+    invalidateDetailCache();
+    // ensureTermLoaded는 상세 열 때만 호출하면 충분 — 전체 forEach 제거 (수천 건 시 비용 큼)
+    scheduleApplyFilters();
   });
   registerPageCleanup(unsubscribe);
 
