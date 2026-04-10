@@ -685,11 +685,11 @@ html {
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
-  padding: 0 10px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  padding: 0 8px 24px;
 }
-/* 모바일 카드가 데스크탑 그리드에서 자연스럽게 보이도록 */
+/* 모바일 카드가 데스크탑 그리드에서 컴팩트하게 */
 .catalog-grid .m-product-card {
   display: flex;
   flex-direction: column;
@@ -697,9 +697,14 @@ html {
   overflow: hidden;
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  font-size: 11px;
 }
 .catalog-grid .m-product-card__media { width: 100%; }
 .catalog-grid .m-product-card__img { aspect-ratio: 4/3; width: 100%; object-fit: cover; }
+.catalog-grid .m-product-card__body { padding: 8px; gap: 2px; }
+.catalog-grid .m-product-card__title { font-size: 12px; }
+.catalog-grid .m-product-card__price { font-size: 13px; }
+.catalog-grid .m-product-card__price-sub { font-size: 10px; }
 
 .catalog-card {
   border-radius: var(--radius-lg);
