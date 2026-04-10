@@ -225,9 +225,9 @@ def catalog_view():
     company = req.args.get('c', '')
     agent_name = req.args.get('n', '')
     agent_position = req.args.get('pos', '')
-    # 이미지: in-memory 캐시에서 product id로 조회, 없으면 고정 아이콘
+    # 이미지: 개별 매물은 차량 사진 캐시, 없으면 카탈로그 기본 썸네일 (FREE/PASS)
     cached_img = _share_image_cache.get(share_id) if share_id else None
-    og_image = cached_img or (req.url_root.rstrip('/') + '/static/icons/icon-512.png')
+    og_image = cached_img or (req.url_root.rstrip('/') + '/static/og-catalog.svg')
     # 양식 통일:
     #   상품별:  "상품구분 차량번호 차종 - 홍길동 팀장 | 소속회사"
     #   공급사:  "공급코드 상품 - 홍길동 팀장 | 소속회사"

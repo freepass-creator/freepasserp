@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f1a33"/>
+      <stop offset="100%" stop-color="#1b2a4a"/>
+    </linearGradient>
+    <style>
+      @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+      .free { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; font-weight: 700; fill: #ffffff; letter-spacing: -0.04em; }
+      .pass { font-family: 'Pretendard', -apple-system, 'Segoe UI', sans-serif; font-weight: 700; fill: #93c5fd; letter-spacing: -0.04em; }
+    </style>
+  </defs>
+
+  <rect x="-200" y="-200" width="1600" height="1030" fill="url(#bg)"/>
+
+  <text class="free" x="600" y="280" font-size="180" text-anchor="middle">FREE</text>
+  <text class="pass" x="600" y="430" font-size="180" text-anchor="middle">PASS</text>
+</svg>

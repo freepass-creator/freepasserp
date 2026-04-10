@@ -8,15 +8,12 @@
 <meta property="og:description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ request.url }}">
-{% if og_image %}
-<meta property="og:image" content="{{ og_image }}">
+{% set _og_img = og_image or url_for('static', filename='og-catalog.svg', _external=True) %}
+<meta property="og:image" content="{{ _og_img }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{{ og_image }}">
-{% else %}
-<meta name="twitter:card" content="summary">
-{% endif %}
+<meta name="twitter:image" content="{{ _og_img }}">
 <meta name="twitter:title" content="{{ og_title or '렌터카 상품 안내' }}">
 <meta name="twitter:description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
 <meta name="description" content="{{ og_desc or '렌터카 장기렌트 상품을 검색하고 비교해보세요.' }}">
