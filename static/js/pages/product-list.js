@@ -111,7 +111,7 @@ const FILTER_SCHEMA = [
   { key:"mileage",      title:"주행거리",   type:"range",                              open:false }
 ];
 const FILTER_STORAGE_KEY = 'freepass.product-list.filters.v5';
-const state = { allProducts: [], filteredProducts: [], selectedId: null, activePhotoIndex: 0, openGroups: {}, filters: {}, searchQuery: '', role: '', companyCode: '', profile: null, user: null, termCache: {}, termLoading: {}, filterOverlayOpen: false };
+const state = { allProducts: [], filteredProducts: [], selectedId: null, activePhotoIndex: 0, openGroups: {}, filters: {}, searchQuery: '', role: '', companyCode: '', profile: null, user: null, termCache: {}, termLoading: {}, filterOverlayOpen: false, rangeSortDir: {} };
 const params = new URLSearchParams(window.location.search);
 const preferredProductCode = String(params.get('product_code') || '').trim();
 FILTER_SCHEMA.forEach(g=>{state.filters[g.key]=g.key==="periods"?DEFAULT_PERIODS.slice():[]; state.openGroups[g.key]=!!g.open;});
@@ -402,18 +402,42 @@ function renderFilterAccordion(baseSets){
         return { ...option, count };
       }).filter(o => group.key === 'periods' || o.count > 0);
     }
-    counted.sort((a, b) => b.count - a.count);
+    // 정렬: range는 금액 오름/내림 토글, 나머지는 count 내림
+    const sortDir = state.rangeSortDir?.[group.key]; // 'asc' | 'desc' | undefined
+    if (group.type === 'range' && sortDir) {
+      counted.sort((a, b) => sortDir === 'asc' ? a.label.localeCompare(b.label, 'ko', {numeric:true}) : b.label.localeCompare(a.label, 'ko', {numeric:true}));
+    } else {
+      counted.sort((a, b) => b.count - a.count);
+    }
+    // range 그룹에 정렬 토글 버튼 추가
+    const sortBtnHtml = group.type === 'range'
+      ? `<div class="filter-sort-row"><button type="button" class="filter-sort-btn" data-sort-group="${group.key}" data-sort-dir="${sortDir === 'asc' ? 'desc' : 'asc'}" title="${!sortDir ? '금액순 정렬' : sortDir === 'asc' ? '내림차순' : '많은순'}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>${!sortDir ? '금액순' : sortDir === 'asc' ? '높은순' : '낮은순'}</button></div>`
+      : '';
     const body = counted.map(option => {
       const checked = state.filters[group.key].includes(option.value);
       return `<label class="filter-option"><span class="filter-check"><input type="checkbox" data-group="${group.key}" data-value="${option.value}" ${checked?'checked':''}><span>${option.label}</span></span><span class="filter-count">(${option.count})</span></label>`;
     }).join('');
-    return `<section class="filter-group ${state.openGroups[group.key]?'is-open':''}" data-filter-group="${group.key}"><button type="button" class="filter-group-head" data-toggle-group="${group.key}" aria-expanded="${state.openGroups[group.key]?'true':'false'}"><span class="filter-group-title">${group.title}</span><span class="filter-group-caret">${state.openGroups[group.key]?'닫기':'열기'}</span></button><div class="filter-group-body" ${state.openGroups[group.key]?'':'hidden'}>${body}</div></section>`;
+    return `<section class="filter-group ${state.openGroups[group.key]?'is-open':''}" data-filter-group="${group.key}"><button type="button" class="filter-group-head" data-toggle-group="${group.key}" aria-expanded="${state.openGroups[group.key]?'true':'false'}"><span class="filter-group-title">${group.title}</span><span class="filter-group-caret">${state.openGroups[group.key]?'닫기':'열기'}</span></button><div class="filter-group-body" ${state.openGroups[group.key]?'':'hidden'}>${sortBtnHtml}${body}</div></section>`;
   }).join('');
 }
 function bindFilterAccordion(){
   if(!$accordion || $accordion.dataset.bound === 'true') return;
   $accordion.dataset.bound = 'true';
   $accordion.addEventListener('click', (event) => {
+    // 정렬 토글 버튼
+    const sortBtn = event.target.closest('[data-sort-group]');
+    if (sortBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      const gk = sortBtn.dataset.sortGroup;
+      const dir = sortBtn.dataset.sortDir;
+      // 3단 토글: count순(기본) → asc → desc → count순
+      if (!state.rangeSortDir[gk]) state.rangeSortDir[gk] = dir;
+      else if (state.rangeSortDir[gk] === 'asc') state.rangeSortDir[gk] = 'desc';
+      else delete state.rangeSortDir[gk];
+      renderFilterAccordion();
+      return;
+    }
     const btn = event.target.closest('[data-toggle-group]');
     if(!btn) return;
     event.preventDefault();

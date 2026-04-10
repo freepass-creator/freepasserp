@@ -158,3 +158,30 @@
   border-color: var(--interactive-active-border);
   background: #fff;
 }
+
+
+/* ─── 필터 정렬 토글 (대여료/보증금/주행거리) ─── */
+.filter-sort-row {
+  padding: 4px 8px 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+.filter-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-soft, #e2e8f0);
+  border-radius: var(--radius-ui, 4px);
+  background: var(--surface-subtle, #f8fafc);
+  font-size: var(--font-size-xs, 11px);
+  font-weight: 600;
+  color: var(--text-subtle, #64748b);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.filter-sort-btn:hover {
+  background: var(--surface-base, #f1f5f9);
+  color: var(--text-main, #0f172a);
+}
+.filter-sort-btn svg { flex-shrink: 0; }
