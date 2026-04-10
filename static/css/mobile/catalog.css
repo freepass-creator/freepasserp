@@ -60,10 +60,12 @@
 }
 .m-catalog-detail__gallery-empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: rgba(255,255,255,0.4);
+  background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+  color: rgba(255,255,255,0.35);
   font-size: 13px;
 }
 .m-catalog-detail__nav {

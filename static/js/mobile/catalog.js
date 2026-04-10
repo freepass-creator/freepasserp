@@ -161,7 +161,10 @@ function getPhotos(p) {
 function renderDetailGallery(p) {
   const photos = getPhotos(p);
   if (!photos.length) {
-    $gallery.innerHTML = '<div class="m-catalog-detail__gallery-empty">등록사진 없음</div>';
+    $gallery.innerHTML = `<div class="m-catalog-detail__gallery-empty">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="color:rgba(255,255,255,0.15)"><path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8"/><path d="M7 14h.01"/><path d="M17 14h.01"/><rect width="18" height="8" x="3" y="10" rx="2"/><path d="M5 18v2"/><path d="M19 18v2"/></svg>
+      <span style="margin-top:8px">등록된 사진이 없습니다</span>
+    </div>`;
     return;
   }
   const idx = Math.min(galleryIndex, photos.length - 1);
