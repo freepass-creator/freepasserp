@@ -199,22 +199,11 @@
   color: #0f172a;
 }
 
-/* ─── 표 행 Zebra 가독성 ─────────────────────── */
-.m-pd--desktop .m-pd-tbl__row:nth-child(even),
-.m-pd--desktop .m-pd-price-table__row:nth-child(even) {
-  background: #fafbfc;
-}
-
-/* ─── 가격 섹션 최저가 하이라이트 강화 ───────── */
-.m-pd--desktop .m-pd-price-table__row.is-cheapest {
-  background: #f0f9ff;
-  border-left: 2px solid #0284c7;
-  padding-left: 10px;
-}
+/* ─── 최저가 대여료 숫자만 크게 ─────────────── */
 .m-pd--desktop .m-pd-price-table__row.is-cheapest strong {
   font-size: var(--font-size-xl, 17px);
   font-weight: 800;
-  color: #0c4a6e;
+  color: #0f172a;
 }
 
 /* ─── 표 (가격/보험) ─────────────────────────── */
@@ -222,13 +211,13 @@
 .m-pd--desktop .m-pd-price-table__row,
 .m-pd--desktop .m-pd-tbl__th,
 .m-pd--desktop .m-pd-tbl__row {
-  padding: 9px 12px;
+  padding: 9px 4px;
   font-size: var(--font-size-base, 12px);
 }
 .m-pd--desktop .m-pd-price-table__th,
 .m-pd--desktop .m-pd-tbl__th {
-  background: #f8fafc;
-  border-radius: 6px 6px 0 0;
+  background: transparent;
+  border-radius: 0;
   font-size: var(--font-size-sm, 12px);
   font-weight: 700;
   color: #64748b;
