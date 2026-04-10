@@ -68,10 +68,11 @@
 .m-pd--desktop .m-pd-group:first-of-type {
   margin-top: 18px;
 }
-/* 섹션 타이틀 — 아이콘만 표시 */
+/* 섹션 타이틀 — 아이콘 + 텍스트 */
 .m-pd--desktop .m-pd-group__head {
   display: flex;
   align-items: center;
+  gap: 6px;
   margin: 0 0 8px;
   padding: 0 0 0 2px;
   border: none;
@@ -83,7 +84,10 @@
   color: #64748b;
 }
 .m-pd--desktop .m-pd-group__title {
-  display: none;
+  font-size: var(--font-size-md, 14px);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: #1f2937;
 }
 .m-pd--desktop .m-pd-group__count {
   display: none;
