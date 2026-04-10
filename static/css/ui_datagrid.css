@@ -352,3 +352,56 @@
   margin: 0 -6px;
   padding-left: 12px;
 }
+
+/* ─── 공용 우클릭 컨텍스트 메뉴 ──────────── */
+.pm-ctx-menu {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  padding: 4px 0;
+  min-width: 160px;
+  font-family: inherit;
+}
+.pm-ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: #0f172a;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pm-ctx-item:hover { background: #f1f5f9; }
+.pm-ctx-item svg { flex-shrink: 0; color: #64748b; }
+.pm-ctx-item--danger { color: #dc2626; }
+.pm-ctx-item--danger svg { color: #dc2626; }
+.pm-ctx-item--danger:hover { background: #fef2f2; }
+.pm-ctx-item--parent { position: relative; }
+.pm-ctx-chevron { margin-left: auto; color: #94a3b8; }
+.pm-ctx-divider {
+  height: 1px;
+  background: #e5e8eb;
+  margin: 4px 0;
+}
+.pm-ctx-sub { position: relative; }
+.pm-ctx-submenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: -4px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  padding: 4px 0;
+  min-width: 120px;
+  z-index: 1;
+}
+.pm-ctx-sub:hover .pm-ctx-submenu { display: block; }
+.pm-ctx-submenu .pm-ctx-item { padding: 7px 14px; }

@@ -208,6 +208,93 @@ function renderList(members) {
   });
 }
 
+// ─── 우클릭 컨텍스트 메뉴 (승인 / 수정 / 등록삭제) ──────────
+const STATUS_OPTIONS = [
+  { value: 'active', label: '승인' },
+  { value: 'pending', label: '대기' },
+  { value: 'rejected', label: '반려' },
+];
+let _ctxMenu = null;
+function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.remove(); _ctxMenu = null; } }
+document.addEventListener('click', removeCtxMenu);
+document.addEventListener('scroll', removeCtxMenu, true);
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
+
+list?.addEventListener('contextmenu', (e) => {
+  const row = e.target.closest('tr[data-key]');
+  if (!row) return;
+  e.preventDefault();
+  removeCtxMenu();
+  const uid = row.dataset.key;
+  const member = currentMembers.find(m => m.uid === uid);
+
+  const menu = document.createElement('div');
+  menu.className = 'pm-ctx-menu';
+  menu.innerHTML = `
+    <button type="button" class="pm-ctx-item" data-action="edit">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+      정보수정
+    </button>
+    <div class="pm-ctx-sub">
+      <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+        상태변경
+        <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div class="pm-ctx-submenu">
+        ${STATUS_OPTIONS.map(s =>
+          `<button type="button" class="pm-ctx-item" data-action="status" data-status="${escapeHtml(s.value)}">${escapeHtml(s.label)}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="pm-ctx-divider"></div>
+    <button type="button" class="pm-ctx-item pm-ctx-item--danger" data-action="delete">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+      등록삭제
+    </button>
+  `;
+  document.body.appendChild(menu);
+  _ctxMenu = menu;
+  menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;`;
+  requestAnimationFrame(() => {
+    const rect = menu.getBoundingClientRect();
+    if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 8}px`;
+    if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 8}px`;
+  });
+
+  menu.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === 'edit') {
+      removeCtxMenu();
+      if (member) fillForm(member);
+    }
+    if (action === 'status') {
+      removeCtxMenu();
+      try {
+        await updateUserProfile(uid, { status: btn.dataset.status });
+        currentMembers = await fetchUsersOnce();
+        renderList(currentMembers);
+        showToast(`상태 → ${STATUS_OPTIONS.find(s => s.value === btn.dataset.status)?.label || btn.dataset.status}`, 'success');
+      } catch (err) {
+        showToast('상태 변경 실패: ' + (err.message || err), 'error');
+      }
+    }
+    if (action === 'delete') {
+      removeCtxMenu();
+      if (!await showConfirm(`${member?.name || uid}\n삭제하시겠습니까?`)) return;
+      try {
+        await deleteUserProfile(uid);
+        showToast('삭제 완료', 'success');
+        clearForm();
+      } catch (err) {
+        showToast('삭제 실패: ' + (err.message || err), 'error');
+      }
+    }
+  });
+});
+
 async function refreshMembers() {
   currentPartners = await fetchPartnersOnce();
   currentMembers = await fetchUsersOnce();
