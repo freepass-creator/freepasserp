@@ -1,0 +1,56 @@
+{% extends 'mobile/_layout.html' %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/product.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/product-detail.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/product-detail-desktop.css') }}?v={{ app_version }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/catalog.css') }}?v={{ app_version }}">
+<!-- OG 메타 (카카오톡 미리보기) -->
+{% set _og_img = og_image or url_for('static', filename='og-catalog.svg', _external=True) %}
+<meta property="og:title" content="{{ og_title or '렌터카 상품 안내' }}">
+<meta property="og:description" content="{{ og_desc or '장기렌터카 구독서비스 영업전용 ERP' }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:image" content="{{ _og_img }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{ _og_img }}">
+{% endblock %}
+{% block topbar_left %}
+  <div class="m-search-bar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="m-catalog-search" type="search" placeholder="모델·차량번호 검색">
+  </div>
+{% endblock %}
+{% block topbar_center %}
+  <span class="m-catalog-agent" id="m-catalog-agent"></span>
+{% endblock %}
+{% block topbar_right %}
+  <button class="m-icon-btn" id="m-catalog-filter-btn" type="button" aria-label="필터">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></svg>
+  </button>
+{% endblock %}
+{% block body %}
+<!-- 목록 뷰 -->
+<div class="m-product-grid" id="m-catalog-grid">
+  <div class="m-skeleton" style="aspect-ratio:3/4"></div>
+  <div class="m-skeleton" style="aspect-ratio:3/4"></div>
+  <div class="m-skeleton" style="aspect-ratio:3/4"></div>
+  <div class="m-skeleton" style="aspect-ratio:3/4"></div>
+</div>
+<!-- 상세 뷰 (숨김) -->
+<div class="m-catalog-detail" id="m-catalog-detail" hidden>
+  <div class="m-catalog-detail__gallery" id="m-catalog-gallery"></div>
+  <div class="m-catalog-detail__body" id="m-catalog-body"></div>
+</div>
+<!-- 하단 CTA 바 -->
+<div class="m-catalog-cta" id="m-catalog-cta" hidden>
+  <a class="m-catalog-cta__btn" id="m-catalog-call" href="tel:">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <span id="m-catalog-call-text">연락하기</span>
+  </a>
+</div>
+{% endblock %}
+{% block page_js %}
+<script type="module" src="{{ url_for('static', filename='js/mobile/catalog.js') }}?v={{ app_version }}"></script>
+{% endblock %}

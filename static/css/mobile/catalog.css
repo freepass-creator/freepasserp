@@ -1,0 +1,115 @@
+/* 카탈로그 전용 오버라이드 — 모바일 레이아웃 기반 */
+
+/* 탭바 숨김, CTA 바로 대체 */
+.m-body[data-page="카탈로그"] .m-tabbar { display: none !important; }
+.m-body[data-page="카탈로그"] .m-pwa-install { display: none !important; }
+.m-body[data-page="카탈로그"] .m-page {
+  padding-bottom: 0; /* 탭바 자리 없앰 — CTA 바가 대신 */
+}
+
+/* 상단 에이전트 뱃지 */
+.m-catalog-agent {
+  font-size: 11px;
+  color: var(--m-text-secondary, #475569);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+/* 하단 CTA 바 */
+.m-catalog-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1px solid #f2f4f6;
+}
+.m-catalog-cta[hidden] { display: none; }
+.m-catalog-cta__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  background: #1b2a4a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.m-catalog-cta__btn:active { opacity: 0.85; transform: scale(0.98); }
+.m-catalog-cta__btn svg { flex-shrink: 0; }
+
+/* CTA 바 있을 때 페이지 하단 패딩 확보 */
+.m-body[data-page="카탈로그"] .m-page:has(~ .m-catalog-cta:not([hidden])) {
+  padding-bottom: calc(68px + env(safe-area-inset-bottom));
+}
+/* :has 미지원 폴백 */
+@supports not (selector(:has(*))) {
+  .m-body[data-page="카탈로그"] .m-page {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
+  }
+}
+
+/* 상세 뷰 */
+.m-catalog-detail[hidden] { display: none; }
+.m-catalog-detail__gallery {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #0f172a;
+  overflow: hidden;
+}
+.m-catalog-detail__gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.m-catalog-detail__gallery-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+}
+.m-catalog-detail__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  cursor: pointer;
+}
+.m-catalog-detail__nav--prev { left: 10px; }
+.m-catalog-detail__nav--next { right: 10px; }
+.m-catalog-detail__counter {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.6);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 2;
+}
