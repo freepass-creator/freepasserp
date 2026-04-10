@@ -628,7 +628,7 @@ document.addEventListener('contextmenu', (e) => {
       removeCtxMenu();
       if (product) {
         fillProductForm(product, { ...adapterContext, currentProfile });
-        applyFormMode('edit');
+        requestAnimationFrame(() => applyFormMode('edit'));
       }
     }
     if (action === 'status') {
