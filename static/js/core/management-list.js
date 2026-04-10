@@ -615,57 +615,63 @@ function _openGridFilter(thead, tbody, colKey, columns, items, getKey, getCellVa
 
   if (!gf.active[colKey]) gf.active[colKey] = new Set();
   const selected = gf.active[colKey];
+  const isNumCol = col.num || col.priceMonth;
 
-  // 대여료 컬럼(priceMonth) → 3중 필터: 대여료 구간 + 보증금 구간 + 정렬
+  let html = '';
+
+  // 숫자 컬럼(대여료/주행거리)에만 정렬 버튼
+  if (isNumCol) html += _buildSortRow(gf, colKey);
+
+  // 대여료 컬럼(priceMonth) → 보증금 섹션도 추가
   const depKey = col.priceMonth ? `_dep_${colKey}` : null;
-  let depCounts = null;
-  let depSorted = null;
+  let depSelected = null;
   if (depKey) {
     if (!gf.active[depKey]) gf.active[depKey] = new Set();
-    depCounts = new Map();
+    depSelected = gf.active[depKey];
+    html += `<div class="pls-fdd__section-title">대여료</div>`;
+  }
+
+  // 메인 체크박스 목록
+  html += sorted.map(([val, cnt]) => {
+    const checked = selected.has(val) ? 'checked' : '';
+    const cls = checked ? ' is-checked' : '';
+    return `<label class="${cls}"><input type="checkbox" data-filter-type="rent" value="${escapeHtml(val)}" ${checked}><span>${escapeHtml(val)}</span><span class="pls-fdd__count">${cnt}</span></label>`;
+  }).join('');
+
+  // 보증금 구간 (priceMonth 컬럼만)
+  if (depKey) {
+    const depCounts = new Map();
     facetedItems.forEach(item => {
       const depNum = Number(String(item?.price?.[col.priceMonth]?.deposit ?? '').replace(/[^\d.-]/g, '')) || 0;
       if (!depNum) return;
       const label = typeof window._depositBucketLabel === 'function' ? window._depositBucketLabel(depNum) : '';
       if (label) depCounts.set(label, (depCounts.get(label) || 0) + 1);
     });
-    depSorted = [...depCounts.entries()].sort((a, b) =>
+    const depSorted = [...depCounts.entries()].sort((a, b) =>
       (parseFloat(a[0].replace(/[^\d.-]/g, '')) || 0) - (parseFloat(b[0].replace(/[^\d.-]/g, '')) || 0)
     );
+    if (depSorted.length) {
+      html += `<div class="pls-fdd__section-title" style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e8eb;">보증금</div>`;
+      html += depSorted.map(([val, cnt]) => {
+        const checked = depSelected.has(val) ? 'checked' : '';
+        const cls = checked ? ' is-checked' : '';
+        return `<label class="${cls}"><input type="checkbox" data-filter-type="deposit" value="${escapeHtml(val)}" ${checked}><span>${escapeHtml(val)}</span><span class="pls-fdd__count">${cnt}</span></label>`;
+      }).join('');
+    }
   }
-  const depSelected = depKey ? gf.active[depKey] : null;
 
-  let html = '';
-  // 정렬 버튼
-  html += _buildSortRow(gf, colKey);
-  // 대여료 구간
-  html += `<div class="pls-fdd__section-title">대여료</div>`;
-  html += sorted.map(([val, cnt]) => {
-      const checked = selected.has(val) ? 'checked' : '';
-      const cls = checked ? ' is-checked' : '';
-      return `<label class="${cls}"><input type="checkbox" data-filter-type="rent" value="${escapeHtml(val)}" ${checked}><span>${escapeHtml(val)}</span><span class="pls-fdd__count">${cnt}</span></label>`;
-    }).join('');
-  // 보증금 구간 (priceMonth 컬럼만)
-  if (depSorted && depSorted.length) {
-    html += `<div class="pls-fdd__section-title" style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e8eb;">보증금</div>`;
-    html += depSorted.map(([val, cnt]) => {
-      const checked = depSelected.has(val) ? 'checked' : '';
-      const cls = checked ? ' is-checked' : '';
-      return `<label class="${cls}"><input type="checkbox" data-filter-type="deposit" value="${escapeHtml(val)}" ${checked}><span>${escapeHtml(val)}</span><span class="pls-fdd__count">${cnt}</span></label>`;
-    }).join('');
-  }
   html += `<div class="pls-fdd__actions"><button type="button" class="pls-fdd__action-btn pls-fdd__action-btn--reset" data-fdd-reset>초기화</button><button type="button" class="pls-fdd__action-btn pls-fdd__action-btn--apply" data-fdd-apply>적용</button></div>`;
   dd.innerHTML = html;
 
   _positionDropdown(dd, th);
-  _bindSortButtons(dd, thead, gf, colKey, fullOptions, items);
+  if (isNumCol) _bindSortButtons(dd, thead, gf, colKey, fullOptions, items);
 
   // 체크박스 → 즉시 필터 (드롭다운 유지, 바디만 갱신)
   dd.addEventListener('change', (e) => {
     const input = e.target.closest('input[type="checkbox"]');
     if (!input) return;
     const ftype = input.dataset.filterType;
-    const targetSet = ftype === 'deposit' ? depSelected : selected;
+    const targetSet = (ftype === 'deposit' && depSelected) ? depSelected : selected;
     if (input.checked) targetSet.add(input.value); else targetSet.delete(input.value);
     input.closest('label')?.classList.toggle('is-checked', input.checked);
     const latest = thead._gridFilter?.latestOpts || { ...fullOptions, items };
