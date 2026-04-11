@@ -173,23 +173,15 @@ export function renderVehicleGroup(p) {
         <div class="m-pd-vinfo__label">선택 옵션</div>
         <div class="m-pd-vinfo__value m-pd-vinfo__value--block">${opts.length ? escapeHtml(opts.join(', ')) : '-'}</div>
       </div>
-      <div class="m-pd-vinfo__row m-pd-vinfo__row--grid2">
-        <div class="m-pd-vinfo__cell">
-          <div class="m-pd-vinfo__label">연식</div>
-          <div class="m-pd-vinfo__value">${escapeHtml(dash(year))}</div>
-        </div>
-        <div class="m-pd-vinfo__cell">
-          <div class="m-pd-vinfo__label">주행거리</div>
-          <div class="m-pd-vinfo__value">${escapeHtml(dash(mileage))}</div>
-        </div>
-        <div class="m-pd-vinfo__cell">
-          <div class="m-pd-vinfo__label">연료</div>
-          <div class="m-pd-vinfo__value">${escapeHtml(dash(fuel))}</div>
-        </div>
-        <div class="m-pd-vinfo__cell">
-          <div class="m-pd-vinfo__label">색상 (외 / 내)</div>
-          <div class="m-pd-vinfo__value">${colorBadges || '-'}</div>
-        </div>
+      <div class="m-pd-vinfo__row m-pd-vinfo__row--grid4">
+        <div class="m-pd-vinfo__label">연식</div>
+        <div class="m-pd-vinfo__value">${escapeHtml(dash(year))}</div>
+        <div class="m-pd-vinfo__label">주행거리</div>
+        <div class="m-pd-vinfo__value">${escapeHtml(dash(mileage))}</div>
+        <div class="m-pd-vinfo__label">연료</div>
+        <div class="m-pd-vinfo__value">${escapeHtml(dash(fuel))}</div>
+        <div class="m-pd-vinfo__label">색상 (외 / 내)</div>
+        <div class="m-pd-vinfo__value">${colorBadges || '-'}</div>
       </div>
     </div>
     </div>
