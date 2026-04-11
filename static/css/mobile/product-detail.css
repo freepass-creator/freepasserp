@@ -368,8 +368,9 @@
 }
 .m-pd-vinfo__cell {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--m-space-2);
   min-width: 0;
 }
 .m-pd-vinfo__cell .m-pd-vinfo__label {
