@@ -361,7 +361,7 @@
 /* 2x2 그리드 */
 .m-pd-vinfo__row--grid2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 3.5fr 6.5fr;
   gap: var(--m-space-3) var(--m-space-4);
   padding: var(--m-space-4);
   background: transparent;
