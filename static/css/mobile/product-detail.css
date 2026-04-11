@@ -359,14 +359,19 @@
   background: transparent;
 }
 /* 2x2 그리드 */
-/* 4분할 그리드: 라벨 값 | 라벨 값 */
+/* 차량 스펙 그리드 — 모바일: 세로 1열 / 데스크탑: 4분할 */
 .m-pd-vinfo__row--grid4 {
   display: grid;
-  grid-template-columns: auto 1fr auto 1fr;
-  gap: var(--m-space-2) var(--m-space-4);
+  grid-template-columns: auto 1fr;
+  gap: var(--m-space-2) var(--m-space-3);
   padding: var(--m-space-4);
   background: transparent;
   align-items: baseline;
+}
+@media (min-width: 600px) {
+  .m-pd-vinfo__row--grid4 {
+    grid-template-columns: auto 1fr auto 1fr;
+  }
 }
 .m-pd-vinfo__cell .m-pd-vinfo__label {
   font-size: var(--m-font-caption);
