@@ -115,7 +115,7 @@ export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termF
   // ── 2. 차량정보 ──
   // 순서: 제조사 모델명 차량번호 / 세부모델 / 세부트림 / 선택옵션 / 연료·연식·주행거리·색상
   const vehicleInfo = `
-    ${sectionHead('차량정보 v128')}
+    ${sectionHead('차량정보')}
     <div class="md-card">
       <div class="md-vehicle-head">
         <div class="md-vehicle-model">${esc(safe(product.maker))} ${esc(safe(product.model))}</div>

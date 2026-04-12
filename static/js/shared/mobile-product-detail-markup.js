@@ -148,7 +148,7 @@ export function renderVehicleGroup(p) {
   const opts = has(optsRaw) ? String(optsRaw).split(/[,/·•|\n]/).map(s => s.trim()).filter(Boolean) : [];
 
   return `<section class="m-pd-group">
-    ${groupHead(ICO.car, '차량 정보 v129')}
+    ${groupHead(ICO.car, '차량 정보')}
     <div class="m-pd-group__body">
     <div class="m-pd-vinfo">
       <div class="m-pd-vinfo__row m-pd-vinfo__row--head">
