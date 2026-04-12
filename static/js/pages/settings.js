@@ -11,11 +11,11 @@ import { fillProfile } from './settings/helpers.js';
 import { formatPhone, bindAutoFormat } from '../core/management-format.js';
 
 const LANDING_OPTIONS = [
-  { href: '/home',         label: '대시보드',           roles: ['provider', 'agent', 'admin'] },
-  { href: '/product-list', label: '전체 상품 검색',     roles: ['provider', 'agent', 'admin'] },
-  { href: '/chat',         label: '실시간 문의·응대',   roles: ['provider', 'agent', 'admin'] },
-  { href: '/contract',     label: '계약 관리',          roles: ['provider', 'agent', 'admin'] },
-  { href: '/settlement',   label: '정산 · 수수료',      roles: ['provider', 'agent', 'admin'] },
+  { href: '/home',         label: '대시보드',           roles: ['provider', 'agent', 'agent_manager', 'admin'] },
+  { href: '/product-list', label: '전체 상품 검색',     roles: ['provider', 'agent', 'agent_manager', 'admin'] },
+  { href: '/chat',         label: '실시간 문의·응대',   roles: ['provider', 'agent', 'agent_manager', 'admin'] },
+  { href: '/contract',     label: '계약 관리',          roles: ['provider', 'agent', 'agent_manager', 'admin'] },
+  { href: '/settlement',   label: '정산 · 수수료',      roles: ['provider', 'agent', 'agent_manager', 'admin'] },
   { href: '/product-new',  label: '재고 관리',          roles: ['provider', 'admin'] },
   { href: '/terms',        label: '운영 정책',          roles: ['provider', 'admin'] },
   { href: '/partner',      label: '파트너사 관리',      roles: ['admin'] },
@@ -417,7 +417,7 @@ function bindDownloadSection(profile) {
   if (!list) return;
 
   const items = [
-    { label: '상품 목록', fn: downloadProducts, roles: ['provider', 'agent', 'admin'] },
+    { label: '상품 목록', fn: downloadProducts, roles: ['provider', 'agent', 'agent_manager', 'admin'] },
   ];
 
   list.innerHTML = items
@@ -508,7 +508,7 @@ function bindDocUploads() {
 
 async function bootstrap() {
   try {
-    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
+    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'agent_manager', 'admin'] });
     currentProfile = { ...profile, uid: user.uid };
     renderRoleMenu(qs('#sidebar-menu'), profile.role);
     fillProfile(profile);

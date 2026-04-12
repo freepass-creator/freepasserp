@@ -68,6 +68,7 @@ function badgeRoleLabel(role) {
   if (role === 'admin') return '관리자';
   if (role === 'provider') return '공급사';
   if (role === 'agent') return '영업자';
+  if (role === 'agent_manager') return '영업관리자';
   return '미지정';
 }
 
@@ -75,7 +76,7 @@ function buildCompanyCodeOptions(role, selectedCode = '') {
   const items = currentPartners.filter((partner) => {
     if (partner.status === 'deleted' || partner.status === 'inactive') return false;
     if (role === 'provider') return partner.partner_type === 'provider';
-    if (role === 'agent') return partner.partner_type === 'sales_channel';
+    if (role === 'agent' || role === 'agent_manager') return partner.partner_type === 'sales_channel';
     return false;
   });
 

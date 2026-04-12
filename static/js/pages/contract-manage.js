@@ -478,6 +478,10 @@ function contractVisible(contract) {
     const cp = String(contract.partner_code || contract.provider_company_code || '').trim();
     return cp === String(currentProfile.company_code || '').trim();
   }
+  if (currentProfile?.role === 'agent_manager') {
+    const cc = String(contract.channel_code || contract.agent_channel_code || '').trim();
+    return cc === String(currentProfile.company_code || '').trim();
+  }
   if (currentProfile?.role === 'agent') {
     const myUid = String(currentProfile.uid || '').trim();
     const myCode = String(currentProfile.user_code || '').trim();
@@ -824,7 +828,7 @@ function handleDocSelection(files) {
 async function bootstrap() {
   _bootDone = false;
   try {
-    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
+    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'agent_manager', 'admin'] });
     currentProfile = { ...profile, uid: user.uid };
     renderRoleMenu(menu, profile.role);
 

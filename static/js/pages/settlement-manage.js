@@ -221,6 +221,7 @@ function formatSettlementCodeDisplay(value) {
 function settlementVisible(item) {
   if (currentProfile?.role === 'admin') return true;
   if (currentProfile?.role === 'provider') return safeText(item.partner_code, '') === safeText(currentProfile.company_code, '');
+  if (currentProfile?.role === 'agent_manager') return safeText(item.channel_code, '') === safeText(currentProfile.company_code, '');
   if (currentProfile?.role === 'agent') return safeText(item.agent_uid, '') === safeText(currentProfile.uid, '');
   return false;
 }
@@ -464,7 +465,7 @@ function renderList() {
 
 async function bootstrap() {
   try {
-    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
+    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'agent_manager', 'admin'] });
     currentProfile = { ...profile, uid: user.uid };
     renderRoleMenu(menu, profile.role);
 

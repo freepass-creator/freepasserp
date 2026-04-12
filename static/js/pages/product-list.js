@@ -1460,7 +1460,7 @@ function bindMobile() {
 }
 
 async function init(){ 
-  const { user, profile } = await requireAuth({ roles: ['provider','agent','admin'] });
+  const { user, profile } = await requireAuth({ roles: ['provider','agent','agent_manager','admin'] });
   state.user = user;
   state.profile = profile;
   state.role = profile.role;

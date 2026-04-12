@@ -11,13 +11,13 @@
 
 const ROUTE_REGISTRY = [
   // 대시보드
-  { href: '/home',         label: '대시보드',       pageTitle: '홈',         icon: 'home',      roles: ['provider', 'agent', 'admin'], group: 'top' },
+  { href: '/home',         label: '대시보드',       pageTitle: '홈',         icon: 'home',      roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'top' },
   // 상품 · 대화
-  { href: '/product-list', label: '전체 상품 검색', pageTitle: '상품목록',   icon: 'car-front', roles: ['provider', 'agent', 'admin'], group: 'g1' },
-  { href: '/chat',         label: '실시간 문의·응대', pageTitle: '문의·응대',  icon: 'message',   roles: ['provider', 'agent', 'admin'], group: 'g1' },
+  { href: '/product-list', label: '전체 상품 검색', pageTitle: '상품목록',   icon: 'car-front', roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'g1' },
+  { href: '/chat',         label: '실시간 문의·응대', pageTitle: '문의·응대',  icon: 'message',   roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'g1' },
   // 계약 · 정산
-  { href: '/contract',     label: '계약 관리',      pageTitle: '계약관리',   icon: 'file-text', roles: ['provider', 'agent', 'admin'], group: 'g2' },
-  { href: '/settlement',   label: '정산 · 수수료',  pageTitle: '정산관리',   icon: 'currency',  roles: ['provider', 'agent', 'admin'], group: 'g2' },
+  { href: '/contract',     label: '계약 관리',      pageTitle: '계약관리',   icon: 'file-text', roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'g2' },
+  { href: '/settlement',   label: '정산 · 수수료',  pageTitle: '정산관리',   icon: 'currency',  roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'g2' },
   // 재고 · 정책
   { href: '/product-new',  label: '재고 관리',      pageTitle: '재고관리',   icon: 'package',   roles: ['provider', 'admin'],          group: 'g3' },
   { href: '/terms',        label: '운영 정책',      pageTitle: '정책관리',   icon: 'shield',    roles: ['provider', 'admin'],          group: 'g3' },
@@ -27,7 +27,7 @@ const ROUTE_REGISTRY = [
   { href: '/admin',        label: '관리자 페이지',  pageTitle: '관리자',     icon: 'lock-keyhole', roles: ['admin'],                     group: 'g4' },
   { href: '/upload-center',label: '업로드 센터',    pageTitle: '업로드센터', icon: 'upload',       roles: ['admin'],                     group: 'g4' },
   // 환경설정 (맨 하단)
-  { href: '/settings',     label: '설정',           pageTitle: '설정',       icon: 'settings',  roles: ['provider', 'agent', 'admin'], group: 'bottom' },
+  { href: '/settings',     label: '설정',           pageTitle: '설정',       icon: 'settings',  roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'bottom' },
 ];
 
 const ICON_STROKE_WIDTH = 1.2;

@@ -214,6 +214,7 @@ function roleName(role) {
   if (role === 'admin') return '관리자';
   if (role === 'provider') return '공급사';
   if (role === 'agent') return '영업자';
+  if (role === 'agent_manager') return '영업관리자';
   return '';
 }
 
@@ -288,7 +289,7 @@ const roomSelectionController = createChatRoomSelectionController({
 
 async function bootstrap() {
   try {
-    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
+    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'agent_manager', 'admin'] });
     currentProfile = profile;
     currentUser = user;
     renderRoleMenu(menu, profile.role);
@@ -441,6 +442,7 @@ async function bootstrap() {
         const isHiddenForMe = !!hiddenBy[user.uid];
         if (isHiddenForMe) return false;
         if (profile.role === 'admin') return true;
+        if (profile.role === 'agent_manager') return (room.agent_channel_code || '') === (profile.company_code || '');
         if (profile.role === 'agent') return room.agent_uid === user.uid || room.agent_code === profile.user_code;
         if (profile.role === 'provider') return (room.provider_company_code || '') === (profile.company_code || '');
         return false;

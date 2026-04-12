@@ -9,6 +9,7 @@ export function formatMoney(value) {
 export function roleLabel(role) {
   if (role === 'provider') return '공급사';
   if (role === 'agent') return '영업자';
+  if (role === 'agent_manager') return '영업관리자';
   if (role === 'admin') return '관리자';
   return '-';
 }

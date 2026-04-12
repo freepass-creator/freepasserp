@@ -42,7 +42,7 @@ function fmtDate(v) {
   return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 }
 function fmtMoney(v) { const n = Number(v || 0); return (n < 0 ? '-' : '') + Math.abs(n).toLocaleString('ko-KR'); }
-function roleName(r) { return r === 'admin' ? '관리자' : r === 'provider' ? '공급사' : r === 'agent' ? '영업자' : '사용자'; }
+function roleName(r) { return r === 'admin' ? '관리자' : r === 'provider' ? '공급사' : r === 'agent_manager' ? '영업관리자' : r === 'agent' ? '영업자' : '사용자'; }
 
 // ─── 필터 ───────────────────────────────────────────────────────────────────
 
@@ -478,7 +478,7 @@ async function bootstrap() {
     return;
   }
   try {
-    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'admin'] });
+    const { user, profile } = await requireAuth({ roles: ['provider', 'agent', 'agent_manager', 'admin'] });
     currentProfile = profile; currentUid = user.uid;
     renderRoleMenu(menu, profile.role);
     roleSummary.textContent = `${roleName(profile.role)} · 미처리 현황`;
