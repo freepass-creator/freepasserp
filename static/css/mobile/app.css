@@ -573,31 +573,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   background: var(--m-card-bg);
-  padding-bottom: calc(var(--m-tabbar-h) + env(safe-area-inset-bottom));
   contain: layout style;
 }
 /* 목록형 페이지(상품 그리드 등)는 회색 배경 */
 .m-page:has(.m-product-grid) { background: var(--m-bg); }
 
-/* PWA 앱 모드에서 하단 탭바 뒤 콘텐츠 가림 방지 */
-@media all and (display-mode: standalone) {
-  .m-page {
-    padding-bottom: calc(var(--m-tabbar-h) + env(safe-area-inset-bottom) + 16px);
-  }
-}
-
 /* 하단 탭바 */
 .m-tabbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 200;
+  flex: 0 0 auto;
   display: flex;
   height: calc(var(--m-tabbar-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: var(--m-card-bg);
   border-top: 1px solid var(--m-divider);
+  z-index: 200;
 }
 .m-tab {
   flex: 1;

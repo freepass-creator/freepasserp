@@ -5,7 +5,6 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--m-space-2);
   padding: var(--m-page-pad);
-  padding-bottom: calc(var(--m-tabbar-h, 56px) + env(safe-area-inset-bottom) + var(--m-space-4, 16px));
   background: var(--m-bg);
 }
 .m-product-card {
