@@ -168,18 +168,48 @@ html.theme-classic.theme-dark .inline-button:hover { background: var(--dk-bg-sel
 html.theme-classic.theme-dark .btn-tone-save,
 html.theme-classic.theme-dark .auth-submit { background: var(--dk-accent) !important; color: #ffffff !important; }
 
-/* ── 대화 페이지 ── */
+/* ── 대화 페이지 (전체 다크) ── */
+html.theme-classic.theme-dark [class*="chat"],
+html.theme-classic.theme-dark [class*="Chat"],
+html.theme-classic.theme-dark [class*="room"],
+html.theme-classic.theme-dark [class*="Room"],
+html.theme-classic.theme-dark [class*="message"],
+html.theme-classic.theme-dark [class*="Message"] { background-color: var(--dk-bg-deep); color: var(--dk-text-primary); }
 html.theme-classic.theme-dark .chat-messages { background: var(--dk-bg-deep) !important; }
-html.theme-classic.theme-dark .message-form { background: var(--dk-bg-card) !important; }
+html.theme-classic.theme-dark .message-form { background: var(--dk-bg-card) !important; border-color: var(--dk-border-subtle) !important; }
 html.theme-classic.theme-dark .message-form textarea { background: var(--dk-bg-card) !important; color: var(--dk-text-primary) !important; }
 html.theme-classic.theme-dark .message-form-code { color: var(--dk-text-muted) !important; }
 html.theme-classic.theme-dark .chat-date-separator { color: var(--dk-text-muted) !important; }
 html.theme-classic.theme-dark .chat-system-msg { color: var(--dk-text-muted) !important; }
+
+/* 채팅 말풍선 */
+html.theme-classic.theme-dark .chat-msg-row { background: transparent !important; }
+html.theme-classic.theme-dark .chat-bubble,
+html.theme-classic.theme-dark [class*="msg-bubble"],
+html.theme-classic.theme-dark [class*="message-bubble"],
+html.theme-classic.theme-dark [class*="chat-bubble"] { background: var(--dk-bg-elevated) !important; color: var(--dk-text-primary) !important; border-color: var(--dk-border-subtle) !important; }
+html.theme-classic.theme-dark .chat-bubble--mine,
+html.theme-classic.theme-dark [class*="bubble--mine"],
+html.theme-classic.theme-dark [class*="bubble-mine"],
+html.theme-classic.theme-dark .is-mine [class*="bubble"],
+html.theme-classic.theme-dark .is-mine [class*="msg-bubble"] { background: #1e3a5f !important; color: #d0e8ff !important; }
+html.theme-classic.theme-dark [class*="msg-sender"],
+html.theme-classic.theme-dark [class*="message-sender"] { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark [class*="msg-time"],
+html.theme-classic.theme-dark [class*="message-time"] { color: var(--dk-text-muted) !important; }
+
+/* 대화 목록 카드 */
 html.theme-classic.theme-dark .m-list-card { background: var(--dk-bg-card) !important; }
 html.theme-classic.theme-dark .m-list-card:hover { background: var(--dk-bg-elevated) !important; }
 html.theme-classic.theme-dark .m-list-card.is-active { background: var(--dk-bg-hover) !important; }
 html.theme-classic.theme-dark .m-list-card__name { color: var(--dk-text-primary) !important; }
 html.theme-classic.theme-dark .m-list-card__sub { color: var(--dk-text-tertiary) !important; }
+
+/* 채팅 오른쪽 상세 패널 */
+html.theme-classic.theme-dark .chat-detail,
+html.theme-classic.theme-dark [class*="room-detail"],
+html.theme-classic.theme-dark [class*="chat-detail"],
+html.theme-classic.theme-dark [class*="room-selection"] { background: var(--dk-bg-base) !important; }
 
 /* ── 설정 페이지 ── */
 html.theme-classic.theme-dark .settings-section-block { background: var(--dk-bg-card) !important; }
