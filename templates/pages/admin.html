@@ -20,6 +20,7 @@
         <button class="admin-menu-item" data-tab="notice" type="button">안내사항 관리</button>
         <button class="admin-menu-item" data-tab="vehicle" type="button">차종 관리</button>
         <button class="admin-menu-item" data-tab="color" type="button">색상 관리</button>
+        <button class="admin-menu-item" data-tab="upload" type="button">상품업로드</button>
       </nav>
     </div>
   </section>
@@ -151,6 +152,16 @@
               <p class="message" id="adminNoticeMessage"></p>
             </form>
           </div>
+        </div>
+      </div>
+
+      <!-- 상품업로드 -->
+      <div class="admin-tab-panel" data-tab-panel="upload" hidden>
+        <div class="admin-tab-bar">
+          <span class="admin-tab-bar__count" id="adminUploadStatus"></span>
+        </div>
+        <div class="admin-tab-scroll" style="padding:16px">
+          <iframe id="adminUploadFrame" src="/upload-center" style="width:100%;height:calc(100vh - 200px);border:none;border-radius:var(--radius-ui);"></iframe>
         </div>
       </div>
 
