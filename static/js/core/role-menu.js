@@ -26,7 +26,7 @@ const ROUTE_REGISTRY = [
   { href: '/member',       label: '사용자 관리',    pageTitle: '사용자관리', icon: 'users',       roles: ['admin'],                      group: 'g4' },
   { href: '/admin',        label: '관리자 페이지',  pageTitle: '관리자',     icon: 'lock-keyhole', roles: ['admin'],                     group: 'g4' },
   { href: '/upload-center',label: '상품업로드',      pageTitle: '상품업로드', icon: 'upload',       roles: ['admin'],                     group: 'g4' },
-  { href: '/download-center', label: '파일센터',    pageTitle: '파일센터',   icon: 'download',     roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'g3' },
+  { href: '/download-center', label: '파일센터',    pageTitle: '파일센터',   icon: 'download',     roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'g2' },
   // 환경설정 (맨 하단)
   { href: '/settings',     label: '설정',           pageTitle: '설정',       icon: 'settings',  roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'bottom' },
 ];
