@@ -260,6 +260,47 @@ html.theme-classic.theme-dark .settings-account-action-row { border-color: #1f1f
 html.theme-classic.theme-dark .settings-account-action-row:hover { background: #18181b; }
 html.theme-classic.theme-dark .toggle-switch-track { background: #27272a; }
 
+/* ─── 상세 패널 전체 강제 다크 ─── */
+html.theme-classic.theme-dark .pls-detail-panel,
+html.theme-classic.theme-dark .pls-detail-panel * { color-scheme: dark; }
+html.theme-classic.theme-dark .pls-detail-panel { background: #0c0c0e !important; }
+html.theme-classic.theme-dark .pls-detail-panel .panel-body,
+html.theme-classic.theme-dark .pls-detail-panel .panel-body--detail { background: #0c0c0e !important; }
+html.theme-classic.theme-dark .md-card { background: #111113 !important; box-shadow: none !important; border: 1px solid #1f1f23 !important; }
+html.theme-classic.theme-dark .md-row { border-color: #1f1f23 !important; }
+html.theme-classic.theme-dark .md-row span { color: #71717a !important; }
+html.theme-classic.theme-dark .md-row strong { color: #d4d4d8 !important; }
+html.theme-classic.theme-dark .md-section-head { color: #d4d4d8 !important; }
+html.theme-classic.theme-dark .md-section-head svg { color: #52525b !important; }
+html.theme-classic.theme-dark .md-table th { background: #18181b !important; color: #71717a !important; border-color: #1f1f23 !important; }
+html.theme-classic.theme-dark .md-table td { background: #111113 !important; color: #d4d4d8 !important; border-color: #1f1f23 !important; }
+html.theme-classic.theme-dark .md-table td strong { color: #fafafa !important; }
+html.theme-classic.theme-dark .md-note { background: #18181b !important; color: #52525b !important; }
+html.theme-classic.theme-dark .md-link { color: #60a5fa !important; }
+
+/* 상세 가격 히어로 */
+html.theme-classic.theme-dark .md-hero,
+html.theme-classic.theme-dark [class*="detail__hero"],
+html.theme-classic.theme-dark [class*="detail__price-wrap"] { background: #111113 !important; }
+html.theme-classic.theme-dark [class*="detail__price"] { color: #fafafa !important; }
+html.theme-classic.theme-dark [class*="detail__price-sub"],
+html.theme-classic.theme-dark [class*="detail__price-term"] { color: #71717a !important; }
+
+/* 상세 패널 헤더 */
+html.theme-classic.theme-dark .pls-detail-panel .panel-head { background: #111113 !important; border-color: #1f1f23 !important; }
+html.theme-classic.theme-dark .pls-detail-panel .panel-head-title { color: #fafafa !important; }
+
+/* 상세 액션 버튼 */
+html.theme-classic.theme-dark .detail-actions button,
+html.theme-classic.theme-dark [class*="detail-action"] { background: #18181b; color: #d4d4d8; border-color: #27272a; }
+html.theme-classic.theme-dark .detail-actions button:hover { background: #27272a; }
+
+/* 뱃지 (상세 패널 내) */
+html.theme-classic.theme-dark [class*="badge"] { border-color: transparent; }
+
+/* 색상 칩 */
+html.theme-classic.theme-dark .md-color-chip { border-color: #3f3f46 !important; }
+
 /* ─── 공통 와일드카드 (남은 흰 배경 잡기) ─── */
 html.theme-classic.theme-dark .work-page { background: #09090b; }
 html.theme-classic.theme-dark .main-area { background: #09090b; }
