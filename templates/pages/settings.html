@@ -110,6 +110,23 @@
 </div>
 </section>
 <section class="settings-section-block">
+<div class="section-title-row"><span class="section-title"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>보기 모드</span><span class="section-desc">디자인 테마 선택</span></div>
+<div class="field">
+<label for="settings-theme">테마</label>
+<select id="settings-theme">
+  <option value="modern">모던 (기본)</option>
+  <option value="classic">클래식</option>
+</select>
+</div>
+<div class="field" id="settings-darkmode-wrap" style="display:none">
+<label for="settings-darkmode">다크모드</label>
+<select id="settings-darkmode">
+  <option value="0">라이트</option>
+  <option value="1">다크</option>
+</select>
+</div>
+</section>
+<section class="settings-section-block">
 <div class="section-title-row"><span class="section-title"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>상품목록 기간</span><span class="section-desc">표시할 개월 수 선택 (기본: 전체)</span></div>
 <div id="settings-period-list" class="settings-badge-list"></div>
 </section>

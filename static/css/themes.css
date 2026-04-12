@@ -1,0 +1,137 @@
+/* ═══════════════════════════════════════════════════════════════
+   FREEPASS ERP — 테마 시스템
+   기본: Modern (현재 디자인)
+   클래식: 직각 / 미니멀 / 순백
+   다크: 클래식 전용 다크모드
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── 클래식 테마 ──────────────────────────────────────────────── */
+
+html.theme-classic {
+  /* 곡률 */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-pill: 0;
+  --radius-ui: 0;
+
+  /* 배경: 순백 */
+  --new-bg-app: #ffffff;
+  --new-bg-main: #ffffff;
+  --new-bg-sidebar: #fafaf8;
+  --new-bg-panel-head: #fafaf8;
+  --surface-subtle: #fafafa;
+  --surface-hover: #f5f5f5;
+  --surface-selected: #f0f0f0;
+  --surface-muted: #fafafa;
+  --interactive-hover-bg: #f5f5f5;
+  --interactive-active-bg: #ebebeb;
+  --interactive-selected-bg: #f0f0f0;
+
+  /* 테두리: 명확한 선 */
+  --border-soft: #e5e5e5;
+  --border-main: #d4d4d4;
+  --new-border-soft: #e5e5e5;
+  --new-border-strong: #d4d4d4;
+  --new-line-view: #e5e5e5;
+
+  /* 간격: 콤팩트 */
+  --panel-gap: 0;
+  --panel-shadow: none;
+}
+
+html.theme-classic body {
+  background: #ffffff;
+}
+
+html.theme-classic .dashboard-shell--new .sidebar {
+  background: #fafaf8;
+  border-right: 1px solid #e5e5e5;
+  box-shadow: none;
+}
+
+html.theme-classic .main-shell { padding: 0 !important; gap: 0 !important; }
+html.theme-classic .work-page { gap: 0; }
+html.theme-classic .panel { box-shadow: none; border: 1px solid #e5e5e5; border-radius: 0; }
+html.theme-classic .panel-resize-handle { flex: 0 0 1px; background: #e5e5e5; }
+html.theme-classic .panel-resize-handle:hover { background: #2563eb; }
+
+/* ─── 다크모드 (클래식 전용) ──────────────────────────────────── */
+
+html.theme-classic.theme-dark {
+  /* 배경 */
+  --new-bg-app: #0f0f0f;
+  --new-bg-main: #0f0f0f;
+  --new-bg-sidebar: #141414;
+  --new-bg-panel: #1a1a1a;
+  --new-bg-panel-head: #1f1f1f;
+  --surface-base: #1a1a1a;
+  --surface-subtle: #222222;
+  --surface-hover: #2a2a2a;
+  --surface-selected: #333333;
+  --surface-muted: #222222;
+  --interactive-hover-bg: #2a2a2a;
+  --interactive-active-bg: #333333;
+  --interactive-selected-bg: #333333;
+
+  /* 텍스트 */
+  --text-main: #e5e5e5;
+  --text-subtle: #a3a3a3;
+  --text-muted: #737373;
+  --new-text-main: #e5e5e5;
+  --new-text-sub: #a3a3a3;
+  --new-sidebar-text: #a3a3a3;
+  --new-sidebar-text-active: #ffffff;
+  --new-sidebar-icon: #737373;
+  --new-sidebar-icon-active: #ffffff;
+
+  /* 테두리 */
+  --border-soft: #2a2a2a;
+  --border-main: #333333;
+  --border-strong: #444444;
+  --new-border-soft: #2a2a2a;
+  --new-border-strong: #333333;
+  --new-line-view: #2a2a2a;
+
+  /* 버튼/액센트 */
+  --new-sidebar-accent: #60a5fa;
+  --new-hover: rgba(255, 255, 255, 0.06);
+  --new-selected: rgba(255, 255, 255, 0.1);
+
+  color-scheme: dark;
+}
+
+html.theme-classic.theme-dark body {
+  background: #0f0f0f;
+  color: #e5e5e5;
+}
+
+html.theme-classic.theme-dark .dashboard-shell--new .sidebar {
+  background: #141414;
+  border-right: 1px solid #2a2a2a;
+}
+
+html.theme-classic.theme-dark .panel {
+  background: #1a1a1a;
+  border-color: #2a2a2a;
+}
+
+html.theme-classic.theme-dark .panel-resize-handle { background: #2a2a2a; }
+
+html.theme-classic.theme-dark input,
+html.theme-classic.theme-dark select,
+html.theme-classic.theme-dark textarea {
+  background: #222222;
+  color: #e5e5e5;
+  border-color: #333333;
+}
+
+html.theme-classic.theme-dark .pls-table th { background: #1f1f1f; color: #a3a3a3; }
+html.theme-classic.theme-dark .pls-table td { border-color: #2a2a2a; }
+html.theme-classic.theme-dark .pls-table tr:hover td { background: #222222; }
+html.theme-classic.theme-dark .pls-table tr.is-selected td { background: #2a2a2a; }
+
+html.theme-classic.theme-dark .pm-ctx-menu { background: #1f1f1f; border-color: #333333; }
+html.theme-classic.theme-dark .pm-ctx-item:hover { background: #2a2a2a; }
+html.theme-classic.theme-dark .pm-ctx-item { color: #e5e5e5; }

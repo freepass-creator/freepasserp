@@ -33,6 +33,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_tokens.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}?v={{ app_version }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}?v={{ app_version }}">
+  <script>try{var t=localStorage.getItem('fp.theme');if(t==='classic')document.documentElement.classList.add('theme-classic');if(t==='classic'&&localStorage.getItem('fp.darkmode')==='1')document.documentElement.classList.add('theme-dark')}catch(e){}</script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/panel.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}?v={{ app_version }}">

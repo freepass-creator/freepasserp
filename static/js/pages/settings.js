@@ -321,6 +321,39 @@ function bindAppSettings(profile) {
     }).join('');
     badgeList.addEventListener('change', saveAppSettings);
   }
+
+  // 보기 모드 (테마)
+  const themeSelect = document.getElementById('settings-theme');
+  const darkmodeSelect = document.getElementById('settings-darkmode');
+  const darkmodeWrap = document.getElementById('settings-darkmode-wrap');
+  const savedTheme = localStorage.getItem('fp.theme') || 'modern';
+  const savedDark = localStorage.getItem('fp.darkmode') || '0';
+
+  if (themeSelect) {
+    themeSelect.value = savedTheme;
+    if (darkmodeWrap) darkmodeWrap.style.display = savedTheme === 'classic' ? '' : 'none';
+    if (darkmodeSelect) darkmodeSelect.value = savedDark;
+
+    themeSelect.addEventListener('change', () => {
+      const theme = themeSelect.value;
+      localStorage.setItem('fp.theme', theme);
+      document.documentElement.classList.toggle('theme-classic', theme === 'classic');
+      if (theme !== 'classic') {
+        document.documentElement.classList.remove('theme-dark');
+        localStorage.setItem('fp.darkmode', '0');
+        if (darkmodeSelect) darkmodeSelect.value = '0';
+      }
+      if (darkmodeWrap) darkmodeWrap.style.display = theme === 'classic' ? '' : 'none';
+    });
+  }
+
+  if (darkmodeSelect) {
+    darkmodeSelect.addEventListener('change', () => {
+      const dark = darkmodeSelect.value;
+      localStorage.setItem('fp.darkmode', dark);
+      document.documentElement.classList.toggle('theme-dark', dark === '1');
+    });
+  }
 }
 
 function applyBadgeVisibility(badgeMap = {}) {
