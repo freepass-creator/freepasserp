@@ -1,8 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
    FREEPASS ERP — 테마 시스템
-   기본: Modern (현재 디자인)
-   클래식: 직각 / 미니멀 / 순백
-   다크: 클래식 전용 다크모드
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── 클래식 테마 ──────────────────────────────────────────────── */
@@ -28,286 +25,209 @@ html.theme-classic .panel { box-shadow: none; border: 1px solid #e5e5e5; border-
 html.theme-classic .panel-resize-handle { flex: 0 0 1px; background: #e5e5e5; }
 html.theme-classic .panel-resize-handle:hover { background: #2563eb; }
 
-/* ─── 다크모드 (클래식 전용) ──────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   다크모드 (클래식 전용)
+   전략: CSS 변수 + 와일드카드로 전체 반전
+   ═══════════════════════════════════════════════════════════════ */
 
 html.theme-classic.theme-dark {
-  --new-bg-app: #09090b; --new-bg-main: #09090b;
-  --new-bg-sidebar: #0c0c0e;
-  --new-bg-panel: #111113; --new-bg-panel-head: #18181b;
-  --surface-base: #111113; --surface-subtle: #18181b;
-  --surface-hover: #1f1f23; --surface-selected: #27272a;
-  --surface-muted: #18181b;
-  --interactive-hover-bg: #1f1f23; --interactive-active-bg: #27272a;
-  --interactive-selected-bg: #27272a;
+  /* 배경 계층 */
+  --dk-bg-deep: #09090b;
+  --dk-bg-base: #0c0c0e;
+  --dk-bg-card: #111113;
+  --dk-bg-elevated: #18181b;
+  --dk-bg-hover: #1f1f23;
+  --dk-bg-selected: #27272a;
 
-  --text-main: #fafafa; --text-subtle: #a1a1aa; --text-muted: #71717a;
-  --new-text-main: #fafafa; --new-text-sub: #a1a1aa;
-  --new-text-primary: #fafafa; --new-text-secondary: #a1a1aa;
-  --new-sidebar-text: #a1a1aa; --new-sidebar-text-active: #ffffff;
-  --new-sidebar-icon: #71717a; --new-sidebar-icon-active: #ffffff;
+  /* 텍스트 계층 */
+  --dk-text-primary: #fafafa;
+  --dk-text-secondary: #a1a1aa;
+  --dk-text-tertiary: #71717a;
+  --dk-text-muted: #52525b;
 
-  --border-soft: #1f1f23; --border-main: #27272a; --border-strong: #3f3f46;
-  --new-border-soft: #1f1f23; --new-border-strong: #27272a; --new-line-view: #1f1f23;
-  --new-border-panel: #27272a; --new-border-control: #3f3f46;
+  /* 테두리 계층 */
+  --dk-border-subtle: #1f1f23;
+  --dk-border-default: #27272a;
+  --dk-border-strong: #3f3f46;
 
-  --new-sidebar-accent: #60a5fa;
-  --new-hover: rgba(255, 255, 255, 0.05); --new-selected: rgba(255, 255, 255, 0.08);
-  --new-accent: #3b82f6; --new-accent-hover: #2563eb;
+  /* 액센트 */
+  --dk-accent: #3b82f6;
+  --dk-accent-hover: #2563eb;
+  --dk-link: #60a5fa;
+
+  /* 기존 변수 매핑 */
+  --new-bg-app: var(--dk-bg-deep); --new-bg-main: var(--dk-bg-deep);
+  --new-bg-sidebar: var(--dk-bg-base); --new-bg-panel: var(--dk-bg-card);
+  --new-bg-panel-head: var(--dk-bg-elevated);
+  --surface-base: var(--dk-bg-card); --surface-subtle: var(--dk-bg-elevated);
+  --surface-hover: var(--dk-bg-hover); --surface-selected: var(--dk-bg-selected);
+  --surface-muted: var(--dk-bg-elevated);
+  --interactive-hover-bg: var(--dk-bg-hover); --interactive-active-bg: var(--dk-bg-selected);
+  --interactive-selected-bg: var(--dk-bg-selected);
+  --text-main: var(--dk-text-primary); --text-subtle: var(--dk-text-secondary); --text-muted: var(--dk-text-tertiary);
+  --new-text-main: var(--dk-text-primary); --new-text-sub: var(--dk-text-secondary);
+  --new-text-primary: var(--dk-text-primary); --new-text-secondary: var(--dk-text-secondary);
+  --new-sidebar-text: var(--dk-text-secondary); --new-sidebar-text-active: #ffffff;
+  --new-sidebar-icon: var(--dk-text-tertiary); --new-sidebar-icon-active: #ffffff;
+  --border-soft: var(--dk-border-subtle); --border-main: var(--dk-border-default); --border-strong: var(--dk-border-strong);
+  --new-border-soft: var(--dk-border-subtle); --new-border-strong: var(--dk-border-default);
+  --new-border-panel: var(--dk-border-default); --new-border-control: var(--dk-border-strong);
+  --new-line-view: var(--dk-border-subtle);
+  --new-sidebar-accent: var(--dk-link);
+  --new-hover: rgba(255,255,255,0.05); --new-selected: rgba(255,255,255,0.08);
+  --new-accent: var(--dk-accent); --new-accent-hover: var(--dk-accent-hover);
   --panel-shadow: none;
-
   color-scheme: dark;
 }
 
-html.theme-classic.theme-dark body { background: #09090b; color: #fafafa; }
-html.theme-classic.theme-dark .dashboard-shell--new .sidebar { background: #0c0c0e; border-right: 1px solid #1f1f23; }
-html.theme-classic.theme-dark .panel { background: #111113; border-color: #27272a; }
-html.theme-classic.theme-dark .panel-head { background: #18181b; }
-html.theme-classic.theme-dark .panel-resize-handle { background: #27272a; }
+/* ── 와일드카드: 모든 요소의 흰 배경/검은 텍스트 강제 반전 ── */
+html.theme-classic.theme-dark body { background: var(--dk-bg-deep); color: var(--dk-text-primary); }
 
-/* 폼 요소 */
+html.theme-classic.theme-dark *:not(img):not(svg):not(video):not(canvas):not(iframe):not([class*="badge"]):not([class*="btn-primary"]):not([class*="btn-tone-save"]):not([class*="auth-submit"]) {
+  border-color: var(--dk-border-default) !important;
+}
+
+html.theme-classic.theme-dark .main-area,
+html.theme-classic.theme-dark .main-shell,
+html.theme-classic.theme-dark .work-page { background: var(--dk-bg-deep) !important; }
+
+html.theme-classic.theme-dark .dashboard-shell--new .sidebar { background: var(--dk-bg-base) !important; }
+
+html.theme-classic.theme-dark .panel,
+html.theme-classic.theme-dark .panel--form,
+html.theme-classic.theme-dark .pls-grid-panel { background: var(--dk-bg-card) !important; }
+
+html.theme-classic.theme-dark .panel-head { background: var(--dk-bg-elevated) !important; }
+html.theme-classic.theme-dark .panel-body,
+html.theme-classic.theme-dark .panel-body--detail,
+html.theme-classic.theme-dark .manage-form-body,
+html.theme-classic.theme-dark .manage-form-shell,
+html.theme-classic.theme-dark .form-stack,
+html.theme-classic.theme-dark .form-grid { background: var(--dk-bg-card) !important; }
+
+html.theme-classic.theme-dark .pls-grid-scroll { background: var(--dk-bg-base) !important; }
+html.theme-classic.theme-dark .panel-resize-handle { background: var(--dk-border-default) !important; }
+
+/* ── 상세 패널 ── */
+html.theme-classic.theme-dark .pls-detail-panel { background: var(--dk-bg-base) !important; box-shadow: -4px 0 20px rgba(0,0,0,0.5) !important; }
+html.theme-classic.theme-dark .pls-detail-panel .panel-body,
+html.theme-classic.theme-dark .pls-detail-panel .panel-body--detail { background: var(--dk-bg-base) !important; }
+
+/* md- 카드/섹션 (상세 마크업) */
+html.theme-classic.theme-dark .md-card { background: var(--dk-bg-card) !important; box-shadow: none !important; }
+html.theme-classic.theme-dark .md-section-head { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .md-section-head svg { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .md-row { border-color: var(--dk-border-subtle) !important; }
+html.theme-classic.theme-dark .md-row span { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .md-row strong { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .md-table th { background: var(--dk-bg-elevated) !important; color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .md-table td { background: var(--dk-bg-card) !important; color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .md-table td strong { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .md-note { background: var(--dk-bg-elevated) !important; color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .md-link { color: var(--dk-link) !important; }
+
+/* ── 테이블 (목록) ── */
+html.theme-classic.theme-dark .pls-table th { background: var(--dk-bg-card) !important; color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .pls-table td { background: var(--dk-bg-base) !important; color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .pls-table tr:nth-child(even) td { background: var(--dk-bg-card) !important; }
+html.theme-classic.theme-dark .pls-table tr:hover td { background: var(--dk-bg-hover) !important; }
+html.theme-classic.theme-dark .pls-table tr.is-selected td { background: var(--dk-bg-selected) !important; }
+
+/* ── 사이드바 ── */
+html.theme-classic.theme-dark .sidebar-link { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .sidebar-link:hover { background: var(--dk-bg-hover) !important; color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .sidebar-link.is-active { background: var(--dk-bg-hover) !important; color: #ffffff !important; }
+html.theme-classic.theme-dark .sidebar-head { border-color: var(--dk-border-subtle) !important; }
+html.theme-classic.theme-dark .sidebar-toggle-btn { color: var(--dk-text-tertiary) !important; }
+
+/* ── 탑바 ── */
+html.theme-classic.theme-dark .top-bar { background: var(--dk-bg-base) !important; border-color: var(--dk-border-subtle) !important; }
+html.theme-classic.theme-dark .top-bar-user-item { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .top-bar-page-name { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .top-bar-identity { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .top-bar-logout-btn { color: var(--dk-text-tertiary) !important; }
+
+/* ── 폼 요소 ── */
 html.theme-classic.theme-dark input,
 html.theme-classic.theme-dark select,
-html.theme-classic.theme-dark textarea {
-  background: #18181b; color: #fafafa; border-color: #27272a;
-}
-html.theme-classic.theme-dark input::placeholder { color: #52525b; }
+html.theme-classic.theme-dark textarea { background: var(--dk-bg-elevated) !important; color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark input::placeholder { color: var(--dk-text-muted) !important; }
 html.theme-classic.theme-dark input:focus,
-html.theme-classic.theme-dark select:focus { border-color: #3b82f6; }
+html.theme-classic.theme-dark select:focus { border-color: var(--dk-accent) !important; }
+html.theme-classic.theme-dark input[readonly] { background: var(--dk-bg-base) !important; color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark input[type="checkbox"] { accent-color: var(--dk-accent); }
+html.theme-classic.theme-dark label { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .field label { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .section-title { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .form-section-title { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .form-section-title svg { color: var(--dk-text-tertiary) !important; }
 
-/* 테이블 */
-html.theme-classic.theme-dark .pls-table th { background: #111113; color: #71717a; border-color: #1f1f23; }
-html.theme-classic.theme-dark .pls-table td { color: #a1a1aa; border-color: #18181b; background: #0c0c0e; }
-html.theme-classic.theme-dark .pls-table tr:nth-child(even) td { background: #111113; }
-html.theme-classic.theme-dark .pls-table tr:hover td { background: #1a1a1e; }
-html.theme-classic.theme-dark .pls-table tr.is-selected td { background: #1f1f23; }
+/* ── 버튼 ── */
+html.theme-classic.theme-dark .inline-button { background: var(--dk-bg-elevated) !important; color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .inline-button:hover { background: var(--dk-bg-selected) !important; }
+html.theme-classic.theme-dark .btn-tone-save,
+html.theme-classic.theme-dark .auth-submit { background: var(--dk-accent) !important; color: #ffffff !important; }
 
-/* 사이드바 메뉴 */
-html.theme-classic.theme-dark .sidebar-link { color: #a1a1aa; }
-html.theme-classic.theme-dark .sidebar-link:hover { background: #1f1f23; color: #fafafa; }
-html.theme-classic.theme-dark .sidebar-link.is-active { background: #1f1f23; color: #ffffff; }
+/* ── 대화 페이지 ── */
+html.theme-classic.theme-dark .chat-messages { background: var(--dk-bg-deep) !important; }
+html.theme-classic.theme-dark .message-form { background: var(--dk-bg-card) !important; }
+html.theme-classic.theme-dark .message-form textarea { background: var(--dk-bg-card) !important; color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .message-form-code { color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .chat-date-separator { color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .chat-system-msg { color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .m-list-card { background: var(--dk-bg-card) !important; }
+html.theme-classic.theme-dark .m-list-card:hover { background: var(--dk-bg-elevated) !important; }
+html.theme-classic.theme-dark .m-list-card.is-active { background: var(--dk-bg-hover) !important; }
+html.theme-classic.theme-dark .m-list-card__name { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .m-list-card__sub { color: var(--dk-text-tertiary) !important; }
 
-/* 탑바 */
-html.theme-classic.theme-dark .top-bar { background: #0c0c0e; border-bottom: 1px solid #1f1f23; }
-html.theme-classic.theme-dark .top-bar-user-item { color: #a1a1aa; }
-html.theme-classic.theme-dark .top-bar-page-name { color: #fafafa; }
+/* ── 설정 페이지 ── */
+html.theme-classic.theme-dark .settings-section-block { background: var(--dk-bg-card) !important; }
+html.theme-classic.theme-dark .section-title-row .section-desc { color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .settings-catalog-link-input { background: var(--dk-bg-elevated) !important; color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .settings-badge-label { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .settings-helper { color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .settings-account-action-row { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .settings-account-action-row:hover { background: var(--dk-bg-elevated) !important; }
+html.theme-classic.theme-dark .toggle-switch-track { background: var(--dk-bg-selected) !important; }
 
-/* 버튼 */
-html.theme-classic.theme-dark .inline-button { background: #18181b; color: #d4d4d8; border-color: #3f3f46; }
-html.theme-classic.theme-dark .inline-button:hover { background: #27272a; }
-html.theme-classic.theme-dark .btn-tone-save { background: #3b82f6; color: #ffffff; }
+/* ── 컨텍스트 메뉴 ── */
+html.theme-classic.theme-dark .pm-ctx-menu { background: var(--dk-bg-elevated) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important; }
+html.theme-classic.theme-dark .pm-ctx-item { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .pm-ctx-item:hover { background: var(--dk-bg-selected) !important; }
+html.theme-classic.theme-dark .pm-ctx-item svg { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .pm-ctx-divider { background: var(--dk-border-default) !important; }
+html.theme-classic.theme-dark .pm-ctx-submenu { background: var(--dk-bg-elevated) !important; }
 
-/* 뱃지 */
-html.theme-classic.theme-dark .badge { background: #27272a; color: #d4d4d8; }
+/* ── 모달 ── */
+html.theme-classic.theme-dark .fp-modal-box { background: var(--dk-bg-elevated) !important; }
+html.theme-classic.theme-dark .fp-modal-text { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .fp-modal-btn--cancel { background: var(--dk-bg-selected) !important; color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .fp-modal-btn--ok { background: var(--dk-accent) !important; }
 
-/* 컨텍스트 메뉴 */
-html.theme-classic.theme-dark .pm-ctx-menu { background: #18181b; border-color: #27272a; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-html.theme-classic.theme-dark .pm-ctx-item { color: #d4d4d8; }
-html.theme-classic.theme-dark .pm-ctx-item:hover { background: #27272a; }
-html.theme-classic.theme-dark .pm-ctx-item svg { color: #71717a; }
-html.theme-classic.theme-dark .pm-ctx-divider { background: #27272a; }
-html.theme-classic.theme-dark .pm-ctx-submenu { background: #18181b; border-color: #27272a; }
+/* ── 토스트 ── */
+html.theme-classic.theme-dark .fp-toast { background: var(--dk-bg-selected) !important; color: var(--dk-text-primary) !important; }
 
-/* 토스트 */
-html.theme-classic.theme-dark .fp-toast { background: #27272a; color: #fafafa; }
-
-/* 스크롤바 */
+/* ── 스크롤바 ── */
 html.theme-classic.theme-dark ::-webkit-scrollbar { width: 8px; height: 8px; }
-html.theme-classic.theme-dark ::-webkit-scrollbar-track { background: #09090b; }
-html.theme-classic.theme-dark ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 0; }
-html.theme-classic.theme-dark ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+html.theme-classic.theme-dark ::-webkit-scrollbar-track { background: var(--dk-bg-deep); }
+html.theme-classic.theme-dark ::-webkit-scrollbar-thumb { background: var(--dk-bg-selected); }
+html.theme-classic.theme-dark ::-webkit-scrollbar-thumb:hover { background: var(--dk-border-strong); }
 
-/* 패널 헤더 타이틀 */
-html.theme-classic.theme-dark .panel-head-title { color: #fafafa; }
-html.theme-classic.theme-dark .panel-head-subtitle { color: #71717a; }
+/* ── 빈 상태 ── */
+html.theme-classic.theme-dark .empty-block,
+html.theme-classic.theme-dark .manage-idle-hint { color: var(--dk-text-muted) !important; }
 
-/* 폼 라벨 */
-html.theme-classic.theme-dark label { color: #a1a1aa; }
-html.theme-classic.theme-dark .section-title { color: #d4d4d8; }
-html.theme-classic.theme-dark .form-section { border-color: #27272a; }
+/* ── 필터 ── */
+html.theme-classic.theme-dark .filter-overlay { background: var(--dk-bg-card) !important; }
+html.theme-classic.theme-dark .filter-group-head { background: var(--dk-bg-elevated) !important; color: var(--dk-text-secondary) !important; }
 
-/* 빈 상태 */
-html.theme-classic.theme-dark .empty-block { color: #52525b; }
-html.theme-classic.theme-dark .manage-idle-hint { color: #52525b; }
+/* ── 링크 ── */
+html.theme-classic.theme-dark a { color: var(--dk-link) !important; }
+html.theme-classic.theme-dark a:hover { color: #93bbfd !important; }
 
-/* 필터 */
-html.theme-classic.theme-dark .filter-overlay { background: #111113; border-color: #27272a; }
-html.theme-classic.theme-dark .filter-group-head { background: #18181b; color: #d4d4d8; }
+/* ── 계약 체크 ── */
+html.theme-classic.theme-dark .contract-check-item span { color: var(--dk-text-secondary) !important; }
 
-/* 상세 패널 (오른쪽) */
-html.theme-classic.theme-dark .pls-detail-panel { background: #111113; border-color: #27272a; box-shadow: -4px 0 20px rgba(0,0,0,0.4); }
-html.theme-classic.theme-dark .panel-body { background: #111113; }
-html.theme-classic.theme-dark .panel-body--detail { background: #111113; }
-
-/* 상품 상세 마크업 */
-html.theme-classic.theme-dark .md-card { background: #18181b; border-color: #27272a; }
-html.theme-classic.theme-dark .md-section-head { color: #d4d4d8; }
-html.theme-classic.theme-dark .md-section-head svg { color: #71717a; }
-html.theme-classic.theme-dark .md-table th { background: #1f1f23; color: #a1a1aa; border-color: #27272a; }
-html.theme-classic.theme-dark .md-table td { color: #d4d4d8; border-color: #27272a; background: #18181b; }
-html.theme-classic.theme-dark .md-row { border-color: #27272a; }
-html.theme-classic.theme-dark .md-row-label { color: #71717a; }
-html.theme-classic.theme-dark .md-row-value { color: #d4d4d8; }
-html.theme-classic.theme-dark .md-note { color: #52525b; background: #1f1f23; }
-
-/* 가격 히어로 */
-html.theme-classic.theme-dark .plist-detail__hero { background: #18181b; }
-html.theme-classic.theme-dark .plist-detail__price { color: #fafafa; }
-html.theme-classic.theme-dark .plist-detail__price-sub { color: #71717a; }
-
-/* 뱃지 색상 (다크 배경용) */
-html.theme-classic.theme-dark [class*="badge"] { opacity: 0.9; }
-html.theme-classic.theme-dark .manage-badge { background: #27272a; color: #d4d4d8; }
-
-/* 갤러리 */
-html.theme-classic.theme-dark .m-pd-gallery { background: #09090b; }
-
-/* 체크박스 */
-html.theme-classic.theme-dark input[type="checkbox"] { accent-color: #3b82f6; }
-
-/* 폼 그리드/스택 */
-html.theme-classic.theme-dark .form-stack { background: #111113; }
-html.theme-classic.theme-dark .form-grid { background: #111113; }
-html.theme-classic.theme-dark .manage-form-body { background: #111113; }
-html.theme-classic.theme-dark .manage-form-shell { background: #111113; }
-
-/* 모달/다이얼로그 */
-html.theme-classic.theme-dark .fp-modal-box { background: #18181b !important; }
-html.theme-classic.theme-dark .fp-modal-text { color: #fafafa; }
-html.theme-classic.theme-dark .fp-modal-btn--cancel { background: #27272a; color: #d4d4d8; }
-html.theme-classic.theme-dark .fp-modal-btn--ok { background: #3b82f6; }
-
-/* 탑바 상태 */
-html.theme-classic.theme-dark .top-bar-identity { color: #a1a1aa; }
-html.theme-classic.theme-dark .top-bar-work-badge { color: #71717a; }
-html.theme-classic.theme-dark .top-bar-logout-btn { color: #71717a; }
-html.theme-classic.theme-dark .top-bar-logout-btn:hover { color: #fafafa; }
-
-/* 사이드바 헤더 */
-html.theme-classic.theme-dark .sidebar-head { border-color: #1f1f23; }
-html.theme-classic.theme-dark .sidebar-toggle-btn { color: #71717a; }
-html.theme-classic.theme-dark .sidebar-toggle-btn:hover { color: #fafafa; }
-
-/* 링크 */
-html.theme-classic.theme-dark a { color: #60a5fa; }
-
-/* 전체 배경 잡기 */
-html.theme-classic.theme-dark .pls-grid-scroll { background: #0c0c0e; }
-html.theme-classic.theme-dark .pls-grid-panel { background: #0c0c0e; }
-html.theme-classic.theme-dark .panel--form { background: #111113; }
-html.theme-classic.theme-dark .panel--form .panel-body { background: #111113; }
-
-/* ─── 대화 페이지 ─── */
-html.theme-classic.theme-dark .chat-room-list { background: #0c0c0e; }
-html.theme-classic.theme-dark .chat-room-item { background: #111113; border-color: #1f1f23; color: #d4d4d8; }
-html.theme-classic.theme-dark .chat-room-item:hover { background: #18181b; }
-html.theme-classic.theme-dark .chat-room-item.is-active { background: #1f1f23; }
-html.theme-classic.theme-dark .chat-messages { background: #09090b; }
-html.theme-classic.theme-dark .chat-message-bubble { background: #18181b; color: #d4d4d8; }
-html.theme-classic.theme-dark .chat-message-bubble--mine { background: #1e3a5f; color: #e0f0ff; }
-html.theme-classic.theme-dark .chat-message-sender { color: #71717a; }
-html.theme-classic.theme-dark .chat-message-time { color: #52525b; }
-html.theme-classic.theme-dark .chat-input-area { background: #111113; border-color: #27272a; }
-html.theme-classic.theme-dark .chat-input-area textarea { background: #18181b; color: #fafafa; }
-html.theme-classic.theme-dark .chat-date-separator { color: #52525b; }
-html.theme-classic.theme-dark .chat-date-separator::before,
-html.theme-classic.theme-dark .chat-date-separator::after { background: #27272a; }
-html.theme-classic.theme-dark .message-form { background: #111113; border-color: #1f1f23; }
-html.theme-classic.theme-dark .message-form textarea { background: #111113; color: #fafafa; }
-html.theme-classic.theme-dark .message-form-code { color: #52525b; }
-html.theme-classic.theme-dark .chat-system-msg { color: #52525b; }
-html.theme-classic.theme-dark .chat-code { color: #71717a; }
-
-/* 대화 목록 카드 */
-html.theme-classic.theme-dark .m-list-card { background: #111113; border-color: #1f1f23; }
-html.theme-classic.theme-dark .m-list-card:hover { background: #18181b; }
-html.theme-classic.theme-dark .m-list-card.is-active { background: #1f1f23; }
-html.theme-classic.theme-dark .m-list-card__name { color: #e4e4e7; }
-html.theme-classic.theme-dark .m-list-card__sub { color: #71717a; }
-html.theme-classic.theme-dark .m-list-card__time { color: #52525b; }
-
-/* ─── 상품 상세 (데스크탑 오버레이) ─── */
-html.theme-classic.theme-dark .plist-detail__section { background: #111113; }
-html.theme-classic.theme-dark .plist-detail__table th { background: #18181b; color: #71717a; border-color: #27272a; }
-html.theme-classic.theme-dark .plist-detail__table td { background: #111113; color: #d4d4d8; border-color: #1f1f23; }
-html.theme-classic.theme-dark .plist-detail__row { border-color: #1f1f23; }
-html.theme-classic.theme-dark .plist-detail__label { color: #71717a; }
-html.theme-classic.theme-dark .plist-detail__value { color: #d4d4d8; }
-
-/* 카탈로그 상세 카드 */
-html.theme-classic.theme-dark .catalog-card { background: #111113; border-color: #27272a; }
-html.theme-classic.theme-dark .catalog-section-title { color: #a1a1aa; }
-html.theme-classic.theme-dark .catalog-price-table th { background: #18181b; color: #71717a; }
-html.theme-classic.theme-dark .catalog-price-table td { background: #111113; color: #d4d4d8; border-color: #1f1f23; }
-
-/* ─── 계약/정산 폼 영역 ─── */
-html.theme-classic.theme-dark .contract-check-item { color: #d4d4d8; }
-html.theme-classic.theme-dark .contract-check-item span { color: #a1a1aa; }
-html.theme-classic.theme-dark .form-section-title { color: #d4d4d8; }
-html.theme-classic.theme-dark .form-section-title svg { color: #71717a; }
-html.theme-classic.theme-dark .form-feedback { background: #18181b; color: #a1a1aa; }
-html.theme-classic.theme-dark .field label { color: #71717a; }
-html.theme-classic.theme-dark .field input[readonly] { background: #0c0c0e; color: #52525b; }
-
-/* ─── 설정 페이지 ─── */
-html.theme-classic.theme-dark .settings-section-block { background: #111113; border-color: #27272a; }
-html.theme-classic.theme-dark .section-title-row .section-title { color: #d4d4d8; }
-html.theme-classic.theme-dark .section-title-row .section-desc { color: #52525b; }
-html.theme-classic.theme-dark .settings-catalog-link-input { background: #18181b; color: #a1a1aa; border-color: #27272a; }
-html.theme-classic.theme-dark .settings-badge-row { border-color: #1f1f23; }
-html.theme-classic.theme-dark .settings-badge-label { color: #a1a1aa; }
-html.theme-classic.theme-dark .settings-helper { color: #52525b; }
-html.theme-classic.theme-dark .settings-account-action-row { border-color: #1f1f23; color: #a1a1aa; }
-html.theme-classic.theme-dark .settings-account-action-row:hover { background: #18181b; }
-html.theme-classic.theme-dark .toggle-switch-track { background: #27272a; }
-
-/* ─── 상세 패널 전체 강제 다크 ─── */
-html.theme-classic.theme-dark .pls-detail-panel,
-html.theme-classic.theme-dark .pls-detail-panel * { color-scheme: dark; }
-html.theme-classic.theme-dark .pls-detail-panel { background: #0c0c0e !important; }
-html.theme-classic.theme-dark .pls-detail-panel div,
-html.theme-classic.theme-dark .pls-detail-panel section,
-html.theme-classic.theme-dark .pls-detail-panel article,
-html.theme-classic.theme-dark .pls-detail-panel header,
-html.theme-classic.theme-dark .pls-detail-panel footer,
-html.theme-classic.theme-dark .pls-detail-panel nav { background-color: transparent; }
-html.theme-classic.theme-dark .pls-detail-panel .panel-body,
-html.theme-classic.theme-dark .pls-detail-panel .panel-body--detail { background: #0c0c0e !important; }
-html.theme-classic.theme-dark .md-card { background: #111113 !important; box-shadow: none !important; border: 1px solid #1f1f23 !important; }
-html.theme-classic.theme-dark .md-row { border-color: #1f1f23 !important; }
-html.theme-classic.theme-dark .md-row span { color: #71717a !important; }
-html.theme-classic.theme-dark .md-row strong { color: #d4d4d8 !important; }
-html.theme-classic.theme-dark .md-section-head { color: #d4d4d8 !important; }
-html.theme-classic.theme-dark .md-section-head svg { color: #52525b !important; }
-html.theme-classic.theme-dark .md-table th { background: #18181b !important; color: #71717a !important; border-color: #1f1f23 !important; }
-html.theme-classic.theme-dark .md-table td { background: #111113 !important; color: #d4d4d8 !important; border-color: #1f1f23 !important; }
-html.theme-classic.theme-dark .md-table td strong { color: #fafafa !important; }
-html.theme-classic.theme-dark .md-note { background: #18181b !important; color: #52525b !important; }
-html.theme-classic.theme-dark .md-link { color: #60a5fa !important; }
-
-/* 상세 가격 히어로 */
-html.theme-classic.theme-dark .md-hero,
-html.theme-classic.theme-dark [class*="detail__hero"],
-html.theme-classic.theme-dark [class*="detail__price-wrap"] { background: #111113 !important; }
-html.theme-classic.theme-dark [class*="detail__price"] { color: #fafafa !important; }
-html.theme-classic.theme-dark [class*="detail__price-sub"],
-html.theme-classic.theme-dark [class*="detail__price-term"] { color: #71717a !important; }
-
-/* 상세 패널 헤더 */
-html.theme-classic.theme-dark .pls-detail-panel .panel-head { background: #111113 !important; border-color: #1f1f23 !important; }
-html.theme-classic.theme-dark .pls-detail-panel .panel-head-title { color: #fafafa !important; }
-
-/* 상세 액션 버튼 */
-html.theme-classic.theme-dark .detail-actions button,
-html.theme-classic.theme-dark [class*="detail-action"] { background: #18181b; color: #d4d4d8; border-color: #27272a; }
-html.theme-classic.theme-dark .detail-actions button:hover { background: #27272a; }
-
-/* 뱃지 (상세 패널 내) */
-html.theme-classic.theme-dark [class*="badge"] { border-color: transparent; }
-
-/* 색상 칩 */
-html.theme-classic.theme-dark .md-color-chip { border-color: #3f3f46 !important; }
-
-/* ─── 공통 와일드카드 (남은 흰 배경 잡기) ─── */
-html.theme-classic.theme-dark .work-page { background: #09090b; }
-html.theme-classic.theme-dark .main-area { background: #09090b; }
-html.theme-classic.theme-dark .main-shell { background: #09090b; }
+/* ── 뱃지 ── */
+html.theme-classic.theme-dark .manage-badge { background: var(--dk-bg-selected) !important; color: var(--dk-text-secondary) !important; }
