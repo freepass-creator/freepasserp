@@ -271,7 +271,19 @@ html.theme-classic.theme-dark [class*="Badge"] {
 html.theme-classic.theme-dark #productDetail,
 html.theme-classic.theme-dark #plsDetailPanel,
 html.theme-classic.theme-dark [class*="detail-panel"],
-html.theme-classic.theme-dark [class*="detail"] > div {
-  background: var(--dk-bg-base) !important;
+html.theme-classic.theme-dark [class*="detail"] > div,
+html.theme-classic.theme-dark [class*="detail"] > div > div,
+html.theme-classic.theme-dark [class*="detail"] > div > div > div,
+html.theme-classic.theme-dark [class*="detail"] section,
+html.theme-classic.theme-dark [class*="plist-detail"],
+html.theme-classic.theme-dark [class*="plist-detail"] * {
+  background-color: var(--dk-bg-base) !important;
   color: var(--dk-text-primary) !important;
 }
+html.theme-classic.theme-dark [class*="plist-detail"] span,
+html.theme-classic.theme-dark [class*="plist-detail"] label,
+html.theme-classic.theme-dark [class*="detail"] span:not([class*="badge"]) { color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark [class*="plist-detail"] strong,
+html.theme-classic.theme-dark [class*="detail"] strong { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark [class*="plist-detail"] th { background: var(--dk-bg-elevated) !important; color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark [class*="plist-detail"] td { background: var(--dk-bg-card) !important; color: var(--dk-text-secondary) !important; }
