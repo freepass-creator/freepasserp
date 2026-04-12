@@ -75,10 +75,11 @@ html.theme-classic.theme-dark input:focus,
 html.theme-classic.theme-dark select:focus { border-color: #3b82f6; }
 
 /* 테이블 */
-html.theme-classic.theme-dark .pls-table th { background: #18181b; color: #a1a1aa; border-color: #27272a; }
-html.theme-classic.theme-dark .pls-table td { color: #d4d4d8; border-color: #1f1f23; }
-html.theme-classic.theme-dark .pls-table tr:hover td { background: #1f1f23; }
-html.theme-classic.theme-dark .pls-table tr.is-selected td { background: #27272a; }
+html.theme-classic.theme-dark .pls-table th { background: #111113; color: #71717a; border-color: #1f1f23; }
+html.theme-classic.theme-dark .pls-table td { color: #a1a1aa; border-color: #18181b; background: #0c0c0e; }
+html.theme-classic.theme-dark .pls-table tr:nth-child(even) td { background: #111113; }
+html.theme-classic.theme-dark .pls-table tr:hover td { background: #1a1a1e; }
+html.theme-classic.theme-dark .pls-table tr.is-selected td { background: #1f1f23; }
 
 /* 사이드바 메뉴 */
 html.theme-classic.theme-dark .sidebar-link { color: #a1a1aa; }
