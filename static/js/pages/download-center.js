@@ -2,10 +2,11 @@ import { requireAuth } from '../core/auth-guard.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { qs } from '../core/utils.js';
 import { fetchProductsOnce, fetchPartnersOnce, updateProduct } from '../firebase/firebase-db.js';
-import { storage } from '../firebase/firebase-config.js';
-import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { showToast, showConfirm } from '../core/toast.js';
-import { normalizeCarNumber } from '../firebase/firebase-codes.js';
+
+function normalizeCarNumber(value = '') {
+  return String(value).trim().replace(/\s+/g, '').replace(/[.#$\[\]\/]/g, '').toUpperCase();
+}
 
 let allProducts = [];
 let allPartners = [];
@@ -293,6 +294,9 @@ async function handleFolderUpload(files) {
   const fillEl = qs('#dlc-upload-fill');
   const textEl = qs('#dlc-upload-text');
   progressEl.hidden = false;
+
+  const { storage } = await import('../firebase/firebase-config.js');
+  const { ref: sRef, uploadBytes, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js');
 
   let completed = 0;
   const total = imageFiles.length;
