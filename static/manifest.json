@@ -1,6 +1,7 @@
 {
   "name": "FREEPASS ERP",
   "short_name": "FREEPASS ERP",
+  "version": "1.2.0",
   "description": "장기렌터카 구독서비스 영업전용 ERP",
   "start_url": "/",
   "display": "standalone",
