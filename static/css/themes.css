@@ -187,12 +187,12 @@ html.theme-classic.theme-dark .chat-msg-row { background: transparent !important
 html.theme-classic.theme-dark .chat-bubble,
 html.theme-classic.theme-dark [class*="msg-bubble"],
 html.theme-classic.theme-dark [class*="message-bubble"],
-html.theme-classic.theme-dark [class*="chat-bubble"] { background: var(--dk-bg-elevated) !important; color: var(--dk-text-primary) !important; border-color: var(--dk-border-subtle) !important; }
+html.theme-classic.theme-dark [class*="chat-bubble"] { background: #1f1f23 !important; color: #e4e4e7 !important; border: 1px solid #2a2a2e !important; }
 html.theme-classic.theme-dark .chat-bubble--mine,
 html.theme-classic.theme-dark [class*="bubble--mine"],
 html.theme-classic.theme-dark [class*="bubble-mine"],
 html.theme-classic.theme-dark .is-mine [class*="bubble"],
-html.theme-classic.theme-dark .is-mine [class*="msg-bubble"] { background: #1e3a5f !important; color: #d0e8ff !important; }
+html.theme-classic.theme-dark .is-mine [class*="msg-bubble"] { background: #1a2e4a !important; color: #c8ddf5 !important; border: 1px solid #243a5c !important; }
 html.theme-classic.theme-dark [class*="msg-sender"],
 html.theme-classic.theme-dark [class*="message-sender"] { color: var(--dk-text-tertiary) !important; }
 html.theme-classic.theme-dark [class*="msg-time"],
