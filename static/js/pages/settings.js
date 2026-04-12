@@ -27,7 +27,7 @@ let currentProfile = null;
 
 
 let profileEditMode = false;
-const editableFields = ['settings-name', 'settings-position', 'settings-phone', 'settings-note'];
+const editableFields = ['settings-name', 'settings-position', 'settings-phone', 'settings-note', 'settings-business-number'];
 
 function setProfileViewMode(isView) {
   profileEditMode = !isView;
@@ -52,13 +52,34 @@ function setProfileViewMode(isView) {
 async function saveProfile() {
   if (!currentProfile?.uid) return;
   const val = (id) => document.getElementById(id)?.value?.trim() || '';
+  const rawBizNum = val('settings-business-number').replace(/[^0-9]/g, '');
   const updates = {
     name: val('settings-name'),
     position: val('settings-position'),
     phone: val('settings-phone'),
-    note: val('settings-note')
+    note: val('settings-note'),
+    business_number: rawBizNum
   };
   try {
+    if (rawBizNum && rawBizNum !== '7777777777' && rawBizNum !== (currentProfile.business_number || '').replace(/[^0-9]/g, '')) {
+      const res = await fetch('/api/partner/match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ business_number: rawBizNum }),
+      });
+      const json = await res.json();
+      const partner = json?.partner;
+      if (partner) {
+        updates.matched_partner_code = partner.partner_code;
+        updates.matched_partner_name = partner.partner_name;
+        updates.matched_partner_type = partner.partner_type;
+        updates.company_code = partner.partner_code;
+        updates.company_name = partner.partner_name;
+        updates.role = partner.partner_type === 'provider' ? 'provider' : 'agent';
+        updates.match_status = 'matched';
+        showToast(`소속 매칭: ${partner.partner_name}`, 'success');
+      }
+    }
     await updateUserProfile(currentProfile.uid, updates);
     Object.assign(currentProfile, updates);
     showToast('저장 완료', 'success');
