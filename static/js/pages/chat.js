@@ -1,5 +1,5 @@
 import { requireAuth } from '../core/auth-guard.js';
-import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
+import { qs, registerPageCleanup, runPageCleanup, roleLabel } from '../core/utils.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { deleteRoomEverywhere, ensureRoom, hideRoomForUser, markRoomRead, resolveTermForProduct, sendMessage, watchMessages, watchProducts, watchRooms } from '../firebase/firebase-db.js';
 import { extractTermFields, normalizeProduct } from '../shared/product-list-detail-view.js';
@@ -210,13 +210,7 @@ async function ensureChatTermLoaded(product) {
   }
 }
 
-function roleName(role) {
-  if (role === 'admin') return '관리자';
-  if (role === 'provider') return '공급사';
-  if (role === 'agent') return '영업자';
-  if (role === 'agent_manager') return '영업관리자';
-  return '';
-}
+function roleName(role) { const l = roleLabel(role); return l === '-' ? '' : l; }
 
 function formatMessageTime(ts) {
   try { return new Date(ts).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }); } catch (_) { return ''; }

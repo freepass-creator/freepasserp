@@ -1,6 +1,6 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormModeApplier, createSubmitHandler, syncTopBarPageCount } from '../core/management-skeleton.js';
-import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
+import { qs, registerPageCleanup, runPageCleanup, roleLabel } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { deleteUserProfile, fetchPartnersOnce, fetchUsersOnce, updateUserProfile, watchUsers } from '../firebase/firebase-db.js';
@@ -65,11 +65,7 @@ function statusLabel(status) {
 }
 
 function badgeRoleLabel(role) {
-  if (role === 'admin') return '관리자';
-  if (role === 'provider') return '공급사';
-  if (role === 'agent') return '영업자';
-  if (role === 'agent_manager') return '영업관리자';
-  return '미지정';
+  return roleLabel(role) === '-' ? '미지정' : roleLabel(role);
 }
 
 function buildCompanyCodeOptions(role, selectedCode = '') {

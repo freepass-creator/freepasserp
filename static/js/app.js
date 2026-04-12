@@ -164,7 +164,7 @@ async function loadPage(url, options = {}) {
       }
       // 이전 페이지의 page-* body 클래스 제거 (모바일 레이아웃 잔류 방지)
       if (cur?.module && typeof cur.module.onHide === 'function') {
-        try { cur.module.onHide(); } catch (_) {}
+        try { cur.module.onHide(); } catch (e) { console.warn('[app] onHide error', e); }
       }
       // 열려있는 필터 오버레이 닫기
       document.querySelectorAll('.filter-overlay.is-open').forEach((o) => {
@@ -186,7 +186,7 @@ async function loadPage(url, options = {}) {
       if (cached.doc) syncTopBar(cached.doc);
       // top-bar-actions 교체 후 이벤트 재바인딩
       if (cached.module && typeof cached.module.onShow === 'function') {
-        try { cached.module.onShow(); } catch (_) {}
+        try { cached.module.onShow(); } catch (e) { console.warn('[app] onShow error', e); }
       }
       // CSS 갱신: 재방문 시 캐시된 styles와 현재 DOM에 박힌 styles가 다를 수 있음
       // app_version이 바뀌면 새 CSS가 필요하므로 ensureStyles 다시 호출

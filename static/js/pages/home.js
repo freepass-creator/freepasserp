@@ -1,7 +1,7 @@
 import { onValue, ref } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
 import { escapeHtml } from '../core/management-format.js';
 import { requireAuth } from '../core/auth-guard.js';
-import { registerPageCleanup, runPageCleanup } from '../core/utils.js';
+import { registerPageCleanup, runPageCleanup, roleLabel } from '../core/utils.js';
 import { renderRoleMenu } from '../core/role-menu.js';
 import { db } from '../firebase/firebase-config.js';
 import { watchContracts, watchPartners, watchProducts, watchRooms, watchSettlements, watchTerms, watchUsers } from '../firebase/firebase-db.js';
@@ -42,7 +42,7 @@ function fmtDate(v) {
   return `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 }
 function fmtMoney(v) { const n = Number(v || 0); return (n < 0 ? '-' : '') + Math.abs(n).toLocaleString('ko-KR'); }
-function roleName(r) { return r === 'admin' ? '관리자' : r === 'provider' ? '공급사' : r === 'agent_manager' ? '영업관리자' : r === 'agent' ? '영업자' : '사용자'; }
+function roleName(r) { const l = roleLabel(r); return l === '-' ? '사용자' : l; }
 
 // ─── 필터 ───────────────────────────────────────────────────────────────────
 
