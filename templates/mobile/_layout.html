@@ -58,8 +58,7 @@
     .m-pwa-install__btn{border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer}
     .m-pwa-install__btn--dismiss{background:#f1f5f9;color:#64748b}
     .m-pwa-install__btn--accept{background:#1b2a4a;color:#fff}
-    .m-page{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff;contain:layout style}
-    .m-page::after{content:'';display:block;height:calc(56px + env(safe-area-inset-bottom))}
+    .m-page{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff;contain:layout style;padding-bottom:calc(56px + env(safe-area-inset-bottom))}
     .m-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:200;display:flex;align-items:stretch;justify-content:space-around;height:calc(56px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid #f2f4f6}
     .m-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;border:none;background:transparent;text-decoration:none;color:#8b95a1;font-size:11px;font-weight:500;padding:6px 0 0;position:relative}
     .m-tab.is-active{color:#1b2a4a;font-weight:600}

@@ -15,9 +15,6 @@
   padding-bottom: 0;
   height: 100svh;
 }
-.m-body:has(.m-cr) .m-page::after {
-  display: none;
-}
 .m-body:has(.m-cr) .m-tabbar {
   display: none;
 }
