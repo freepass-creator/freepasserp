@@ -62,6 +62,8 @@ const MILE_BUCKETS = [
 ];
 
 const FILTER_GROUPS = [
+  { key: 'vehicle_status', title: '차량상태',  icon: 'shield',   type: 'check',  field: 'vehicle_status' },
+  { key: 'product_type',  title: '상품구분',   icon: 'tag',      type: 'check',  field: 'product_type' },
   { key: 'rent',          title: '월 대여료',  icon: 'money',    type: 'range',  buckets: RENT_BUCKETS },
   { key: 'deposit',       title: '보증금',     icon: 'deposit',  type: 'range',  buckets: DEP_BUCKETS },
   { key: 'periods',       title: '기간',       icon: 'calendar', type: 'periods', options: ['1','12','24','36','48','60'] },
@@ -73,7 +75,8 @@ const FILTER_GROUPS = [
   { key: 'year',          title: '연식',       icon: 'hash',     type: 'check',  field: 'year', sort: 'desc' },
   { key: 'mileage',       title: '주행거리',   icon: 'road',     type: 'range',  buckets: MILE_BUCKETS },
   { key: 'fuel_type',     title: '연료',       icon: 'fuel',     type: 'check',  field: 'fuel_type' },
-  { key: 'color',         title: '색상',       icon: 'palette',  type: 'check',  fields: ['ext_color', 'int_color'] },
+  { key: 'ext_color',     title: '외부색상',   icon: 'palette',  type: 'check',  field: 'ext_color' },
+  { key: 'int_color',     title: '내부색상',   icon: 'palette',  type: 'check',  field: 'int_color' },
   { key: 'vehicle_class', title: '차종구분',   icon: 'shape',    type: 'check',  field: 'vehicle_class' },
   { key: 'screening_criteria', title: '심사기준', icon: 'shield', type: 'policyCheck', field: 'screening_criteria' },
   { key: 'basic_driver_age',   title: '최저연령', icon: 'user',  type: 'policyCheck', field: 'basic_driver_age' },
