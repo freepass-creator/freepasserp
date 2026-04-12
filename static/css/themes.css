@@ -184,19 +184,15 @@ html.theme-classic.theme-dark .chat-system-msg { color: var(--dk-text-muted) !im
 
 /* 채팅 말풍선 */
 html.theme-classic.theme-dark .chat-msg-row { background: transparent !important; }
-html.theme-classic.theme-dark .chat-bubble,
-html.theme-classic.theme-dark [class*="msg-bubble"],
-html.theme-classic.theme-dark [class*="message-bubble"],
-html.theme-classic.theme-dark [class*="chat-bubble"] { background: #1f1f23 !important; color: #e4e4e7 !important; border: 1px solid #2a2a2e !important; }
-html.theme-classic.theme-dark .chat-bubble--mine,
-html.theme-classic.theme-dark [class*="bubble--mine"],
-html.theme-classic.theme-dark [class*="bubble-mine"],
-html.theme-classic.theme-dark .is-mine [class*="bubble"],
-html.theme-classic.theme-dark .is-mine [class*="msg-bubble"] { background: #1a2e4a !important; color: #c8ddf5 !important; border: 1px solid #243a5c !important; }
-html.theme-classic.theme-dark [class*="msg-sender"],
-html.theme-classic.theme-dark [class*="message-sender"] { color: var(--dk-text-tertiary) !important; }
-html.theme-classic.theme-dark [class*="msg-time"],
-html.theme-classic.theme-dark [class*="message-time"] { color: var(--dk-text-muted) !important; }
+/* 상대 말풍선 */
+html.theme-classic.theme-dark .message-bubble { background: #1f1f23 !important; color: #e4e4e7 !important; border: 1px solid #2a2a2e !important; }
+/* 내 말풍선 */
+html.theme-classic.theme-dark .message-wrap.out .message-bubble { background: #1a2e4a !important; color: #c8ddf5 !important; border: 1px solid #243a5c !important; }
+html.theme-classic.theme-dark .message-sender { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .message-time { color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .message-date-divider { color: var(--dk-text-muted) !important; }
+html.theme-classic.theme-dark .message-wrap { background: transparent !important; }
+html.theme-classic.theme-dark .message-content { background: transparent !important; }
 
 /* 대화 목록 카드 */
 html.theme-classic.theme-dark .m-list-card { background: var(--dk-bg-card) !important; }
@@ -205,11 +201,19 @@ html.theme-classic.theme-dark .m-list-card.is-active { background: var(--dk-bg-h
 html.theme-classic.theme-dark .m-list-card__name { color: var(--dk-text-primary) !important; }
 html.theme-classic.theme-dark .m-list-card__sub { color: var(--dk-text-tertiary) !important; }
 
-/* 채팅 오른쪽 상세 패널 */
-html.theme-classic.theme-dark .chat-detail,
-html.theme-classic.theme-dark [class*="room-detail"],
-html.theme-classic.theme-dark [class*="chat-detail"],
-html.theme-classic.theme-dark [class*="room-selection"] { background: var(--dk-bg-base) !important; }
+/* 채팅 오른쪽 상세 패널 (m-pd 마크업) */
+html.theme-classic.theme-dark .m-pd,
+html.theme-classic.theme-dark .m-pd--desktop,
+html.theme-classic.theme-dark .m-pd * { background-color: var(--dk-bg-base) !important; color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .m-pd-group__body { background: var(--dk-bg-card) !important; }
+html.theme-classic.theme-dark .m-pd__row { border-color: var(--dk-border-subtle) !important; }
+html.theme-classic.theme-dark .m-pd__row-label { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .m-pd__row-value { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .m-pd-group-head { color: var(--dk-text-primary) !important; }
+html.theme-classic.theme-dark .m-pd-group-head svg { color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .m-pd .md-table th { background: var(--dk-bg-elevated) !important; color: var(--dk-text-tertiary) !important; }
+html.theme-classic.theme-dark .m-pd .md-table td { background: var(--dk-bg-card) !important; color: var(--dk-text-secondary) !important; }
+html.theme-classic.theme-dark .m-pd img { background: transparent !important; }
 
 /* ── 설정 페이지 ── */
 html.theme-classic.theme-dark .settings-section-block { background: var(--dk-bg-card) !important; }
