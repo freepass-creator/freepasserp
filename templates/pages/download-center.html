@@ -5,16 +5,15 @@
 {% block page_title_text %}파일센터{% endblock %}
 {% block workspace_body %}
 <div class="work-page min-h-work dlc-shell">
+
+  <!-- 왼쪽: 다운로드 -->
   <section class="panel dlc-panel">
     <div class="panel-head panel-head-default">
       <div class="panel-head-title-wrap">
-        <div class="panel-head-title">파일센터</div>
+        <div class="panel-head-title">다운로드</div>
       </div>
     </div>
     <div class="panel-body dlc-body">
-
-      <!-- ━━━ 다운로드 ━━━ -->
-      <div class="dlc-group-title">다운로드</div>
 
       <section class="dlc-section">
         <div class="dlc-section-title">
@@ -41,16 +40,22 @@
             <label class="dlc-label">대상</label>
             <span id="dlc-photo-count" class="dlc-count">-</span>
           </div>
-          <button type="button" class="dlc-btn" id="dlc-photo-download">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
-            사진 다운로드 (ZIP)
-          </button>
+          <div class="dlc-btn-row">
+            <button type="button" class="dlc-btn" id="dlc-photo-download">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+              ZIP 다운로드
+            </button>
+            <button type="button" class="dlc-btn dlc-btn--outline" id="dlc-photo-folder">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M12 10v6"/><path d="m15 13-3 3-3-3"/></svg>
+              폴더별 저장
+            </button>
+          </div>
         </div>
         <div id="dlc-photo-progress" class="dlc-progress" hidden>
           <div class="dlc-progress-bar"><div class="dlc-progress-fill" id="dlc-photo-fill"></div></div>
           <span class="dlc-progress-text" id="dlc-photo-text">준비 중...</span>
         </div>
-        <div class="dlc-hint">차량번호_제조사_모델명 폴더별로 묶여서 ZIP 다운로드됩니다.</div>
+        <div class="dlc-hint">폴더명: 차량번호_모델명_공급사코드</div>
       </section>
 
       <section class="dlc-section">
@@ -72,8 +77,17 @@
         </div>
       </section>
 
-      <!-- ━━━ 업로드 ━━━ -->
-      <div class="dlc-group-title">업로드</div>
+    </div>
+  </section>
+
+  <!-- 오른쪽: 업로드 (공급사/관리자만) -->
+  <section class="panel dlc-panel dlc-upload-panel" id="dlc-upload-panel">
+    <div class="panel-head panel-head-default">
+      <div class="panel-head-title-wrap">
+        <div class="panel-head-title">업로드</div>
+      </div>
+    </div>
+    <div class="panel-body dlc-body">
 
       <section class="dlc-section">
         <div class="dlc-section-title">
@@ -109,11 +123,29 @@
               &nbsp;&nbsp;&nbsp;└ 2.jpg
             </code>
           </div>
+          <div class="dlc-hint-title" style="margin-top:8px">대표사진 지정</div>
+          <div class="dlc-hint">
+            파일명 정렬 기준으로 <strong>첫 번째 사진</strong>이 대표사진이 됩니다.<br>
+            대표사진을 지정하려면 아래 방법 중 하나를 사용하세요.
+          </div>
+          <div class="dlc-hint-example">
+            <code>
+              방법 1: 파일명 앞에 번호 붙이기<br>
+              &nbsp;&nbsp;&nbsp;01_전면.jpg ← 대표<br>
+              &nbsp;&nbsp;&nbsp;02_측면.jpg<br>
+              &nbsp;&nbsp;&nbsp;03_후면.jpg<br><br>
+              방법 2: "대표" 키워드 사용<br>
+              &nbsp;&nbsp;&nbsp;대표.jpg ← 대표<br>
+              &nbsp;&nbsp;&nbsp;측면.jpg<br>
+              &nbsp;&nbsp;&nbsp;후면.jpg
+            </code>
+          </div>
         </div>
       </section>
 
     </div>
   </section>
+
 </div>
 {% endblock %}
 {% block workspace_page_js %}

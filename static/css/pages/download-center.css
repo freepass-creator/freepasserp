@@ -1,5 +1,5 @@
-.dlc-shell { display: flex; justify-content: center; padding: var(--space-4); }
-.dlc-panel { width: 100%; max-width: 560px; }
+.dlc-shell { display: flex; gap: var(--space-4); padding: var(--space-4); }
+.dlc-panel { flex: 1; min-width: 0; }
 .dlc-body { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-6); }
 
 .dlc-section {
@@ -156,6 +156,12 @@
 }
 .dlc-drop svg { color: #94a3b8; }
 .dlc-drop span { font-size: var(--font-size-sm); color: var(--new-text-secondary); }
+
+.dlc-btn-row {
+  display: flex;
+  gap: var(--space-2);
+}
+.dlc-btn-row .dlc-btn { flex: 1; }
 
 .dlc-btn--outline {
   background: #fff;

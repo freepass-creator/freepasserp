@@ -36,9 +36,8 @@ function getPhotosFromProduct(product) {
 function buildFolderName(product) {
   const parts = [
     product.car_number || product.carNo || '',
-    product.maker || '',
     product.model_name || product.model || '',
-    product.sub_model || product.subModel || ''
+    product.provider_company_code || product.partner_code || ''
   ].filter(Boolean);
   return parts.join('_').replace(/[\\/:*?"<>|]/g, '_') || product.id || 'unknown';
 }
@@ -128,6 +127,71 @@ async function downloadPhotos() {
   }
 }
 
+async function downloadPhotosToFolder() {
+  const period = qs('#dlc-photo-period')?.value || 'all';
+  const provider = qs('#dlc-photo-provider')?.value || 'all';
+  const filtered = getFilteredProducts(period, provider);
+  const productsWithPhotos = filtered.filter(p => getPhotosFromProduct(p).length > 0);
+
+  if (!productsWithPhotos.length) {
+    showToast('다운로드할 사진이 없습니다.', 'info');
+    return;
+  }
+
+  if (!window.showDirectoryPicker) {
+    showToast('이 브라우저에서는 폴더 저장을 지원하지 않습니다. ZIP 다운로드를 이용해주세요.', 'error');
+    return;
+  }
+
+  let dirHandle;
+  try {
+    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+  } catch { return; }
+
+  const progressEl = qs('#dlc-photo-progress');
+  const fillEl = qs('#dlc-photo-fill');
+  const textEl = qs('#dlc-photo-text');
+  const btn = qs('#dlc-photo-folder');
+  progressEl.hidden = false;
+  if (btn) btn.disabled = true;
+
+  let completed = 0;
+  let totalPhotos = 0;
+  productsWithPhotos.forEach(p => { totalPhotos += getPhotosFromProduct(p).length; });
+
+  try {
+    for (const product of productsWithPhotos) {
+      const photos = getPhotosFromProduct(product);
+      const folderName = buildFolderName(product);
+      const subDir = await dirHandle.getDirectoryHandle(folderName, { create: true });
+
+      for (let i = 0; i < photos.length; i++) {
+        try {
+          const res = await fetch(photos[i]);
+          if (!res.ok) continue;
+          const blob = await res.blob();
+          const ext = (blob.type || '').includes('png') ? 'png' : 'jpg';
+          const fileHandle = await subDir.getFileHandle(`${i + 1}.${ext}`, { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+        } catch {}
+        completed++;
+        fillEl.style.width = `${Math.round((completed / totalPhotos) * 100)}%`;
+        textEl.textContent = `저장 중... ${completed}/${totalPhotos}`;
+      }
+    }
+    textEl.textContent = '저장 완료';
+    showToast(`${productsWithPhotos.length}대 / ${completed}장 폴더 저장 완료`, 'success');
+  } catch (err) {
+    showToast(`저장 실패: ${err.message}`, 'error');
+    textEl.textContent = '저장 실패';
+  } finally {
+    if (btn) btn.disabled = false;
+    setTimeout(() => { progressEl.hidden = true; fillEl.style.width = '0'; }, 3000);
+  }
+}
+
 function downloadExcel() {
   const provider = qs('#dlc-excel-provider')?.value || 'all';
   let filtered = allProducts.filter(p => p.status !== 'deleted');
@@ -195,6 +259,17 @@ async function handleFolderUpload(files) {
     if (!carNum) continue;
     if (!grouped.has(carNum)) grouped.set(carNum, []);
     grouped.get(carNum).push(file);
+  }
+
+  for (const [carNum, files] of grouped) {
+    files.sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      const aMain = aName.includes('대표') || aName.startsWith('main') ? -1 : 0;
+      const bMain = bName.includes('대표') || bName.startsWith('main') ? -1 : 0;
+      if (aMain !== bMain) return aMain - bMain;
+      return aName.localeCompare(bName);
+    });
   }
 
   if (!grouped.size) {
@@ -266,6 +341,11 @@ async function bootstrap() {
     const { profile } = await requireAuth({ roles: ['provider', 'agent', 'agent_manager', 'admin'] });
     renderRoleMenu(qs('#sidebar-menu'), profile.role);
 
+    if (profile.role === 'agent' || profile.role === 'agent_manager') {
+      const uploadPanel = qs('#dlc-upload-panel');
+      if (uploadPanel) uploadPanel.hidden = true;
+    }
+
     [allProducts, allPartners] = await Promise.all([fetchProductsOnce(), fetchPartnersOnce()]);
 
     populateProviderSelect('#dlc-photo-provider');
@@ -275,6 +355,7 @@ async function bootstrap() {
     qs('#dlc-photo-period')?.addEventListener('change', updatePhotoCount);
     qs('#dlc-photo-provider')?.addEventListener('change', updatePhotoCount);
     qs('#dlc-photo-download')?.addEventListener('click', downloadPhotos);
+    qs('#dlc-photo-folder')?.addEventListener('click', downloadPhotosToFolder);
     qs('#dlc-excel-download')?.addEventListener('click', downloadExcel);
 
     const uploadInput = qs('#dlc-upload-input');
