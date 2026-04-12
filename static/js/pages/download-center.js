@@ -24,12 +24,23 @@ function getFilteredProducts(periodValue, providerValue) {
   return filtered;
 }
 
-function getPhotosFromProduct(product) {
+function isFirebaseUrl(url) {
+  return url.includes('firebasestorage.googleapis.com') || url.includes('storage.googleapis.com');
+}
+
+function getPhotosFromProduct(product, source = 'all') {
   const urls = [];
   if (Array.isArray(product.image_urls) && product.image_urls.length) {
     urls.push(...product.image_urls);
   } else if (product.image_url) {
     urls.push(product.image_url);
+  }
+  if (source === 'erp') return urls.filter(u => isFirebaseUrl(u));
+  if (source === 'external') {
+    const externalFromUrls = urls.filter(u => !isFirebaseUrl(u));
+    const photoLink = String(product.photo_link || '').trim();
+    if (photoLink && !externalFromUrls.includes(photoLink)) externalFromUrls.push(photoLink);
+    return externalFromUrls;
   }
   return urls;
 }
@@ -55,17 +66,20 @@ function updatePhotoCount() {
   const period = qs('#dlc-photo-period')?.value || 'all';
   const provider = qs('#dlc-photo-provider')?.value || 'all';
   const filtered = getFilteredProducts(period, provider);
-  let photoCount = 0;
-  filtered.forEach(p => { photoCount += getPhotosFromProduct(p).length; });
+  let erpCount = 0, extCount = 0;
+  filtered.forEach(p => {
+    erpCount += getPhotosFromProduct(p, 'erp').length;
+    extCount += getPhotosFromProduct(p, 'external').length;
+  });
   const countEl = qs('#dlc-photo-count');
-  if (countEl) countEl.textContent = `차량 ${filtered.length}대 / 사진 ${photoCount}장`;
+  if (countEl) countEl.textContent = `차량 ${filtered.length}대 / ERP ${erpCount}장 / 외부링크 ${extCount}장`;
 }
 
-async function downloadPhotos() {
+async function downloadPhotos(source = 'erp') {
   const period = qs('#dlc-photo-period')?.value || 'all';
   const provider = qs('#dlc-photo-provider')?.value || 'all';
   const filtered = getFilteredProducts(period, provider);
-  const productsWithPhotos = filtered.filter(p => getPhotosFromProduct(p).length > 0);
+  const productsWithPhotos = filtered.filter(p => getPhotosFromProduct(p, source).length > 0);
 
   if (!productsWithPhotos.length) {
     showToast('다운로드할 사진이 없습니다.', 'info');
@@ -83,16 +97,17 @@ async function downloadPhotos() {
     const zip = new JSZip();
     let completed = 0;
     let totalPhotos = 0;
-    productsWithPhotos.forEach(p => { totalPhotos += getPhotosFromProduct(p).length; });
+    productsWithPhotos.forEach(p => { totalPhotos += getPhotosFromProduct(p, source).length; });
 
     for (const product of productsWithPhotos) {
-      const photos = getPhotosFromProduct(product);
+      const photos = getPhotosFromProduct(product, source);
       const folderName = buildFolderName(product);
       const folder = zip.folder(folderName);
 
       for (let i = 0; i < photos.length; i++) {
         try {
-          const res = await fetch(photos[i]);
+          const url = source === 'external' ? `/api/proxy-image?url=${encodeURIComponent(photos[i])}` : photos[i];
+          const res = await fetch(url);
           if (!res.ok) continue;
           const blob = await res.blob();
           const ext = (blob.type || '').includes('png') ? 'png' : 'jpg';
@@ -113,7 +128,8 @@ async function downloadPhotos() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     const periodLabel = period === 'all' ? '전체' : `최근${period}일`;
-    a.download = `상품사진_${periodLabel}_${new Date().toISOString().slice(0, 10)}.zip`;
+    const sourceLabel = source === 'external' ? '외부링크' : 'ERP';
+    a.download = `상품사진_${sourceLabel}_${periodLabel}_${new Date().toISOString().slice(0, 10)}.zip`;
     a.click();
     URL.revokeObjectURL(a.href);
 
@@ -428,7 +444,8 @@ async function bootstrap() {
 
     qs('#dlc-photo-period')?.addEventListener('change', updatePhotoCount);
     qs('#dlc-photo-provider')?.addEventListener('change', updatePhotoCount);
-    qs('#dlc-photo-download')?.addEventListener('click', downloadPhotos);
+    qs('#dlc-photo-download')?.addEventListener('click', () => downloadPhotos('erp'));
+    qs('#dlc-photo-external')?.addEventListener('click', () => downloadPhotos('external'));
     qs('#dlc-photo-folder')?.addEventListener('click', downloadPhotosToFolder);
     qs('#dlc-excel-download')?.addEventListener('click', downloadExcel);
 

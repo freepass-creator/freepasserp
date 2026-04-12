@@ -356,6 +356,32 @@ def fetch_vehicle_master_source():
         return _api_error(str(error) or '차종 마스터 링크 처리 중 오류가 발생했습니다.', 500)
 
 
+@api_bp.route('/proxy-image', methods=['GET'])
+def proxy_image():
+    url = request.args.get('url', '').strip()
+    if not url:
+        return _api_error('url 파라미터가 필요합니다.')
+    parsed = urlparse(url)
+    allowed = ('drive.google.com', 'docs.google.com', 'lh3.googleusercontent.com', 'lh4.googleusercontent.com', 'lh5.googleusercontent.com', 'lh6.googleusercontent.com')
+    if parsed.hostname not in allowed:
+        return _api_error('허용되지 않는 도메인입니다.')
+    if 'drive.google.com' in url and '/file/d/' in url:
+        import re as _re
+        m = _re.search(r'/file/d/([^/]+)', url)
+        if m:
+            url = f'https://drive.google.com/uc?export=download&id={m.group(1)}'
+    try:
+        req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urlopen(req, timeout=15) as resp:
+            data = resp.read(MAX_DOWNLOAD_BYTES)
+            ct = resp.headers.get('Content-Type', 'image/jpeg')
+            return app.response_class(data, mimetype=ct, headers={'Cache-Control': 'public, max-age=86400'})
+    except HTTPError as e:
+        return _api_error(f'이미지를 가져올 수 없습니다. (HTTP {e.code})')
+    except Exception:
+        return _api_error('이미지 다운로드에 실패했습니다.')
+
+
 @api_bp.route('/integrity/storage-orphans', methods=['POST'])
 def check_storage_orphans():
     """
