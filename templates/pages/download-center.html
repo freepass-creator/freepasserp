@@ -1,0 +1,122 @@
+{% extends 'pages/layout/workspace.html' %}
+{% block workspace_page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/download-center.css') }}?v={{ app_version }}" data-page-style="true">
+{% endblock %}
+{% block page_title_text %}파일센터{% endblock %}
+{% block workspace_body %}
+<div class="work-page min-h-work dlc-shell">
+  <section class="panel dlc-panel">
+    <div class="panel-head panel-head-default">
+      <div class="panel-head-title-wrap">
+        <div class="panel-head-title">파일센터</div>
+      </div>
+    </div>
+    <div class="panel-body dlc-body">
+
+      <!-- ━━━ 다운로드 ━━━ -->
+      <div class="dlc-group-title">다운로드</div>
+
+      <section class="dlc-section">
+        <div class="dlc-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+          사진 다운로드
+        </div>
+        <div class="dlc-controls">
+          <div class="dlc-row">
+            <label class="dlc-label">기간</label>
+            <select id="dlc-photo-period" class="dlc-select">
+              <option value="all">전체</option>
+              <option value="7">최근 7일</option>
+              <option value="14">최근 14일</option>
+              <option value="30">최근 30일</option>
+            </select>
+          </div>
+          <div class="dlc-row">
+            <label class="dlc-label">공급사</label>
+            <select id="dlc-photo-provider" class="dlc-select">
+              <option value="all">전체</option>
+            </select>
+          </div>
+          <div class="dlc-row">
+            <label class="dlc-label">대상</label>
+            <span id="dlc-photo-count" class="dlc-count">-</span>
+          </div>
+          <button type="button" class="dlc-btn" id="dlc-photo-download">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+            사진 다운로드 (ZIP)
+          </button>
+        </div>
+        <div id="dlc-photo-progress" class="dlc-progress" hidden>
+          <div class="dlc-progress-bar"><div class="dlc-progress-fill" id="dlc-photo-fill"></div></div>
+          <span class="dlc-progress-text" id="dlc-photo-text">준비 중...</span>
+        </div>
+        <div class="dlc-hint">차량번호_제조사_모델명 폴더별로 묶여서 ZIP 다운로드됩니다.</div>
+      </section>
+
+      <section class="dlc-section">
+        <div class="dlc-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>
+          엑셀 다운로드
+        </div>
+        <div class="dlc-controls">
+          <div class="dlc-row">
+            <label class="dlc-label">공급사</label>
+            <select id="dlc-excel-provider" class="dlc-select">
+              <option value="all">전체</option>
+            </select>
+          </div>
+          <button type="button" class="dlc-btn" id="dlc-excel-download">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+            엑셀 다운로드 (CSV)
+          </button>
+        </div>
+      </section>
+
+      <!-- ━━━ 업로드 ━━━ -->
+      <div class="dlc-group-title">업로드</div>
+
+      <section class="dlc-section">
+        <div class="dlc-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8"/><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="m8 17 4-4 4 4"/></svg>
+          사진 폴더 업로드
+        </div>
+        <div class="dlc-controls">
+          <div class="dlc-drop" id="dlc-upload-drop">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+            <span>폴더를 선택하거나 드래그하세요</span>
+            <input type="file" id="dlc-upload-input" webkitdirectory multiple hidden>
+            <button type="button" class="dlc-btn dlc-btn--outline" id="dlc-upload-browse">폴더 선택</button>
+          </div>
+        </div>
+        <div id="dlc-upload-progress" class="dlc-progress" hidden>
+          <div class="dlc-progress-bar"><div class="dlc-progress-fill" id="dlc-upload-fill"></div></div>
+          <span class="dlc-progress-text" id="dlc-upload-text">업로드 중...</span>
+        </div>
+        <div class="dlc-hint-box">
+          <div class="dlc-hint-title">폴더 구조 안내</div>
+          <div class="dlc-hint">
+            폴더명을 <strong>차량번호</strong>로 만들어주세요.<br>
+            폴더 안에 해당 차량의 사진 파일을 넣으면 자동으로 매칭됩니다.
+          </div>
+          <div class="dlc-hint-example">
+            <code>
+              📁 12가3456/<br>
+              &nbsp;&nbsp;&nbsp;├ 전면.jpg<br>
+              &nbsp;&nbsp;&nbsp;├ 측면.jpg<br>
+              &nbsp;&nbsp;&nbsp;└ 후면.jpg<br>
+              📁 34나5678/<br>
+              &nbsp;&nbsp;&nbsp;├ 1.jpg<br>
+              &nbsp;&nbsp;&nbsp;└ 2.jpg
+            </code>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block workspace_page_js %}
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script type="module" src="{{ url_for('static', filename='js/pages/download-center.js') }}?v={{ app_version }}" data-page-script="true"></script>
+{% endblock %}

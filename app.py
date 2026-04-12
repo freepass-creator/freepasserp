@@ -175,6 +175,7 @@ _NEW_ROUTES = [
     ('/codes',         'code-manage.html',              '코드관리'),
     ('/request',       'request-manage.html',           '요청하기'),
     ('/upload-center', 'pages/upload-center.html',      '업로드센터'),
+    ('/download-center', 'pages/download-center.html',  '파일센터'),
 ]
 
 def _make_new_view(template: str, title: str):
