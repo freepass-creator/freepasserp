@@ -264,6 +264,12 @@ html.theme-classic.theme-dark .toggle-switch-track { background: #27272a; }
 html.theme-classic.theme-dark .pls-detail-panel,
 html.theme-classic.theme-dark .pls-detail-panel * { color-scheme: dark; }
 html.theme-classic.theme-dark .pls-detail-panel { background: #0c0c0e !important; }
+html.theme-classic.theme-dark .pls-detail-panel div,
+html.theme-classic.theme-dark .pls-detail-panel section,
+html.theme-classic.theme-dark .pls-detail-panel article,
+html.theme-classic.theme-dark .pls-detail-panel header,
+html.theme-classic.theme-dark .pls-detail-panel footer,
+html.theme-classic.theme-dark .pls-detail-panel nav { background-color: transparent; }
 html.theme-classic.theme-dark .pls-detail-panel .panel-body,
 html.theme-classic.theme-dark .pls-detail-panel .panel-body--detail { background: #0c0c0e !important; }
 html.theme-classic.theme-dark .md-card { background: #111113 !important; box-shadow: none !important; border: 1px solid #1f1f23 !important; }
