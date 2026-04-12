@@ -131,3 +131,66 @@ html.theme-classic.theme-dark .manage-idle-hint { color: #52525b; }
 /* 필터 */
 html.theme-classic.theme-dark .filter-overlay { background: #111113; border-color: #27272a; }
 html.theme-classic.theme-dark .filter-group-head { background: #18181b; color: #d4d4d8; }
+
+/* 상세 패널 (오른쪽) */
+html.theme-classic.theme-dark .pls-detail-panel { background: #111113; border-color: #27272a; box-shadow: -4px 0 20px rgba(0,0,0,0.4); }
+html.theme-classic.theme-dark .panel-body { background: #111113; }
+html.theme-classic.theme-dark .panel-body--detail { background: #111113; }
+
+/* 상품 상세 마크업 */
+html.theme-classic.theme-dark .md-card { background: #18181b; border-color: #27272a; }
+html.theme-classic.theme-dark .md-section-head { color: #d4d4d8; }
+html.theme-classic.theme-dark .md-section-head svg { color: #71717a; }
+html.theme-classic.theme-dark .md-table th { background: #1f1f23; color: #a1a1aa; border-color: #27272a; }
+html.theme-classic.theme-dark .md-table td { color: #d4d4d8; border-color: #27272a; background: #18181b; }
+html.theme-classic.theme-dark .md-row { border-color: #27272a; }
+html.theme-classic.theme-dark .md-row-label { color: #71717a; }
+html.theme-classic.theme-dark .md-row-value { color: #d4d4d8; }
+html.theme-classic.theme-dark .md-note { color: #52525b; background: #1f1f23; }
+
+/* 가격 히어로 */
+html.theme-classic.theme-dark .plist-detail__hero { background: #18181b; }
+html.theme-classic.theme-dark .plist-detail__price { color: #fafafa; }
+html.theme-classic.theme-dark .plist-detail__price-sub { color: #71717a; }
+
+/* 뱃지 색상 (다크 배경용) */
+html.theme-classic.theme-dark [class*="badge"] { opacity: 0.9; }
+html.theme-classic.theme-dark .manage-badge { background: #27272a; color: #d4d4d8; }
+
+/* 갤러리 */
+html.theme-classic.theme-dark .m-pd-gallery { background: #09090b; }
+
+/* 체크박스 */
+html.theme-classic.theme-dark input[type="checkbox"] { accent-color: #3b82f6; }
+
+/* 폼 그리드/스택 */
+html.theme-classic.theme-dark .form-stack { background: #111113; }
+html.theme-classic.theme-dark .form-grid { background: #111113; }
+html.theme-classic.theme-dark .manage-form-body { background: #111113; }
+html.theme-classic.theme-dark .manage-form-shell { background: #111113; }
+
+/* 모달/다이얼로그 */
+html.theme-classic.theme-dark .fp-modal-box { background: #18181b !important; }
+html.theme-classic.theme-dark .fp-modal-text { color: #fafafa; }
+html.theme-classic.theme-dark .fp-modal-btn--cancel { background: #27272a; color: #d4d4d8; }
+html.theme-classic.theme-dark .fp-modal-btn--ok { background: #3b82f6; }
+
+/* 탑바 상태 */
+html.theme-classic.theme-dark .top-bar-identity { color: #a1a1aa; }
+html.theme-classic.theme-dark .top-bar-work-badge { color: #71717a; }
+html.theme-classic.theme-dark .top-bar-logout-btn { color: #71717a; }
+html.theme-classic.theme-dark .top-bar-logout-btn:hover { color: #fafafa; }
+
+/* 사이드바 헤더 */
+html.theme-classic.theme-dark .sidebar-head { border-color: #1f1f23; }
+html.theme-classic.theme-dark .sidebar-toggle-btn { color: #71717a; }
+html.theme-classic.theme-dark .sidebar-toggle-btn:hover { color: #fafafa; }
+
+/* 링크 */
+html.theme-classic.theme-dark a { color: #60a5fa; }
+
+/* 전체 배경 잡기 */
+html.theme-classic.theme-dark .pls-grid-scroll { background: #111113; }
+html.theme-classic.theme-dark .pls-grid-panel { background: #111113; }
+html.theme-classic.theme-dark .panel--form { background: #111113; }
+html.theme-classic.theme-dark .panel--form .panel-body { background: #111113; }
