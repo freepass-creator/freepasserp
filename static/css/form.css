@@ -592,6 +592,17 @@ select {
   font-weight: 600;
 }
 
+.price-manage-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--form-control-height);
+  font-size: var(--font-size-main);
+  color: #94a3b8;
+  background: #f8fafc;
+  border-radius: var(--form-control-radius);
+}
+
 .price-manage-grid input {
   width: 100%;
   min-height: var(--form-control-height);

@@ -99,12 +99,19 @@ export function formatDateTime(value) {
   if (!timestamp) return '-';
   try { return new Intl.DateTimeFormat('ko-KR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(timestamp)); } catch { return '-'; }
 }
+function formatBizNum(value = '') {
+  const digits = String(value || '').replace(/[^0-9]/g, '');
+  if (digits.length !== 10) return digits || '-';
+  return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5)}`;
+}
+
 export function fillProfile(profile = {}) {
   const set = (id, value) => { const el = document.getElementById(id); if (el) el.value = value || ''; };
   set('settings-account-status', statusLabel(profile.status));
   set('settings-account-role', roleLabel(profile.role));
   set('settings-company-code', profile.company_code);
   set('settings-company-name', profile.company_name);
+  set('settings-business-number', formatBizNum(profile.business_number));
   set('settings-user-code', profile.user_code || profile.admin_code);
   set('settings-email', profile.email);
   set('settings-name', profile.name);

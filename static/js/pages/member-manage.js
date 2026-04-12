@@ -215,8 +215,8 @@ const STATUS_OPTIONS = [
   { value: 'rejected', label: '반려' },
 ];
 let _ctxMenu = null;
-function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.remove(); _ctxMenu = null; } }
-document.addEventListener('click', removeCtxMenu);
+function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.style.display = 'none'; _ctxMenu.remove(); _ctxMenu = null; } }
+document.addEventListener('pointerdown', (e) => { if (_ctxMenu && !_ctxMenu.contains(e.target)) removeCtxMenu(); }, true);
 document.addEventListener('scroll', removeCtxMenu, true);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
 

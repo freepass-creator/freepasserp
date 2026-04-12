@@ -3,7 +3,7 @@ import { applyManagementButtonTones, bindFilterOverlayToggle, createManagedFormM
 import { qs, registerPageCleanup, runPageCleanup } from '../core/utils.js';
 import { setDirtyCheck, clearDirtyCheck } from '../app.js';
 import { renderRoleMenu } from '../core/role-menu.js';
-import { deletePartner, savePartner, updatePartner, watchPartners } from '../firebase/firebase-db.js';
+import { deletePartner, savePartner, updatePartner, watchPartners, fetchUsersOnce, updateUserProfile } from '../firebase/firebase-db.js';
 import { storage } from '../firebase/firebase-config.js';
 import { ref as sRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 import { renderBadgeRow } from '../shared/badge.js';
@@ -194,6 +194,23 @@ async function handleSubmit() {
   const editingCode = editingCodeInput.value.trim();
   if (!editingCode) {
     const code = await savePartner(payload);
+    const bizNum = payload.business_number?.replace(/[^0-9]/g, '');
+    if (bizNum && bizNum !== '7777777777') {
+      try {
+        const users = await fetchUsersOnce();
+        const unmatchedUsers = users.filter(u => u.company_code === 'SP999' && u.business_number?.replace(/[^0-9]/g, '') === bizNum);
+        for (const u of unmatchedUsers) {
+          await updateUserProfile(u.uid, {
+            company_code: code, company_name: payload.partner_name,
+            matched_partner_code: code, matched_partner_name: payload.partner_name,
+            matched_partner_type: payload.partner_type,
+            match_status: 'matched',
+            role: payload.partner_type === 'provider' ? 'provider' : 'agent'
+          });
+        }
+        if (unmatchedUsers.length) showToast(`임시소속 ${unmatchedUsers.length}명이 자동 매칭되었습니다.`, 'success');
+      } catch (err) { console.error('[partner] auto-match error:', err); }
+    }
     showToast(`저장 완료: ${code}`, 'success');
     const saved = currentPartners.find((item) => item.partner_code === code) || { ...payload, partner_code: code };
     fillForm(saved);

@@ -52,7 +52,7 @@ function render() {
   $content.innerHTML = renderMobileProductDetail(p, {
     policies: allPolicies,
     activePhotoIndex,
-    showFee: true,
+    showFee: false,
   });
 
   // 갤러리 인터랙션

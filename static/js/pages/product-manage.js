@@ -570,8 +570,8 @@ function renderList(products) {
 // ─── 우클릭 컨텍스트 메뉴 (정보수정 / 상태변경 / 등록삭제) ──────────
 const VEHICLE_STATUS_OPTIONS = ['출고가능', '출고협의', '출고불가', '계약대기', '계약완료'];
 let _ctxMenu = null;
-function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.remove(); _ctxMenu = null; } }
-document.addEventListener('click', removeCtxMenu);
+function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.style.display = 'none'; _ctxMenu.remove(); _ctxMenu = null; } }
+document.addEventListener('pointerdown', (e) => { if (_ctxMenu && !_ctxMenu.contains(e.target)) removeCtxMenu(); }, true);
 document.addEventListener('scroll', removeCtxMenu, true);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
 

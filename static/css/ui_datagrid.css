@@ -379,6 +379,8 @@
   padding: 4px 0;
   min-width: 160px;
   font-family: inherit;
+  will-change: transform;
+  contain: layout style;
 }
 .pm-ctx-item {
   display: flex;

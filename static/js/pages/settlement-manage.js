@@ -77,6 +77,94 @@ let selectedCode = '';
 const productCache = new Map();
 let formMode = 'create';
 
+const SETTLE_STATUS_OPTIONS = [
+  { value: '정산대기', label: '정산대기' },
+  { value: '정산완료', label: '정산완료' },
+  { value: '정산보류', label: '정산보류' },
+  { value: '환수대기', label: '환수대기' },
+  { value: '환수결정', label: '환수결정' },
+];
+
+// ─── 우클릭 컨텍스트 메뉴 ──────────
+let _ctxMenu = null;
+function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.style.display = 'none'; _ctxMenu.remove(); _ctxMenu = null; } }
+document.addEventListener('pointerdown', (e) => { if (_ctxMenu && !_ctxMenu.contains(e.target)) removeCtxMenu(); }, true);
+document.addEventListener('scroll', removeCtxMenu, true);
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
+
+document.addEventListener('contextmenu', (e) => {
+  const row = e.target.closest('#settlement-list tr[data-key]');
+  if (!row) return;
+  e.preventDefault();
+  removeCtxMenu();
+  const code = row.dataset.key;
+  const item = currentSettlements.find(s => s.settlement_code === code);
+  if (!item) return;
+
+  const menu = document.createElement('div');
+  menu.className = 'pm-ctx-menu';
+  menu.innerHTML = `
+    <button type="button" class="pm-ctx-item" data-action="edit">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+      정보수정
+    </button>
+    <div class="pm-ctx-sub">
+      <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+        상태변경
+        <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div class="pm-ctx-submenu">
+        ${SETTLE_STATUS_OPTIONS.map(s =>
+          `<button type="button" class="pm-ctx-item" data-action="status" data-status="${escapeHtml(s.value)}">${escapeHtml(s.label)}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="pm-ctx-divider"></div>
+    <button type="button" class="pm-ctx-item pm-ctx-item--danger" data-action="delete">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+      등록삭제
+    </button>
+  `;
+  document.body.appendChild(menu);
+  _ctxMenu = menu;
+  menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;`;
+  requestAnimationFrame(() => {
+    const rect = menu.getBoundingClientRect();
+    if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 8}px`;
+    if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 8}px`;
+  });
+
+  menu.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    if (action === 'edit') {
+      removeCtxMenu();
+      fillForm(item);
+      applyFormMode('edit');
+    }
+    if (action === 'status') {
+      removeCtxMenu();
+      const contractCode = item.contract_code || item.settlement_code;
+      try {
+        await updateSettlement(contractCode, { settlement_status: btn.dataset.status, status: btn.dataset.status });
+        showToast(`상태 → ${btn.dataset.status}`, 'success');
+      } catch (err) { showToast('상태 변경 실패: ' + (err.message || err), 'error'); }
+    }
+    if (action === 'delete') {
+      removeCtxMenu();
+      if (!await showConfirm(`${item.settlement_code}\n삭제하시겠습니까?`)) return;
+      const contractCode = item.contract_code || item.settlement_code;
+      try {
+        await deleteSettlement(contractCode);
+        showToast('삭제 완료', 'success');
+        setIdleMode();
+      } catch (err) { showToast('삭제 실패: ' + (err.message || err), 'error'); }
+    }
+  });
+});
+
 const CHECK_KEYS = ['provider_confirmed', 'agent_confirmed', 'admin_confirmed'];
 
 let applySettlementFormMode = null;

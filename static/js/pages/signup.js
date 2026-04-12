@@ -20,9 +20,9 @@ async function updatePartnerPreview() {
   const businessNumber = normalizeBusinessNumber(businessNumberInput?.value || '');
   matchedPartner = null;
   if (!partnerPreview) return;
-  if (!businessNumber) {
-    partnerPreview.className = 'auth-match-badge auth-match-badge--unmatched';
-    partnerPreview.textContent = '매칭 대기';
+  if (!businessNumber || businessNumber === '7777777777') {
+    partnerPreview.className = 'auth-match-badge auth-match-badge--matched';
+    partnerPreview.textContent = '개인영업채널 / SP002';
     return;
   }
   try {
@@ -36,7 +36,7 @@ async function updatePartnerPreview() {
     const partner = json?.partner;
     if (!partner) {
       partnerPreview.className = 'auth-match-badge auth-match-badge--unmatched';
-      partnerPreview.textContent = '매칭되는 코드 없음';
+      partnerPreview.textContent = '임시소속 / SP999 (소속 미매칭)';
       return;
     }
     matchedPartner = partner;
@@ -78,30 +78,51 @@ form?.addEventListener('submit', async (event) => {
   try {
     const credential = await signupWithEmail(email, password);
     try {
-      const partner = matchedPartner || await getPartnerByBusinessNumber(businessNumber);
+      const isPersonal = !businessNumber || businessNumber === '7777777777';
+      const partner = isPersonal ? null : (matchedPartner || await getPartnerByBusinessNumber(businessNumber));
       const partnerType = partner?.partner_type || '';
-      const role = partnerType === 'provider' ? 'provider' : partnerType === 'sales_channel' ? 'agent' : '';
+      const role = partnerType === 'provider' ? 'provider' : 'agent';
 
-      await saveUserProfile(credential.user.uid, {
-        email,
-        name,
-        position,
-        phone,
-        business_number: businessNumber,
-        matched_partner_code: partner?.partner_code || '',
-        matched_partner_name: partner?.partner_name || '',
-        matched_partner_type: partnerType,
-        company_code: partner?.partner_code || '',
-        company_name: partner?.partner_name || '',
-        role,
-        status: 'pending',
-        user_code: '',
-        match_status: partner ? 'matched' : 'unmatched'
-      });
+      let profileData;
+      let resultMessage;
 
-      message.textContent = partner
-        ? '계정 생성 완료. 소속이 자동 매칭되었으며 관리자 승인 후 로그인할 수 있습니다.'
-        : '계정 생성 완료. 매칭되는 코드 없음 상태로 저장되었으며 관리자 확인 후 승인됩니다.';
+      if (isPersonal) {
+        profileData = {
+          email, name, position, phone,
+          business_number: '7777777777',
+          matched_partner_code: 'SP002', matched_partner_name: '개인영업채널',
+          matched_partner_type: 'sales_channel',
+          company_code: 'SP002', company_name: '개인영업채널',
+          role: 'agent', status: 'pending', user_code: '',
+          match_status: 'individual'
+        };
+        resultMessage = '계정 생성 완료. 개인 영업자로 등록되었으며 관리자 승인 후 로그인할 수 있습니다.';
+      } else if (!partner) {
+        profileData = {
+          email, name, position, phone,
+          business_number: businessNumber,
+          matched_partner_code: 'SP999', matched_partner_name: '임시소속',
+          matched_partner_type: 'sales_channel',
+          company_code: 'SP999', company_name: '임시소속',
+          role: 'agent', status: 'pending', user_code: '',
+          match_status: 'unmatched'
+        };
+        resultMessage = '계정 생성 완료. 소속이 확인되지 않아 임시소속으로 등록되었으며 관리자 확인 후 승인됩니다.';
+      } else {
+        profileData = {
+          email, name, position, phone,
+          business_number: businessNumber,
+          matched_partner_code: partner.partner_code, matched_partner_name: partner.partner_name,
+          matched_partner_type: partnerType,
+          company_code: partner.partner_code, company_name: partner.partner_name,
+          role, status: 'pending', user_code: '',
+          match_status: 'matched'
+        };
+        resultMessage = '계정 생성 완료. 소속이 자동 매칭되었으며 관리자 승인 후 로그인할 수 있습니다.';
+      }
+
+      await saveUserProfile(credential.user.uid, profileData);
+      message.textContent = resultMessage;
 
       setTimeout(() => {
         window.location.href = '/login';

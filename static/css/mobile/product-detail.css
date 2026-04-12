@@ -46,6 +46,7 @@
 
   background: var(--m-card-bg);
   padding: var(--m-page-pad);
+  padding-bottom: calc(var(--m-tabbar-h, 56px) + env(safe-area-inset-bottom) + var(--m-space-4));
 }
 
 /* ─── 갤러리 ──────────────────────────────────────── */

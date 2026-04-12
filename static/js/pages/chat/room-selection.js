@@ -63,7 +63,7 @@ export function createChatRoomSelectionController({
     detailCard.innerHTML = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
       activePhotoIndex: getActivePhotoIndex(),
       policy: termFields,
-      showFee: true,
+      showFee: false,
     })}</div>`;
     // 갤러리 이벤트
     bindChatDetailGallery(detailCard);

@@ -157,6 +157,25 @@
 .auth-helper a { color: #1b2a4a; text-decoration: none; font-weight: var(--font-weight-strong); }
 .auth-helper a:hover { color: #142038; }
 
+.auth-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-md);
+  color: #1f1f1f;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.auth-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #1b2a4a;
+  cursor: pointer;
+}
+
 .auth-match-badge {
   display: inline-flex;
   align-items: center;
