@@ -1,7 +1,10 @@
 /* ===== ADMIN PAGE ===== */
 
-.work-page.layout-39:has(.admin-workspace-panel) > :nth-child(1) { grid-column: 1 / span 2; }
-.work-page.layout-39:has(.admin-workspace-panel) > :nth-child(2) { grid-column: 3 / span 10; }
+.work-page.layout-39:has(.admin-workspace-panel) {
+  grid-template-columns: 12.5% 1fr !important;
+}
+.work-page.layout-39:has(.admin-workspace-panel) > :nth-child(1) { grid-column: auto; }
+.work-page.layout-39:has(.admin-workspace-panel) > :nth-child(2) { grid-column: auto; }
 
 .admin-filter-select {
   height: 32px;
