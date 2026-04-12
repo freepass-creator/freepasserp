@@ -197,7 +197,7 @@
   <script>
     // ⚡ Service Worker 등록 + 새 버전 감지 시 자동 reload
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/static/sw.js', { scope: '/' }).then(reg => {
+      navigator.serviceWorker.register('/static/sw.js?v={{ app_version }}', { scope: '/' }).then(reg => {
         reg.addEventListener('updatefound', () => {
           const nw = reg.installing;
           if (!nw) return;

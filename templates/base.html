@@ -87,7 +87,7 @@
     window.APP_VER='{{ app_version }}';
     requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.remove('no-transition')));
     if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('/static/sw.js').catch(()=>{});
+      navigator.serviceWorker.register('/static/sw.js?v={{ app_version }}').catch(()=>{});
       navigator.serviceWorker.addEventListener('message',(e)=>{if(e.data?.type==='SW_UPDATED')location.reload();});
     }
   </script>
