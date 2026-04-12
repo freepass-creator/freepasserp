@@ -209,17 +209,13 @@ async function downloadPhotosToFolder() {
   }
 }
 
-function downloadExcel() {
+async function downloadExcel() {
   const provider = qs('#dlc-excel-provider')?.value || 'all';
   let filtered = allProducts.filter(p => p.status !== 'deleted');
   if (provider !== 'all') {
     filtered = filtered.filter(p => (p.provider_company_code || p.partner_code || '') === provider);
   }
-
-  if (!filtered.length) {
-    showToast('다운로드할 상품이 없습니다.', 'info');
-    return;
-  }
+  if (!filtered.length) { showToast('다운로드할 상품이 없습니다.', 'info'); return; }
 
   const months = ['1', '12', '24', '36', '48', '60'];
   const headers = [
@@ -239,92 +235,115 @@ function downloadExcel() {
     '특이사항', '사진링크'
   ];
 
-  const data = filtered.map(p => {
+  const priceStartIdx = 16;
+  const priceEndIdx = 27;
+  const vehiclePriceIdx = 15;
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'FREEPASS ERP';
+  const ws = wb.addWorksheet('상품목록', { views: [{ state: 'frozen', ySplit: 1 }] });
+
+  const colWidths = headers.map(h => {
+    if (h === '사진링크') return 40;
+    if (h.includes('대여료') || h.includes('보증금') || h === '차량가격') return 14;
+    if (h.includes('옵션') || h.includes('트림') || h === '특이사항') return 18;
+    if (h === '상품코드') return 18;
+    return 11;
+  });
+
+  ws.columns = headers.map((h, i) => ({ header: h, key: h, width: colWidths[i] }));
+
+  const thinBorder = { style: 'thin', color: { argb: 'FFD0D5DD' } };
+  const border = { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
+  const bodyFont = { name: 'Pretendard', size: 9, color: { argb: 'FF1F2937' } };
+  const headerFont = { name: 'Pretendard', size: 9, bold: true, color: { argb: 'FF1B2A4A' } };
+  const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F4F9' } };
+  const priceFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFAFBFC' } };
+
+  const headerRow = ws.getRow(1);
+  headerRow.height = 22;
+  headerRow.eachCell((cell) => {
+    cell.font = headerFont;
+    cell.fill = headerFill;
+    cell.border = border;
+    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: false };
+  });
+
+  filtered.forEach(p => {
     const price = p.price || {};
     const photoUrls = Array.isArray(p.image_urls) ? p.image_urls : (p.image_url ? [p.image_url] : []);
     const photoLink = p.photo_link || '';
-    const photoDisplay = photoUrls.length ? photoUrls.join('\n') : photoLink || '';
+    const photoDisplay = photoUrls.length ? photoUrls[0] : photoLink || '';
 
-    const row = {};
-    row['공급코드'] = p.provider_company_code || p.partner_code || '';
-    row['상품코드'] = p.product_code || p.product_uid || '';
-    row['차량상태'] = p.vehicle_status || '';
-    row['상품구분'] = p.product_type || '';
-    row['차량번호'] = p.car_number || '';
-    row['제조사'] = p.maker || '';
-    row['모델명'] = p.model_name || '';
-    row['세부모델'] = p.sub_model || '';
-    row['세부트림'] = p.trim_name || p.trim || '';
-    row['선택옵션'] = p.options || '';
-    row['연료'] = p.fuel_type || '';
-    row['연식'] = p.year || '';
-    row['주행거리'] = p.mileage || '';
-    row['색상'] = p.ext_color || '';
-    row['차종구분'] = p.vehicle_class || '';
-    row['차량가격'] = Number(p.vehicle_price || 0) || '';
+    const values = [
+      p.provider_company_code || p.partner_code || '',
+      p.product_code || p.product_uid || '',
+      p.vehicle_status || '',
+      p.product_type || '',
+      p.car_number || '',
+      p.maker || '',
+      p.model_name || '',
+      p.sub_model || '',
+      p.trim_name || p.trim || '',
+      p.options || '',
+      p.fuel_type || '',
+      p.year || '',
+      p.mileage || '',
+      p.ext_color || '',
+      p.vehicle_class || '',
+      Number(p.vehicle_price || 0) || ''
+    ];
     months.forEach(m => {
       const slot = price[m] || {};
-      const label = m === '1' ? '월렌트' : m + '개월';
-      row[`${label}_대여료`] = Number(slot.rent || 0) || '';
-      row[`${label}_보증금`] = Number(slot.deposit || 0) || '';
+      values.push(Number(slot.rent || 0) || '', Number(slot.deposit || 0) || '');
     });
-    row['심사기준'] = p.review_status || '';
-    row['최저연령'] = p.min_age || '';
-    row['신용등급'] = p.credit_grade || '';
-    row['대인'] = p.bodily_limit || p.injury_limit_deductible || '';
-    row['대물'] = p.property_limit || p.property_limit_deductible || '';
-    row['자손'] = p.personal_injury_limit || p.personal_injury_limit_deductible || '';
-    row['무보험'] = p.uninsured_limit || p.uninsured_limit_deductible || '';
-    row['자차'] = p.own_damage || p.own_damage_limit_deductible || '';
-    row['운전자연령인하'] = p.driver_age_lowering || p.age_lowering || '';
-    row['연령인하비용'] = p.age_lowering_cost || '';
-    row['연간주행거리'] = p.annual_mileage || '';
-    row['결제방식'] = p.payment_method || '';
-    row['탁송비'] = p.delivery_fee || '';
-    row['위약금'] = p.penalty_rate || '';
-    row['특이사항'] = p.partner_memo || p.note || '';
-    row['사진링크'] = photoDisplay;
-    return row;
+    values.push(
+      p.review_status || '', p.min_age || '', p.credit_grade || '',
+      p.bodily_limit || p.injury_limit_deductible || '',
+      p.property_limit || p.property_limit_deductible || '',
+      p.personal_injury_limit || p.personal_injury_limit_deductible || '',
+      p.uninsured_limit || p.uninsured_limit_deductible || '',
+      p.own_damage || p.own_damage_limit_deductible || '',
+      p.driver_age_lowering || p.age_lowering || '',
+      p.age_lowering_cost || '',
+      p.annual_mileage || '',
+      p.payment_method || '',
+      p.delivery_fee || '',
+      p.penalty_rate || '',
+      p.partner_memo || p.note || '',
+      photoDisplay
+    );
+
+    const row = ws.addRow(values);
+    row.height = 18;
+    row.eachCell({ includeEmpty: true }, (cell, colNum) => {
+      cell.font = bodyFont;
+      cell.border = border;
+      cell.alignment = { vertical: 'middle', wrapText: false };
+      const ci = colNum - 1;
+      if (ci >= priceStartIdx && ci <= priceEndIdx || ci === vehiclePriceIdx) {
+        if (typeof cell.value === 'number' && cell.value > 0) {
+          cell.numFmt = '#,##0';
+        }
+        cell.alignment = { horizontal: 'right', vertical: 'middle' };
+        cell.fill = priceFill;
+      }
+      if (ci === headers.length - 1 && cell.value && String(cell.value).startsWith('http')) {
+        cell.value = { text: '사진 보기', hyperlink: String(cell.value) };
+        cell.font = { ...bodyFont, color: { argb: 'FF2563EB' }, underline: true };
+      }
+    });
   });
 
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.json_to_sheet(data, { header: headers });
+  ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: filtered.length + 1, column: headers.length } };
 
-  const colWidths = headers.map(h => {
-    if (h === '사진링크') return { wch: 50 };
-    if (h.includes('대여료') || h.includes('보증금') || h === '차량가격') return { wch: 14 };
-    if (h.includes('옵션') || h.includes('트림') || h === '특이사항') return { wch: 20 };
-    if (h === '상품코드') return { wch: 20 };
-    return { wch: 12 };
-  });
-  ws['!cols'] = colWidths;
-
-  const range = XLSX.utils.decode_range(ws['!ref']);
-  ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
-
-  const priceColStart = headers.indexOf('월렌트_대여료');
-  const priceColEnd = headers.indexOf('60개월_보증금');
-  const vehiclePriceCol = headers.indexOf('차량가격');
-  for (let r = 1; r <= range.e.r; r++) {
-    const cols = [vehiclePriceCol];
-    for (let c = priceColStart; c <= priceColEnd; c++) cols.push(c);
-    for (const c of cols) {
-      const addr = XLSX.utils.encode_cell({ r, c });
-      if (!ws[addr] || !ws[addr].v) continue;
-      ws[addr].t = 'n';
-      ws[addr].z = '#,##0';
-    }
-
-    const photoCol = headers.indexOf('사진링크');
-    const photoAddr = XLSX.utils.encode_cell({ r, c: photoCol });
-    if (ws[photoAddr] && ws[photoAddr].v && String(ws[photoAddr].v).startsWith('http')) {
-      const firstUrl = String(ws[photoAddr].v).split('\n')[0];
-      ws[photoAddr].l = { Target: firstUrl, Tooltip: '사진 보기' };
-    }
-  }
-
-  XLSX.utils.book_append_sheet(wb, ws, '상품목록');
-  XLSX.writeFile(wb, `상품목록_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `상품목록_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(a.href);
   showToast(`${filtered.length}건 엑셀 다운로드 완료`, 'success');
 }
 
