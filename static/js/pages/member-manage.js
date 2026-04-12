@@ -312,23 +312,28 @@ async function handleSave() {
     return;
   }
   const role = roleSelect.value;
-  const companyCode = companyCodeSelect.value;
+  let companyCode = companyCodeSelect.value;
+  let effectiveRole = role;
   if (!role) throw new Error('회원유형을 선택하세요.');
-  if (!companyCode && role !== 'admin') throw new Error('소속코드를 선택하세요.');
+  if (!companyCode && role !== 'admin') {
+    companyCode = 'SP999';
+    effectiveRole = 'agent';
+  }
 
   const selectedPartner = currentPartners.find((item) => item.partner_code === companyCode);
+  const isTemp = companyCode === 'SP999';
   const payload = {
     name: qs('#member_name').value.trim(),
     position: qs('#member_position').value.trim(),
     phone: qs('#member_phone').value.trim(),
     note: qs('#member_note').value.trim(),
-    role,
-    company_code: role === 'admin' ? 'admin' : companyCode,
-    company_name: qs('#member_company_name').value.trim() || (role === 'admin' ? '프리패스모빌리티' : ''),
-    matched_partner_code: role === 'admin' ? 'admin' : companyCode,
-    matched_partner_name: role === 'admin' ? '프리패스모빌리티' : (selectedPartner?.partner_name || ''),
-    matched_partner_type: role === 'provider' ? 'provider' : role === 'agent' ? 'sales_channel' : 'admin',
-    match_status: role === 'admin' ? 'matched' : (selectedPartner ? 'matched' : 'unmatched'),
+    role: effectiveRole,
+    company_code: effectiveRole === 'admin' ? 'admin' : companyCode,
+    company_name: effectiveRole === 'admin' ? '프리패스모빌리티' : (isTemp ? '임시소속' : (qs('#member_company_name').value.trim() || '')),
+    matched_partner_code: effectiveRole === 'admin' ? 'admin' : companyCode,
+    matched_partner_name: effectiveRole === 'admin' ? '프리패스모빌리티' : (isTemp ? '임시소속' : (selectedPartner?.partner_name || '')),
+    matched_partner_type: isTemp ? 'sales_channel' : (effectiveRole === 'provider' ? 'provider' : effectiveRole === 'agent' ? 'sales_channel' : 'admin'),
+    match_status: effectiveRole === 'admin' ? 'matched' : (isTemp ? 'unmatched' : (selectedPartner ? 'matched' : 'unmatched')),
     status: qs('#member_status').value
   };
 
