@@ -884,6 +884,7 @@ async function handleInquiry(btnEl) {
       agentUid: state.user.uid,
       agentCode: state.profile.user_code || '',
       agentName: state.profile.name || state.profile.user_name || '',
+      agentChannelCode: state.profile.company_code || '',
       vehicleNumber: product.carNo && product.carNo !== '-' ? product.carNo : '',
       modelName: [product.maker, product.model, product.subModel, product.trim].filter(v => v && v !== '-').join(' ')
     });

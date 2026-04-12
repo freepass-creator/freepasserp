@@ -536,7 +536,7 @@ function deriveRoomChatStatus(room = {}) {
 
 export async function ensureRoom({
   productUid = '', productCode = '', providerUid, providerCompanyCode, providerName = '',
-  agentUid, agentCode, agentName = '', vehicleNumber = '', modelName = ''
+  agentUid, agentCode, agentName = '', agentChannelCode = '', vehicleNumber = '', modelName = ''
 }) {
   const productReference = sanitizeCodeValue(productCode || productUid);
   const normalizedProductUid = sanitizeCodeValue(productUid);
@@ -553,6 +553,7 @@ export async function ensureRoom({
     provider_uid: providerUid || '', provider_company_code: providerCompanyCode || '',
     provider_name: providerName || '', agent_uid: agentUid || '',
     agent_code: agentCode || '', agent_name: agentName || '',
+    agent_channel_code: agentChannelCode || '',
     vehicle_number: vehicleNumber || '', model_name: modelName || '',
     last_message: '', last_message_at: 0, last_sender_role: '', last_sender_code: '',
     last_effective_sender_role: '', last_effective_sender_code: '',
@@ -573,6 +574,7 @@ export async function ensureRoom({
       provider_uid: providerUid || current.provider_uid || '', provider_company_code: providerCompanyCode || current.provider_company_code || '',
       provider_name: providerName || current.provider_name || '', agent_uid: agentUid || current.agent_uid || '',
       agent_code: agentCode || current.agent_code || '', agent_name: agentName || current.agent_name || '',
+      agent_channel_code: agentChannelCode || current.agent_channel_code || '',
       vehicle_number: vehicleNumber || current.vehicle_number || '', model_name: modelName || current.model_name || '',
       last_effective_sender_role: current.last_effective_sender_role || (current.last_sender_role === 'admin' ? '' : (current.last_sender_role || '')),
       last_effective_sender_code: current.last_effective_sender_code || (current.last_sender_role === 'admin' ? '' : (current.last_sender_code || '')),

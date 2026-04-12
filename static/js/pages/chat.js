@@ -385,6 +385,7 @@ async function bootstrap() {
             agentUid: user.uid,
             agentCode: profile.user_code,
             agentName: profile.name || '',
+            agentChannelCode: profile.company_code || '',
             vehicleNumber: product.carNo,
             modelName: [product.maker, product.model, product.subModel, product.trim].filter(Boolean).join(' ')
           }).then((roomId) => {

@@ -113,6 +113,7 @@ $btnChat?.addEventListener('click', async (e) => {
       agentUid: currentUser?.uid || '',
       agentCode: currentProfile?.user_code || '',
       agentName: currentProfile?.name || '',
+      agentChannelCode: currentProfile?.company_code || '',
       vehicleNumber: p.car_number || '',
       modelName: [p.maker, p.model_name, p.sub_model, p.trim_name].filter(v => v && v !== '-').join(' '),
     });

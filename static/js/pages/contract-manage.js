@@ -892,6 +892,7 @@ async function bootstrap() {
           agentUid: agentKey || currentProfile?.uid || '',
           agentCode: c.agent_code || currentProfile?.user_code || '',
           agentName: c.agent_name || currentProfile?.name || '',
+          agentChannelCode: c.agent_channel_code || currentProfile?.company_code || '',
           vehicleNumber: c.car_number || '',
           modelName: c.model_name || c.vehicle_name || ''
         });
