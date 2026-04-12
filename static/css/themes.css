@@ -229,5 +229,19 @@ html.theme-classic.theme-dark a:hover { color: #93bbfd !important; }
 /* ── 계약 체크 ── */
 html.theme-classic.theme-dark .contract-check-item span { color: var(--dk-text-secondary) !important; }
 
-/* ── 뱃지 ── */
-html.theme-classic.theme-dark .manage-badge { background: var(--dk-bg-selected) !important; color: var(--dk-text-secondary) !important; }
+/* ── 뱃지 (무채색 통일) ── */
+html.theme-classic.theme-dark .manage-badge,
+html.theme-classic.theme-dark [class*="badge"],
+html.theme-classic.theme-dark [class*="Badge"] {
+  filter: saturate(0) !important;
+  opacity: 0.85;
+}
+
+/* ── 상세 패널 배경 강제 (모든 depth) ── */
+html.theme-classic.theme-dark #productDetail,
+html.theme-classic.theme-dark #plsDetailPanel,
+html.theme-classic.theme-dark [class*="detail-panel"],
+html.theme-classic.theme-dark [class*="detail"] > div {
+  background: var(--dk-bg-base) !important;
+  color: var(--dk-text-primary) !important;
+}
