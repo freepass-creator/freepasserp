@@ -48,7 +48,7 @@ function populateProviderSelect(selectId) {
   if (!select) return;
   const providers = allPartners.filter(p => p.partner_type === 'provider' && p.status !== 'deleted');
   select.innerHTML = '<option value="all">전체</option>' +
-    providers.map(p => `<option value="${p.partner_code}">${p.partner_code} / ${p.partner_name}</option>`).join('');
+    providers.map(p => `<option value="${p.partner_code}">${p.partner_code}</option>`).join('');
 }
 
 function updatePhotoCount() {
