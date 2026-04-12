@@ -1,5 +1,5 @@
 import { watchAuth } from '../firebase/firebase-auth.js';
-import { getUserProfile } from '../firebase/firebase-db.js';
+import { getUserProfile, setLogProfile } from '../firebase/firebase-db.js';
 
 const PROFILE_CACHE_KEY = 'fp.profile.cache';
 const PROFILE_CACHE_TTL = 5 * 60 * 1000; // 5분
@@ -65,6 +65,7 @@ export async function requireAuth(options = {}) {
         return;
       }
       unsubscribe?.();
+      setLogProfile(profile);
       resolve({ user, profile });
     });
   });

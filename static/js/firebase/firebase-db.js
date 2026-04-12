@@ -14,7 +14,7 @@
 import {
   get, onValue, push, ref, remove, runTransaction, set, update
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
-import { db } from './firebase-config.js';
+import { db, auth } from './firebase-config.js';
 import {
   buildChatCode, buildLegacyTermCode, buildProductCode,
   createManagedTermCode, createPartnerCode, createUserCode, sanitizeCodeValue
@@ -24,6 +24,48 @@ import {
   fetchOne, isNotDeleted, isActive, queryByChild,
   limitToLast, query, orderByChild
 } from './firebase-db-helpers.js';
+
+// ─── 감사 로그 ──────────────────────────────────────────────────────────────
+
+function getCurrentUser() {
+  const user = auth.currentUser;
+  if (!user) return { uid: '', code: '', name: '' };
+  return { uid: user.uid, code: '', name: '' };
+}
+
+let _cachedProfile = null;
+export function setLogProfile(profile) { _cachedProfile = profile; }
+
+async function writeLog(action, targetType, targetId, changes = null) {
+  try {
+    const user = getCurrentUser();
+    const entry = {
+      timestamp: Date.now(),
+      user_uid: user.uid,
+      user_code: _cachedProfile?.user_code || _cachedProfile?.admin_code || '',
+      user_name: _cachedProfile?.name || '',
+      user_role: _cachedProfile?.role || '',
+      action,
+      target_type: targetType,
+      target_id: String(targetId || ''),
+    };
+    if (changes) entry.changes = changes;
+    await push(ref(db, 'logs'), entry);
+  } catch (_) {}
+}
+
+function diffChanges(before, after) {
+  const diff = {};
+  for (const key of Object.keys(after)) {
+    if (key === 'updated_at' || key === 'created_at') continue;
+    const bv = before?.[key];
+    const av = after[key];
+    if (JSON.stringify(bv) !== JSON.stringify(av)) {
+      diff[key] = { from: bv ?? '', to: av ?? '' };
+    }
+  }
+  return Object.keys(diff).length ? diff : null;
+}
 
 // ─── 공통 유틸 ───────────────────────────────────────────────────────────────
 
@@ -114,6 +156,7 @@ export async function updateUserProfile(uid, updates) {
     }
   }
   await set(userRef, next);
+  writeLog('update', 'user', next.user_code || next.email || uid, diffChanges(current, next));
   return uid;
 }
 
@@ -141,7 +184,9 @@ export async function updatePartner(partnerCode, updates) {
   const snapshot = await get(partnerRef);
   if (!snapshot.exists()) throw new Error('수정할 파트너가 없습니다.');
   const current = snapshot.val();
-  await set(partnerRef, { ...current, ...updates, partner_code: code, updated_at: Date.now() });
+  const next = { ...current, ...updates, partner_code: code, updated_at: Date.now() };
+  await set(partnerRef, next);
+  writeLog('update', 'partner', code, diffChanges(current, next));
   return code;
 }
 
@@ -512,6 +557,7 @@ export async function updateProduct(productIdentifier, updates) {
   await set(ref(db, `products/${productKey}`), next);
   await bindProductCodeAliases(productUid, [nextProductCode, previousProductCode, ...nextAliases]);
   await updateLinkedProductReferences({ productUid, previousProductCode, nextProductCode, previousCarNumber, nextCarNumber });
+  writeLog('update', 'product', nextCarNumber || productKey, diffChanges(current, next));
   return { productUid: productKey, productCode: nextProductCode };
 }
 
@@ -883,6 +929,7 @@ export async function updateContract(contractCode, updates) {
     updated_at: Date.now(),
   };
   await update(contractRef, patch);
+  writeLog('update', 'contract', code, diffChanges(current, next));
   if (next.contract_status === '계약완료') {
     const settlementRef = ref(db, `settlements/${code}`);
     const settlementSnapshot = await get(settlementRef);
@@ -946,7 +993,9 @@ export async function updateSettlement(contractCode, updates) {
   const snapshot = await get(stlRef);
   if (!snapshot.exists()) throw new Error('수정할 정산이 없습니다.');
   const current = snapshot.val() || {};
-  await set(stlRef, { ...current, ...updates, updated_at: Date.now() });
+  const next = { ...current, ...updates, updated_at: Date.now() };
+  await set(stlRef, next);
+  writeLog('update', 'settlement', current.settlement_code || code, diffChanges(current, next));
   return code;
 }
 
