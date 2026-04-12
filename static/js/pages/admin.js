@@ -56,7 +56,10 @@ const TAB_TITLES = {
   notice: '안내사항 관리',
   vehicle: '차종 관리',
   color: '색상 관리',
+  upload: '상품업로드',
 };
+
+let uploadFrameLoaded = false;
 
 function switchTab(tabKey) {
   adminMenu?.querySelectorAll('.admin-menu-item').forEach(btn => {
@@ -74,6 +77,13 @@ function switchTab(tabKey) {
   if (tabKey === 'notice') notice.onTabEnter();
   if (tabKey === 'vehicle') vehicleMaster.onTabEnter();
   if (tabKey === 'color') colorAdmin.onTabEnter();
+  if (tabKey === 'upload' && !uploadFrameLoaded) {
+    const frame = document.getElementById('adminUploadFrame');
+    if (frame) {
+      frame.src = '/upload-center?embed=1';
+      uploadFrameLoaded = true;
+    }
+  }
 
   const identity = document.getElementById('topBarIdentity');
   const sep = document.getElementById('topBarStateSep');
