@@ -206,39 +206,109 @@ function downloadExcel() {
   }
 
   const months = ['1', '12', '24', '36', '48', '60'];
-  const headers = ['공급코드', '차량번호', '제조사', '모델명', '세부모델', '세부트림', '선택옵션', '연료', '연식', '주행거리', '색상', '차종구분'];
-  months.forEach(m => { headers.push(`${m}개월_대여료`, `${m}개월_보증금`); });
+  const headers = [
+    '공급코드', '상품코드', '차량상태', '상품구분',
+    '차량번호', '제조사', '모델명', '세부모델', '세부트림', '선택옵션',
+    '연료', '연식', '주행거리', '색상', '차종구분', '차량가격',
+    '월렌트_대여료', '월렌트_보증금',
+    '12개월_대여료', '12개월_보증금',
+    '24개월_대여료', '24개월_보증금',
+    '36개월_대여료', '36개월_보증금',
+    '48개월_대여료', '48개월_보증금',
+    '60개월_대여료', '60개월_보증금',
+    '심사기준', '최저연령', '신용등급',
+    '대인', '대물', '자손', '무보험', '자차',
+    '운전자연령인하', '연령인하비용', '연간주행거리',
+    '결제방식', '탁송비', '위약금',
+    '특이사항', '사진링크'
+  ];
 
-  const rows = filtered.map(p => {
-    const row = [
-      p.provider_company_code || p.partner_code || '',
-      p.car_number || p.carNo || '',
-      p.maker || '',
-      p.model_name || p.model || '',
-      p.sub_model || p.subModel || '',
-      p.trim || '',
-      p.options || '',
-      p.fuel || '',
-      p.year || '',
-      p.mileage || '',
-      p.color || '',
-      p.vehicle_class || ''
-    ];
+  const data = filtered.map(p => {
+    const price = p.price || {};
+    const photoUrls = Array.isArray(p.image_urls) ? p.image_urls : (p.image_url ? [p.image_url] : []);
+    const photoLink = p.photo_link || '';
+    const photoDisplay = photoUrls.length ? photoUrls.join('\n') : photoLink || '';
+
+    const row = {};
+    row['공급코드'] = p.provider_company_code || p.partner_code || '';
+    row['상품코드'] = p.product_code || p.product_uid || '';
+    row['차량상태'] = p.vehicle_status || '';
+    row['상품구분'] = p.product_type || '';
+    row['차량번호'] = p.car_number || '';
+    row['제조사'] = p.maker || '';
+    row['모델명'] = p.model_name || '';
+    row['세부모델'] = p.sub_model || '';
+    row['세부트림'] = p.trim_name || p.trim || '';
+    row['선택옵션'] = p.options || '';
+    row['연료'] = p.fuel_type || '';
+    row['연식'] = p.year || '';
+    row['주행거리'] = p.mileage || '';
+    row['색상'] = p.ext_color || '';
+    row['차종구분'] = p.vehicle_class || '';
+    row['차량가격'] = Number(p.vehicle_price || 0) || '';
     months.forEach(m => {
-      const slot = p.price?.[m] || {};
-      row.push(slot.rent || '', slot.deposit || '');
+      const slot = price[m] || {};
+      const label = m === '1' ? '월렌트' : m + '개월';
+      row[`${label}_대여료`] = Number(slot.rent || 0) || '';
+      row[`${label}_보증금`] = Number(slot.deposit || 0) || '';
     });
+    row['심사기준'] = p.review_status || '';
+    row['최저연령'] = p.min_age || '';
+    row['신용등급'] = p.credit_grade || '';
+    row['대인'] = p.bodily_limit || p.injury_limit_deductible || '';
+    row['대물'] = p.property_limit || p.property_limit_deductible || '';
+    row['자손'] = p.personal_injury_limit || p.personal_injury_limit_deductible || '';
+    row['무보험'] = p.uninsured_limit || p.uninsured_limit_deductible || '';
+    row['자차'] = p.own_damage || p.own_damage_limit_deductible || '';
+    row['운전자연령인하'] = p.driver_age_lowering || p.age_lowering || '';
+    row['연령인하비용'] = p.age_lowering_cost || '';
+    row['연간주행거리'] = p.annual_mileage || '';
+    row['결제방식'] = p.payment_method || '';
+    row['탁송비'] = p.delivery_fee || '';
+    row['위약금'] = p.penalty_rate || '';
+    row['특이사항'] = p.partner_memo || p.note || '';
+    row['사진링크'] = photoDisplay;
     return row;
   });
 
-  const bom = '\uFEFF';
-  const csv = bom + [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `상품목록_${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data, { header: headers });
+
+  const colWidths = headers.map(h => {
+    if (h === '사진링크') return { wch: 50 };
+    if (h.includes('대여료') || h.includes('보증금') || h === '차량가격') return { wch: 14 };
+    if (h.includes('옵션') || h.includes('트림') || h === '특이사항') return { wch: 20 };
+    if (h === '상품코드') return { wch: 20 };
+    return { wch: 12 };
+  });
+  ws['!cols'] = colWidths;
+
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
+
+  const priceColStart = headers.indexOf('월렌트_대여료');
+  const priceColEnd = headers.indexOf('60개월_보증금');
+  const vehiclePriceCol = headers.indexOf('차량가격');
+  for (let r = 1; r <= range.e.r; r++) {
+    const cols = [vehiclePriceCol];
+    for (let c = priceColStart; c <= priceColEnd; c++) cols.push(c);
+    for (const c of cols) {
+      const addr = XLSX.utils.encode_cell({ r, c });
+      if (!ws[addr] || !ws[addr].v) continue;
+      ws[addr].t = 'n';
+      ws[addr].z = '#,##0';
+    }
+
+    const photoCol = headers.indexOf('사진링크');
+    const photoAddr = XLSX.utils.encode_cell({ r, c: photoCol });
+    if (ws[photoAddr] && ws[photoAddr].v && String(ws[photoAddr].v).startsWith('http')) {
+      const firstUrl = String(ws[photoAddr].v).split('\n')[0];
+      ws[photoAddr].l = { Target: firstUrl, Tooltip: '사진 보기' };
+    }
+  }
+
+  XLSX.utils.book_append_sheet(wb, ws, '상품목록');
+  XLSX.writeFile(wb, `상품목록_${new Date().toISOString().slice(0, 10)}.xlsx`);
   showToast(`${filtered.length}건 엑셀 다운로드 완료`, 'success');
 }
 

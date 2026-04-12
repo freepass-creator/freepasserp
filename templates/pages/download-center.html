@@ -72,7 +72,7 @@
           </div>
           <button type="button" class="dlc-btn" id="dlc-excel-download">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
-            엑셀 다운로드 (CSV)
+            엑셀 다운로드 (.xlsx)
           </button>
         </div>
       </section>
@@ -150,5 +150,6 @@
 {% endblock %}
 {% block workspace_page_js %}
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/pages/download-center.js') }}" data-page-script="true"></script>
 {% endblock %}
