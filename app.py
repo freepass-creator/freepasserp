@@ -113,12 +113,20 @@ def _build_google_sheet_csv_url(source_url: str) -> str:
     return f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={quote(str(gid))}'
 
 
+MAX_DOWNLOAD_BYTES = 10 * 1024 * 1024  # 10MB
+
 def _download_text(url: str) -> str:
     request_obj = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     with urlopen(request_obj, timeout=20) as response:
+        length = response.headers.get('Content-Length')
+        if length and int(length) > MAX_DOWNLOAD_BYTES:
+            raise ValueError('데이터가 너무 큽니다 (최대 10MB)')
         charset = response.headers.get_content_charset() or 'utf-8'
         content_type = response.headers.get('Content-Type', '')
-        body = response.read().decode(charset, errors='replace')
+        body = response.read(MAX_DOWNLOAD_BYTES + 1)
+        if len(body) > MAX_DOWNLOAD_BYTES:
+            raise ValueError('데이터가 너무 큽니다 (최대 10MB)')
+        body = body.decode(charset, errors='replace')
         # CSV로 명시되거나, HTML이 아니면 통과
         if 'text/csv' in content_type:
             return body
