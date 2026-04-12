@@ -11,9 +11,12 @@
   z-index: 100;
 }
 .m-body:has(.m-cr) .m-page {
-  padding-top: 48px; /* 상단바 fixed → 본문 시작점 보정 */
+  padding-top: 48px;
   padding-bottom: 0;
   height: 100svh;
+}
+.m-body:has(.m-cr) .m-page::after {
+  display: none;
 }
 .m-body:has(.m-cr) .m-tabbar {
   display: none;
