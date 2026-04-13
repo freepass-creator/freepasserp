@@ -69,6 +69,25 @@
 </div>
 </section>
 <section class="form-section">
+<div class="section-title"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>요청서류</div>
+<div class="field full" id="cc-doc-editor-field">
+<label for="cc-docs">면허증 및 요청서류</label>
+<div class="upload-dropzone" id="cc-doc-dropzone">
+<input accept="image/*,.pdf,.jpg,.jpeg,.png,.webp,.heic" id="cc-docs" multiple type="file"/>
+<svg class="upload-dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+<div class="upload-dropzone-text">파일을 드래그하거나 여기를 눌러 업로드</div>
+<div class="upload-dropzone-sub">면허증, 신분증, 기타 요청서류를 등록합니다.</div>
+</div>
+</div>
+<div class="field full">
+<div class="img-thumb-list" id="cc-doc-list"></div>
+<div class="img-thumb-footer" id="cc-doc-toolbar">
+<span class="img-thumb-summary" id="cc-doc-summary">등록된 서류가 없습니다.</span>
+<button class="inline-button btn-tone-hide" id="cc-doc-clear" type="button">전체 삭제</button>
+</div>
+</div>
+</section>
+<section class="form-section">
 <div class="section-title"><svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/></svg>기본정보</div>
 <div class="form-grid">
 <div class="field"><label for="cc-contract_status">계약상태</label><select id="cc-contract_status"><option value="계약대기">계약대기</option><option value="계약요청">계약요청</option><option value="계약발송">계약발송</option><option value="계약완료">계약완료</option><option value="계약철회">계약철회</option></select></div>
@@ -97,25 +116,6 @@
 <div class="field"><label for="cc-customer_birth">생년월일</label><input id="cc-customer_birth" placeholder="예: 900101"/></div>
 <div class="field"><label for="cc-customer_phone">연락처</label><input id="cc-customer_phone" placeholder="예: 010-0000-0000"/></div>
 <div class="field full"><button type="button" class="inline-button btn-tone-edit" id="cc-reveal-btn" style="width:100%"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="16" r="1"/><rect x="3" y="10" width="18" height="12" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg> 개인정보 원본 열람</button></div>
-</div>
-</section>
-<section class="form-section">
-<div class="section-title"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>요청서류</div>
-<div class="field full" id="cc-doc-editor-field">
-<label for="cc-docs">면허증 및 요청서류</label>
-<div class="upload-dropzone" id="cc-doc-dropzone">
-<input accept="image/*,.pdf,.jpg,.jpeg,.png,.webp,.heic" id="cc-docs" multiple type="file"/>
-<svg class="upload-dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-<div class="upload-dropzone-text">파일을 드래그하거나 여기를 눌러 업로드</div>
-<div class="upload-dropzone-sub">면허증, 신분증, 기타 요청서류를 등록합니다.</div>
-</div>
-</div>
-<div class="field full">
-<div class="img-thumb-list" id="cc-doc-list"></div>
-<div class="img-thumb-footer" id="cc-doc-toolbar">
-<span class="img-thumb-summary" id="cc-doc-summary">등록된 서류가 없습니다.</span>
-<button class="inline-button btn-tone-hide" id="cc-doc-clear" type="button">전체 삭제</button>
-</div>
 </div>
 </section>
 </form>
