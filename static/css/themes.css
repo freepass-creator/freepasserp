@@ -6,7 +6,7 @@
 
 html.theme-classic {
   --radius-xs: 0; --radius-sm: 0; --radius-md: 0; --radius-lg: 0;
-  --radius-pill: 0; --radius-ui: 0;
+  --radius-pill: 999px; --radius-ui: 0;
   --new-bg-app: #ffffff; --new-bg-main: #ffffff;
   --new-bg-sidebar: #fafaf8; --new-bg-panel-head: #fafaf8;
   --surface-subtle: #fafafa; --surface-hover: #f5f5f5;
