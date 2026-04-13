@@ -535,6 +535,74 @@ async function bootstrap() {
     });
 
 
+    // ─── 대화 목록 우클릭 컨텍스트 메뉴 ──────────
+    let _chatCtx = null;
+    const removeChatCtx = () => { if (_chatCtx) { _chatCtx.remove(); _chatCtx = null; } };
+    document.addEventListener('click', removeChatCtx);
+    document.addEventListener('scroll', removeChatCtx, true);
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeChatCtx(); });
+
+    document.addEventListener('contextmenu', (e) => {
+      const row = e.target.closest('#room-list tr[data-management-key]');
+      if (!row) return;
+      e.preventDefault();
+      removeChatCtx();
+      const roomId = row.dataset.managementKey;
+      const room = visibleRoomsCache.find(r => r.room_id === roomId);
+      if (!room) return;
+      const isAdmin = currentProfile?.role === 'admin';
+
+      const ctxMenu = document.createElement('div');
+      ctxMenu.className = 'pm-ctx-menu';
+      let html = `
+        <button type="button" class="pm-ctx-item" data-action="hide">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          숨기기
+        </button>`;
+      if (isAdmin) {
+        html += `
+          <div class="pm-ctx-divider"></div>
+          <button type="button" class="pm-ctx-item pm-ctx-item--danger" data-action="delete">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            삭제
+          </button>`;
+      }
+      ctxMenu.innerHTML = html;
+      document.body.appendChild(ctxMenu);
+      _chatCtx = ctxMenu;
+      ctxMenu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;`;
+      requestAnimationFrame(() => {
+        const rect = ctxMenu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) ctxMenu.style.left = `${window.innerWidth - rect.width - 8}px`;
+        if (rect.bottom > window.innerHeight) ctxMenu.style.top = `${window.innerHeight - rect.height - 8}px`;
+      });
+
+      ctxMenu.addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('[data-action]');
+        if (!btn) return;
+        const action = btn.dataset.action;
+        if (action === 'hide') {
+          removeChatCtx();
+          if (!await showConfirm('이 대화를 목록에서 숨기시겠습니까?')) return;
+          try {
+            localHiddenRoomIds.add(roomId);
+            await hideRoomForUser(roomId, user.uid);
+            if (currentRoomId === roomId) await roomSelectionController.moveToNextRoomAfterRemoval(visibleRoomsCache);
+            showToast('대화를 숨겼습니다.', 'success');
+          } catch (err) { showToast('숨김 실패: ' + (err.message || err), 'error'); }
+        }
+        if (action === 'delete') {
+          removeChatCtx();
+          if (!await showConfirm('이 대화를 완전히 삭제하시겠습니까?\n메시지도 모두 삭제됩니다.')) return;
+          try {
+            await deleteRoomEverywhere(roomId);
+            if (currentRoomId === roomId) { currentRoomId = null; openedRoomId = null; }
+            showToast('대화를 삭제했습니다.', 'success');
+          } catch (err) { showToast('삭제 실패: ' + (err.message || err), 'error'); }
+        }
+      });
+    });
+
     // 초기: 대화방 미선택 → 입력폼 비활성 (preferredRoomId 있으면 이미 선택된 상태)
     if (!currentRoomId) messageForm?.classList.add('is-disabled');
 
