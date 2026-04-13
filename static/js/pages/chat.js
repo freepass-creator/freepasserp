@@ -556,11 +556,11 @@ async function bootstrap() {
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeChatCtx(); });
 
     document.addEventListener('contextmenu', (e) => {
-      const row = e.target.closest('#room-list tr[data-management-key]');
+      const row = e.target.closest('#room-list tr[data-key]');
       if (!row) return;
       e.preventDefault();
       removeChatCtx();
-      const roomId = row.dataset.managementKey;
+      const roomId = row.dataset.key;
       const room = visibleRoomsCache.find(r => r.room_id === roomId);
       if (!room) return;
       const isAdmin = currentProfile?.role === 'admin';
