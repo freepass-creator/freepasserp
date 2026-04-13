@@ -87,7 +87,7 @@
   position: absolute;
   inset: 0;
   background: #d1d5db;
-  border-radius: var(--radius-pill);
+  border-radius: 999px !important;
   cursor: pointer;
   transition: background var(--transition-normal);
 }
@@ -99,7 +99,7 @@
   width: 14px;
   height: 14px;
   background: #fff;
-  border-radius: var(--radius-circle);
+  border-radius: 50% !important;
   transition: transform var(--transition-normal);
 }
 .toggle-switch input:checked + .toggle-switch-track {
