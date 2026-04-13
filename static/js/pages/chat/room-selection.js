@@ -45,14 +45,16 @@ export function createChatRoomSelectionController({
   getActivePhotoIndex,
   setActivePhotoIndex,
   getOpenedRoomId,
-  setOpenedRoomId
+  setOpenedRoomId,
+  onRoomOpened
 }) {
   let unsubscribeMessages = null;
 
   function renderCurrentDetail() {
+    if (!detailCard) return;
     const product = getCurrentProduct();
     if (!product) {
-      if (detailTitle) detailTitle.textContent = '상세정보';
+      if (detailTitle) detailTitle.textContent = '계약정보';
       detailCard.innerHTML = '<div class="detail-empty">선택된 대화의 상품정보가 없습니다.</div>';
       return;
     }
@@ -65,7 +67,6 @@ export function createChatRoomSelectionController({
       policy: termFields,
       showFee: false,
     })}</div>`;
-    // 갤러리 이벤트
     bindChatDetailGallery(detailCard);
     ensureChatTermLoaded(product);
   }
@@ -77,7 +78,7 @@ export function createChatRoomSelectionController({
     unsubscribeMessages?.();
     unsubscribeMessages = null;
     if (chatCode) chatCode.textContent = '대화코드 없음';
-    if (detailTitle) detailTitle.textContent = '상세정보';
+    if (detailTitle) detailTitle.textContent = '계약정보';
     roomList?.querySelectorAll('[data-management-key]').forEach((element) => {
       element.classList.remove('is-selected');
       element.classList.remove('active');
@@ -105,7 +106,9 @@ export function createChatRoomSelectionController({
 
     const _profile = getCurrentProfile();
     const _user = getCurrentUser();
-    await markRoomRead(room.room_id, _profile?.role, _user?.uid);
+    if (_profile?.role !== 'agent_manager') {
+      await markRoomRead(room.room_id, _profile?.role, _user?.uid);
+    }
 
     unsubscribeMessages?.();
     unsubscribeMessages = watchMessages(room.room_id, (messages) => {
@@ -123,6 +126,8 @@ export function createChatRoomSelectionController({
       sep.hidden = false;
       if (badge) badge.textContent = '채팅';
     }
+
+    if (typeof onRoomOpened === 'function') onRoomOpened(room);
   }
 
   async function moveToNextRoomAfterRemoval(visibleRoomsCache = []) {
@@ -138,7 +143,7 @@ export function createChatRoomSelectionController({
     const currentProfile = getCurrentProfile();
     if (!currentProfile) return;
     // 대화 패널 헤드 버튼: 숨김/삭제는 역할별, 상세 버튼은 상품 연결 시 표시
-    if (currentProfile.role === 'agent') {
+    if (currentProfile.role === 'agent' || currentProfile.role === 'agent_manager') {
       if (deleteRoomBtn) deleteRoomBtn.style.display = 'none';
       if (hideRoomBtn) hideRoomBtn.style.display = '';
     } else if (currentProfile.role === 'provider' || currentProfile.role === 'admin') {

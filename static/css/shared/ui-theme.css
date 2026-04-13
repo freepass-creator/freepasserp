@@ -82,7 +82,7 @@ input[type="checkbox"] {
   padding: 0 !important;
   margin: 0;
   border: 1.5px solid #9ca3af;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   background: #fff;
   cursor: pointer;
   position: relative;
@@ -502,7 +502,7 @@ body[data-page] img {
   background: transparent;
   border-color: transparent;
   color: var(--text-subtle, #5f6368);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .panel-head-actions .inline-button.btn-icon-only:hover {

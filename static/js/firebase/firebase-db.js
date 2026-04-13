@@ -567,6 +567,45 @@ export async function deleteProduct(productIdentifier) {
   return remove(ref(db, `products/${record.key}`));
 }
 
+/** 외부 시트 동기화 전용 — uid 기준 직접 저장/삭제 */
+export async function syncExternalProducts(newProducts = {}, providerCode = '') {
+  // 1. 기존 외부 상품 가져오기
+  const snapshot = await get(ref(db, 'products'));
+  const existing = snapshot.val() || {};
+  const existingExtKeys = new Set();
+  for (const [key, val] of Object.entries(existing)) {
+    if (val?.source === 'external_sheet' && val?.provider_company_code === providerCode) {
+      existingExtKeys.add(key);
+    }
+  }
+
+  const newKeys = new Set(Object.keys(newProducts));
+  let added = 0, updated = 0, deleted = 0;
+
+  // 2. 신규/업데이트
+  for (const [uid, product] of Object.entries(newProducts)) {
+    if (existingExtKeys.has(uid)) {
+      // 기존 — created_at 유지, updated_at만 갱신
+      const kept = { ...product, created_at: existing[uid]?.created_at || product.created_at, updated_at: Date.now() };
+      await set(ref(db, `products/${uid}`), kept);
+      updated++;
+    } else {
+      await set(ref(db, `products/${uid}`), { ...product, created_at: Date.now(), updated_at: Date.now() });
+      added++;
+    }
+  }
+
+  // 3. 시트에 없는 기존 외부 상품 삭제
+  for (const key of existingExtKeys) {
+    if (!newKeys.has(key)) {
+      await remove(ref(db, `products/${key}`));
+      deleted++;
+    }
+  }
+
+  return { added, updated, deleted };
+}
+
 export async function getProduct(productIdentifier) {
   const record = await findProductRecord(productIdentifier);
   return record ? (record.product || null) : null;

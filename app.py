@@ -465,6 +465,258 @@ def internal_error(e):
     return redirect(url_for('auth.login'))
 
 
+@api_bp.route('/sync/external-sheet', methods=['POST'])
+def sync_external_sheet():
+    """외부 구글시트 → JSON 파싱 (클라이언트가 Firebase에 저장)"""
+    import json, urllib.request, hashlib
+    from datetime import datetime
+
+    SHEETS_API_KEY = 'AIzaSyBSPo1kZOefX-6NuHoQdUF1htqQDSxXsCs'
+    SHEET_ID = '1TJBG4PABgly7EtGG6Os5GcY9La7kDR_yex56KHhXe2U'
+    TAB_NAME = '판매차량리스트(수수료100)'
+    PROVIDER_CODE = 'RP023'
+
+    try:
+        encoded_tab = quote(TAB_NAME)
+        # 1a. 셀 값 읽기
+        sheets_url = f'https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{encoded_tab}?key={SHEETS_API_KEY}'
+        req_obj = urllib.request.Request(sheets_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req_obj, timeout=30) as resp:
+            sheet_data = json.loads(resp.read().decode('utf-8'))
+
+        rows = sheet_data.get('values', [])
+        if not rows:
+            return jsonify({'ok': False, 'message': '시트 데이터 없음'}), 400
+
+        # 1b. 하이퍼링크 읽기 (차량번호 셀에 사진 링크)
+        hyperlink_map = {}  # row_idx -> url
+        try:
+            meta_url = f'https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}?ranges={encoded_tab}&fields=sheets.data.rowData.values.hyperlink&key={SHEETS_API_KEY}'
+            meta_req = urllib.request.Request(meta_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(meta_req, timeout=30) as resp:
+                meta_data = json.loads(resp.read().decode('utf-8'))
+            sheets_list = meta_data.get('sheets', [])
+            if sheets_list:
+                row_data = sheets_list[0].get('data', [{}])[0].get('rowData', [])
+                for ri, rd in enumerate(row_data):
+                    cells = rd.get('values', [])
+                    for cell in cells:
+                        link = cell.get('hyperlink', '')
+                        if link:
+                            hyperlink_map[ri] = link
+                            break  # 행당 첫 번째 하이퍼링크 (차량번호)
+        except Exception:
+            pass  # 하이퍼링크 실패해도 진행
+
+        # 헤더 찾기
+        header_idx = None
+        headers = []
+        for i, row in enumerate(rows):
+            row_str = [str(c).strip() for c in row]
+            if '차량번호' in row_str:
+                header_idx = i
+                headers = row_str
+                break
+        if header_idx is None:
+            return jsonify({'ok': False, 'message': '헤더 행을 찾을 수 없음'}), 400
+
+        def col_idx(name):
+            try: return headers.index(name)
+            except ValueError: return -1
+
+        idx_car = col_idx('차량번호')
+        idx_model_short = col_idx('차종') if '차종' in headers else col_idx('모델명')
+        idx_model_full = -1
+        for i, h in enumerate(headers):
+            if i != idx_model_short and i > idx_model_short and ('모델' in h or '차명' in h or '세부' in h):
+                idx_model_full = i; break
+        # 차종 바로 옆이 풀네임인 패턴
+        if idx_model_full == -1 and idx_model_short >= 0 and idx_model_short + 1 < len(headers):
+            next_h = headers[idx_model_short + 1]
+            if next_h and next_h not in ('색상', '연료', '주행거리(예상)'):
+                idx_model_full = idx_model_short + 1
+
+        idx_color = col_idx('색상')
+        idx_fuel = col_idx('연료')
+        idx_mileage = col_idx('주행거리(예상)')
+        idx_reg_date = col_idx('최초등록일')
+        idx_location = col_idx('현위치')
+        idx_status = col_idx('판매상태')
+        idx_options = -1
+        for c in ['비고', '옵션']:
+            ci = col_idx(c)
+            if ci >= 0: idx_options = ci; break
+
+        # 가격 컬럼 (3만km 기준: 12/24/36)
+        idx_rent_12 = idx_rent_24 = idx_rent_36 = -1
+        for i, h in enumerate(headers):
+            hl = h.replace(' ', '')
+            if '12개월' in hl and '3만' in hl: idx_rent_12 = i
+            elif '24개월' in hl and '3만' in hl: idx_rent_24 = i
+            elif '36개월' in hl and '3만' in hl: idx_rent_36 = i
+        # 12개월은 3만km만 존재하는 경우 (헤더에 "3만" 없이 "12개월"만)
+        if idx_rent_12 == -1:
+            for i, h in enumerate(headers):
+                if '12개월' in h.replace(' ', ''): idx_rent_12 = i; break
+
+        def safe_get(row, idx):
+            if idx < 0 or idx >= len(row): return ''
+            return str(row[idx]).strip()
+
+        def parse_price(val):
+            return int(re.sub(r'[^\d]', '', val) or '0')
+
+        # ── 차종 → 제조사 매핑 ──
+        MAKER_MAP = {
+            # 현대
+            '그랜저': '현대', '쏘나타': '현대', '아반떼': '현대', '투싼': '현대', '싼타페': '현대',
+            '팰리세이드': '현대', '코나': '현대', '베뉴': '현대', '캐스퍼': '현대', '스타리아': '현대',
+            '아이오닉': '현대', '아이오닉5': '현대', '아이오닉6': '현대', '넥쏘': '현대', '포터': '현대',
+            '엑센트': '현대', '벨로스터': '현대', 'i30': '현대', 'i40': '현대',
+            # 기아
+            'K9': '기아', 'K8': '기아', 'K7': '기아', 'K5': '기아', 'K3': '기아',
+            '쏘렌토': '기아', '카니발': '기아', '스포티지': '기아', '셀토스': '기아', '니로': '기아',
+            'EV6': '기아', 'EV9': '기아', '모하비': '기아', '레이': '기아', '봉고': '기아',
+            '스팅어': '기아', '모닝': '기아',
+            # 제네시스
+            'G90': '제네시스', 'G80': '제네시스', 'G70': '제네시스',
+            'GV90': '제네시스', 'GV80': '제네시스', 'GV70': '제네시스', 'GV60': '제네시스',
+            # 쉐보레
+            '말리부': '쉐보레', '트래버스': '쉐보레', '트랙스': '쉐보레', '이쿼녹스': '쉐보레',
+            '콜로라도': '쉐보레', '볼트': '쉐보레', '타호': '쉐보레',
+            # 르노
+            'SM6': '르노', 'QM6': '르노', 'XM3': '르노', '아르카나': '르노', '마스터': '르노',
+            # KG/쌍용
+            '토레스': 'KG모빌리티', '렉스턴': 'KG모빌리티', '티볼리': 'KG모빌리티', '코란도': 'KG모빌리티',
+            # 수입
+            'BMW': 'BMW', '벤츠': 'Mercedes-Benz', '아우디': 'Audi', '볼보': 'Volvo',
+            '렉서스': 'Lexus', '포르쉐': 'Porsche', '미니': 'MINI', '폭스바겐': 'Volkswagen',
+            '테슬라': 'Tesla', '링컨': 'Lincoln', '재규어': 'Jaguar', '랜드로버': 'Land Rover',
+            '마세라티': 'Maserati', '벤틀리': 'Bentley', '롤스로이스': 'Rolls-Royce',
+            '페라리': 'Ferrari', '람보르기니': 'Lamborghini', '푸조': 'Peugeot',
+        }
+        # BMW 740d 같은 수입차: 차종에 브랜드명이 포함된 경우
+        IMPORT_BRAND_KEYWORDS = ['bmw', 'benz', 'mercedes', '벤츠', 'audi', '아우디', 'volvo', '볼보',
+                       'lexus', '렉서스', 'porsche', '포르쉐', 'jaguar', '재규어', 'land rover',
+                       '랜드로버', 'mini', '미니', 'volkswagen', '폭스바겐', 'peugeot', '푸조',
+                       'maserati', '마세라티', 'bentley', '벤틀리', 'rolls', '롤스', 'ferrari',
+                       '페라리', 'lamborghini', '람보르기니', 'tesla', '테슬라', 'lincoln', '링컨']
+        def is_import(name):
+            nl = name.lower()
+            return any(b in nl for b in IMPORT_BRAND_KEYWORDS)
+
+        def resolve_maker(short_name):
+            """차종(간략명)에서 제조사 추출"""
+            if short_name in MAKER_MAP:
+                return MAKER_MAP[short_name]
+            # 수입차: "BMW 740d" → "BMW"
+            for brand, maker in MAKER_MAP.items():
+                if short_name.startswith(brand + ' ') or short_name.startswith(brand):
+                    return maker
+            # 풀네임에서 키워드 검색
+            for brand, maker in MAKER_MAP.items():
+                if brand in short_name:
+                    return maker
+            return ''
+
+        # parse_vehicle_name은 클라이언트에서 차량마스터 기반으로 처리
+
+        # ── 상태 매핑 ──
+        STATUS_MAP = {
+            '판매중': 'available', '할인판매': 'available',
+            '계약중': 'unavailable', '계약요청': 'unavailable',
+            '보류': 'unavailable', '매각진행중': 'unavailable', '판매완료': 'unavailable',
+            '판매보류': 'unavailable', '수리중': 'unavailable',
+        }
+        VEHICLE_STATUS_MAP = {
+            '판매중': '출고가능', '할인판매': '출고가능',
+            '계약중': '계약완료', '계약요청': '계약대기',
+            '보류': '출고불가', '매각진행중': '출고불가', '판매완료': '출고불가',
+            '판매보류': '출고불가', '수리중': '출고불가',
+        }
+
+        products = {}
+        now_ms = int(datetime.now().timestamp() * 1000)
+        synced = skipped = 0
+
+        for row_offset, row in enumerate(rows[header_idx + 1:]):
+            abs_row_idx = header_idx + 1 + row_offset
+            car_number = safe_get(row, idx_car)
+            if not car_number or not re.search(r'[가-힣]', car_number):
+                skipped += 1; continue
+
+            status_raw = safe_get(row, idx_status)
+            status = STATUS_MAP.get(status_raw, '')
+            if not status:
+                skipped += 1; continue
+            vehicle_status = VEHICLE_STATUS_MAP.get(status_raw, '출고가능')
+
+            model_short = safe_get(row, idx_model_short)
+            model_full = safe_get(row, idx_model_full) if idx_model_full >= 0 else ''
+
+            rent_12 = parse_price(safe_get(row, idx_rent_12)) if idx_rent_12 >= 0 else 0
+            rent_24 = parse_price(safe_get(row, idx_rent_24)) if idx_rent_24 >= 0 else 0
+            rent_36 = parse_price(safe_get(row, idx_rent_36)) if idx_rent_36 >= 0 else 0
+
+            imp = is_import(model_full) or is_import(model_short)
+            dep_mult = 3 if imp else 2
+
+            uid_seed = f'{PROVIDER_CODE}_{car_number}'
+            product_uid = f'EXT_{hashlib.md5(uid_seed.encode()).hexdigest()[:12]}'
+
+            mileage = int(re.sub(r'[^\d]', '', safe_get(row, idx_mileage)) or '0')
+
+            # 연식 계산 (최초등록일 → 연식)
+            reg_date = safe_get(row, idx_reg_date)
+            year_model = ''
+            if reg_date:
+                y_match = re.match(r'(\d{4})', reg_date)
+                if y_match:
+                    y = int(y_match.group(1))
+                    year_model = f'{str(y)[2:]}년식'
+
+            product = {
+                'product_uid': product_uid,
+                'product_code': f'{PROVIDER_CODE}_{car_number}',
+                'provider_company_code': PROVIDER_CODE,
+                'car_number': car_number,
+                'raw_model_short': model_short,
+                'raw_model_full': model_full,
+                'maker': '',
+                'model_name': '',
+                'sub_model': '',
+                'trim_name': '',
+                'color_exterior': safe_get(row, idx_color),
+                'fuel_type': safe_get(row, idx_fuel),
+                'mileage': mileage,
+                'year_model': year_model,
+                'first_registration_date': reg_date,
+                'location': safe_get(row, idx_location),
+                'status': status,
+                'vehicle_status': vehicle_status,
+                'product_type': '중고구독',
+                'status_label': status_raw,
+                'options': safe_get(row, idx_options) if idx_options >= 0 else '',
+                'photo_link': hyperlink_map.get(abs_row_idx, ''),
+                'source': 'external_sheet',
+                'source_sheet_id': SHEET_ID,
+                'price': {},
+                'created_at': now_ms,
+                'updated_at': now_ms,
+            }
+            if rent_12: product['price']['12'] = {'rent': rent_12, 'deposit': rent_12 * dep_mult}
+            if rent_24: product['price']['24'] = {'rent': rent_24, 'deposit': rent_24 * dep_mult}
+            if rent_36: product['price']['36'] = {'rent': rent_36, 'deposit': rent_36 * dep_mult}
+
+            products[product_uid] = product
+            synced += 1
+
+        return jsonify({'ok': True, 'synced': synced, 'skipped': skipped, 'products': products})
+
+    except Exception as e:
+        return jsonify({'ok': False, 'message': str(e)}), 500
+
+
 # ─── Blueprint 등록 및 루트 리다이렉트 ───────────────────────────────────────
 
 app.register_blueprint(auth_bp)

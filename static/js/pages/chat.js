@@ -1,12 +1,14 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { qs, registerPageCleanup, runPageCleanup, roleLabel } from '../core/utils.js';
 import { renderRoleMenu } from '../core/role-menu.js';
-import { deleteRoomEverywhere, ensureRoom, hideRoomForUser, markRoomRead, resolveTermForProduct, sendMessage, watchMessages, watchProducts, watchRooms } from '../firebase/firebase-db.js';
+import { deleteRoomEverywhere, ensureRoom, hideRoomForUser, markRoomRead, resolveTermForProduct, sendMessage, watchContracts, watchMessages, watchProducts, watchRooms } from '../firebase/firebase-db.js';
 import { extractTermFields, normalizeProduct } from '../shared/product-list-detail-view.js';
+import { renderMobileProductDetail } from '../shared/mobile-product-detail-markup.js';
 import { createChatRoomSelectionController } from './chat/room-selection.js';
 import { escapeHtml, normalizeLookupKey, renderChatRoomList, syncSelectedRoomRow, truncate, deriveStatusLabel, deriveReplyStatus, formatDate, formatTime } from './chat/room-list.js';
 import { renderSkeletonRows } from '../core/management-list.js';
 import { showToast, showConfirm } from '../core/toast.js';
+import { createChatContractPanel } from './chat/contract-panel.js';
 
 let menu = qs('#sidebar-menu');
 let roomList = qs('#room-list');
@@ -15,8 +17,7 @@ let messageForm = qs('#message-form');
 let messageInput = qs('#message-input');
 let chatCode = qs('#chat-code');
 let feedback = qs('#chat-message');
-let detailCard = qs('#chat-product-detail-card');
-let detailTitle = qs('#chatDetailPanelTitle');
+let detailTitle = qs('#cc-title');
 let filterToggleButton = qs('#openChatFilterBtn');
 let filterOverlay = qs('#chatFilterOverlay');
 let hideRoomBtn = qs('#hideRoomBtn');
@@ -30,8 +31,7 @@ function bindDOM() {
   messageInput = qs('#message-input');
   chatCode = qs('#chat-code');
   feedback = qs('#chat-message');
-  detailCard = qs('#chat-product-detail-card');
-  detailTitle = qs('#chatDetailPanelTitle');
+  detailTitle = qs('#cc-title');
   filterToggleButton = qs('#openChatFilterBtn');
   filterOverlay = qs('#chatFilterOverlay');
   hideRoomBtn = qs('#hideRoomBtn');
@@ -65,6 +65,7 @@ let openedRoomId = null;
 let visibleRoomsCache = [];
 let localHiddenRoomIds = new Set();
 let activePhotoIndex = 0;
+let allContracts = [];
 
 const termCache = {};
 const termLoading = {};
@@ -176,8 +177,8 @@ function getCurrentRoom() {
   return currentRoomId ? roomMap.get(currentRoomId) || null : null;
 }
 
-function getCurrentProduct() {
-  const room = getCurrentRoom();
+function getCurrentProduct(targetRoom) {
+  const room = targetRoom || getCurrentRoom();
   if (!room) return null;
   const keys = getRoomProductLookupKeys(room);
   for (const key of keys) {
@@ -268,10 +269,109 @@ function renderMessages(messages) {
   messageList.scrollTop = messageList.scrollHeight;
 }
 
+let chatContractPanel = null;
+
+function findContractsForRoom(room) {
+  if (!room || !allContracts.length) return [];
+  const carNo = (room.vehicle_number || '').trim();
+  const productUid = (room.product_uid || '').trim();
+  return allContracts.filter(c => {
+    if (productUid && (c.product_uid || '').trim() === productUid) return true;
+    if (carNo && (c.car_number || '').trim() === carNo) return true;
+    return false;
+  });
+}
+
+// ── 상품 상세 슬라이드 패널 ──
+const $pdPanel = document.getElementById('chatProductDetailPanel');
+const $pdCard = document.getElementById('chatProductDetailCard');
+const $pdTitle = document.getElementById('chatProductDetailTitle');
+
+function openProductDetailSlide(room) {
+  if (!$pdPanel || !$pdCard) return;
+  const product = getCurrentProduct(room);
+  if (!product) { showToast('상품 정보를 찾을 수 없습니다.', 'info'); return; }
+  const rawProduct = product._raw || product;
+  const carNo = String(room?.vehicle_number || product?.carNo || '').trim();
+  if ($pdTitle) $pdTitle.textContent = carNo ? `상세정보 (${carNo})` : '상세정보';
+
+  const termFields = extractTermFields(product);
+  $pdCard.innerHTML = `<div class="m-pd m-pd--desktop">${renderMobileProductDetail(rawProduct, {
+    activePhotoIndex: 0,
+    policy: termFields,
+    showFee: false,
+  })}</div>`;
+
+  $pdPanel.hidden = false;
+  $pdPanel.classList.remove('is-open');
+  requestAnimationFrame(() => { $pdPanel.classList.add('is-open'); });
+}
+
+function hideProductDetailSlide() {
+  if (!$pdPanel || $pdPanel.hidden) return;
+  $pdPanel.classList.remove('is-open');
+  const onEnd = () => { $pdPanel.hidden = true; $pdPanel.removeEventListener('transitionend', onEnd); };
+  $pdPanel.addEventListener('transitionend', onEnd);
+  // fallback
+  setTimeout(() => { if (!$pdPanel.hidden) $pdPanel.hidden = true; }, 300);
+}
+
+document.getElementById('chatCloseDetailBtn')?.addEventListener('pointerdown', hideProductDetailSlide);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $pdPanel && !$pdPanel.hidden) hideProductDetailSlide(); });
+
+document.getElementById('chatDetailContractBtn')?.addEventListener('click', () => {
+  const room = roomMap.get(currentRoomId);
+  if (!room) return;
+  if (currentProfile?.role !== 'agent') { showToast('영업자 계정에서만 계약을 생성할 수 있습니다.', 'error'); return; }
+  const product = getCurrentProduct();
+  const seed = {
+    product_uid: room.product_uid || product?.productUid || product?.id || '',
+    product_code: room.product_code || product?.productCode || '',
+    partner_code: room.provider_company_code || product?.providerCompanyCode || '',
+    car_number: room.vehicle_number || product?.carNo || '',
+    model_name: room.model_name || product?.model || '',
+    sub_model: product?.subModel || '',
+    rent_month: '48',
+    rent_amount: product?.price?.['48']?.rent || 0,
+    deposit_amount: product?.price?.['48']?.deposit || 0
+  };
+  localStorage.setItem('freepass_pending_contract_seed', JSON.stringify(seed));
+  window.location.href = '/contract';
+});
+
+document.getElementById('chatDetailShareBtn')?.addEventListener('click', async () => {
+  const room = roomMap.get(currentRoomId);
+  if (!room) return;
+  const product = getCurrentProduct();
+  const productId = product?.productUid || product?.id || room.product_uid || '';
+  const carNo = room.vehicle_number || product?.carNo || '';
+  const url = new URL(window.location.origin + '/catalog');
+  if (currentProfile?.user_code) url.searchParams.set('a', currentProfile.user_code);
+  if (productId) url.searchParams.set('id', productId);
+  else if (carNo) url.searchParams.set('car', carNo);
+  const shareUrl = url.toString();
+  try {
+    if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(shareUrl); showToast('공유 링크가 복사되었습니다.', 'success'); return; }
+  } catch (e) { if (e?.name === 'AbortError') return; }
+  window.prompt('아래 링크를 복사하세요.', shareUrl);
+});
+
+function renderContractForCurrentRoom() {
+  if (!chatContractPanel) return;
+  const room = roomMap.get(currentRoomId);
+  if (!room) { chatContractPanel.resetForm(); return; }
+  const contracts = findContractsForRoom(room);
+  if (!contracts.length) {
+    chatContractPanel.resetForm(room, { getCurrentProduct });
+    return;
+  }
+  chatContractPanel.fillForm(contracts[0]);
+}
+
 const roomSelectionController = createChatRoomSelectionController({
   roomList,
   messageList,
-  detailCard,
+  detailCard: null,
   detailTitle,
   chatCode,
   markRoomRead,
@@ -291,7 +391,8 @@ const roomSelectionController = createChatRoomSelectionController({
   getActivePhotoIndex: () => activePhotoIndex,
   setActivePhotoIndex: (value) => { activePhotoIndex = value; },
   getOpenedRoomId: () => openedRoomId,
-  setOpenedRoomId: (value) => { openedRoomId = value; }
+  setOpenedRoomId: (value) => { openedRoomId = value; },
+  onRoomOpened: () => renderContractForCurrentRoom()
 });
 
 async function bootstrap() {
@@ -314,6 +415,16 @@ async function bootstrap() {
     });
     roomSelectionController.applyChatHeadActions({ deleteRoomBtn, hideRoomBtn, chatShareBtn: qs('#detailShareBtn'), chatContractBtn: qs('#detailContractBtn') });
     registerPageCleanup(() => roomSelectionController.cleanup());
+
+    // ── 계약 패널 초기화 ──
+    chatContractPanel = createChatContractPanel({ profile, user });
+    registerPageCleanup(() => chatContractPanel?.destroy());
+
+    // ── 계약 데이터 실시간 감시 ──
+    registerPageCleanup(watchContracts((contracts) => {
+      allContracts = contracts;
+      renderContractForCurrentRoom();
+    }));
 
     // 모바일 뒤로가기: 채팅창 → 대화목록
     document.getElementById('mobile-back-btn')?.addEventListener('click', async () => {
@@ -371,7 +482,7 @@ async function bootstrap() {
     });
 
     registerPageCleanup(watchProducts((products) => {
-      const normalizedProducts = products.map(normalizeProduct).filter((item) => item.id);
+      const normalizedProducts = products.map((p) => Object.assign(normalizeProduct(p), { _raw: p })).filter((item) => item.id);
       productsMap = new Map();
       normalizedProducts.forEach((item) => {
         getProductLookupKeys(item).forEach((key) => {
@@ -568,6 +679,11 @@ async function bootstrap() {
       const ctxMenu = document.createElement('div');
       ctxMenu.className = 'pm-ctx-menu';
       let html = `
+        <button type="button" class="pm-ctx-item" data-action="detail">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          상세정보
+        </button>
+        <div class="pm-ctx-divider"></div>
         <button type="button" class="pm-ctx-item" data-action="hide">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           숨기기
@@ -594,6 +710,10 @@ async function bootstrap() {
         const btn = ev.target.closest('[data-action]');
         if (!btn) return;
         const action = btn.dataset.action;
+        if (action === 'detail') {
+          removeChatCtx();
+          openProductDetailSlide(room);
+        }
         if (action === 'hide') {
           removeChatCtx();
           if (!await showConfirm('이 대화를 목록에서 숨기시겠습니까?')) return;

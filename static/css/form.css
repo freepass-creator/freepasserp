@@ -13,7 +13,7 @@
   --form-control-border: transparent;
   --form-control-bg: #f2f3f7;
   --form-control-text: var(--text-main);
-  --form-control-radius: 8px;
+  --form-control-radius: var(--radius-ui);
   --form-checkbox-size: var(--space-4);
   --form-check-gap: var(--space-2);
   --form-check-px: var(--space-3);

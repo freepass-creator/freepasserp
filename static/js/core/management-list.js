@@ -304,32 +304,29 @@ export function renderTableGrid(options = {}) {
       const priceCol = columns.find(c => c.key === priceColKey);
       if (!priceCol?.priceMonth) continue;
       const m = priceCol.priceMonth;
-      const candidate = filtered.filter(item => {
+      filtered = filtered.filter(item => {
         const dep = Number(String(item?.price?.[m]?.deposit ?? '').replace(/[^\d.-]/g, '')) || 0;
         const label = typeof window._depositBucketLabel === 'function' ? window._depositBucketLabel(dep) : '';
         return selectedSet.has(label);
       });
-      if (candidate.length) filtered = candidate;
       continue;
     }
     const col = columns.find(c => c.key === colKey);
     if (!col) continue;
-    const candidate = filtered.filter(item => {
+    filtered = filtered.filter(item => {
       const text = typeof getCellText === 'function' ? getCellText(col, item) : '';
       return selectedSet.has(text);
     });
-    if (candidate.length) filtered = candidate;
   }
   for (const [colKey, query] of Object.entries(searchFilters)) {
     if (!query) continue;
     const col = columns.find(c => c.key === colKey);
     if (!col) continue;
     const q = query.toLowerCase();
-    const candidate = filtered.filter(item => {
+    filtered = filtered.filter(item => {
       const text = typeof getCellText === 'function' ? getCellText(col, item) : '';
       return text.toLowerCase().includes(q);
     });
-    if (candidate.length) filtered = candidate;
   }
 
   // ── 선택된 항목 보존: 필터에 빠져도 목록에 유지 ──

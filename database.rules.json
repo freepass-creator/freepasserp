@@ -1,13 +1,8 @@
 {
   "rules": {
-    // ─── 공통 헬퍼 ─────────────────────────────────────────────────────────────
-    // role(): 현재 사용자 역할
-    // company(): 현재 사용자 소속 회사코드
-
     "users": {
-      // 본인 프로필만 읽기, admin은 전체
+      ".read": "auth != null",
       "$uid": {
-        ".read": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
         ".write": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
         "role": {
           ".validate": "!data.exists() || newData.val() === data.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'"
@@ -15,64 +10,42 @@
         "status": {
           ".validate": "root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.val() === data.val() || (!data.exists() && newData.val() === 'pending')"
         }
-      },
-      // admin만 전체 사용자 목록 조회
-      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+      }
     },
-
     "partners": {
-      // 로그인 사용자만 읽기 (비로그인 차단)
-      ".read": "auth != null",
+      ".read": true,
       "$partner_code": {
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
         ".validate": "newData.hasChildren(['partner_code', 'partner_type', 'partner_name', 'status', 'created_at'])",
-        "partner_type": {
-          ".validate": "newData.val() === 'provider' || newData.val() === 'sales_channel' || newData.val() === 'operator'"
-        },
-        "status": {
-          ".validate": "newData.val() === 'active' || newData.val() === 'deleted'"
-        },
-        "created_by": {
-          ".validate": "!data.exists() || data.val() === newData.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'"
-        }
+        "partner_type": { ".validate": "newData.val() === 'provider' || newData.val() === 'sales_channel' || newData.val() === 'operator'" },
+        "status": { ".validate": "newData.val() === 'active' || newData.val() === 'deleted'" },
+        "created_by": { ".validate": "!data.exists() || data.val() === newData.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'" }
       }
     },
-
     "policies": {
-      // 로그인 사용자만 읽기
       ".read": "auth != null",
       "$policy_code": {
         ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider')"
       }
     },
     "terms": {
-      // 로그인 사용자만 읽기
       ".read": "auth != null",
       "$term_code": {
         ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'provider' && root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val()))",
         ".validate": "newData.hasChildren(['term_code', 'provider_company_code', 'term_name', 'status', 'created_at'])",
-        "status": {
-          ".validate": "newData.val() === 'active' || newData.val() === 'deleted'"
-        },
-        "created_by": {
-          ".validate": "!data.exists() || data.val() === newData.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'"
-        }
+        "status": { ".validate": "newData.val() === 'active' || newData.val() === 'deleted'" },
+        "created_by": { ".validate": "!data.exists() || data.val() === newData.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'" }
       }
     },
-
     "products": {
-      // 로그인 사용자만 읽기 (카탈로그는 별도 API로 제공)
-      ".read": "auth != null",
+      ".read": true,
       ".indexOn": ["car_number", "product_code", "provider_company_code", "status"],
       "$product_uid": {
-        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'provider' && root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val()))",
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'provider' && (root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val() || (!newData.exists() && root.child('users').child(auth.uid).child('company_code').val() === data.child('provider_company_code').val()))))",
         ".validate": "newData.hasChildren(['product_uid', 'product_code', 'car_number', 'created_at'])",
-        "created_by": {
-          ".validate": "!data.exists() || data.val() === newData.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'"
-        }
+        "created_by": { ".validate": "!data.exists() || data.val() === newData.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'" }
       }
     },
-
     "product_code_aliases": {
       ".read": "auth != null",
       "$alias": {
@@ -80,62 +53,49 @@
         ".validate": "newData.isString()"
       }
     },
-
     "rooms": {
-      // 본인이 참여한 대화방만 읽기 (RTDB 한계로 컬렉션 레벨에서는 auth 체크만)
       ".read": "auth != null",
       "$room_id": {
-        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.child('agent_uid').val() === auth.uid || newData.child('provider_uid').val() === auth.uid || data.child('agent_uid').val() === auth.uid || data.child('provider_uid').val() === auth.uid || root.child('users').child(auth.uid).child('company_code').val() === data.child('provider_company_code').val() || root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val())"
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.child('agent_uid').val() === auth.uid || newData.child('provider_uid').val() === auth.uid || data.child('agent_uid').val() === auth.uid || data.child('provider_uid').val() === auth.uid || root.child('users').child(auth.uid).child('company_code').val() === data.child('provider_company_code').val() || root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val() || (root.child('users').child(auth.uid).child('role').val() === 'agent_manager' && root.child('users').child(auth.uid).child('company_code').val() === data.child('agent_channel_code').val()))"
       },
       ".indexOn": ["product_uid", "agent_uid", "provider_uid", "provider_company_code", "last_message_at"]
     },
-
     "messages": {
       "$room_id": {
-        // 대화방 참여자 또는 admin만 읽기
-        ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('rooms').child($room_id).child('agent_uid').val() === auth.uid || root.child('rooms').child($room_id).child('provider_uid').val() === auth.uid)",
+        ".read": "auth != null",
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
         "$message_id": {
-          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('rooms').child($room_id).child('agent_uid').val() === auth.uid || root.child('rooms').child($room_id).child('provider_uid').val() === auth.uid)",
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('rooms').child($room_id).child('agent_uid').val() === auth.uid || root.child('rooms').child($room_id).child('provider_uid').val() === auth.uid || root.child('users').child(auth.uid).child('company_code').val() === root.child('rooms').child($room_id).child('provider_company_code').val() || (root.child('users').child(auth.uid).child('role').val() === 'agent_manager' && root.child('users').child(auth.uid).child('company_code').val() === root.child('rooms').child($room_id).child('agent_channel_code').val()))",
           ".validate": "newData.hasChildren(['text', 'sender_uid', 'sender_role', 'created_at'])",
-          "sender_uid": {
-            ".validate": "newData.val() === auth.uid"
-          }
+          "sender_uid": { ".validate": "newData.val() === auth.uid" }
         }
       }
     },
-
     "contracts": {
-      // admin: 전체, provider: 자사 계약, agent: 본인 계약
       ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider' || root.child('users').child(auth.uid).child('role').val() === 'agent')",
       ".indexOn": ["product_uid", "partner_code", "contract_status", "agent_uid", "created_at"],
       "$contract_code": {
         ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'agent' && (newData.child('agent_uid').val() === auth.uid || (!newData.exists() && data.child('agent_uid').val() === auth.uid))) || (root.child('users').child(auth.uid).child('role').val() === 'provider' && (root.child('users').child(auth.uid).child('company_code').val() === newData.child('partner_code').val() || root.child('users').child(auth.uid).child('company_code').val() === newData.child('provider_company_code').val() || (!newData.exists() && (root.child('users').child(auth.uid).child('company_code').val() === data.child('partner_code').val() || root.child('users').child(auth.uid).child('company_code').val() === data.child('provider_company_code').val())))))",
         ".validate": "!newData.exists() || newData.hasChildren(['contract_code', 'partner_code', 'created_at'])",
-        // _secure 노드: admin만 직접 읽기, 클라이언트에서 암호화된 값으로 저장
         "_secure": {
           ".read": "auth != null",
           ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'agent')"
         }
       }
     },
-
     "settlements": {
-      // admin: 전체, provider: 자사 정산
       ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider')",
       ".indexOn": ["contract_code", "settlement_status"],
       "$settlement_code": {
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
       }
     },
-
     "code_sequences": {
       ".read": "auth != null",
       "$key": {
         ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'provider' || root.child('users').child(auth.uid).child('role').val() === 'agent')"
       }
     },
-
     "input_codes": {
       ".read": "auth != null",
       ".indexOn": ["group_code"],
@@ -143,24 +103,16 @@
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
       }
     },
-
-    "logs": {
-      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
-      ".write": "auth != null"
-    },
-
     "vehicle_master": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
     },
-
     "home_notices": {
       ".read": "auth != null",
       "$notice_id": {
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
       }
     },
-
     "$other": {
       ".read": false,
       ".write": false

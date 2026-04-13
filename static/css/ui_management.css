@@ -352,7 +352,7 @@
   display: inline-flex;
   align-items: center;
   padding: 1px 7px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sub);
   font-weight: var(--font-weight-heavy);
   line-height: 18px;
@@ -367,7 +367,7 @@
   display: inline-flex;
   align-items: center;
   padding: 1px 7px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sub);
   font-weight: var(--font-weight-heavy);
   line-height: 18px;

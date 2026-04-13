@@ -52,10 +52,11 @@ let fields = {
   customer_name: qs('#customer_name'),
   customer_birth: qs('#customer_birth'),
   customer_phone: qs('#customer_phone'),
+  docs_attached: qs('#docs_attached'),
+  approval_requested: qs('#approval_requested'),
   deposit_confirmed: qs('#deposit_confirmed'),
-  docs_confirmed: qs('#docs_confirmed'),
-  approval_confirmed: qs('#approval_confirmed'),
-  contract_confirmed: qs('#contract_confirmed'),
+  progress_approved: qs('#progress_approved'),
+  contract_written: qs('#contract_written'),
   balance_confirmed: qs('#balance_confirmed'),
   delivery_confirmed: qs('#delivery_confirmed')
 };
@@ -92,18 +93,23 @@ function bindDOM() {
     customer_name: f('customer_name'),
     customer_birth: f('customer_birth'),
     customer_phone: f('customer_phone'),
+    docs_attached: f('docs_attached'),
+    approval_requested: f('approval_requested'),
     deposit_confirmed: f('deposit_confirmed'),
-    docs_confirmed: f('docs_confirmed'),
-    approval_confirmed: f('approval_confirmed'),
-    contract_confirmed: f('contract_confirmed'),
+    progress_approved: f('progress_approved'),
+    contract_written: f('contract_written'),
     balance_confirmed: f('balance_confirmed'),
     delivery_confirmed: f('delivery_confirmed')
   };
   bindAutoFormat(f('customer_phone'), formatPhone);
 }
 
-const CHECK_FIELD_KEYS = ['deposit_confirmed', 'docs_confirmed', 'approval_confirmed', 'contract_confirmed', 'balance_confirmed', 'delivery_confirmed'];
-const CHECK_FIELD_LABELS = { deposit_confirmed: '계약금 확인', docs_confirmed: '서류 확인', approval_confirmed: '승인 확인', contract_confirmed: '계약서 확인', balance_confirmed: '잔금 확인', delivery_confirmed: '인도 확인' };
+const AGENT_CHECK_KEYS = ['docs_attached', 'approval_requested'];
+const AGENT_CHECK_LABELS = { docs_attached: '서류첨부', approval_requested: '승인요청' };
+const PROVIDER_CHECK_KEYS = ['deposit_confirmed', 'progress_approved', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
+const PROVIDER_CHECK_LABELS = { deposit_confirmed: '계약금확인', progress_approved: '진행승인', contract_written: '계약서작성', balance_confirmed: '잔금확인', delivery_confirmed: '인도확인' };
+const CHECK_FIELD_KEYS = [...AGENT_CHECK_KEYS, ...PROVIDER_CHECK_KEYS];
+const CHECK_FIELD_LABELS = { ...AGENT_CHECK_LABELS, ...PROVIDER_CHECK_LABELS };
 const CONTRACT_STATUS_OPTIONS = [
   { value: '계약대기', label: '계약대기' },
   { value: '계약요청', label: '계약요청' },
@@ -148,12 +154,18 @@ document.addEventListener('contextmenu', (e) => {
     <div class="pm-ctx-sub">
       <button type="button" class="pm-ctx-item pm-ctx-item--parent">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-        체크하기
+        진행상황
         <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
       </button>
       <div class="pm-ctx-submenu">
-        ${CHECK_FIELD_KEYS.map(key =>
-          `<button type="button" class="pm-ctx-item" data-action="check" data-key="${escapeHtml(key)}">${checks[key] ? '☑' : '☐'} ${escapeHtml(CHECK_FIELD_LABELS[key])}</button>`
+        <div style="padding:4px 14px 2px;font-size:10px;color:#64748b;font-weight:700;">영업자</div>
+        ${AGENT_CHECK_KEYS.map(key =>
+          `<button type="button" class="pm-ctx-item" data-action="check" data-key="${escapeHtml(key)}">${checks[key] ? '☑' : '☐'} ${escapeHtml(AGENT_CHECK_LABELS[key])}</button>`
+        ).join('')}
+        <div class="pm-ctx-divider"></div>
+        <div style="padding:4px 14px 2px;font-size:10px;color:#64748b;font-weight:700;">공급사</div>
+        ${PROVIDER_CHECK_KEYS.map(key =>
+          `<button type="button" class="pm-ctx-item" data-action="check" data-key="${escapeHtml(key)}">${checks[key] ? '☑' : '☐'} ${escapeHtml(PROVIDER_CHECK_LABELS[key])}</button>`
         ).join('')}
       </div>
     </div>
@@ -200,6 +212,9 @@ document.addEventListener('contextmenu', (e) => {
       const newStatus = allDone ? '계약완료' : (contract.contract_status === '계약완료' ? '계약발송' : contract.contract_status);
       try {
         await updateContract(contract.contract_code, { checks: newChecks, contract_status: newStatus });
+        contract.checks = newChecks;
+        contract.contract_status = newStatus;
+        renderList();
         showToast(`${CHECK_FIELD_LABELS[key]} ${newChecks[key] ? '✓' : '해제'}`, 'success');
       } catch (err) { showToast('체크 변경 실패: ' + (err.message || err), 'error'); }
       removeCtxMenu();
@@ -560,9 +575,10 @@ function renderList() {
         case 'model':    return escapeHtml(c.model_name || '-');
         case 'subModel': return escapeHtml(c.sub_model || '-');
         case 'progress': {
-          const checks = ['deposit_confirmed','docs_confirmed','approval_confirmed','contract_confirmed','balance_confirmed','delivery_confirmed'];
-          const done = checks.filter(k => c[k]).length;
-          return `<span style="font-size:11px;font-weight:600;color:${done === 6 ? '#16a34a' : done > 0 ? '#f59e0b' : '#94a3b8'}">${done}/6</span>`;
+          const chk = c.checks || {};
+          const done = CHECK_FIELD_KEYS.filter(k => chk[k]).length;
+          const total = CHECK_FIELD_KEYS.length;
+          return `<span style="font-size:11px;font-weight:600;color:${done === total ? '#16a34a' : done > 0 ? '#f59e0b' : '#94a3b8'}">${done}/${total}</span>`;
         }
         case 'month': return escapeHtml(c.rent_month ? `${c.rent_month}개월` : '');
         case 'rent': return escapeHtml(c.rent_amount ? Number(c.rent_amount).toLocaleString('ko-KR') : '');
@@ -585,8 +601,8 @@ function renderList() {
         case 'model':    return c.model_name || '';
         case 'subModel': return c.sub_model || '';
         case 'progress': {
-          const checks = ['deposit_confirmed','docs_confirmed','approval_confirmed','contract_confirmed','balance_confirmed','delivery_confirmed'];
-          return `${checks.filter(k => c[k]).length}/6`;
+          const chk = c.checks || {};
+          return `${CHECK_FIELD_KEYS.filter(k => chk[k]).length}/${CHECK_FIELD_KEYS.length}`;
         }
         case 'month': return c.rent_month ? `${c.rent_month}개월` : '';
         case 'rent': return c.rent_amount ? String(c.rent_amount) : '';
@@ -718,14 +734,7 @@ async function maybeCreateFromPendingSeed() {
     contract_code: code,
     ...payload,
     created_at: Date.now(),
-    checks: {
-      deposit_confirmed: false,
-      docs_confirmed: false,
-      approval_confirmed: false,
-      contract_confirmed: false,
-      balance_confirmed: false,
-      delivery_confirmed: false
-    },
+    checks: Object.fromEntries(CHECK_FIELD_KEYS.map(k => [k, false])),
     docs: []
   };
   allContracts = [created, ...remoteContracts];

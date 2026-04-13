@@ -76,7 +76,7 @@
   border-right: none;
 }
 
-.pls-th__label { white-space: nowrap; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; }
+.pls-th__label { white-space: nowrap; flex: 1 1 auto; overflow: visible; text-overflow: ellipsis; }
 .pls-th__sort { font-size: 9px; color: #3b82f6; flex-shrink: 0; }
 
 /* ─── 데이터 행 (tr) ──────────────────────────────────────────────────────── */
@@ -374,7 +374,7 @@
 .pm-ctx-menu {
   background: #fff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,0.14);
   padding: 4px 0;
   min-width: 160px;
@@ -416,7 +416,7 @@
   top: -4px;
   background: #fff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,0.14);
   padding: 4px 0;
   min-width: 120px;
