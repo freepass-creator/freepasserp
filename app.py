@@ -468,7 +468,7 @@ def internal_error(e):
 @api_bp.route('/sync/external-sheet', methods=['POST'])
 def sync_external_sheet():
     """외부 구글시트 → JSON 파싱 (클라이언트가 Firebase에 저장)"""
-    import json, urllib.request, hashlib
+    import json, urllib.request, hashlib, re
     from datetime import datetime
 
     SHEETS_API_KEY = 'AIzaSyBSPo1kZOefX-6NuHoQdUF1htqQDSxXsCs'
