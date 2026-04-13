@@ -522,6 +522,7 @@ const CONTRACT_COLS = [
   { key: 'agent',         label: '영업자코드',   align: 'c', filterable: true },
   { key: 'car',           label: '차량번호',     align: 'c', searchable: true },
   { key: 'subModel',      label: '세부모델',     align: 'c', searchable: true },
+  { key: 'progress',      label: '처리율',       align: 'c' },
   { key: 'month',         label: '기간',         align: 'c', searchable: true },
   { key: 'rent',          label: '대여료',       align: 'r', num: true },
   { key: 'customer',      label: '고객명',       align: 'c', searchable: true },
@@ -558,6 +559,11 @@ function renderList() {
         case 'maker':    return escapeHtml(c.maker || '-');
         case 'model':    return escapeHtml(c.model_name || '-');
         case 'subModel': return escapeHtml(c.sub_model || '-');
+        case 'progress': {
+          const checks = ['deposit_confirmed','docs_confirmed','approval_confirmed','contract_confirmed','balance_confirmed','delivery_confirmed'];
+          const done = checks.filter(k => c[k]).length;
+          return `<span style="font-size:11px;font-weight:600;color:${done === 6 ? '#16a34a' : done > 0 ? '#f59e0b' : '#94a3b8'}">${done}/6</span>`;
+        }
         case 'month': return escapeHtml(c.rent_month ? `${c.rent_month}개월` : '');
         case 'rent': return escapeHtml(c.rent_amount ? Number(c.rent_amount).toLocaleString('ko-KR') : '');
         case 'deposit': return escapeHtml(c.deposit_amount ? Number(c.deposit_amount).toLocaleString('ko-KR') : '');
@@ -578,6 +584,10 @@ function renderList() {
         case 'maker':    return c.maker || '';
         case 'model':    return c.model_name || '';
         case 'subModel': return c.sub_model || '';
+        case 'progress': {
+          const checks = ['deposit_confirmed','docs_confirmed','approval_confirmed','contract_confirmed','balance_confirmed','delivery_confirmed'];
+          return `${checks.filter(k => c[k]).length}/6`;
+        }
         case 'month': return c.rent_month ? `${c.rent_month}개월` : '';
         case 'rent': return c.rent_amount ? String(c.rent_amount) : '';
         case 'deposit': return c.deposit_amount ? String(c.deposit_amount) : '';
