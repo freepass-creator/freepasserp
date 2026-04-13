@@ -165,6 +165,12 @@
   flex-shrink: 0;
   white-space: nowrap;
 }
+.message-read {
+  color: #2563eb;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
 
 /* ─── 날짜 구분선 ────────────────────────────────────────────────────────── */
 

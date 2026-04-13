@@ -224,13 +224,26 @@ function renderMessages(messages) {
     messageList.innerHTML = '<div class="empty-block">아직 메시지가 없습니다.</div>';
     return;
   }
-  const sorted = messages.sort((a, b) => a.created_at - b.created_at);
+  const sorted = messages.sort((a, b) => a.created_at - b.created_at || String(a.id || '').localeCompare(String(b.id || '')));
+  // 상대방 읽음 시점 계산
+  const room = getCurrentRoom();
+  const readBy = room?.read_by || {};
+  const myUid = currentUser?.uid;
+  // 상대방들의 마지막 읽은 시점 (내가 아닌 사람들 중 가장 최근)
+  let otherLastRead = 0;
+  for (const [uid, ts] of Object.entries(readBy)) {
+    if (uid !== myUid && Number(ts) > otherLastRead) otherLastRead = Number(ts);
+  }
+
   let lastDate = '';
   const html = sorted.map((message) => {
-    const own = message.sender_uid === currentUser.uid ? 'out' : 'in';
+    const own = message.sender_uid === myUid ? 'out' : 'in';
     const roleClass = `role-${message.sender_role || 'etc'}`;
     const senderLabel = `${escapeHtml(message.sender_code || roleName(message.sender_role))} ${formatRoleBadge(message.sender_role)}`;
     const time = formatMessageTime(message.created_at);
+    // 내가 보낸 메시지 — 상대가 읽었는지
+    const isRead = own === 'out' && otherLastRead >= message.created_at;
+    const readMark = isRead ? '<span class="message-read">읽음</span>' : '';
 
     // 날짜 구분선
     const msgDate = new Date(message.created_at);
@@ -247,7 +260,7 @@ function renderMessages(messages) {
           <div class="message-sender sender-${message.sender_role || 'etc'}">${senderLabel}</div>
           <div class="message-bubble ${roleClass}">${escapeHtml(message.text || '')}</div>
         </div>
-        <div class="message-time">${time}</div>
+        <div class="message-time">${time}${readMark}</div>
       </div>
     `;
   }).join('');
