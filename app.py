@@ -478,7 +478,28 @@ def sync_external_sheet():
 
     try:
         encoded_tab = quote(TAB_NAME)
-        # 1a. 셀 값 읽기
+        # 1a-1. 차량번호 셀의 스마트칩 링크 읽기 (chipRuns → 구글드라이브 폴더)
+        photo_link_map = {}  # row_idx → drive folder url
+        try:
+            chip_url = f'https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}?ranges={encoded_tab}&fields=sheets.data.rowData.values.chipRuns&key={SHEETS_API_KEY}'
+            chip_req = urllib.request.Request(chip_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(chip_req, timeout=30) as resp:
+                chip_data = json.loads(resp.read().decode('utf-8'))
+            chip_sheets = chip_data.get('sheets', [])
+            if chip_sheets:
+                chip_rows = chip_sheets[0].get('data', [{}])[0].get('rowData', [])
+                for ri, rd in enumerate(chip_rows):
+                    for cell in (rd.get('values') or []):
+                        for chip_run in (cell.get('chipRuns') or []):
+                            uri = chip_run.get('chip', {}).get('richLinkProperties', {}).get('uri', '')
+                            if uri and 'drive.google.com' in uri:
+                                photo_link_map[ri] = uri.split('?')[0]  # query param 제거
+                                break
+                        if ri in photo_link_map: break
+        except Exception:
+            pass
+
+        # 1a-2. 셀 값 읽기
         sheets_url = f'https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}/values/{encoded_tab}?key={SHEETS_API_KEY}'
         req_obj = urllib.request.Request(sheets_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req_obj, timeout=30) as resp:
@@ -488,25 +509,6 @@ def sync_external_sheet():
         if not rows:
             return jsonify({'ok': False, 'message': '시트 데이터 없음'}), 400
 
-        # 1b. 하이퍼링크 읽기 (차량번호 셀에 사진 링크)
-        hyperlink_map = {}  # row_idx -> url
-        try:
-            meta_url = f'https://sheets.googleapis.com/v4/spreadsheets/{SHEET_ID}?ranges={encoded_tab}&fields=sheets.data.rowData.values.hyperlink&key={SHEETS_API_KEY}'
-            meta_req = urllib.request.Request(meta_url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(meta_req, timeout=30) as resp:
-                meta_data = json.loads(resp.read().decode('utf-8'))
-            sheets_list = meta_data.get('sheets', [])
-            if sheets_list:
-                row_data = sheets_list[0].get('data', [{}])[0].get('rowData', [])
-                for ri, rd in enumerate(row_data):
-                    cells = rd.get('values', [])
-                    for cell in cells:
-                        link = cell.get('hyperlink', '')
-                        if link:
-                            hyperlink_map[ri] = link
-                            break  # 행당 첫 번째 하이퍼링크 (차량번호)
-        except Exception:
-            pass  # 하이퍼링크 실패해도 진행
 
         # 헤더 찾기
         header_idx = None
@@ -536,16 +538,19 @@ def sync_external_sheet():
             if next_h and next_h not in ('색상', '연료', '주행거리(예상)'):
                 idx_model_full = idx_model_short + 1
 
-        idx_color = col_idx('색상')
-        idx_fuel = col_idx('연료')
-        idx_mileage = col_idx('주행거리(예상)')
-        idx_reg_date = col_idx('최초등록일')
-        idx_location = col_idx('현위치')
-        idx_status = col_idx('판매상태')
-        idx_options = -1
-        for c in ['비고', '옵션']:
-            ci = col_idx(c)
-            if ci >= 0: idx_options = ci; break
+        def col_partial(keyword):
+            for ci, h in enumerate(headers):
+                if keyword in h: return ci
+            return -1
+
+        idx_color = col_partial('색상')
+        idx_fuel = col_partial('연료')
+        idx_mileage = col_partial('주행')
+        idx_reg_date = col_partial('최초등록')
+        idx_location = col_partial('현위치')
+        idx_status = col_partial('판매상태')
+        idx_options = col_partial('옵션')
+        idx_notes = col_partial('비고')
 
         # 가격 컬럼 (3만km 기준: 12/24/36)
         idx_rent_12 = idx_rent_24 = idx_rent_36 = -1
@@ -686,10 +691,10 @@ def sync_external_sheet():
                 'model_name': '',
                 'sub_model': '',
                 'trim_name': '',
-                'color_exterior': safe_get(row, idx_color),
+                'ext_color': safe_get(row, idx_color),
                 'fuel_type': safe_get(row, idx_fuel),
                 'mileage': mileage,
-                'year_model': year_model,
+                'year': year_model,
                 'first_registration_date': reg_date,
                 'location': safe_get(row, idx_location),
                 'status': status,
@@ -697,7 +702,8 @@ def sync_external_sheet():
                 'product_type': '중고구독',
                 'status_label': status_raw,
                 'options': safe_get(row, idx_options) if idx_options >= 0 else '',
-                'photo_link': hyperlink_map.get(abs_row_idx, ''),
+                'partner_memo': safe_get(row, idx_notes) if idx_notes >= 0 else '',
+                'photo_link': photo_link_map.get(abs_row_idx, ''),
                 'source': 'external_sheet',
                 'source_sheet_id': SHEET_ID,
                 'price': {},
