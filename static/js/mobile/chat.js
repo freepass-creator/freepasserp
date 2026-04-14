@@ -256,6 +256,9 @@ function _hydrateProductMap(products) {
     });
   } catch (e) {
     console.error('[mobile/chat] init failed', e);
-    if ($list) $list.innerHTML = '<div class="m-list-empty">대화 목록을 불러오지 못했습니다</div>';
+    // 이미 목록이 렌더됐으면 에러 메시지 덮어쓰지 않음
+    if ($list && !_hasRenderedList) {
+      $list.innerHTML = '<div class="m-list-empty">대화 목록을 불러오지 못했습니다</div>';
+    }
   }
 })();
