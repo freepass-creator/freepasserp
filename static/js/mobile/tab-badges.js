@@ -73,7 +73,8 @@ if (document.readyState === 'loading') {
         if (!r) return;
         if (r.hidden_by && Object.keys(r.hidden_by).length) return;
         if (!isMineRoom(r)) return;
-        if (role === 'agent' || role === 'agent_manager' || role === 'admin') total += Number(r.unread_for_agent || 0);
+        if (role === 'admin') total += Number(r.unread_for_agent || 0) + Number(r.unread_for_provider || 0);
+        else if (role === 'agent' || role === 'agent_manager') total += Number(r.unread_for_agent || 0);
         else if (role === 'provider') total += Number(r.unread_for_provider || 0);
       });
       setBadge('m-tab-chat-badge', total);
