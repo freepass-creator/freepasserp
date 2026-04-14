@@ -166,6 +166,7 @@ function render() {
           ${toggleRow('새 대화 알림', 'notify_chat')}
           ${toggleRow('새 계약 알림', 'notify_contract')}
           ${toggleRow('알림 효과음', 'sound')}
+          <button type="button" id="m-st-sound-test" style="margin-top:8px;padding:10px;background:#1b2a4a;color:#fff;border:none;border-radius:4px;font-size:14px;width:100%">🔊 소리 테스트</button>
         </div>
       </div>
     </section>
@@ -279,6 +280,24 @@ function render() {
         }
       }
     });
+  });
+
+  // 소리 테스트 버튼
+  $st.querySelector('#m-st-sound-test')?.addEventListener('click', () => {
+    try {
+      const a = new Audio('/static/sound-msg.wav');
+      a.volume = 0.8;
+      showToast('소리 재생 시도...', 'info');
+      const p = a.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => showToast('✓ 재생 성공 — 미디어 볼륨 확인', 'success'))
+         .catch(err => showToast(`✗ 실패: ${err.name} - ${err.message}`, 'error'));
+      } else {
+        showToast('✓ play() 호출됨 (promise 없음)', 'info');
+      }
+    } catch (err) {
+      showToast(`✗ 에러: ${err.message}`, 'error');
+    }
   });
 
   // 페이지 로드 시 sound 상태 동기화
