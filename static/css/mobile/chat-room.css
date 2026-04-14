@@ -123,8 +123,13 @@
   margin: var(--m-space-2) 0;
 }
 
-/* 입력창 — 항상 하단에 고정 */
+/* 입력창 — 항상 하단에 고정 (Visual Viewport 기반) */
 .m-cr__input {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateY(var(--cr-input-offset, 0px));
   display: flex;
   align-items: flex-end;
   gap: var(--m-space-2);
@@ -132,7 +137,12 @@
   padding-bottom: max(var(--m-space-2), env(safe-area-inset-bottom));
   background: var(--m-card-bg);
   border-top: 1px solid var(--m-divider);
-  flex: 0 0 auto;
+  z-index: 50;
+}
+
+/* 메시지 영역이 입력칸에 안 가리게 하단 여백 */
+.m-body:has(.m-cr) .m-cr__messages {
+  padding-bottom: calc(var(--cr-input-h, 60px) + env(safe-area-inset-bottom));
 }
 .m-cr__textarea {
   flex: 1 1 0;
