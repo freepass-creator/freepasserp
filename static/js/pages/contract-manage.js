@@ -106,8 +106,8 @@ function bindDOM() {
 
 const AGENT_CHECK_KEYS = ['docs_attached', 'approval_requested'];
 const AGENT_CHECK_LABELS = { docs_attached: '서류첨부', approval_requested: '승인요청' };
-const PROVIDER_CHECK_KEYS = ['deposit_confirmed', 'progress_approved', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
-const PROVIDER_CHECK_LABELS = { deposit_confirmed: '계약금확인', progress_approved: '진행승인', contract_written: '계약서작성', balance_confirmed: '잔금확인', delivery_confirmed: '인도확인' };
+const PROVIDER_CHECK_KEYS = ['progress_approved', 'deposit_confirmed', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
+const PROVIDER_CHECK_LABELS = { progress_approved: '진행승인', deposit_confirmed: '계약금확인', contract_written: '계약서작성', balance_confirmed: '잔금확인', delivery_confirmed: '인도확인' };
 const CHECK_FIELD_KEYS = [...AGENT_CHECK_KEYS, ...PROVIDER_CHECK_KEYS];
 const CHECK_FIELD_LABELS = { ...AGENT_CHECK_LABELS, ...PROVIDER_CHECK_LABELS };
 const CONTRACT_STATUS_OPTIONS = [

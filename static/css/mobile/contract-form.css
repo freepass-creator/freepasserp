@@ -161,3 +161,30 @@
   height: auto;
 }
 .m-cf.is-readonly .m-cf-checks { pointer-events: none; opacity: 0.85; }
+
+/* 서류 업로드 */
+.m-cf-docs { display: flex; flex-direction: column; gap: 8px; }
+.m-cf-doc-add {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 14px 16px; border: 1.5px dashed var(--m-border, #d4d4d8);
+  border-radius: var(--radius-ui, 4px); background: transparent;
+  color: var(--m-text-secondary, #64748b); font-size: 13px; font-weight: 600;
+  cursor: pointer;
+}
+.m-cf-doc-add svg { width: 18px; height: 18px; flex-shrink: 0; }
+.m-cf-doc-add:active { background: rgba(0,0,0,0.03); }
+.m-cf.is-readonly .m-cf-doc-add { display: none; }
+.m-cf-doc-list, .m-cf-doc-pending { display: flex; flex-direction: column; gap: 4px; }
+.m-cf-doc-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; background: var(--m-card-bg, #f8fafc);
+  border: 1px solid var(--m-border, #e5e7eb); border-radius: var(--radius-ui, 4px);
+  font-size: 12px;
+}
+.m-cf-doc-item a { color: var(--m-text-primary, #1b2a4a); text-decoration: none; }
+.m-cf-doc-item--pending { background: #fffbeb; border-color: #fde68a; }
+.m-cf-doc-remove {
+  border: none; background: none; color: #94a3b8; font-size: 18px;
+  cursor: pointer; padding: 0 4px; line-height: 1;
+}
+.m-cf.is-readonly .m-cf-doc-remove { display: none; }

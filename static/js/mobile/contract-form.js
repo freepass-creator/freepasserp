@@ -3,6 +3,7 @@
  */
 import { requireAuth } from '../core/auth-guard.js';
 import { watchContracts, updateContract, deleteContract, watchProducts } from '../firebase/firebase-db.js';
+import { uploadContractFilesDetailed, deleteProductImagesByUrls } from '../firebase/firebase-storage.js';
 import { escapeHtml } from '../core/management-format.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { maskName, maskPhone, maskBirth, decryptField, requestDecryptPassword } from '../core/crypto.js';
@@ -21,16 +22,21 @@ const contractCode = decodeURIComponent(pathParts[pathParts.length - 1] || '');
 
 let currentContract = null;
 let currentProfile = null;
+let currentUser = null;
 let productMap = new Map();
 
-const CHECK_FIELDS = [
-  { key: 'deposit_confirmed',  label: '계약금 확인' },
-  { key: 'docs_confirmed',     label: '서류 확인' },
-  { key: 'approval_confirmed', label: '승인 확인' },
-  { key: 'contract_confirmed', label: '계약서 확인' },
-  { key: 'balance_confirmed',  label: '잔금 확인' },
-  { key: 'delivery_confirmed', label: '인도 확인' },
+const AGENT_CHECK_FIELDS = [
+  { key: 'docs_attached',       label: '서류첨부' },
+  { key: 'approval_requested',  label: '승인요청' },
 ];
+const PROVIDER_CHECK_FIELDS = [
+  { key: 'progress_approved',   label: '진행승인' },
+  { key: 'deposit_confirmed',   label: '계약금확인' },
+  { key: 'contract_written',    label: '계약서작성' },
+  { key: 'balance_confirmed',   label: '잔금확인' },
+  { key: 'delivery_confirmed',  label: '인도확인' },
+];
+const CHECK_FIELDS = [...AGENT_CHECK_FIELDS, ...PROVIDER_CHECK_FIELDS];
 
 const STATUS_OPTIONS = ['계약대기', '계약요청', '계약발송', '계약완료', '계약철회'];
 
@@ -40,6 +46,7 @@ const ICO = {
   doc:    SVG('<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12h4"/><path d="M10 16h4"/>'),
   car:    SVG('<path d="M21 8 17.65 2.65A2 2 0 0 0 15.94 2H8.06a2 2 0 0 0-1.71 1.65L3 8"/><rect width="18" height="13" x="3" y="8" rx="2"/>'),
   user:   SVG('<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>'),
+  upload: SVG('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>'),
 };
 
 function fmtMoney(v) {
@@ -47,9 +54,12 @@ function fmtMoney(v) {
   return n ? n.toLocaleString('ko-KR') : '';
 }
 
+let _storedDocs = [];
+
 function render(c) {
   if (!$cf || !c) return;
   const checks = c.checks || {};
+  _storedDocs = [...(c.docs || [])];
 
   // 상단바 타이틀: 차량번호 세부모델명
   const $title = document.getElementById('m-cf-title');
@@ -68,11 +78,43 @@ function render(c) {
         <span class="m-cf-group__title">계약 진행</span>
       </div>
       <div class="m-cf-group__body">
+        <div class="m-cf-check-group-label" style="font-size:10px;font-weight:700;color:#94a3b8;padding:4px 0 2px;">영업자</div>
         <div class="m-cf-checks">
-          ${CHECK_FIELDS.map(f => `<label class="m-cf-check${checks[f.key] ? ' is-checked' : ''}">
+          ${AGENT_CHECK_FIELDS.map(f => `<label class="m-cf-check${checks[f.key] ? ' is-checked' : ''}">
             <input type="checkbox" data-check="${f.key}"${checks[f.key] ? ' checked' : ''}>
             <span>${escapeHtml(f.label)}</span>
           </label>`).join('')}
+        </div>
+        <div class="m-cf-check-group-label" style="font-size:10px;font-weight:700;color:#94a3b8;padding:8px 0 2px;">공급사</div>
+        <div class="m-cf-checks">
+          ${PROVIDER_CHECK_FIELDS.map(f => `<label class="m-cf-check${checks[f.key] ? ' is-checked' : ''}">
+            <input type="checkbox" data-check="${f.key}"${checks[f.key] ? ' checked' : ''}>
+            <span>${escapeHtml(f.label)}</span>
+          </label>`).join('')}
+        </div>
+      </div>
+    </section>
+
+    <!-- 요청서류 -->
+    <section class="m-cf-group">
+      <div class="m-cf-group__head">
+        <span class="m-cf-group__icon">${ICO.upload}</span>
+        <span class="m-cf-group__title">요청서류</span>
+      </div>
+      <div class="m-cf-group__body">
+        <div class="m-cf-docs">
+          <input type="file" id="m-cf-doc-input" accept="image/*,.pdf,.jpg,.jpeg,.png,.webp,.heic" multiple hidden>
+          <button type="button" class="m-cf-doc-add" id="m-cf-doc-add">
+            ${ICO.upload}
+            <span>면허증 및 요청서류 업로드</span>
+          </button>
+          <div class="m-cf-doc-list" id="m-cf-doc-list">
+            ${(c.docs || []).map((d, i) => `<div class="m-cf-doc-item">
+              <a href="${escapeHtml(d.url || '')}" target="_blank" rel="noopener">${escapeHtml(d.name || '서류' + (i + 1))}</a>
+              <button type="button" class="m-cf-doc-remove" data-doc-idx="${i}">&times;</button>
+            </div>`).join('')}
+          </div>
+          <div class="m-cf-doc-pending" id="m-cf-doc-pending"></div>
         </div>
       </div>
     </section>
@@ -201,6 +243,39 @@ function render(c) {
       cb.closest('.m-cf-check')?.classList.toggle('is-checked', cb.checked);
     });
   });
+  // 서류 업로드 이벤트
+  const docInput = $cf.querySelector('#m-cf-doc-input');
+  const docAddBtn = $cf.querySelector('#m-cf-doc-add');
+  const docPending = $cf.querySelector('#m-cf-doc-pending');
+  let pendingDocFiles = [];
+
+  docAddBtn?.addEventListener('click', () => { if (!isEditMode) return; docInput?.click(); });
+  docInput?.addEventListener('change', () => {
+    pendingDocFiles = [...pendingDocFiles, ...Array.from(docInput.files || [])];
+    docInput.value = '';
+    if (docPending) docPending.innerHTML = pendingDocFiles.map((f, i) =>
+      `<div class="m-cf-doc-item m-cf-doc-item--pending"><span>${escapeHtml(f.name)}</span><button type="button" class="m-cf-doc-remove" data-pending-idx="${i}">&times;</button></div>`
+    ).join('');
+  });
+  $cf.querySelector('#m-cf-doc-list')?.addEventListener('click', (e) => {
+    const rmBtn = e.target.closest('[data-doc-idx]');
+    if (!rmBtn || !isEditMode) return;
+    const idx = Number(rmBtn.dataset.docIdx);
+    _storedDocs = _storedDocs.filter((_, i) => i !== idx);
+    rmBtn.closest('.m-cf-doc-item')?.remove();
+  });
+  docPending?.addEventListener('click', (e) => {
+    const rmBtn = e.target.closest('[data-pending-idx]');
+    if (!rmBtn) return;
+    pendingDocFiles = pendingDocFiles.filter((_, i) => i !== Number(rmBtn.dataset.pendingIdx));
+    if (docPending) docPending.innerHTML = pendingDocFiles.map((f, i) =>
+      `<div class="m-cf-doc-item m-cf-doc-item--pending"><span>${escapeHtml(f.name)}</span><button type="button" class="m-cf-doc-remove" data-pending-idx="${i}">&times;</button></div>`
+    ).join('');
+  });
+  // expose for save
+  window._mcfPendingDocs = () => pendingDocFiles;
+  window._mcfStoredDocs = () => _storedDocs;
+
   // 숫자 필드 콤마 포맷
   $cf.querySelectorAll('input[data-field="rent_amount"], input[data-field="deposit_amount"]').forEach(input => {
     input.addEventListener('input', () => {
@@ -294,6 +369,15 @@ $save?.addEventListener('click', async () => {
     if (updates.rent_amount !== undefined) updates.rent_amount = Number(updates.rent_amount) || 0;
     if (updates.deposit_amount !== undefined) updates.deposit_amount = Number(updates.deposit_amount) || 0;
     if (updates.rent_month !== undefined) updates.rent_month = String(updates.rent_month || '').replace(/[^\d]/g, '');
+    // 서류 처리
+    const pendingFiles = window._mcfPendingDocs?.() || [];
+    let docs = (window._mcfStoredDocs?.() || []).map(d => ({ name: d.name, url: d.url, type: d.type || '' }));
+    if (pendingFiles.length) {
+      showToast('서류 업로드 중...', 'info');
+      const uploaded = await uploadContractFilesDetailed(pendingFiles, currentUser?.uid || 'unknown', {});
+      docs = [...docs, ...uploaded.results.filter(r => r.success).map(r => ({ name: r.name, url: r.url, type: r.type || '' }))];
+    }
+    updates.docs = docs;
     await updateContract(currentContract.contract_code, updates);
     showToast('저장 완료', 'success');
     isEditMode = false;
@@ -353,6 +437,7 @@ window.addEventListener('fp:data', (e) => {
 (async () => {
   try {
     const auth = await requireAuth();
+    currentUser = auth.user;
     currentProfile = auth.profile;
     const role = currentProfile?.role || '';
     const canDelete = role === 'provider' || role === 'admin';

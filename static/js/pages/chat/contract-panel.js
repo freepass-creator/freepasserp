@@ -12,7 +12,7 @@ import { maskName, maskBirth, maskPhone, encryptField, decryptField, requestDecr
 import { createManagedFormModeApplier } from '../../core/management-skeleton.js';
 
 const AGENT_CHECK_KEYS = ['docs_attached', 'approval_requested'];
-const PROVIDER_CHECK_KEYS = ['deposit_confirmed', 'progress_approved', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
+const PROVIDER_CHECK_KEYS = ['progress_approved', 'deposit_confirmed', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
 const CHECK_FIELD_KEYS = [...AGENT_CHECK_KEYS, ...PROVIDER_CHECK_KEYS];
 
 export function createChatContractPanel({ profile, user }) {
