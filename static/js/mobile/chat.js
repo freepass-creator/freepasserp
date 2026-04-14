@@ -218,13 +218,15 @@ function _hydrateProductMap(products) {
 (async () => {
   try {
     // ⚡ 메모리 캐시 즉시 사용
-    const cached = window.__appData || {};
-    if (Array.isArray(cached.rooms) && cached.rooms.length) {
-      allRooms = cached.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
-    }
-    if (Array.isArray(cached.products) && cached.products.length) {
-      productMap = _hydrateProductMap(cached.products);
-    }
+    try {
+      const cached = window.__appData || {};
+      if (Array.isArray(cached.rooms) && cached.rooms.length) {
+        allRooms = cached.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+      }
+      if (Array.isArray(cached.products) && cached.products.length) {
+        productMap = _hydrateProductMap(cached.products);
+      }
+    } catch (e) { console.warn('[chat] cache load error', e); }
 
     const { user, profile } = await requireAuth();
     currentUser = user;
@@ -232,15 +234,24 @@ function _hydrateProductMap(products) {
     currentRole = profile?.role || '';
     if (allRooms.length) applyAll();
 
-    watchRooms((rooms) => {
-      allRooms = (rooms || []).filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
-      _roomsLoaded = true;
-      applyAll();
-    });
-    watchProducts((products) => {
-      productMap = _hydrateProductMap(products);
-      applyAll();
-    });
+    try {
+      watchRooms((rooms) => {
+        try {
+          allRooms = (rooms || []).filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+          _roomsLoaded = true;
+          applyAll();
+        } catch (e) { console.warn('[chat] watchRooms cb error', e); }
+      });
+    } catch (e) { console.warn('[chat] watchRooms sub error', e); }
+
+    try {
+      watchProducts((products) => {
+        try {
+          productMap = _hydrateProductMap(products);
+          applyAll();
+        } catch (e) { console.warn('[chat] watchProducts cb error', e); }
+      });
+    } catch (e) { console.warn('[chat] watchProducts sub error', e); }
 
     // 글로벌 prefetcher 이벤트
     window.addEventListener('fp:data', (e) => {
