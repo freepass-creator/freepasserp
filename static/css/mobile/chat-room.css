@@ -1,6 +1,6 @@
 /* 모바일 대화방 — 채팅방 진입 시 페이지 전체 사용 */
 .m-body:has(.m-cr) {
-  height: 100svh;
+  height: 100dvh;
   overflow: hidden;
 }
 .m-body:has(.m-cr) .m-topbar {
@@ -13,7 +13,7 @@
 .m-body:has(.m-cr) .m-page {
   padding-top: 48px;
   padding-bottom: 0;
-  height: 100svh;
+  height: 100dvh;
 }
 .m-body:has(.m-cr) .m-tabbar {
   display: none;
