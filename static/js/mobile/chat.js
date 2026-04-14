@@ -114,12 +114,16 @@ function replyTone(s) {
   return 'neutral';
 }
 
+let _firstRender = true;
 function render(rooms) {
   if (!$list) return;
   if (!rooms || !rooms.length) {
+    // 최초 렌더 전에는 빈 메시지 대신 스켈레톤/빈 화면 유지
+    if (_firstRender) { _firstRender = false; return; }
     $list.innerHTML = '<div class="m-list-empty">대화 내역이 없습니다</div>';
     return;
   }
+  _firstRender = false;
   $list.innerHTML = rooms.map(r => {
     const status   = r.chat_status || '신규';
     const reply    = r._reply_status || deriveReplyStatus(r);
