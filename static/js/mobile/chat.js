@@ -114,16 +114,15 @@ function replyTone(s) {
   return 'neutral';
 }
 
-let _firstRender = true;
+let _roomsLoaded = false;
 function render(rooms) {
   if (!$list) return;
   if (!rooms || !rooms.length) {
-    // 최초 렌더 전에는 빈 메시지 대신 스켈레톤/빈 화면 유지
-    if (_firstRender) { _firstRender = false; return; }
+    // watchRooms 첫 응답이 오기 전에는 빈 메시지 표시 안 함
+    if (!_roomsLoaded) return;
     $list.innerHTML = '<div class="m-list-empty">대화 내역이 없습니다</div>';
     return;
   }
-  _firstRender = false;
   $list.innerHTML = rooms.map(r => {
     const status   = r.chat_status || '신규';
     const reply    = r._reply_status || deriveReplyStatus(r);
@@ -230,6 +229,7 @@ function _hydrateProductMap(products) {
 
     watchRooms((rooms) => {
       allRooms = (rooms || []).filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+      _roomsLoaded = true;
       applyAll();
     });
     watchProducts((products) => {
@@ -242,6 +242,7 @@ function _hydrateProductMap(products) {
       const t = e.detail?.type;
       if (t === 'rooms' && window.__appData.rooms) {
         allRooms = window.__appData.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+        _roomsLoaded = true;
         applyAll();
       } else if (t === 'products' && window.__appData.products) {
         productMap = _hydrateProductMap(window.__appData.products);
