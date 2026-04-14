@@ -119,7 +119,8 @@ let _hasRenderedList = false;
 function render(rooms) {
   if (!$list) return;
   if (!rooms || !rooms.length) {
-    // 한번이라도 목록이 렌더됐거나 DOM에 실제 리스트가 있으면 유지
+    // allRooms 원본에 데이터가 있으면 절대 empty 표시 안 함 (필터로 인한 일시적 empty)
+    if (allRooms && allRooms.length > 0) return;
     if (_hasRenderedList) return;
     if ($list.querySelector('.m-list-row') || $list.querySelector('.m-list-card')) return;
     if (!_roomsLoaded) return;
