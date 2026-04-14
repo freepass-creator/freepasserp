@@ -17,6 +17,39 @@
   </button>
 {% endblock %}
 {% block body %}
+<div style="padding:16px;background:#fff3cd;border-bottom:1px solid #ffc107;">
+  <button id="direct-sound-test" type="button" style="width:100%;padding:14px;background:#1b2a4a;color:#fff;border:none;border-radius:4px;font-size:16px;font-weight:bold;">
+    🔊 소리 테스트 (HTML 직접)
+  </button>
+  <div id="direct-sound-log" style="margin-top:8px;font-size:12px;color:#666;white-space:pre-wrap;"></div>
+</div>
+<script>
+(function(){
+  var btn = document.getElementById('direct-sound-test');
+  var log = document.getElementById('direct-sound-log');
+  function print(msg) { log.textContent += msg + '\n'; console.log('[sound-test]', msg); }
+  btn.addEventListener('click', function(){
+    log.textContent = '';
+    print('클릭됨. Audio 생성...');
+    try {
+      var a = new Audio('/static/sound-msg.wav');
+      a.volume = 0.8;
+      a.addEventListener('loadeddata', function(){ print('loadeddata: duration=' + a.duration); });
+      a.addEventListener('play', function(){ print('play 이벤트 발생'); });
+      a.addEventListener('ended', function(){ print('재생 완료'); });
+      a.addEventListener('error', function(e){ print('error: ' + (a.error ? a.error.code + '/' + a.error.message : 'unknown')); });
+      var p = a.play();
+      print('play() 호출. promise=' + (p ? 'yes' : 'no'));
+      if (p && p.then) {
+        p.then(function(){ print('promise resolve'); })
+         .catch(function(err){ print('promise reject: ' + err.name + ' - ' + err.message); });
+      }
+    } catch (e) {
+      print('catch: ' + e.message);
+    }
+  });
+})();
+</script>
 <div class="m-settings" id="m-settings">
   <div class="m-skeleton" style="height:120px;margin-bottom:12px"></div>
   <div class="m-skeleton" style="height:160px;margin-bottom:12px"></div>
