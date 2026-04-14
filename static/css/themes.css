@@ -24,6 +24,10 @@ html.theme-classic .work-page { gap: 0; }
 html.theme-classic .panel { box-shadow: none; border: none; border-right: 1px solid #e5e5e5; border-radius: 2px; }
 html.theme-classic .panel:last-child { border-right: none; }
 html.theme-classic .panel-head { border-bottom: 1px solid #e5e5e5; }
+/* 클래식: 맞닿는 가로 보더 중복 제거 */
+html.theme-classic .work-page { border-top: none; }
+html.theme-classic .pls-grid-scroll { border-top: none; }
+html.theme-classic .pls-th { border-bottom-color: #e5e5e5; }
 html.theme-classic .panel-resize-handle { flex: 0 0 1px; background: #e5e5e5; }
 html.theme-classic .panel-resize-handle:hover { background: #2563eb; }
 
