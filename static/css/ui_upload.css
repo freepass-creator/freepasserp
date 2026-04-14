@@ -548,6 +548,12 @@
   background: rgba(0, 0, 0, 0.75);
 }
 
+/* 뷰 모드: X 버튼 숨김 */
+.ui-mode-view .img-thumb-remove,
+.ui-mode-view .doc-thumb-delete,
+[data-panel-mode="view"] .img-thumb-remove,
+[data-panel-mode="view"] .doc-thumb-delete { display: none !important; }
+
 .img-thumb-footer {
   display: flex;
   align-items: center;
