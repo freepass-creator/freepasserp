@@ -56,6 +56,7 @@ function fmtMoney(v) {
 }
 
 let _storedDocs = [];
+let __pendingDocFiles = [];
 
 function render(c) {
   if (!$cf || !c) return;
@@ -248,13 +249,13 @@ function render(c) {
   const docInput = $cf.querySelector('#m-cf-doc-input');
   const docAddBtn = $cf.querySelector('#m-cf-doc-add');
   const docPending = $cf.querySelector('#m-cf-doc-pending');
-  let pendingDocFiles = [];
+  __pendingDocFiles = [];
 
   docAddBtn?.addEventListener('click', () => { if (!isEditMode) return; docInput?.click(); });
   docInput?.addEventListener('change', () => {
-    pendingDocFiles = [...pendingDocFiles, ...Array.from(docInput.files || [])];
+    _pendingDocFiles = [..._pendingDocFiles, ...Array.from(docInput.files || [])];
     docInput.value = '';
-    if (docPending) docPending.innerHTML = pendingDocFiles.map((f, i) =>
+    if (docPending) docPending.innerHTML = _pendingDocFiles.map((f, i) =>
       `<div class="m-cf-doc-item m-cf-doc-item--pending"><span>${escapeHtml(f.name)}</span><button type="button" class="m-cf-doc-remove" data-pending-idx="${i}">&times;</button></div>`
     ).join('');
   });
@@ -268,14 +269,11 @@ function render(c) {
   docPending?.addEventListener('click', (e) => {
     const rmBtn = e.target.closest('[data-pending-idx]');
     if (!rmBtn) return;
-    pendingDocFiles = pendingDocFiles.filter((_, i) => i !== Number(rmBtn.dataset.pendingIdx));
-    if (docPending) docPending.innerHTML = pendingDocFiles.map((f, i) =>
+    _pendingDocFiles = _pendingDocFiles.filter((_, i) => i !== Number(rmBtn.dataset.pendingIdx));
+    if (docPending) docPending.innerHTML = _pendingDocFiles.map((f, i) =>
       `<div class="m-cf-doc-item m-cf-doc-item--pending"><span>${escapeHtml(f.name)}</span><button type="button" class="m-cf-doc-remove" data-pending-idx="${i}">&times;</button></div>`
     ).join('');
   });
-  // expose for save
-  window._mcfPendingDocs = () => pendingDocFiles;
-  window._mcfStoredDocs = () => _storedDocs;
 
   // 숫자 필드 콤마 포맷
   $cf.querySelectorAll('input[data-field="rent_amount"], input[data-field="deposit_amount"]').forEach(input => {
@@ -371,8 +369,8 @@ $save?.addEventListener('click', async () => {
     if (updates.deposit_amount !== undefined) updates.deposit_amount = Number(updates.deposit_amount) || 0;
     if (updates.rent_month !== undefined) updates.rent_month = String(updates.rent_month || '').replace(/[^\d]/g, '');
     // 서류 처리
-    const pendingFiles = window._mcfPendingDocs?.() || [];
-    let docs = (window._mcfStoredDocs?.() || []).map(d => ({ name: d.name, url: d.url, type: d.type || '' }));
+    const pendingFiles = _pendingDocFiles || [];
+    let docs = (_storedDocs || []).map(d => ({ name: d.name, url: d.url, type: d.type || '' }));
     if (pendingFiles.length) {
       showToast('서류 업로드 중...', 'info');
       const uploaded = await uploadContractFilesDetailed(pendingFiles, currentUser?.uid || 'unknown', {});

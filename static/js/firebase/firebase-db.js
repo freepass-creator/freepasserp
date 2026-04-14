@@ -939,7 +939,7 @@ export async function saveContract(contract) {
   const payload = {
     contract_code: contractCode, contract_date: `${yyyy}-${mm}-${dd}`,
     contract_status: '계약대기', customer_name: '', customer_birth: '', customer_phone: '',
-    docs: [], checks: { deposit_confirmed: false, docs_confirmed: false, contract_signed: false, final_payment: false, vehicle_delivered: false },
+    docs: [], checks: { docs_attached: false, approval_requested: false, contract_proceed: false, progress_approved: false, deposit_confirmed: false, contract_written: false, balance_confirmed: false, delivery_confirmed: false },
     ...normalizedContract, ...buildContractSnapshots(normalizedContract),
     contract_code: contractCode, partner_code: partnerCode,
     provider_company_code: partnerCode, created_at: Date.now()

@@ -8,7 +8,7 @@ import { toggleFilter, applyFilter } from './filter-sheet.js';
 import { wireHtmlCache } from './page-cache.js';
 
 // 처리상태 도출 — 데스크탑과 동일 로직
-const CHECK_FIELD_KEYS = ['deposit_confirmed', 'docs_confirmed', 'approval_confirmed', 'contract_confirmed', 'balance_confirmed', 'delivery_confirmed'];
+const CHECK_FIELD_KEYS = ['docs_attached', 'approval_requested', 'contract_proceed', 'progress_approved', 'deposit_confirmed', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
 function uncheckedCount(c) {
   const checks = c?.checks || {};
   return CHECK_FIELD_KEYS.filter(k => !checks[k]).length;
