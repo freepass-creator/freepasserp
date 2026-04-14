@@ -1,26 +1,60 @@
 /**
  * notif-sound.js — 알림 소리
- * Web Audio API로 간단한 '딩동' 톤 생성 (외부 파일 불필요)
- * 사용자가 한 번이라도 페이지와 상호작용한 후에만 재생 가능 (브라우저 정책)
+ * HTMLAudioElement + data URL 기반 (외부 파일/AudioContext 불필요)
  */
 
 const STORAGE_KEY = 'fp.sound.enabled';
-let audioCtx = null;
-let userInteracted = false;
 let lastPlayedAt = 0;
 
-// 사용자 첫 인터랙션 이후 AudioContext 활성화 (브라우저 autoplay 정책)
-function setupInteractionUnlock() {
-  const unlock = () => {
-    userInteracted = true;
-    try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); } catch {}
-    if (audioCtx?.state === 'suspended') audioCtx.resume().catch(() => {});
-  };
-  ['click', 'touchstart', 'keydown'].forEach(ev => {
-    document.addEventListener(ev, unlock, { once: false, passive: true });
-  });
+// 짧은 WAV 비프음 (사인파) — 메시지/계약 구분
+// 16-bit PCM, 44100Hz, mono
+function makeBeepDataUrl(freq = 880, duration = 0.2) {
+  const sampleRate = 44100;
+  const samples = Math.floor(sampleRate * duration);
+  const buffer = new ArrayBuffer(44 + samples * 2);
+  const view = new DataView(buffer);
+
+  // WAV 헤더
+  const writeStr = (off, str) => { for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i)); };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + samples * 2, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, samples * 2, true);
+
+  // 사인파 데이터 + 페이드아웃
+  for (let i = 0; i < samples; i++) {
+    const t = i / sampleRate;
+    const env = Math.exp(-t * 8); // 감쇠
+    const v = Math.sin(2 * Math.PI * freq * t) * env * 0.4;
+    view.setInt16(44 + i * 2, Math.max(-1, Math.min(1, v)) * 0x7FFF, true);
+  }
+
+  // base64 인코딩
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return 'data:audio/wav;base64,' + btoa(binary);
 }
-setupInteractionUnlock();
+
+let audioMsg = null;
+let audioContract = null;
+function getAudio(type) {
+  if (type === 'contract') {
+    if (!audioContract) { audioContract = new Audio(makeBeepDataUrl(660, 0.25)); audioContract.volume = 0.5; }
+    return audioContract;
+  }
+  if (!audioMsg) { audioMsg = new Audio(makeBeepDataUrl(880, 0.2)); audioMsg.volume = 0.5; }
+  return audioMsg;
+}
 
 export function isSoundEnabled() {
   try { return localStorage.getItem(STORAGE_KEY) !== '0'; } catch { return true; }
@@ -29,41 +63,19 @@ export function setSoundEnabled(on) {
   try { localStorage.setItem(STORAGE_KEY, on ? '1' : '0'); } catch {}
 }
 
-/**
- * 알림 소리 재생 — '딩동' 2음 톤
- * @param {object} opts
- *   type: 'message' | 'contract' — 용도별 다른 톤
- */
 export function playNotifSound(opts = {}) {
   if (!isSoundEnabled()) return;
-  if (!userInteracted) return;
-  // 과도한 연속 재생 방지 (1.5초 쿨다운)
   const now = Date.now();
   if (now - lastPlayedAt < 1500) return;
   lastPlayedAt = now;
 
   try {
-    const ctx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    audioCtx = ctx;
-    if (ctx.state === 'suspended') ctx.resume();
-
-    const type = opts.type || 'message';
-    const notes = type === 'contract'
-      ? [{ f: 660, t: 0 }, { f: 880, t: 0.12 }]     // 낮음→높음 (계약)
-      : [{ f: 880, t: 0 }, { f: 660, t: 0.12 }];    // 높음→낮음 (메시지)
-
-    notes.forEach(({ f, t }) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(f, ctx.currentTime + t);
-      gain.gain.setValueAtTime(0, ctx.currentTime + t);
-      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.18);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(ctx.currentTime + t);
-      osc.stop(ctx.currentTime + t + 0.2);
-    });
+    const audio = getAudio(opts.type || 'message');
+    audio.currentTime = 0;
+    const p = audio.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(err => console.warn('[notif-sound] play blocked', err.name));
+    }
   } catch (e) {
     console.warn('[notif-sound] play failed', e);
   }
