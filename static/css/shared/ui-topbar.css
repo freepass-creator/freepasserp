@@ -9,6 +9,8 @@
   padding: 0 var(--space-3);
   border-bottom: none;
   margin-bottom: 0;
+  position: relative;
+  z-index: 2;
 }
 
 /* ── 좌: 소속 이름 직급 ── */
