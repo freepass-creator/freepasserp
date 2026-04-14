@@ -260,16 +260,21 @@ function render() {
       if (el.dataset.pref === 'sound') {
         setSoundEnabled(el.checked);
         if (el.checked) {
-          // 직접 Audio 생성 — user gesture 직후 동기 재생
           try {
             const a = new Audio('/static/sound-msg.wav');
-            a.volume = 0.6;
+            a.volume = 0.8;
+            a.muted = false;
+            showToast(`재생 시도 (볼륨 확인: 미디어 볼륨 켜짐?)`, 'info');
             const p = a.play();
-            if (p && p.catch) p.catch(err => {
-              showToast(`재생 실패: ${err.name} - ${err.message}`, 'error');
-            });
+            if (p && typeof p.then === 'function') {
+              p.then(() => {
+                showToast(`재생 성공 (duration: ${a.duration?.toFixed(2) || '?'}s)`, 'success');
+              }).catch(err => {
+                showToast(`실패: ${err.name} - ${err.message}`, 'error');
+              });
+            }
           } catch (err) {
-            showToast(`오디오 에러: ${err.message}`, 'error');
+            showToast(`에러: ${err.message}`, 'error');
           }
         }
       }
