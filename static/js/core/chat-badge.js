@@ -6,6 +6,7 @@
 
 import { requireAuth } from './auth-guard.js';
 import { watchRooms } from '../firebase/firebase-db.js';
+import { playNotifSound } from './notif-sound.js';
 
 const BADGE_ID = 'sidebar-chat-badge';
 
@@ -70,9 +71,15 @@ async function initChatBadge() {
     const menu = document.getElementById('sidebar-menu');
     if (menu) observer.observe(menu, { childList: true, subtree: true });
 
+    let prevCount = -1;
     watchRooms((rooms) => {
       lastCount = countPendingRooms(rooms, profile.role, user.uid, profile.company_code || '');
       updateBadge(lastCount);
+      // 첫 로드 이후 카운트 증가 시 소리
+      if (prevCount >= 0 && lastCount > prevCount) {
+        playNotifSound({ type: 'message' });
+      }
+      prevCount = lastCount;
     });
   } catch (_) {
     // 비로그인 상태 등 — 뱃지 숨김 유지

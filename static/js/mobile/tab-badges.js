@@ -4,6 +4,7 @@
  */
 import { requireAuth } from '../core/auth-guard.js';
 import { watchRooms, watchContracts } from '../firebase/firebase-db.js';
+import { playNotifSound } from '../core/notif-sound.js';
 
 // ⚡ sessionStorage 캐시 — 페이지 이동 시 뱃지 깜빡임 방지
 const BADGE_CACHE_KEY = 'fp_tab_badges_v1';
@@ -65,6 +66,7 @@ if (document.readyState === 'loading') {
     }
 
     // 대화 안읽음 — 자기 방만 + 역할별 카운트 합산
+    let prevChat = -1;
     watchRooms((rooms) => {
       let total = 0;
       (rooms || []).forEach(r => {
@@ -75,14 +77,19 @@ if (document.readyState === 'loading') {
         else if (role === 'provider') total += Number(r.unread_for_provider || 0);
       });
       setBadge('m-tab-chat-badge', total);
+      if (prevChat >= 0 && total > prevChat) playNotifSound({ type: 'message' });
+      prevChat = total;
     });
 
     // 계약 처리 대기 — 자기 것만
+    let prevContract = -1;
     watchContracts((contracts) => {
       const pending = (contracts || []).filter(c =>
         c && isMineContract(c) && /대기|진행|신규/.test(String(c.contract_status || ''))
       ).length;
       setBadge('m-tab-contract-badge', pending);
+      if (prevContract >= 0 && pending > prevContract) playNotifSound({ type: 'contract' });
+      prevContract = pending;
     });
   } catch (e) {
     console.warn('[tab-badges] init failed', e);

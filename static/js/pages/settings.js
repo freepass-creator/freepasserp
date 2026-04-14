@@ -322,6 +322,17 @@ function bindAppSettings(profile) {
     badgeList.addEventListener('change', saveAppSettings);
   }
 
+  // 알림 소리
+  import('../core/notif-sound.js').then(({ isSoundEnabled, setSoundEnabled, playNotifSound }) => {
+    const toggle = document.getElementById('settings-sound-toggle');
+    if (!toggle) return;
+    toggle.checked = isSoundEnabled();
+    toggle.addEventListener('change', () => {
+      setSoundEnabled(toggle.checked);
+      if (toggle.checked) playNotifSound({ type: 'message' });
+    });
+  });
+
   // 보기 모드 (테마)
   const themeSelect = document.getElementById('settings-theme');
   const darkmodeSelect = document.getElementById('settings-darkmode');
