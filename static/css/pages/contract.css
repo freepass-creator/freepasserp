@@ -21,6 +21,7 @@
 }
 .contract-check-group-label {
   grid-column: 1 / -1;
+  grid-row: 1;
   font-size: var(--font-size-sub, 10px);
   font-weight: 700;
   color: var(--text-muted, #94a3b8);
