@@ -1,6 +1,6 @@
 /* 모바일 대화방 — 채팅방 진입 시 페이지 전체 사용 */
 .m-body:has(.m-cr) {
-  height: 100dvh;
+  height: var(--cr-vh, 100dvh);
   overflow: hidden;
 }
 .m-body:has(.m-cr) .m-topbar {
@@ -13,7 +13,7 @@
 .m-body:has(.m-cr) .m-page {
   padding-top: 48px;
   padding-bottom: 0;
-  height: 100dvh;
+  height: var(--cr-vh, 100dvh);
 }
 .m-body:has(.m-cr) .m-tabbar {
   display: none;
@@ -128,7 +128,8 @@
   display: flex;
   align-items: flex-end;
   gap: var(--m-space-2);
-  padding: var(--m-space-2) var(--m-space-3) calc(var(--m-space-2) + env(safe-area-inset-bottom));
+  padding: var(--m-space-2) var(--m-space-3);
+  padding-bottom: max(var(--m-space-2), env(safe-area-inset-bottom));
   background: var(--m-card-bg);
   border-top: 1px solid var(--m-divider);
   flex: 0 0 auto;

@@ -2,6 +2,18 @@
  * mobile/chat-room.js — 모바일 대화방
  */
 import { requireAuth } from '../core/auth-guard.js';
+
+// Visual Viewport 기반 실시간 높이 동기화 (URL바 show/hide 대응)
+(function setupViewportHeight() {
+  const update = () => {
+    const h = window.visualViewport?.height || window.innerHeight;
+    document.documentElement.style.setProperty('--cr-vh', `${h}px`);
+  };
+  update();
+  window.visualViewport?.addEventListener('resize', update);
+  window.visualViewport?.addEventListener('scroll', update);
+  window.addEventListener('resize', update);
+})();
 import {
   watchMessages, watchRooms, watchProducts, sendMessage,
   markRoomRead, hideRoomForUser, deleteRoomEverywhere,
