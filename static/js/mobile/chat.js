@@ -115,22 +115,19 @@ function replyTone(s) {
 }
 
 let _roomsLoaded = false;
-let _emptyTimer = null;
+let _hasRenderedList = false;
 function render(rooms) {
   if (!$list) return;
   if (!rooms || !rooms.length) {
-    // 첫 응답 전이거나 캐시 목록이 있으면 유지
+    // 한번이라도 목록이 렌더됐으면 empty 메시지 안 띄움 (목록 그대로 유지)
+    if (_hasRenderedList) return;
+    // 첫 응답 전이면 빈 메시지 표시 안 함
     if (!_roomsLoaded) return;
-    // 빈 상태를 바로 표시하지 않고 300ms 디바운스 — 다른 업데이트가 오면 취소
-    if (_emptyTimer) clearTimeout(_emptyTimer);
-    _emptyTimer = setTimeout(() => {
-      if ($list && (!allRooms || !allRooms.filter(isVisibleForRole).length)) {
-        $list.innerHTML = '<div class="m-list-empty">대화 내역이 없습니다</div>';
-      }
-    }, 300);
+    // 실제로 처음부터 비어있는 경우만 표시
+    $list.innerHTML = '<div class="m-list-empty">대화 내역이 없습니다</div>';
     return;
   }
-  if (_emptyTimer) { clearTimeout(_emptyTimer); _emptyTimer = null; }
+  _hasRenderedList = true;
   $list.innerHTML = rooms.map(r => {
     const status   = r.chat_status || '신규';
     const reply    = r._reply_status || deriveReplyStatus(r);
