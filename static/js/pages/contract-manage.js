@@ -106,12 +106,7 @@ function bindDOM() {
   bindAutoFormat(f('customer_phone'), formatPhone);
 }
 
-const AGENT_CHECK_KEYS = ['docs_attached', 'approval_requested', 'contract_proceed'];
-const AGENT_CHECK_LABELS = { docs_attached: '서류첨부', approval_requested: '승인요청', contract_proceed: '계약진행' };
-const PROVIDER_CHECK_KEYS = ['progress_approved', 'deposit_confirmed', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
-const PROVIDER_CHECK_LABELS = { progress_approved: '진행승인', deposit_confirmed: '계약금확인', contract_written: '계약서작성', balance_confirmed: '잔금확인', delivery_confirmed: '인도확인' };
-const CHECK_FIELD_KEYS = [...AGENT_CHECK_KEYS, ...PROVIDER_CHECK_KEYS];
-const CHECK_FIELD_LABELS = { ...AGENT_CHECK_LABELS, ...PROVIDER_CHECK_LABELS };
+import { AGENT_CHECK_KEYS, AGENT_CHECK_LABELS, PROVIDER_CHECK_KEYS, PROVIDER_CHECK_LABELS, CHECK_FIELD_KEYS, CHECK_FIELD_LABELS, createEmptyChecks } from '../core/contract-constants.js';
 const CONTRACT_STATUS_OPTIONS = [
   { value: '계약대기', label: '계약대기' },
   { value: '계약요청', label: '계약요청' },
@@ -736,7 +731,7 @@ async function maybeCreateFromPendingSeed() {
     contract_code: code,
     ...payload,
     created_at: Date.now(),
-    checks: Object.fromEntries(CHECK_FIELD_KEYS.map(k => [k, false])),
+    checks: createEmptyChecks(),
     docs: []
   };
   allContracts = [created, ...remoteContracts];
@@ -771,7 +766,7 @@ async function handleSave() {
   const currentDocUrls = new Set(docs.map(d => d.url).filter(Boolean));
   const removedUrls = previousDocs.map(d => d.url).filter(url => url && !currentDocUrls.has(url));
   if (removedUrls.length) {
-    try { await deleteProductImagesByUrls(removedUrls); } catch (_) {}
+    try { await deleteProductImagesByUrls(removedUrls); } catch (e) { console.warn('[contract docs cleanup]', e?.message || e); }
   }
 
   syncContractStatusByChecks();

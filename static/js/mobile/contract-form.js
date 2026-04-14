@@ -25,19 +25,7 @@ let currentProfile = null;
 let currentUser = null;
 let productMap = new Map();
 
-const AGENT_CHECK_FIELDS = [
-  { key: 'docs_attached',       label: '서류첨부' },
-  { key: 'approval_requested',  label: '승인요청' },
-  { key: 'contract_proceed',   label: '계약진행' },
-];
-const PROVIDER_CHECK_FIELDS = [
-  { key: 'progress_approved',   label: '진행승인' },
-  { key: 'deposit_confirmed',   label: '계약금확인' },
-  { key: 'contract_written',    label: '계약서작성' },
-  { key: 'balance_confirmed',   label: '잔금확인' },
-  { key: 'delivery_confirmed',  label: '인도확인' },
-];
-const CHECK_FIELDS = [...AGENT_CHECK_FIELDS, ...PROVIDER_CHECK_FIELDS];
+import { AGENT_CHECK_FIELDS, PROVIDER_CHECK_FIELDS, CHECK_FIELDS } from '../core/contract-constants.js';
 
 const STATUS_OPTIONS = ['계약대기', '계약요청', '계약발송', '계약완료', '계약철회'];
 

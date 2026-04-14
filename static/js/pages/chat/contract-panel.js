@@ -11,9 +11,7 @@ import { parseMoneyValue, ensureSelectValue, resolveTermPricing, deriveMakerDisp
 import { maskName, maskBirth, maskPhone, encryptField, decryptField, requestDecryptPassword } from '../../core/crypto.js';
 import { createManagedFormModeApplier } from '../../core/management-skeleton.js';
 
-const AGENT_CHECK_KEYS = ['docs_attached', 'approval_requested', 'contract_proceed'];
-const PROVIDER_CHECK_KEYS = ['progress_approved', 'deposit_confirmed', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
-const CHECK_FIELD_KEYS = [...AGENT_CHECK_KEYS, ...PROVIDER_CHECK_KEYS];
+import { CHECK_FIELD_KEYS } from '../../core/contract-constants.js';
 
 export function createChatContractPanel({ profile, user }) {
   const $ = (id) => document.getElementById(id);

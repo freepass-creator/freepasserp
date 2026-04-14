@@ -15,6 +15,7 @@ import {
   get, onValue, push, ref, remove, runTransaction, set, update
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
 import { db, auth } from './firebase-config.js';
+import { createEmptyChecks } from '../core/contract-constants.js';
 import {
   buildChatCode, buildLegacyTermCode, buildProductCode,
   createManagedTermCode, createPartnerCode, createUserCode, sanitizeCodeValue
@@ -51,7 +52,7 @@ async function writeLog(action, targetType, targetId, changes = null) {
     };
     if (changes) entry.changes = changes;
     await push(ref(db, 'logs'), entry);
-  } catch (_) {}
+  } catch (e) { console.warn('[writeLog]', e?.message || e); }
 }
 
 function diffChanges(before, after) {
@@ -939,7 +940,7 @@ export async function saveContract(contract) {
   const payload = {
     contract_code: contractCode, contract_date: `${yyyy}-${mm}-${dd}`,
     contract_status: '계약대기', customer_name: '', customer_birth: '', customer_phone: '',
-    docs: [], checks: { docs_attached: false, approval_requested: false, contract_proceed: false, progress_approved: false, deposit_confirmed: false, contract_written: false, balance_confirmed: false, delivery_confirmed: false },
+    docs: [], checks: createEmptyChecks(),
     ...normalizedContract, ...buildContractSnapshots(normalizedContract),
     contract_code: contractCode, partner_code: partnerCode,
     provider_company_code: partnerCode, created_at: Date.now()
@@ -993,7 +994,7 @@ export async function updateContract(contractCode, updates) {
           }
           if (!feeAmount) feeAmount = originFeeAmount;
         }
-      } catch (_) {}
+      } catch (e) { console.warn('[settlement fee]', e?.message || e); }
     }
     await set(settlementRef, {
       ...existingSettlement, settlement_code: settlementCode, contract_code: code,
