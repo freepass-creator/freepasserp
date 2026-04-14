@@ -259,7 +259,19 @@ function render() {
       // sound 토글은 notif-sound.js 공용 키와 동기화 + 즉시 테스트 재생 (user gesture 유지)
       if (el.dataset.pref === 'sound') {
         setSoundEnabled(el.checked);
-        if (el.checked) playNotifSound({ type: 'message' });
+        if (el.checked) {
+          // 직접 Audio 생성 — user gesture 직후 동기 재생
+          try {
+            const a = new Audio('/static/sound-msg.wav');
+            a.volume = 0.6;
+            const p = a.play();
+            if (p && p.catch) p.catch(err => {
+              showToast(`재생 실패: ${err.name} - ${err.message}`, 'error');
+            });
+          } catch (err) {
+            showToast(`오디오 에러: ${err.message}`, 'error');
+          }
+        }
       }
     });
   });
