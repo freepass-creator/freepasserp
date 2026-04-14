@@ -45,12 +45,16 @@ export function playNotifSound(opts = {}) {
 
   try {
     const src = opts.type === 'contract' ? '/static/sound-contract.wav' : '/static/sound-msg.wav';
-    // 재생 시점에 새 Audio 생성 (모바일 호환성)
     const audio = new Audio(src);
     audio.volume = 0.5;
     const p = audio.play();
     if (p && typeof p.catch === 'function') {
       p.catch(err => console.warn('[notif-sound]', err.name, err.message));
+    }
+    // 진동 (Android Chrome 등 지원, iOS Safari 미지원)
+    if ('vibrate' in navigator) {
+      const pattern = opts.type === 'contract' ? [100, 50, 100, 50, 100] : [150, 80, 150];
+      try { navigator.vibrate(pattern); } catch {}
     }
   } catch (e) {
     console.warn('[notif-sound] failed', e);
