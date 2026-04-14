@@ -23,6 +23,7 @@ html.theme-classic .main-shell { padding: 0 !important; gap: 0 !important; }
 html.theme-classic .work-page { gap: 0; }
 html.theme-classic .panel { box-shadow: none; border: none; border-right: 1px solid #e5e5e5; border-radius: 2px; }
 html.theme-classic .panel:last-child { border-right: none; }
+html.theme-classic .top-bar { border-bottom: 1px solid #e5e5e5; }
 html.theme-classic .panel-head { border-bottom: 1px solid #e5e5e5; }
 /* 클래식: 맞닿는 가로 보더 중복 제거 */
 html.theme-classic .work-page { border-top: none; }
