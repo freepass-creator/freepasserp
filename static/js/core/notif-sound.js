@@ -47,6 +47,8 @@ function makeBeepDataUrl(freq = 880, duration = 0.2) {
 
 let audioMsg = null;
 let audioContract = null;
+let audioUnlocked = false;
+
 function getAudio(type) {
   if (type === 'contract') {
     if (!audioContract) { audioContract = new Audio(makeBeepDataUrl(660, 0.25)); audioContract.volume = 0.5; }
@@ -55,6 +57,31 @@ function getAudio(type) {
   if (!audioMsg) { audioMsg = new Audio(makeBeepDataUrl(880, 0.2)); audioMsg.volume = 0.5; }
   return audioMsg;
 }
+
+// 모바일용 오디오 unlock — 첫 터치 시 무음 재생으로 권한 획득
+function setupUnlock() {
+  const unlock = () => {
+    if (audioUnlocked) return;
+    try {
+      const msg = getAudio('message');
+      const contract = getAudio('contract');
+      // 무음으로 재생했다가 즉시 멈춤 → 브라우저가 이 오디오 객체를 unlock
+      const origMsgVol = msg.volume;
+      const origContractVol = contract.volume;
+      msg.volume = 0;
+      contract.volume = 0;
+      Promise.all([msg.play().catch(() => {}), contract.play().catch(() => {})]).then(() => {
+        msg.pause(); msg.currentTime = 0; msg.volume = origMsgVol;
+        contract.pause(); contract.currentTime = 0; contract.volume = origContractVol;
+        audioUnlocked = true;
+      });
+    } catch {}
+  };
+  ['touchstart', 'click', 'keydown'].forEach(ev => {
+    document.addEventListener(ev, unlock, { once: false, passive: true });
+  });
+}
+setupUnlock();
 
 export function isSoundEnabled() {
   try { return localStorage.getItem(STORAGE_KEY) !== '0'; } catch { return true; }
