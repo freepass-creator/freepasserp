@@ -119,11 +119,10 @@ let _hasRenderedList = false;
 function render(rooms) {
   if (!$list) return;
   if (!rooms || !rooms.length) {
-    // 한번이라도 목록이 렌더됐으면 empty 메시지 안 띄움 (목록 그대로 유지)
+    // 한번이라도 목록이 렌더됐거나 DOM에 실제 리스트가 있으면 유지
     if (_hasRenderedList) return;
-    // 첫 응답 전이면 빈 메시지 표시 안 함
+    if ($list.querySelector('.m-list-row') || $list.querySelector('.m-list-card')) return;
     if (!_roomsLoaded) return;
-    // 실제로 처음부터 비어있는 경우만 표시
     $list.innerHTML = '<div class="m-list-empty">대화 내역이 없습니다</div>';
     return;
   }
@@ -267,8 +266,9 @@ function _hydrateProductMap(products) {
     });
   } catch (e) {
     console.error('[mobile/chat] init failed', e);
-    // 이미 목록이 렌더됐으면 에러 메시지 덮어쓰지 않음
-    if ($list && !_hasRenderedList) {
+    // 이미 렌더된 목록이나 캐시 HTML이 있으면 에러 메시지 덮어쓰지 않음
+    const hasContent = $list && ($list.querySelector('.m-list-row') || $list.querySelector('.m-list-card') || _hasRenderedList);
+    if ($list && !hasContent) {
       $list.innerHTML = '<div class="m-list-empty">대화 목록을 불러오지 못했습니다</div>';
     }
   }

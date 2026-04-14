@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v181';
+const CACHE_NAME = 'freepass-v182';
 const IMG_CACHE = 'freepass-img-v1';
 
 // 핵심 자원 — 첫 방문 시 미리 다운로드
