@@ -24,7 +24,13 @@
   height: 100%;
   min-height: 0;
   background: var(--m-bg);
+  overscroll-behavior: none;
+  touch-action: pan-y;
+  overflow: hidden;
 }
+.m-cr__input { touch-action: none; }
+.m-cr__input textarea,
+.m-cr__input button { touch-action: auto; }
 
 
 /* 메시지 영역 */
