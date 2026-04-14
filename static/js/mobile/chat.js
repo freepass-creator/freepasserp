@@ -2,7 +2,7 @@
  * mobile/chat.js — 모바일 대화 목록
  */
 import { requireAuth } from '../core/auth-guard.js';
-import { watchRooms } from '../firebase/firebase-db.js';
+import { watchRooms, watchProducts } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
 import { deriveReplyStatus } from '../pages/chat/room-list.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
