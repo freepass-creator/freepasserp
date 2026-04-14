@@ -3,32 +3,6 @@
  */
 import { requireAuth } from '../core/auth-guard.js';
 
-// Visual Viewport 기반 실시간 높이/입력칸 위치 동기화
-(function setupViewportHeight() {
-  const update = () => {
-    const vv = window.visualViewport;
-    const h = vv?.height || window.innerHeight;
-    document.documentElement.style.setProperty('--cr-vh', `${h}px`);
-    // 주소창 show 상태일 때 입력칸이 실제 보이는 영역 하단에 붙도록 offsetTop+height 기반
-    if (vv) {
-      const bottomGap = window.innerHeight - (vv.offsetTop + vv.height);
-      document.documentElement.style.setProperty('--cr-input-offset', `${-bottomGap}px`);
-    }
-    // 입력칸 높이 측정
-    const input = document.querySelector('.m-cr__input');
-    if (input) {
-      document.documentElement.style.setProperty('--cr-input-h', `${input.offsetHeight}px`);
-    }
-  };
-  update();
-  window.visualViewport?.addEventListener('resize', update);
-  window.visualViewport?.addEventListener('scroll', update);
-  window.addEventListener('resize', update);
-  window.addEventListener('scroll', update, { passive: true });
-  // 초기 렌더 후 재측정
-  setTimeout(update, 100);
-  setTimeout(update, 500);
-})();
 import {
   watchMessages, watchRooms, watchProducts, sendMessage,
   markRoomRead, hideRoomForUser, deleteRoomEverywhere,
