@@ -28,6 +28,7 @@ let productMap = new Map();
 const AGENT_CHECK_FIELDS = [
   { key: 'docs_attached',       label: '서류첨부' },
   { key: 'approval_requested',  label: '승인요청' },
+  { key: 'contract_proceed',   label: '계약진행' },
 ];
 const PROVIDER_CHECK_FIELDS = [
   { key: 'progress_approved',   label: '진행승인' },

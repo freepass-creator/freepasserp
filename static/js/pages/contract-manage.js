@@ -54,6 +54,7 @@ let fields = {
   customer_phone: qs('#customer_phone'),
   docs_attached: qs('#docs_attached'),
   approval_requested: qs('#approval_requested'),
+  contract_proceed: qs('#contract_proceed'),
   deposit_confirmed: qs('#deposit_confirmed'),
   progress_approved: qs('#progress_approved'),
   contract_written: qs('#contract_written'),
@@ -95,6 +96,7 @@ function bindDOM() {
     customer_phone: f('customer_phone'),
     docs_attached: f('docs_attached'),
     approval_requested: f('approval_requested'),
+    contract_proceed: f('contract_proceed'),
     deposit_confirmed: f('deposit_confirmed'),
     progress_approved: f('progress_approved'),
     contract_written: f('contract_written'),
@@ -104,8 +106,8 @@ function bindDOM() {
   bindAutoFormat(f('customer_phone'), formatPhone);
 }
 
-const AGENT_CHECK_KEYS = ['docs_attached', 'approval_requested'];
-const AGENT_CHECK_LABELS = { docs_attached: '서류첨부', approval_requested: '승인요청' };
+const AGENT_CHECK_KEYS = ['docs_attached', 'approval_requested', 'contract_proceed'];
+const AGENT_CHECK_LABELS = { docs_attached: '서류첨부', approval_requested: '승인요청', contract_proceed: '계약진행' };
 const PROVIDER_CHECK_KEYS = ['progress_approved', 'deposit_confirmed', 'contract_written', 'balance_confirmed', 'delivery_confirmed'];
 const PROVIDER_CHECK_LABELS = { progress_approved: '진행승인', deposit_confirmed: '계약금확인', contract_written: '계약서작성', balance_confirmed: '잔금확인', delivery_confirmed: '인도확인' };
 const CHECK_FIELD_KEYS = [...AGENT_CHECK_KEYS, ...PROVIDER_CHECK_KEYS];
