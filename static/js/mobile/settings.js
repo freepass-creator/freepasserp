@@ -255,8 +255,22 @@ function render() {
     el.addEventListener('change', () => {
       prefs[el.dataset.pref] = el.checked;
       savePrefs(prefs);
+      // sound 토글은 notif-sound.js 공용 키와 동기화 + 테스트 재생
+      if (el.dataset.pref === 'sound') {
+        try { localStorage.setItem('fp.sound.enabled', el.checked ? '1' : '0'); } catch {}
+        if (el.checked) {
+          import('../core/notif-sound.js').then(({ playNotifSound }) => playNotifSound({ type: 'message' }));
+        }
+      }
     });
   });
+
+  // 페이지 로드 시 sound 상태 동기화
+  try {
+    const soundEnabled = localStorage.getItem('fp.sound.enabled') !== '0';
+    const soundToggle = $st.querySelector('[data-pref="sound"]');
+    if (soundToggle) soundToggle.checked = soundEnabled;
+  } catch {}
 
   // 카탈로그 복사
   $st.querySelector('#m-st-catalog-copy')?.addEventListener('click', async () => {
