@@ -114,20 +114,12 @@ function replyTone(s) {
   return 'neutral';
 }
 
-let _roomsLoaded = false;
-let _hasRenderedList = false;
 function render(rooms) {
   if (!$list) return;
   if (!rooms || !rooms.length) {
-    // allRooms 원본에 데이터가 있으면 절대 empty 표시 안 함 (필터로 인한 일시적 empty)
-    if (allRooms && allRooms.length > 0) return;
-    if (_hasRenderedList) return;
-    if ($list.querySelector('.m-list-row') || $list.querySelector('.m-list-card')) return;
-    if (!_roomsLoaded) return;
     $list.innerHTML = '<div class="m-list-empty">대화 내역이 없습니다</div>';
     return;
   }
-  _hasRenderedList = true;
   $list.innerHTML = rooms.map(r => {
     const status   = r.chat_status || '신규';
     const reply    = r._reply_status || deriveReplyStatus(r);
@@ -218,15 +210,13 @@ function _hydrateProductMap(products) {
 (async () => {
   try {
     // ⚡ 메모리 캐시 즉시 사용
-    try {
-      const cached = window.__appData || {};
-      if (Array.isArray(cached.rooms) && cached.rooms.length) {
-        allRooms = cached.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
-      }
-      if (Array.isArray(cached.products) && cached.products.length) {
-        productMap = _hydrateProductMap(cached.products);
-      }
-    } catch (e) { console.warn('[chat] cache load error', e); }
+    const cached = window.__appData || {};
+    if (Array.isArray(cached.rooms) && cached.rooms.length) {
+      allRooms = cached.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+    }
+    if (Array.isArray(cached.products) && cached.products.length) {
+      productMap = _hydrateProductMap(cached.products);
+    }
 
     const { user, profile } = await requireAuth();
     currentUser = user;
@@ -234,31 +224,20 @@ function _hydrateProductMap(products) {
     currentRole = profile?.role || '';
     if (allRooms.length) applyAll();
 
-    try {
-      watchRooms((rooms) => {
-        try {
-          allRooms = (rooms || []).filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
-          _roomsLoaded = true;
-          applyAll();
-        } catch (e) { console.warn('[chat] watchRooms cb error', e); }
-      });
-    } catch (e) { console.warn('[chat] watchRooms sub error', e); }
-
-    try {
-      watchProducts((products) => {
-        try {
-          productMap = _hydrateProductMap(products);
-          applyAll();
-        } catch (e) { console.warn('[chat] watchProducts cb error', e); }
-      });
-    } catch (e) { console.warn('[chat] watchProducts sub error', e); }
+    watchRooms((rooms) => {
+      allRooms = (rooms || []).filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
+      applyAll();
+    });
+    watchProducts((products) => {
+      productMap = _hydrateProductMap(products);
+      applyAll();
+    });
 
     // 글로벌 prefetcher 이벤트
     window.addEventListener('fp:data', (e) => {
       const t = e.detail?.type;
       if (t === 'rooms' && window.__appData.rooms) {
         allRooms = window.__appData.rooms.filter(r => r && !(r.hidden_by && Object.keys(r.hidden_by).length));
-        _roomsLoaded = true;
         applyAll();
       } else if (t === 'products' && window.__appData.products) {
         productMap = _hydrateProductMap(window.__appData.products);
@@ -267,10 +246,6 @@ function _hydrateProductMap(products) {
     });
   } catch (e) {
     console.error('[mobile/chat] init failed', e);
-    // 이미 렌더된 목록이나 캐시 HTML이 있으면 에러 메시지 덮어쓰지 않음
-    const hasContent = $list && ($list.querySelector('.m-list-row') || $list.querySelector('.m-list-card') || _hasRenderedList);
-    if ($list && !hasContent) {
-      $list.innerHTML = '<div class="m-list-empty">대화 목록을 불러오지 못했습니다</div>';
-    }
+    if ($list) $list.innerHTML = '<div class="m-list-empty">대화 목록을 불러오지 못했습니다</div>';
   }
 })();
