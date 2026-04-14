@@ -35,6 +35,7 @@ function countPendingRooms(rooms, role, uid, companyCode) {
     if (hb && (Array.isArray(hb) ? hb.includes(uid) : hb[uid])) return false;
     // 역할별 방 필터
     if (role === 'agent' && room.agent_uid && room.agent_uid !== uid) return false;
+    if (role === 'agent_manager' && room.agent_channel_code && room.agent_channel_code !== companyCode) return false;
     if (role === 'provider' && room.provider_code && room.provider_code !== companyCode) return false;
     // 메시지 없으면 제외
     if (!Number(room.last_message_at || 0)) return false;

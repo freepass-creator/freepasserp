@@ -98,7 +98,7 @@ $back?.addEventListener('click', () => {
 $btnChat?.addEventListener('click', async (e) => {
   e.preventDefault();
   if (!currentProduct) { showToast('상품 정보를 불러오는 중입니다', 'info'); return; }
-  if (currentProfile?.role !== 'agent') { showToast('영업자만 문의할 수 있습니다', 'error'); return; }
+  if (currentProfile?.role !== 'agent' && currentProfile?.role !== 'agent_manager') { showToast('영업자만 문의할 수 있습니다', 'error'); return; }
   const ok = await showConfirm('이 상품에 대해 문의를 시작하시겠습니까?');
   if (!ok) return;
   $btnChat.disabled = true;
@@ -130,7 +130,7 @@ $btnChat?.addEventListener('click', async (e) => {
 $btnContract?.addEventListener('click', async (e) => {
   e.preventDefault();
   if (!currentProduct) { showToast('상품 정보를 불러오는 중입니다', 'info'); return; }
-  if (currentProfile?.role !== 'agent') { showToast('영업자만 계약을 생성할 수 있습니다', 'error'); return; }
+  if (currentProfile?.role !== 'agent' && currentProfile?.role !== 'agent_manager') { showToast('영업자만 계약을 생성할 수 있습니다', 'error'); return; }
   const ok = await showConfirm('이 상품으로 계약을 생성하시겠습니까?');
   if (!ok) return;
   const p = currentProduct;

@@ -322,7 +322,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $pdPanel
 document.getElementById('chatDetailContractBtn')?.addEventListener('click', () => {
   const room = roomMap.get(currentRoomId);
   if (!room) return;
-  if (currentProfile?.role !== 'agent') { showToast('영업자 계정에서만 계약을 생성할 수 있습니다.', 'error'); return; }
+  if (currentProfile?.role !== 'agent' && currentProfile?.role !== 'agent_manager') { showToast('영업자 계정에서만 계약을 생성할 수 있습니다.', 'error'); return; }
   const product = getCurrentProduct();
   const seed = {
     product_uid: room.product_uid || product?.productUid || product?.id || '',
@@ -464,7 +464,7 @@ async function bootstrap() {
       if (!room) return;
       const product = getCurrentProduct();
       if (!product && !room.product_uid) { showToast('상품 정보가 없습니다.', 'error'); return; }
-      if (profile.role !== 'agent') { showToast('영업자 계정에서만 계약을 생성할 수 있습니다.', 'error'); return; }
+      if (profile.role !== 'agent' && profile.role !== 'agent_manager') { showToast('영업자 계정에서만 계약을 생성할 수 있습니다.', 'error'); return; }
       if (!await showConfirm('이 상품에 대해 계약을 생성하시겠습니까?')) return;
       const seed = {
         product_uid: room.product_uid || product?.productUid || product?.id || '',
@@ -490,7 +490,7 @@ async function bootstrap() {
         });
       });
 
-      if (profile.role === 'agent' && preferredProductCode && !currentRoomId && !_ensureRoomPending) {
+      if ((profile.role === 'agent' || profile.role === 'agent_manager') && preferredProductCode && !currentRoomId && !_ensureRoomPending) {
         const product = productsMap.get(normalizeLookupKey(preferredProductCode));
         if (product) {
           _ensureRoomPending = true;

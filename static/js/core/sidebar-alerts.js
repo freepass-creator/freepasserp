@@ -60,6 +60,7 @@ function countUnreadRooms(rooms) {
     if (room.hidden_by && (Array.isArray(room.hidden_by) ? room.hidden_by.includes(uid) : room.hidden_by[uid])) return false;
     // 역할별 방 필터
     if (profile.role === 'agent' && room.agent_uid && room.agent_uid !== uid) return false;
+    if (profile.role === 'agent_manager' && room.agent_channel_code && room.agent_channel_code !== companyCode) return false;
     if (profile.role === 'provider' && room.provider_company_code && room.provider_company_code !== companyCode) return false;
     // 메시지 없으면 제외
     if (!Number(room.last_message_at || 0)) return false;
@@ -70,7 +71,7 @@ function countUnreadRooms(rooms) {
     if (!sender) return false;
     // 관리자/공급사: 문의접수 (영업자가 보냄 → 답해야 함)
     if (profile.role === 'admin' || profile.role === 'provider') return sender === 'agent';
-    // 영업자: 회신완료 (공급사가 답함 → 확인해야 함)
+    // 영업자/영업관리자: 회신완료 (공급사가 답함 → 확인해야 함)
     return sender === 'provider';
   }).length;
 }
@@ -100,6 +101,12 @@ function countActionContracts(contracts) {
       return match && !CONTRACT_DONE.includes(c.contract_status);
     }).length;
   }
+  if (profile.role === 'agent_manager') {
+    return contracts.filter((c) => {
+      const match = [c.channel_code, c.agent_channel_code].includes(companyCode);
+      return match && !CONTRACT_DONE.includes(c.contract_status);
+    }).length;
+  }
   if (profile.role === 'admin') {
     return contracts.filter((c) => !CONTRACT_DONE.includes(c.contract_status)).length;
   }
@@ -121,6 +128,12 @@ function countActionSettlements(settlements) {
   if (profile.role === 'agent') {
     return settlements.filter((s) => {
       const match = s.agent_uid === uid || s.agent_code === (profile.user_code || '');
+      return match && !SETTLEMENT_DONE.includes(s.settlement_status || s.status);
+    }).length;
+  }
+  if (profile.role === 'agent_manager') {
+    return settlements.filter((s) => {
+      const match = [s.channel_code, s.agent_channel_code].includes(companyCode);
       return match && !SETTLEMENT_DONE.includes(s.settlement_status || s.status);
     }).length;
   }

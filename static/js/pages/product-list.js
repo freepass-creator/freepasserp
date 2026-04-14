@@ -785,7 +785,7 @@ document.addEventListener('contextmenu', (e) => {
       </div>
     </div>`;
   }
-  if (role === 'agent') {
+  if (role === 'agent' || role === 'agent_manager') {
     items += `<button type="button" class="pm-ctx-item" data-action="inquiry">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>
       문의하기</button>`;
@@ -871,7 +871,7 @@ async function handleShare(){
 async function handleInquiry(btnEl) {
   const product = currentProduct();
   if (!product) { showToast('문의할 상품을 먼저 선택하세요.', 'info'); return; }
-  if (state.role !== 'agent' || !state.user || !state.profile) { showToast('영업자 계정에서만 문의할 수 있습니다.', 'error'); return; }
+  if ((state.role !== 'agent' && state.role !== 'agent_manager') || !state.user || !state.profile) { showToast('영업자 계정에서만 문의할 수 있습니다.', 'error'); return; }
   if (!await showConfirm('이 상품에 대해 대화를 시작하시겠습니까?')) return;
   if (btnEl) btnEl.disabled = true;
   try {
@@ -1088,14 +1088,14 @@ function applyRoleActions() {
   const inquiryBtn = qs('#inquiryProductBtn');
   const contractBtn = qs('#contractProductBtn');
   const role = state.role;
-  // 문의: 영업자만
-  if (role === 'agent') {
+  // 문의: 영업자/영업관리자
+  if (role === 'agent' || role === 'agent_manager') {
     inquiryBtn?.classList.remove('detail-actions-hidden');
   } else {
     inquiryBtn?.classList.add('detail-actions-hidden');
   }
-  // 계약: 영업자만
-  if (role === 'agent') {
+  // 계약: 영업자/영업관리자
+  if (role === 'agent' || role === 'agent_manager') {
     contractBtn?.classList.remove('detail-actions-hidden');
   } else {
     contractBtn?.classList.add('detail-actions-hidden');
@@ -1334,8 +1334,8 @@ function openMobileDetail(id) {
   }
   // 카탈로그 스타일 상세 렌더링 — 모바일은 액션 버튼 포함
   const role = state.role;
-  const inquiryBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailInquiry"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> 문의</button>` : '';
-  const contractBtn = role === 'agent' ? `<button class="md-action-btn" id="plsMDetailContract"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg> 계약</button>` : '';
+  const inquiryBtn = (role === 'agent' || role === 'agent_manager') ? `<button class="md-action-btn" id="plsMDetailInquiry"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M8 12h8"/><path d="M12 8v8"/></svg> 문의</button>` : '';
+  const contractBtn = (role === 'agent' || role === 'agent_manager') ? `<button class="md-action-btn" id="plsMDetailContract"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg> 계약</button>` : '';
   const shareBtn = `<button class="md-action-btn" id="plsMDetailShare"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg> 공유</button>`;
   const mobileActionsHtml = `<div class="md-actions">${inquiryBtn}${contractBtn}${shareBtn}</div>`;
   $plsMDetailContent.innerHTML = renderProductDetailMarkup(product, { termFields: getTermFields(product), actionsHtml: mobileActionsHtml });

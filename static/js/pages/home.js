@@ -66,13 +66,13 @@ function vR(items) {
   });
   if (currentProfile?.role === 'admin') return visible;
   if (currentProfile?.role === 'provider') return visible.filter(i => isPM(i) || String(i.provider_uid || '').trim() === currentUid);
-  if (currentProfile?.role === 'agent') return visible.filter(isAM);
+  if (currentProfile?.role === 'agent' || currentProfile?.role === 'agent_manager') return visible.filter(isAM);
   return [];
 }
 function vC(items) {
   if (currentProfile?.role === 'admin') return items;
   if (currentProfile?.role === 'provider') return items.filter(isPM);
-  if (currentProfile?.role === 'agent') return items.filter(isAM);
+  if (currentProfile?.role === 'agent' || currentProfile?.role === 'agent_manager') return items.filter(isAM);
   return [];
 }
 function vS(items) { return vC(items); }

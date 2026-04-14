@@ -210,7 +210,7 @@ export function createChatContractPanel({ profile, user }) {
 
     // room 선택되었지만 계약 없음 → 생성 버튼
     if (hint) hint.style.display = 'none';
-    const canCreate = profile?.role === 'agent';
+    const canCreate = profile?.role === 'agent' || profile?.role === 'agent_manager';
     const wrap = document.createElement('div');
     wrap.className = 'cc-create-wrap';
     wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:20px;padding:32px;';

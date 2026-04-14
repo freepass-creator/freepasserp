@@ -87,6 +87,10 @@ function isVisibleForRole(c) {
   if (currentRole === 'agent') {
     return c.agent_uid === currentUser?.uid || c.agent_code === currentProfile?.user_code;
   }
+  if (currentRole === 'agent_manager') {
+    const myCode = currentProfile?.company_code || '';
+    return (c.channel_code || '') === myCode || (c.agent_channel_code || '') === myCode;
+  }
   if (currentRole === 'provider') {
     const myCode = currentProfile?.company_code || '';
     return (c.partner_code || '') === myCode || (c.provider_company_code || '') === myCode;

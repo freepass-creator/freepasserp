@@ -50,12 +50,14 @@ if (document.readyState === 'loading') {
     function isMineRoom(r) {
       if (role === 'admin') return true;
       if (role === 'agent') return r.agent_uid === myUid || r.agent_code === myCode;
+      if (role === 'agent_manager') return (r.agent_channel_code || '') === myCompanyCode;
       if (role === 'provider') return (r.provider_company_code || '') === myCompanyCode;
       return false;
     }
     function isMineContract(c) {
       if (role === 'admin') return true;
       if (role === 'agent') return c.agent_uid === myUid || c.agent_code === myCode;
+      if (role === 'agent_manager') return (c.channel_code || '') === myCompanyCode || (c.agent_channel_code || '') === myCompanyCode;
       if (role === 'provider') {
         return (c.partner_code || '') === myCompanyCode || (c.provider_company_code || '') === myCompanyCode;
       }
@@ -69,7 +71,7 @@ if (document.readyState === 'loading') {
         if (!r) return;
         if (r.hidden_by && Object.keys(r.hidden_by).length) return;
         if (!isMineRoom(r)) return;
-        if (role === 'agent' || role === 'admin') total += Number(r.unread_for_agent || 0);
+        if (role === 'agent' || role === 'agent_manager' || role === 'admin') total += Number(r.unread_for_agent || 0);
         else if (role === 'provider') total += Number(r.unread_for_provider || 0);
       });
       setBadge('m-tab-chat-badge', total);

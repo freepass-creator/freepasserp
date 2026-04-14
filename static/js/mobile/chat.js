@@ -53,6 +53,9 @@ function isVisibleForRole(room) {
   if (currentRole === 'agent') {
     return room.agent_uid === currentUser?.uid || room.agent_code === currentProfile?.user_code;
   }
+  if (currentRole === 'agent_manager') {
+    return (room.agent_channel_code || '') === (currentProfile?.company_code || '');
+  }
   if (currentRole === 'provider') {
     return (room.provider_company_code || '') === (currentProfile?.company_code || '');
   }
