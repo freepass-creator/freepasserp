@@ -3,6 +3,17 @@
  */
 import { requireAuth } from '../core/auth-guard.js';
 
+// 채팅 페이지: 메시지 영역 밖의 터치 스와이프 완전 차단
+(function lockBodyScroll() {
+  document.addEventListener('touchmove', (e) => {
+    const inMessages = e.target.closest('.m-cr__messages');
+    const inInput = e.target.closest('.m-cr__textarea');
+    if (!inMessages && !inInput) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();
+
 import {
   watchMessages, watchRooms, watchProducts, sendMessage,
   markRoomRead, hideRoomForUser, deleteRoomEverywhere,
