@@ -7,6 +7,7 @@ import { logoutCurrentUser, sendPasswordReset } from '../firebase/firebase-auth.
 import { escapeHtml } from '../core/management-format.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { wireHtmlCache } from './page-cache.js';
+import { playNotifSound, setSoundEnabled } from '../core/notif-sound.js';
 
 const $st = document.getElementById('m-settings');
 const $help = document.getElementById('m-st-help');
@@ -255,12 +256,10 @@ function render() {
     el.addEventListener('change', () => {
       prefs[el.dataset.pref] = el.checked;
       savePrefs(prefs);
-      // sound 토글은 notif-sound.js 공용 키와 동기화 + 테스트 재생
+      // sound 토글은 notif-sound.js 공용 키와 동기화 + 즉시 테스트 재생 (user gesture 유지)
       if (el.dataset.pref === 'sound') {
-        try { localStorage.setItem('fp.sound.enabled', el.checked ? '1' : '0'); } catch {}
-        if (el.checked) {
-          import('../core/notif-sound.js').then(({ playNotifSound }) => playNotifSound({ type: 'message' }));
-        }
+        setSoundEnabled(el.checked);
+        if (el.checked) playNotifSound({ type: 'message' });
       }
     });
   });

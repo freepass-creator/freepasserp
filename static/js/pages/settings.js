@@ -322,16 +322,20 @@ function bindAppSettings(profile) {
     badgeList.addEventListener('change', saveAppSettings);
   }
 
-  // 알림 소리
-  import('../core/notif-sound.js').then(({ isSoundEnabled, setSoundEnabled, playNotifSound }) => {
-    const toggle = document.getElementById('settings-sound-toggle');
-    if (!toggle) return;
-    toggle.checked = isSoundEnabled();
-    toggle.addEventListener('change', () => {
-      setSoundEnabled(toggle.checked);
-      if (toggle.checked) playNotifSound({ type: 'message' });
+  // 알림 소리 (정적 import 되어있으면 재사용)
+  const soundToggle = document.getElementById('settings-sound-toggle');
+  if (soundToggle) {
+    try { soundToggle.checked = localStorage.getItem('fp.sound.enabled') !== '0'; } catch {}
+    soundToggle.addEventListener('change', () => {
+      try { localStorage.setItem('fp.sound.enabled', soundToggle.checked ? '1' : '0'); } catch {}
+      if (soundToggle.checked) {
+        // user gesture 유지를 위해 동기적으로 재생
+        const a = new Audio('/static/sound-msg.wav');
+        a.volume = 0.5;
+        a.play().catch(e => console.warn('[sound]', e.name));
+      }
     });
-  });
+  }
 
   // 보기 모드 (테마)
   const themeSelect = document.getElementById('settings-theme');
