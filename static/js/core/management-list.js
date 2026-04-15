@@ -187,7 +187,7 @@ export function renderTableGrid(options = {}) {
         headerName: col.label || col.key,
         sortable: isNum || false,
         resizable: true,
-        suppressMovable: true,
+        suppressMovable: false,  // 드래그로 컬럼 순서 변경 가능
         suppressHeaderMenuButton: true,
       };
       // 폭 설정 — 뱃지/필터 컬럼은 넉넉히, 검색 컬럼만 flex
@@ -244,7 +244,7 @@ export function renderTableGrid(options = {}) {
       defaultColDef: {
         sortable: false,
         resizable: true,
-        suppressMovable: true,
+        suppressMovable: false,  // 드래그로 컬럼 순서 변경 가능
         suppressHeaderMenuButton: true,
       },
       getRowId: (params) => {
@@ -309,8 +309,6 @@ export function renderTableGrid(options = {}) {
 
     gridApi.addEventListener('columnResized', (event) => {
       if (!event.finished) return;
-      // 사용자 직접 드래그(uiColumnResized) 또는 더블클릭 autoSize만 저장
-      // 초기 api 적용(setGridOption)은 스킵 — col.w 덮어쓰기 방지
       const src = event.source || '';
       if (src !== 'uiColumnResized' && src !== 'uiColumnDragged' && src !== 'autosizeColumns') return;
       try {
@@ -319,6 +317,23 @@ export function renderTableGrid(options = {}) {
           saved[col.getColId()] = col.getActualWidth();
         });
         localStorage.setItem(storageKey, JSON.stringify(saved));
+      } catch (_) {}
+    });
+
+    // 컬럼 순서 변경 영속화
+    const orderKey = `erp.colOrder.v1.${location.pathname}.${container.id}`;
+    // 저장된 순서 복원
+    try {
+      const order = JSON.parse(localStorage.getItem(orderKey) || '[]');
+      if (Array.isArray(order) && order.length) {
+        setTimeout(() => { try { gridApi.moveColumns(order, 0); } catch (_) {} }, 50);
+      }
+    } catch (_) {}
+    gridApi.addEventListener('columnMoved', (event) => {
+      if (!event.finished) return;
+      try {
+        const order = gridApi.getColumns().map(c => c.getColId());
+        localStorage.setItem(orderKey, JSON.stringify(order));
       } catch (_) {}
     });
 
