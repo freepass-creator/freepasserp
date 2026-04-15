@@ -45,14 +45,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_states.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_primitives.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_management.css') }}?v={{ app_version }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_datagrid.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_upload.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_toast.css') }}?v={{ app_version }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}?v={{ app_version }}">
-  <!-- AG Grid Community -->
+  <!-- AG Grid Community (먼저 로드 — 우리 ui_datagrid.css가 오버라이드) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-grid.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-theme-alpine.min.css">
   <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/dist/ag-grid-community.min.noStyle.js"></script>
+  <!-- AG Grid 커스텀 — AG Grid CSS 뒤에 와야 변수 오버라이드 가능 -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ui_datagrid.css') }}?v={{ app_version }}">
   {% block page_css %}{% endblock %}
 </head>
 <body data-page="{{ page_title }}">
