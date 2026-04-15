@@ -464,7 +464,7 @@
   --ag-font-size: 12px;
   --ag-row-height: 32px;
   --ag-header-height: 34px;
-  --ag-cell-horizontal-padding: 6px;
+  --ag-cell-horizontal-padding: 4px;
 }
 /* 우측 패딩만 좁게 — 좌 6 / 우 2 */
 .erp-grid .ag-cell,
