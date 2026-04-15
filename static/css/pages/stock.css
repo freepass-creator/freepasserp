@@ -177,3 +177,5 @@
 
 /* 우클릭 메뉴 CSS → ui_datagrid.css 공용으로 이동됨 */
 .pm-ctx-submenu .pm-ctx-item { padding: 7px 14px; }
+
+/* AG Grid 스타일 → ui_datagrid.css 공용 .erp-grid 클래스로 이동됨 */

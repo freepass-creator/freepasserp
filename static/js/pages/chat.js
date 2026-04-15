@@ -569,7 +569,6 @@ async function bootstrap() {
 
       visibleRoomsCache = visibleRooms;
       roomMap = new Map(visibleRooms.map((room) => [room.room_id, room]));
-      if (roomList) roomList.innerHTML = '';
 
       if (!visibleRooms.length) {
         // preferredRoomId 대기 중이면 clearRoomSelection 하지 않음 (currentRoomId 보존)
@@ -667,7 +666,7 @@ async function bootstrap() {
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeChatCtx(); });
 
     document.addEventListener('contextmenu', (e) => {
-      const row = e.target.closest('#room-list tr[data-key]');
+      const row = e.target.closest('#room-list [data-key]');
       if (!row) return;
       e.preventDefault();
       removeChatCtx();

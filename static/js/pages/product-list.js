@@ -574,31 +574,11 @@ function renderList(){
     sortable: true,
     getKey: (item) => item.id,
     onSelect: (item) => {
-      // 같은 행 재클릭 → 패널 닫기
-      const isSame = state.selectedId === item.id && $detailPanel && !$detailPanel.hidden;
-      if (isSame) {
-        hideDetailPanel();
-        return;
-      }
-      const nextId = item.id;
-      state.selectedId = nextId;
+      // 행 클릭은 선택만 — 상세는 우클릭 '상세정보'에서 연다
+      state.selectedId = item.id;
       state.activePhotoIndex = 0;
-      // 선택 하이라이트 즉시 DOM 업데이트
-      if ($list) {
-        $list.querySelectorAll('tr.is-selected').forEach(tr => tr.classList.remove('is-selected'));
-        const newRow = $list.querySelector(`tr[data-key="${String(nextId).replace(/"/g, '\\"')}"]`);
-        if (newRow) newRow.classList.add('is-selected');
-      }
-      // 패널이 이미 열려있으면 → 바로 닫고 슬라이딩으로 새로 열기
-      if ($detailPanel && !$detailPanel.hidden) {
-        $detailPanel.classList.remove('is-open');
-        $detailPanel.hidden = true;
-        renderDetail();
-        showDetailPanel();
-      } else {
-        renderDetail();
-        showDetailPanel();
-      }
+      // 상세 패널이 이미 열려있다면 선택된 행에 맞춰 갱신
+      if ($detailPanel && !$detailPanel.hidden) renderDetail();
     },
     getCellValue: (col, item) => {
       if (col.priceMonth) {
@@ -757,35 +737,45 @@ document.addEventListener('scroll', removeCtxMenu, true);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
 
 document.addEventListener('contextmenu', (e) => {
-  const row = e.target.closest('#productList tr[data-key]');
+  const row = e.target.closest('#productList [data-key], #productList .ag-row[row-id]');
   if (!row) return;
   e.preventDefault();
   removeCtxMenu();
-  const productId = row.dataset.key;
+  const productId = row.dataset.key || row.getAttribute('row-id');
   const product = state.allProducts.find(p => p.id === productId);
   if (!product) return;
   const role = state.role;
-  const isOwnProduct = role === 'provider' && (product.providerCompanyCode || product.provider_company_code || product.partnerCode) === state.profile?.company_code;
 
-  const VEHICLE_STATUS_OPTIONS = ['출고가능', '출고협의', '출고불가', '계약대기', '계약완료'];
-  const canEdit = role === 'admin' || (role === 'provider' && isOwnProduct);
   let items = '';
 
-  if (canEdit) {
-    items += `<button type="button" class="pm-ctx-item" data-action="edit-product">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
-      수정하기</button>`;
-    items += `<div class="pm-ctx-sub">
-      <button type="button" class="pm-ctx-item pm-ctx-item--parent">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
-        상태변경
-        <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-      <div class="pm-ctx-submenu">
-        ${VEHICLE_STATUS_OPTIONS.map(s => `<button type="button" class="pm-ctx-item" data-action="vehicle-status" data-status="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')}
-      </div>
-    </div>`;
+  // 공통 — 기간선택 → 요약보기 → 상세정보 → 사진보기
+  items += `<div class="pm-ctx-sub">
+    <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+      기간선택
+      <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+    <div class="pm-ctx-submenu pls-period-sub">${renderPeriodChipsHtml(product)}</div>
+  </div>`;
+  const summaryHtml = renderSummarySubmenuHtml(product);
+  items += `<div class="pm-ctx-sub">
+    <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      요약보기
+      <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+    <div class="pm-ctx-submenu pls-summary-sub">${summaryHtml}</div>
+  </div>`;
+  items += `<button type="button" class="pm-ctx-item" data-action="detail">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>
+    상세정보</button>`;
+  const photoHref = product.photoLink || (Array.isArray(product.photos) && product.photos[0]) || '';
+  if (photoHref) {
+    items += `<button type="button" class="pm-ctx-item" data-action="photos">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+      사진보기</button>`;
   }
+  // 영업자/영업관리자 — 문의하기 / 계약하기
   if (role === 'agent' || role === 'agent_manager') {
     items += `<button type="button" class="pm-ctx-item" data-action="inquiry">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>
@@ -794,6 +784,7 @@ document.addEventListener('contextmenu', (e) => {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><polyline points="14 2 14 8 20 8"/></svg>
       계약하기</button>`;
   }
+  // 공통 — 공유하기
   items += `<button type="button" class="pm-ctx-item" data-action="share">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
     공유하기</button>`;
@@ -810,21 +801,57 @@ document.addEventListener('contextmenu', (e) => {
     if (rect.bottom > window.innerHeight) menuEl.style.top = `${window.innerHeight - rect.height - 8}px`;
   });
 
+  // 서브메뉴 hover-intent — 500ms 초기차단 + 150ms 지속호버에만 열림
+  const _menuBornAt = performance.now();
+  menuEl.querySelectorAll('.pm-ctx-sub').forEach(sub => {
+    let tmr = null;
+    sub.addEventListener('mouseenter', () => {
+      if (performance.now() - _menuBornAt < 500) return; // 초기 차단
+      tmr = setTimeout(() => {
+        menuEl.querySelectorAll('.pm-ctx-sub.is-open').forEach(s => s.classList.remove('is-open'));
+        sub.classList.add('is-open');
+        tmr = null;
+      }, 150);
+    });
+    sub.addEventListener('mouseleave', () => {
+      if (tmr) { clearTimeout(tmr); tmr = null; }
+      sub.classList.remove('is-open');
+    });
+  });
+
   menuEl.addEventListener('click', async (ev) => {
+    // 기간 체크박스 토글 — 메뉴 닫지 않고 기간선택/요약보기 둘 다 재렌더
+    const periodInput = ev.target.closest('.pls-period-sub input[data-period]');
+    if (periodInput) {
+      ev.stopPropagation();
+      const period = periodInput.dataset.period;
+      const cur = new Set((state.filters.periods || []).map(String));
+      if (periodInput.checked) cur.add(period); else cur.delete(period);
+      // 모두 해제 시 기본 48개월 유지
+      if (!cur.size) cur.add('48');
+      state.filters.periods = [...cur];
+      const periodSub = menuEl.querySelector('.pls-period-sub');
+      if (periodSub) periodSub.innerHTML = renderPeriodChipsHtml(product);
+      const summarySub = menuEl.querySelector('.pls-summary-sub');
+      if (summarySub) summarySub.innerHTML = renderSummarySubmenuHtml(product);
+      applyFilters();
+      return;
+    }
     const btn = ev.target.closest('[data-action]');
     if (!btn) return;
+    ev.stopPropagation();
     const action = btn.dataset.action;
     removeCtxMenu();
     state.selectedId = productId;
-    if (action === 'edit-product') {
-      localStorage.setItem('freepass_pending_product_edit', productId);
-      window.location.href = '/product-manage';
+    if (action === 'detail') {
+      state.activePhotoIndex = 0;
+      renderDetail();
+      showDetailPanel();
+      return;
     }
-    if (action === 'vehicle-status') {
-      try {
-        await updateProduct(productId, { vehicle_status: btn.dataset.status });
-        showToast(`상태 → ${btn.dataset.status}`, 'success');
-      } catch (err) { showToast('상태 변경 실패: ' + (err.message || err), 'error'); }
+    if (action === 'photos') {
+      const href = product.photoLink || (Array.isArray(product.photos) && product.photos[0]) || '';
+      if (href) window.open(href, '_blank', 'noopener');
       return;
     }
     if (action === 'inquiry') { await handleInquiry(); }
@@ -842,6 +869,50 @@ document.addEventListener('contextmenu', (e) => {
     }
   });
 });
+
+// ─── 요약정보 하위메뉴 HTML ─────────
+function renderPeriodChipsHtml(/* product */) {
+  const selected = new Set(getSelectedPeriods().map(String));
+  return DEFAULT_PERIODS.map(p => {
+    const active = selected.has(String(p));
+    return `<label class="pls-period-sub__opt">
+      <input type="checkbox" data-period="${escapeHtml(p)}" ${active ? 'checked' : ''}>
+      <span>${escapeHtml(p)}개월</span>
+    </label>`;
+  }).join('');
+}
+
+function renderSummarySubmenuHtml(product) {
+  const selected = new Set(getSelectedPeriods().map(String));
+  const priceRows = DEFAULT_PERIODS.filter(p => selected.has(String(p))).map(p => {
+    const rent = moneyToNumber(product.price?.[p]?.rent);
+    const dep = moneyToNumber(product.price?.[p]?.deposit);
+    const rentTxt = rent ? rent.toLocaleString('ko-KR') : '-';
+    const depTxt = dep ? dep.toLocaleString('ko-KR') : '-';
+    return `<tr><td class="period">${escapeHtml(p)}개월</td><td class="num">${rentTxt}</td><td class="num dep">${depTxt}</td></tr>`;
+  }).join('');
+  const carNo = product.carNo || '';
+  const model = [product.maker, product.model].filter(Boolean).join(' ');
+  const title = [carNo, model].filter(Boolean).join(' · ') || '-';
+  const summaryRows = [
+    ['세부모델', product.subModel],
+    ['세부트림', product.trim || product.trim_name || product.trimName],
+    ['선택옵션', product.optionSummary || product.options || product.option_summary],
+    ['연식', product.year],
+    ['주행거리', product.mileageValue ? `${Number(product.mileageValue).toLocaleString('ko-KR')}km` : ''],
+    ['연료', product.fuel],
+    ['색상', product.color],
+  ].filter(([, v]) => v && String(v).trim() && String(v).trim() !== '-')
+   .map(([k, v]) => `<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(String(v))}</td></tr>`).join('');
+  return `
+    <div class="pls-summary-sub__title">${escapeHtml(title)}</div>
+    <table class="pls-summary-sub__tbl">
+      <thead><tr><th>기간</th><th class="num">대여료</th><th class="num">보증금</th></tr></thead>
+      <tbody>${priceRows || '<tr><td colspan="3" class="empty">선택된 기간 없음</td></tr>'}</tbody>
+    </table>
+    ${summaryRows ? `<table class="pls-summary-sub__info"><tbody>${summaryRows}</tbody></table>` : ''}
+  `;
+}
 
 function buildShareUrl(product){
   const url = new URL(window.location.origin + '/catalog');

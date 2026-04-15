@@ -5,7 +5,8 @@ import { syncEditSaveButtonTone , syncTopBarPageCount } from '../core/management
 import { setSelectionUiClass } from '../core/ui-standards.js';
 import { escapeHtml, formatShortDate, formatYearMonth } from '../core/management-format.js';
 import { createProductFormModeController } from './product-manage/form-mode.js';
-import { renderTableGrid, renderSkeletonRows } from '../core/management-list.js';
+import { renderSkeletonRows } from '../core/management-list.js';
+const { createGrid } = globalThis.agGrid || {};
 import { createProductManageState } from './product-manage/state.js';
 import { createProductImageManager } from './product-manage/images.js';
 import { buildProductPayload, fillProductForm } from './product-manage/adapter.js';
@@ -132,11 +133,14 @@ function setSummaryRowSelected(row, selected) {
 }
 
 function syncSelectedSummaryRow() {
+  if (!gridApi) return;
   const selectedCode = String(editingCodeInput?.value || '').trim();
-  listBody?.querySelectorAll('.summary-row').forEach((row) => {
-    const rowKey = row.dataset.managementKey || row.dataset.code || '';
-    setSummaryRowSelected(row, selectedCode && rowKey === selectedCode);
-  });
+  if (selectedCode) {
+    const node = gridApi.getRowNode(selectedCode);
+    if (node) node.setSelected(true);
+  } else {
+    gridApi.deselectAll();
+  }
 }
 
 
@@ -490,79 +494,408 @@ function mileageBucketLabel(value) {
   return '20만Km~';
 }
 
-const PRODUCT_REG_COLS = [
-  { key: 'vehicleStatus', label: '차량상태',   align: 'c', filterable: true, w: 80 },
-  { key: 'productType',   label: '상품구분',   align: 'c', filterable: true, w: 80 },
-  { key: 'partner',       label: '공급사코드', align: 'c', filterable: true },
-  { key: 'carNo',         label: '차량번호',   align: 'c', searchable: true },
-  { key: 'maker',         label: '제조사',     align: 'c', filterable: true },
-  { key: 'model',         label: '모델',       align: 'c', filterable: true },
-  { key: 'subModel',      label: '세부모델',   searchable: true },
-  { key: 'fuel',          label: '연료',       align: 'c', filterable: true },
-  { key: 'mileage',       label: '주행거리',   align: 'c', filterable: true },
-  { key: 'date',          label: '반영일자',   align: 'c', filterable: true },
+// ─── AG Grid ──────────────────────────────────────────────────────
+let gridApi = null;
+const gridContainer = document.getElementById('product-ag-grid');
+
+// 커스텀 Set Filter (Community 대용)
+class CheckboxSetFilter {
+  init(params) {
+    this.params = params;
+    this.selectedValues = null; // null = 전체
+    this.el = document.createElement('div');
+    this.el.style.cssText = 'padding:8px;min-width:160px;max-height:300px;overflow:auto;font-size:12px;';
+  }
+  getGui() { return this.el; }
+  afterGuiAttached() { this._render(); }
+  _render() {
+    const vals = new Set();
+    this.params.api.forEachNode(n => { if (n.data) vals.add(this.params.valueGetter({ data: n.data, node: n, colDef: this.params.colDef, column: this.params.column, api: this.params.api, columnApi: this.params.columnApi, context: this.params.context }) || ''); });
+    const sorted = [...vals].sort();
+    const sel = this.selectedValues;
+    this.el.innerHTML = `
+      <div style="margin-bottom:6px;display:flex;gap:4px;">
+        <button type="button" style="font-size:11px;padding:2px 8px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;" data-action="all">전체</button>
+        <button type="button" style="font-size:11px;padding:2px 8px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;" data-action="reset">초기화</button>
+      </div>
+      ${sorted.map(v => {
+        const checked = !sel || sel.has(v) ? 'checked' : '';
+        const label = v || '(빈값)';
+        return `<label style="display:flex;align-items:center;gap:4px;padding:2px 0;cursor:pointer;"><input type="checkbox" value="${escapeHtml(v)}" ${checked} style="margin:0;"><span>${escapeHtml(label)}</span></label>`;
+      }).join('')}
+    `;
+    this.el.querySelector('[data-action="all"]')?.addEventListener('click', () => {
+      this.selectedValues = null;
+      this.params.filterChangedCallback();
+      this._render();
+    });
+    this.el.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
+      this.selectedValues = null;
+      this.params.filterChangedCallback();
+      this._render();
+    });
+    this.el.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const allCbs = this.el.querySelectorAll('input[type="checkbox"]');
+        const checked = [...allCbs].filter(c => c.checked).map(c => c.value);
+        if (checked.length === allCbs.length) {
+          this.selectedValues = null;
+        } else {
+          this.selectedValues = new Set(checked);
+        }
+        this.params.filterChangedCallback();
+      });
+    });
+  }
+  isFilterActive() { return this.selectedValues !== null; }
+  doesFilterPass(params) {
+    if (!this.selectedValues) return true;
+    const val = this.params.valueGetter({ data: params.data, node: params.node, colDef: this.params.colDef, column: this.params.column, api: this.params.api, columnApi: this.params.columnApi, context: this.params.context }) || '';
+    return this.selectedValues.has(val);
+  }
+  getModel() { return this.selectedValues ? { values: [...this.selectedValues] } : null; }
+  setModel(model) { this.selectedValues = model?.values ? new Set(model.values) : null; }
+}
+
+// _ft: 'set' = 체크박스, 'search' = 텍스트검색, 'range' = 숫자구간, false = 없음
+const AG_COL_DEFS = [
+  { field: 'vehicle_status', headerName: '차량상태', minWidth: 72, maxWidth: 80, _ft: 'set',
+    cellRenderer: (p) => renderBadgeRow([{ field: 'vehicle_status', value: p.value || '-' }]) },
+  { field: 'product_type', headerName: '상품구분', minWidth: 72, maxWidth: 80, _ft: 'set',
+    cellRenderer: (p) => renderBadgeRow([{ field: 'product_type', value: p.value || '-' }]) },
+  { field: 'partner_code', headerName: '공급사', minWidth: 60, maxWidth: 72, _ft: 'set',
+    valueGetter: (p) => p.data?.partner_code || p.data?.provider_company_code || '' },
+  { field: 'car_number', headerName: '차량번호', minWidth: 90, maxWidth: 110, _ft: 'search' },
+  { field: 'maker', headerName: '제조사', minWidth: 50, maxWidth: 68, _ft: 'set' },
+  { field: 'model_name', headerName: '모델', minWidth: 60, maxWidth: 80, _ft: 'set' },
+  { field: 'sub_model', headerName: '세부모델', minWidth: 100, flex: 1, _ft: 'search' },
+  { field: 'trim_name', headerName: '세부트림', minWidth: 80, flex: 1, _ft: 'search' },
+  { field: 'options', headerName: '선택옵션', minWidth: 70, maxWidth: 90, _ft: 'search' },
+  { field: 'ext_color', headerName: '외부색상', minWidth: 56, maxWidth: 68, _ft: 'set' },
+  { field: 'int_color', headerName: '내부색상', minWidth: 56, maxWidth: 68, _ft: 'set' },
+  { field: 'fuel_type', headerName: '연료', minWidth: 48, maxWidth: 60, _ft: 'set' },
+  { field: 'mileage', headerName: '주행거리', minWidth: 72, maxWidth: 90, _ft: 'range', sortable: true,
+    valueFormatter: (p) => { const v = Number(p.value || 0); return v ? `${v.toLocaleString('ko-KR')}km` : '-'; },
+    comparator: (a, b) => (Number(a) || 0) - (Number(b) || 0) },
+  { field: '_rent_48', headerName: '대여료', minWidth: 72, maxWidth: 90, _ft: false, sortable: true,
+    valueGetter: (p) => Number(p.data?.price?.['48']?.rent || 0),
+    valueFormatter: (p) => p.value ? `${Number(p.value).toLocaleString('ko-KR')}` : '-',
+    comparator: (a, b) => (Number(a) || 0) - (Number(b) || 0) },
+  { field: '_dep_48', headerName: '보증금', minWidth: 72, maxWidth: 90, _ft: false, sortable: true,
+    valueGetter: (p) => Number(p.data?.price?.['48']?.deposit || 0),
+    valueFormatter: (p) => p.value ? `${Number(p.value).toLocaleString('ko-KR')}` : '-',
+    comparator: (a, b) => (Number(a) || 0) - (Number(b) || 0) },
+  { field: '_date', headerName: '반영일자', minWidth: 72, maxWidth: 84, _ft: 'set', sort: 'desc', sortable: true,
+    valueGetter: (p) => formatShortDate(p.data?.updated_at || p.data?.created_at) },
 ];
-const productRegThead = qs('#product-register-list-head');
+
+const gridOptions = {
+  columnDefs: AG_COL_DEFS,
+  rowData: [],
+  rowSelection: { mode: 'singleRow', enableClickSelection: true, checkboxes: false },
+  animateRows: true,
+  suppressCellFocus: true,
+  suppressMenuHide: true,
+  overlayNoRowsTemplate: '<div style="padding:40px;color:#94a3b8;">등록된 상품이 없습니다.</div>',
+  defaultColDef: {
+    sortable: false,
+    resizable: true,
+    suppressMovable: true,
+    suppressHeaderMenuButton: true,
+    cellStyle: { fontSize: '12px', display: 'flex', alignItems: 'center' },
+  },
+  getRowId: (params) => params.data?.product_uid || params.data?.product_code || '',
+  onRowClicked: async (event) => {
+    const product = event.data;
+    if (!product) return;
+    const currentCode = editingCodeInput?.value || '';
+    const nextCode = product.product_uid || product.product_code || '';
+    if (currentCode && currentCode === nextCode && mode === 'view') {
+      resetForm(); applyFormMode('idle'); return;
+    }
+    if ((mode === 'edit' || mode === 'create') && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
+    resetForm();
+    fillProductForm(product, { ...adapterContext, currentProfile });
+  },
+};
+
+// ── 외부 필터 상태 ──
+const _colFilters = {}; // { field: Set of selected values }
+let _allGridProducts = [];
+
+// 특정 필드를 제외한 나머지 필터만 적용 (종속 필터용)
+function getFilteredProductsExcept(excludeField) {
+  let items = _allGridProducts;
+  for (const [field, filterVal] of Object.entries(_colFilters)) {
+    if (field === excludeField || !filterVal) continue;
+    const col = AG_COL_DEFS.find(c => c.field === field);
+    if (!col) continue;
+    if (typeof filterVal === 'string') {
+      const q = filterVal.toLowerCase();
+      items = items.filter(p => getColValue(col, p).toLowerCase().includes(q));
+    } else if (filterVal?.type === 'range' && filterVal.ranges) {
+      items = items.filter(p => {
+        const v = Number(p[field] || 0);
+        return filterVal.ranges.some(r => v >= r.min && v < r.max);
+      });
+    } else if (filterVal instanceof Set && filterVal.size) {
+      items = items.filter(p => filterVal.has(getColValue(col, p)));
+    }
+  }
+  return items;
+}
+
+function getFilteredProducts() {
+  let items = _allGridProducts;
+  for (const [field, filterVal] of Object.entries(_colFilters)) {
+    if (!filterVal) continue;
+    const col = AG_COL_DEFS.find(c => c.field === field);
+    if (!col) continue;
+    if (typeof filterVal === 'string') {
+      // 텍스트 검색
+      const q = filterVal.toLowerCase();
+      items = items.filter(p => getColValue(col, p).toLowerCase().includes(q));
+    } else if (filterVal?.type === 'range' && filterVal.ranges) {
+      // 구간 필터
+      items = items.filter(p => {
+        const v = Number(p[field] || 0);
+        return filterVal.ranges.some(r => v >= r.min && v < r.max);
+      });
+    } else if (filterVal instanceof Set && filterVal.size) {
+      // 체크박스 Set
+      items = items.filter(p => filterVal.has(getColValue(col, p)));
+    }
+  }
+  return items;
+}
+
+function applyGridFilters() {
+  const filtered = getFilteredProducts();
+  if (gridApi) gridApi.setGridOption('rowData', filtered);
+  syncTopBarPageCount(filtered.length);
+  // 헤더에 필터 활성 표시 + 건수 뱃지
+  requestAnimationFrame(() => {
+    document.querySelectorAll('#product-ag-grid .ag-header-cell').forEach(cell => {
+      const colId = cell.getAttribute('col-id');
+      const filterVal = _colFilters[colId];
+      const isActive = filterVal instanceof Set ? filterVal.size > 0 : filterVal?.type === 'range' ? true : !!filterVal;
+      cell.classList.toggle('ag-header-cell-filtered', isActive);
+      // 뱃지 업데이트
+      let badge = cell.querySelector('.ag-filter-badge');
+      if (isActive) {
+        const count = filterVal instanceof Set ? filterVal.size : 1;
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'ag-filter-badge';
+          cell.querySelector('.ag-header-cell-label')?.appendChild(badge);
+        }
+        badge.textContent = count;
+      } else if (badge) {
+        badge.remove();
+      }
+    });
+  });
+}
+
+// ── 헤더 클릭 → 커스텀 필터 드롭다운 ──
+let _filterPopup = null;
+function removeFilterPopup() { if (_filterPopup) { _filterPopup.remove(); _filterPopup = null; } }
+document.addEventListener('pointerdown', (e) => { if (_filterPopup && !_filterPopup.contains(e.target)) removeFilterPopup(); }, true);
+
+function getColValue(colDef, p) {
+  if (colDef.valueGetter) return String(colDef.valueGetter({ data: p }) || '');
+  return String(p[colDef.field] || '');
+}
+
+function onGridHeaderClick(e) {
+  const headerEl = e.target.closest('.ag-header-cell');
+  if (!headerEl) return;
+  const colId = headerEl.getAttribute('col-id');
+  if (!colId) return;
+  const colDef = AG_COL_DEFS.find(c => c.field === colId);
+  if (!colDef || !colDef._ft) return;
+
+  removeFilterPopup();
+  const rect = headerEl.getBoundingClientRect();
+  const field = colDef.field;
+  const fType = colDef._ft;
+
+  const popup = document.createElement('div');
+  popup.className = 'pm-ctx-menu';
+  popup.style.cssText = `position:fixed;top:${rect.bottom + 2}px;left:${rect.left}px;z-index:9999;min-width:${Math.max(rect.width, 160)}px;max-height:360px;display:flex;flex-direction:column;padding:0;`;
+
+  if (fType === 'search') {
+    // ── 텍스트 검색 필터 ──
+    const currentQuery = _colFilters[field] || '';
+    popup.innerHTML = `
+      <div style="padding:8px;">
+        <input type="text" value="${escapeHtml(currentQuery)}" placeholder="검색어 입력..." style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:var(--radius-sm,3px);font-size:12px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="display:flex;gap:4px;padding:6px 10px;border-top:1px solid #e5e8eb;flex-shrink:0;">
+        <button type="button" style="flex:1;padding:5px 0;font-size:11px;font-weight:600;border:1px solid #ddd;border-radius:var(--radius-sm,3px);background:#fff;cursor:pointer;" data-action="reset">초기화</button>
+        <button type="button" style="flex:1;padding:5px 0;font-size:11px;font-weight:600;border:none;border-radius:var(--radius-sm,3px);background:#1b2a4a;color:#fff;cursor:pointer;" data-action="apply">적용</button>
+      </div>
+    `;
+    const input = popup.querySelector('input');
+    input?.focus();
+    input?.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { popup.querySelector('[data-action="apply"]')?.click(); }
+    });
+    popup.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
+      delete _colFilters[field];
+      applyGridFilters();
+      removeFilterPopup();
+    });
+    popup.querySelector('[data-action="apply"]')?.addEventListener('click', () => {
+      const q = input?.value?.trim() || '';
+      if (q) { _colFilters[field] = q; } else { delete _colFilters[field]; }
+      applyGridFilters();
+      removeFilterPopup();
+    });
+
+  } else if (fType === 'range') {
+    // ── 구간 필터 (주행거리 등) ──
+    const MILEAGE_RANGES = [
+      { label: '1만Km 미만', min: 0, max: 10000 },
+      { label: '1만~2만Km', min: 10000, max: 20000 },
+      { label: '2만~3만Km', min: 20000, max: 30000 },
+      { label: '3만~4만Km', min: 30000, max: 40000 },
+      { label: '4만~5만Km', min: 40000, max: 50000 },
+      { label: '5만~6만Km', min: 50000, max: 60000 },
+      { label: '6만~7만Km', min: 60000, max: 70000 },
+      { label: '7만~8만Km', min: 70000, max: 80000 },
+      { label: '8만~9만Km', min: 80000, max: 90000 },
+      { label: '9만~10만Km', min: 90000, max: 100000 },
+      { label: '10만~15만Km', min: 100000, max: 150000 },
+      { label: '15만~20만Km', min: 150000, max: 200000 },
+      { label: '20만Km 이상', min: 200000, max: Infinity },
+    ];
+    // 종속 데이터에서 각 구간 건수
+    const otherFiltered = getFilteredProductsExcept(field);
+    const rangeCounts = MILEAGE_RANGES.map(r => {
+      const cnt = otherFiltered.filter(p => {
+        const v = Number(p[field] || 0);
+        return v >= r.min && v < r.max;
+      }).length;
+      return { ...r, cnt };
+    }).filter(r => r.cnt > 0);
+
+    const currentSelected = _colFilters[field] || null;
+
+    popup.innerHTML = `
+      <div style="flex:1;overflow:auto;padding:6px 0;">
+        ${rangeCounts.map((r, i) => {
+          const checked = currentSelected?.has(String(i)) ? 'checked' : '';
+          return `<label style="display:flex;align-items:center;gap:6px;padding:4px 12px;cursor:pointer;font-size:12px;white-space:nowrap;">
+            <input type="checkbox" value="${i}" ${checked} data-min="${r.min}" data-max="${r.max}" style="margin:0;flex-shrink:0;">
+            <span style="flex:1">${escapeHtml(r.label)}</span>
+            <span style="font-size:10px;color:#94a3b8;flex-shrink:0;">${r.cnt}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:4px;padding:6px 10px;border-top:1px solid #e5e8eb;flex-shrink:0;">
+        <button type="button" style="width:100%;padding:5px 0;font-size:11px;font-weight:600;border:1px solid #ddd;border-radius:var(--radius-sm,3px);background:#fff;cursor:pointer;" data-action="reset">초기화</button>
+      </div>
+    `;
+    // 즉시 적용
+    popup.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const checked = [...popup.querySelectorAll('input[type="checkbox"]:checked')];
+        if (checked.length === 0) {
+          delete _colFilters[field];
+        } else {
+          // 선택된 구간 범위를 저장
+          const ranges = checked.map(c => ({ min: Number(c.dataset.min), max: Number(c.dataset.max) }));
+          _colFilters[field] = { type: 'range', ranges, indices: new Set(checked.map(c => c.value)) };
+        }
+        applyGridFilters();
+      });
+    });
+    popup.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
+      delete _colFilters[field];
+      applyGridFilters();
+      removeFilterPopup();
+    });
+
+  } else {
+    // ── 체크박스 Set 필터 ──
+    // 다른 필터가 적용된 상태에서의 종속 데이터로 건수 계산
+    const otherFiltered = getFilteredProductsExcept(field);
+    const countMap = {};
+    otherFiltered.forEach(p => {
+      const v = getColValue(colDef, p);
+      if (v) countMap[v] = (countMap[v] || 0) + 1;
+    });
+    const sorted = Object.entries(countMap).sort((a, b) => b[1] - a[1]);
+    const currentSelected = _colFilters[field] || null;
+
+    popup.innerHTML = `
+      <div style="flex:1;overflow:auto;padding:6px 0;">
+        ${sorted.map(([v, cnt]) => {
+          const checked = currentSelected?.has(v) ? 'checked' : '';
+          return `<label style="display:flex;align-items:center;gap:6px;padding:4px 12px;cursor:pointer;font-size:12px;white-space:nowrap;">
+            <input type="checkbox" value="${escapeHtml(v)}" ${checked} style="margin:0;flex-shrink:0;">
+            <span style="flex:1">${escapeHtml(v)}</span>
+            <span style="font-size:10px;color:#94a3b8;flex-shrink:0;">${cnt}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:4px;padding:6px 10px;border-top:1px solid #e5e8eb;flex-shrink:0;">
+        <button type="button" style="width:100%;padding:5px 0;font-size:11px;font-weight:600;border:1px solid #ddd;border-radius:var(--radius-sm,3px);background:#fff;cursor:pointer;" data-action="reset">초기화</button>
+      </div>
+    `;
+    // 체크 즉시 적용
+    popup.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const checked = [...popup.querySelectorAll('input[type="checkbox"]:checked')].map(c => c.value);
+        if (checked.length === 0) {
+          delete _colFilters[field];
+        } else {
+          _colFilters[field] = new Set(checked);
+        }
+        applyGridFilters();
+      });
+    });
+    popup.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
+      delete _colFilters[field];
+      applyGridFilters();
+      removeFilterPopup();
+    });
+  }
+
+  document.body.appendChild(popup);
+  _filterPopup = popup;
+
+  requestAnimationFrame(() => {
+    const pr = popup.getBoundingClientRect();
+    if (pr.right > window.innerWidth) popup.style.left = `${window.innerWidth - pr.width - 8}px`;
+    if (pr.bottom > window.innerHeight) popup.style.top = `${rect.top - pr.height - 2}px`;
+  });
+}
+
+function initGrid() {
+  if (!gridContainer || gridApi) return;
+  gridApi = createGrid(gridContainer, gridOptions);
+  gridApi.sizeColumnsToFit();
+  window.addEventListener('resize', () => gridApi?.sizeColumnsToFit());
+  // 헤더 클릭 → 필터 드롭다운 (리사이즈 핸들 제외)
+  gridContainer.addEventListener('click', (e) => {
+    if (e.target.closest('.ag-header-cell-resize')) return;
+    if (e.target.closest('.ag-header-cell')) onGridHeaderClick(e);
+  });
+  // 우클릭 메뉴
+  gridContainer.addEventListener('contextmenu', onGridContextMenu);
+}
 
 function renderList(products) {
-  syncTopBarPageCount(products.length);
-  renderTableGrid({
-    thead: productRegThead,
-    tbody: listBody,
-    columns: PRODUCT_REG_COLS,
-    items: products,
-    emptyText: '등록된 상품이 없습니다.',
-    selectedKey: editingCodeInput?.value || '',
-    getKey: (item) => item?.product_uid || item?.product_code || '',
-    onSelect: async (product) => {
-      if (!product) return;
-      const currentCode = editingCodeInput?.value || '';
-      const nextCode = product.product_uid || product.product_code || '';
-      const isSame = currentCode && currentCode === nextCode;
-      // 같은 행 재클릭 → 폼 닫기
-      if (isSame && mode === 'view') {
-        resetForm();
-        applyFormMode('idle');
-        renderFilteredList();
-        return;
-      }
-      // 수정/등록 중 → 확인
-      if ((mode === 'edit' || mode === 'create') && !await showConfirm('수정/등록을 중단하시겠습니까?\n저장하지 않은 내용은 사라집니다.')) return;
-      // 다른 행 클릭 또는 idle 상태 → 바로 보여주기
-      resetForm();
-      fillProductForm(product, { ...adapterContext, currentProfile });
-    },
-    getCellValue: (col, p) => {
-      switch (col.key) {
-        case 'vehicleStatus': return renderBadgeRow([{ field: 'vehicle_status', value: p.vehicle_status || '-' }]);
-        case 'productType': return renderBadgeRow([{ field: 'product_type', value: p.product_type || '-' }]);
-        case 'partner': return escapeHtml(p.partner_code || p.provider_company_code || '');
-        case 'carNo': return escapeHtml(p.car_number || '');
-        case 'maker': return escapeHtml(p.maker || '');
-        case 'model': return escapeHtml(p.model_name || '');
-        case 'subModel': return escapeHtml(p.sub_model || '');
-        case 'fuel': return escapeHtml(p.fuel_type || '');
-        case 'mileage': { const v = Number(p.mileage || 0); return v ? `${v.toLocaleString('ko-KR')}km` : '-'; }
-        case 'date': return escapeHtml(formatShortDate(p.updated_at || p.created_at));
-        default: return '';
-      }
-    },
-    getCellText: (col, p) => {
-      switch (col.key) {
-        case 'vehicleStatus': return p.vehicle_status || '-';
-        case 'productType': return p.product_type || '-';
-        case 'partner': return p.partner_code || p.provider_company_code || '';
-        case 'carNo': return p.car_number || '';
-        case 'maker': return p.maker || '';
-        case 'model': return p.model_name || '';
-        case 'subModel': return p.sub_model || '';
-        case 'fuel': return p.fuel_type || '';
-        case 'mileage': return mileageBucketLabel(p.mileage);
-        case 'date': return formatYearMonth(p.updated_at || p.created_at);
-        default: return '';
-      }
-    }
-  });
+  if (!gridApi) initGrid();
+  _allGridProducts = products;
+  const filtered = getFilteredProducts();
+  syncTopBarPageCount(filtered.length);
+  if (gridApi) {
+    gridApi.setGridOption('rowData', filtered);
+    requestAnimationFrame(() => gridApi?.sizeColumnsToFit());
+  }
   syncSelectedSummaryRow();
 }
 
@@ -575,13 +908,17 @@ document.addEventListener('pointerdown', (e) => { if (_ctxMenu && !_ctxMenu.cont
 document.addEventListener('scroll', removeCtxMenu, true);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
 
-document.addEventListener('contextmenu', (e) => {
-  const row = e.target.closest('#product-register-list tr[data-key]');
-  if (!row) return;
+function onGridContextMenu(e) {
+  const rowEl = e.target.closest('.ag-row');
+  if (!rowEl) return;
   e.preventDefault();
   removeCtxMenu();
-  const productKey = row.dataset.key;
-  const product = (allProducts || []).find(p => (p.product_uid || p.product_code) === productKey);
+  const rowId = rowEl.getAttribute('row-id');
+  if (!rowId || !gridApi) return;
+  const rowNode = gridApi.getRowNode(rowId);
+  const product = rowNode?.data;
+  if (!product) return;
+  const productKey = product.product_uid || product.product_code;
 
   const menu = document.createElement('div');
   menu.className = 'pm-ctx-menu';
@@ -653,7 +990,7 @@ document.addEventListener('contextmenu', (e) => {
       }
     }
   });
-});
+}
 
 async function handleSubmit() {
   setActionButtonBusy(submitButton);
@@ -926,7 +1263,7 @@ async function bootstrap() {
     // 이전 페이지 상태 복원 (뒤로가기 시)
     const restoredState = loadPageState('/product-new');
 
-    renderSkeletonRows(listBody, PRODUCT_REG_COLS, 8);
+    initGrid();
     registerPageCleanup(watchProducts((products) => {
       allProducts = profile.role === 'admin'
         ? [...products]
