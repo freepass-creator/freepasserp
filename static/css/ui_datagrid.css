@@ -457,92 +457,14 @@
 .pls-grid-panel > .erp-grid { flex: 1 1 0; min-height: 0; min-width: 0; width: 100%; }
 .pls-grid-panel { min-width: 0; width: 100%; }
 
-.erp-grid {
-  font-family: inherit;
-  /* 크기 */
-  --ag-font-size: var(--font-size-base, 12px);
-  --ag-row-height: 34px;
-  --ag-header-height: var(--panel-head-height, 40px);
-  --ag-cell-horizontal-padding: 0px;
-  --ag-cell-widget-spacing: 0px;
-  --ag-widget-container-horizontal-padding: 0px;
-  --ag-widget-horizontal-spacing: 0px;
-  --ag-font-family: inherit;
-  /* 색상 — ERP 토큰 사용 */
-  --ag-background-color: var(--surface-base, #fff);
-  --ag-header-background-color: var(--new-bg-panel-head, #fafafa);
-  --ag-header-foreground-color: var(--text-subtle, #64748b);
-  --ag-foreground-color: var(--text-main, #1f1f1f);
-  --ag-row-hover-color: var(--surface-hover, #f5f5f5);
-  --ag-selected-row-background-color: var(--surface-selected, #e8f0fe);
-  --ag-odd-row-background-color: transparent;
-  /* 보더 — 모던: 가로선만 */
-  --ag-border-color: transparent;
-  --ag-row-border-color: rgba(0,0,0,0.06);
-  --ag-header-column-separator-display: none;
-  --ag-header-column-resize-handle-display: none;
-  /* 기타 숨김 */
-  --ag-range-selection-border-color: transparent;
-  --ag-column-hover-color: transparent;
-  --ag-icon-size: 12px;
-  --ag-widget-horizontal-spacing: 4px;
-  --ag-header-cell-hover-background-color: rgba(0,0,0,0.03);
-}
-/* 헤더 — 패널 헤드와 동일 규격 (12px, 600, text-main) */
-.erp-grid .ag-header-cell-label {
-  font-size: 12px !important; font-weight: 600 !important;
-  letter-spacing: -0.02em; line-height: 1.2;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.erp-grid .ag-header-cell-text { font-size: 12px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* 그리드 패널 헤드 — 일반 패널 헤드와 동일 12px */
-.pls-grid-panel .panel-head-title,
-.pls-grid-panel .panel-head-subtitle,
-.pls-grid-panel .panel-head { font-size: 12px !important; }
-.erp-grid .ag-header-cell { cursor: pointer; color: var(--text-subtle, #64748b) !important; }
-.erp-grid .ag-header-cell:hover .ag-header-cell-resize { opacity: 1 !important; }
-.erp-grid .ag-header-cell-resize::after {
-  content: ''; position: absolute; top: 25%; right: 4px; width: 1px; height: 50%;
-  background: transparent; transition: background 0.12s;
-}
-.erp-grid .ag-header-cell:hover .ag-header-cell-resize::after { background: rgba(27, 42, 74, 0.4); }
-/* 셀 — 말줄임 */
-.erp-grid .ag-row { cursor: pointer; }
-.erp-grid .ag-cell {
-  line-height: 34px !important;
-  font-size: 12px !important;
-  font-weight: 400 !important;
-  overflow: hidden !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  min-width: 0 !important;
-}
-.erp-grid .ag-cell > * { min-width: 0 !important; max-width: 100% !important; }
-.erp-grid .ag-cell-value {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
-  width: 100%;
-}
-/* 가격 2줄 셀 */
-.erp-grid .ag-cell-value .pls-price-rent,
-.erp-grid .ag-cell-value .pls-price-dep { white-space: nowrap; }
-.erp-grid .ag-cell-wrapper--price { white-space: normal !important; line-height: 1.3; }
-}
-/* AG Grid 기본 아이콘/메뉴 숨기기 */
-.erp-grid .ag-header-icon { display: none !important; }
-.erp-grid .ag-header-cell-menu-button { display: none !important; }
-.erp-grid .ag-floating-filter { display: none !important; }
+/* ═══════════════════════════════════════════════════════════════
+   AG Grid — 순정값 (커스텀 오버라이드 제거)
+   유지: 필터 뱃지(::after), AG Grid 기본 UI 숨김만
+   ═══════════════════════════════════════════════════════════════ */
+.erp-grid .ag-floating-filter,
 .erp-grid .ag-header-row-floating-filter { display: none !important; }
-/* 리사이즈 핸들 — 보이지 않지만 히트영역 넉넉히 (경계 ±5px) */
-.erp-grid .ag-header-cell-resize { opacity: 0 !important; width: 10px !important; right: -5px !important; cursor: col-resize; z-index: 2; }
-/* 헤더 정렬 */
-.erp-grid .ag-header-center .ag-header-cell-label { justify-content: center; }
-.erp-grid .ag-header-right .ag-header-cell-label { justify-content: flex-end; }
-/* 필터 활성 헤더 강조 */
-.erp-grid .ag-header-cell-filtered .ag-header-cell-label { color: #3b82f6; font-weight: 700; }
-/* 필터 건수 뱃지 — AG Grid DOM 미터치, data-filter-count로 ::after 렌더 */
+
+/* 필터 건수 뱃지 — data-filter-count로 ::after 렌더 (DOM 미터치) */
 .erp-grid .ag-header-cell[data-filter-count]::after {
   content: attr(data-filter-count);
   position: absolute; top: 4px; right: 4px;
@@ -553,36 +475,4 @@
   line-height: 1; font-variant-numeric: tabular-nums;
   pointer-events: none;
 }
-/* 그리드 헤더 — 일반 패널 헤드(.panel-head)와 완전 동일 */
-.erp-grid .ag-root-wrapper {
-  border: none !important;
-  border-radius: var(--radius-md, 4px);
-  background: var(--surface-base, #fff);
-  padding: 0 !important; margin: 0 !important;
-}
-.erp-grid .ag-root-wrapper-body { padding: 0 !important; }
-.erp-grid .ag-header {
-  height: var(--panel-head-height, 40px) !important;
-  min-height: var(--panel-head-height, 40px) !important;
-  max-height: var(--panel-head-height, 40px) !important;
-  border-top: none !important;
-  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
-  background: var(--panel-head-bg, var(--surface-base)) !important;
-  padding: 0 !important;
-}
-.erp-grid .ag-header-row {
-  height: var(--panel-head-height, 40px) !important;
-  display: flex !important; align-items: center !important;
-}
-.erp-grid .ag-header-cell {
-  display: flex !important; align-items: center !important;
-  height: 100% !important;
-  padding-left: 0 !important; padding-right: 0 !important;
-}
-/* 클래식: 세로선 */
-html.theme-classic .erp-grid { --ag-border-color: #e5e5e5; --ag-row-border-color: #e5e5e5; }
-html.theme-classic .erp-grid .ag-cell { border-right: 1px solid #e5e5e5; }
-html.theme-classic .erp-grid .ag-cell:last-child { border-right: none; }
-html.theme-classic .erp-grid .ag-header-cell { border-right: 1px solid #e5e5e5; }
-html.theme-classic .erp-grid .ag-header-cell:last-child { border-right: none; }
-html.theme-classic .erp-grid .ag-header { border-bottom: 1px solid #e5e5e5; }
+.erp-grid .ag-header-cell-filtered .ag-header-cell-label { color: #3b82f6; font-weight: 700; }

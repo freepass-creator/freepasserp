@@ -231,25 +231,25 @@ const INFO_COLS = [
   // maxW 없음 = 텍스트에 맞게 자동. ellipsis = 상한만 제한
   { key: 'vehicleStatus', label: '차량상태', align: 'c', filterable: true, w: 80 },
   { key: 'productType',   label: '상품구분', align: 'c', filterable: true, w: 80 },
-  { key: 'partnerCode',   label: '공급코드', align: 'c', filterable: true },
-  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, searchable: true },
-  { key: 'maker',         label: '제조사',   align: 'c', filterable: true },
-  { key: 'model',         label: '모델명',   align: 'c', filterable: true },
-  { key: 'subModel',      label: '세부모델', maxW: 100, filterable: true },
-  { key: 'trim',          label: '세부트림', maxW: 100, searchable: true },
-  { key: 'options',       label: '선택옵션', maxW: 120, searchable: true },
-  { key: 'fuel',          label: '연료',     align: 'c', filterable: true },
-  { key: 'color',         label: '색상',     align: 'c', maxW: 80, filterable: true },
-  { key: 'year',          label: '연식',     align: 'c', filterable: true },
-  { key: 'mileage',       label: '주행거리', num: true,  filterable: true, wCh: '999,999km' },
-  { key: 'vehicleClass',  label: '차종구분', align: 'c', filterable: true },
-  { key: 'reviewStatus',  label: '심사기준', align: 'c', filterable: true },
-  { key: 'minAge',        label: '최저연령', align: 'c', filterable: true },
+  { key: 'partnerCode',   label: '공급코드', align: 'c', filterable: true, w: 75 },
+  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, searchable: true, w: 95 },
+  { key: 'maker',         label: '제조사',   align: 'c', filterable: true, w: 65 },
+  { key: 'model',         label: '모델명',   align: 'c', filterable: true, w: 80 },
+  { key: 'subModel',      label: '세부모델', filterable: true, w: 170 },
+  { key: 'trim',          label: '세부트림', searchable: true, w: 200 },
+  { key: 'options',       label: '선택옵션', searchable: true, w: 220 },
+  { key: 'fuel',          label: '연료',     align: 'c', filterable: true, w: 60 },
+  { key: 'color',         label: '색상',     align: 'c', filterable: true, w: 80 },
+  { key: 'year',          label: '연식',     align: 'c', filterable: true, w: 55 },
+  { key: 'mileage',       label: '주행거리', num: true,  filterable: true, w: 85 },
+  { key: 'vehicleClass',  label: '차종구분', align: 'c', filterable: true, w: 75 },
+  { key: 'reviewStatus',  label: '심사기준', align: 'c', filterable: true, w: 75 },
+  { key: 'minAge',        label: '최저연령', align: 'c', filterable: true, w: 65 },
 ];
 
-// 기간별 대여료 컬럼 — 9,999,999 기준 고정폭
+// 기간별 대여료 컬럼 — 85px 고정 (1,200,000원 수준 수용)
 const PRICE_COLS = PRICE_MONTHS.map(m => ({
-  key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, wCh: '9,999,999', num: true, priceMonth: m, sortable: true, filterable: true,
+  key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, w: 85, num: true, priceMonth: m, sortable: true, filterable: true,
 }));
 
 const GRID_COLS = [...INFO_COLS, ...PRICE_COLS];

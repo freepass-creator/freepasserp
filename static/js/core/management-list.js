@@ -179,15 +179,9 @@ export function renderTableGrid(options = {}) {
   // 컬럼 정의 빌더 (재사용)
   function buildAgColDefs(colList) {
     return colList.map(col => {
-      // 정렬: 기본 가운데, 특정 컬럼만 셀 좌측
+      // 전체 좌측 정렬 통일 (AG Grid 디폴트)
       const isNum = col.num || col.priceMonth || false;
-      const LEFT_ALIGN_KEYS = ['subModel', 'sub_model', 'trim', 'trim_name', 'options', 'subTrim', 'detail'];
-      // 세부모델/세부트림/선택옵션 — 넓게 유지, 자동맞춤 제외
       const WIDE_KEYS = ['subModel', 'sub_model', 'trim', 'trim_name', 'subTrim', 'options'];
-      const isLeftCell = LEFT_ALIGN_KEYS.includes(col.key);
-      const cellAlign = isLeftCell ? 'left' : 'center';
-      const cellJustify = isLeftCell ? 'flex-start' : 'center';
-      const headerCls = 'ag-header-center';
       const def = {
         colId: col.key,
         headerName: col.label || col.key,
@@ -195,8 +189,6 @@ export function renderTableGrid(options = {}) {
         resizable: true,
         suppressMovable: true,
         suppressHeaderMenuButton: true,
-        cellStyle: { fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: cellJustify, textAlign: cellAlign },
-        headerClass: headerCls,
       };
       // 폭 설정 — 뱃지/필터 컬럼은 넉넉히, 검색 컬럼만 flex
       const labelLen = (col.label || '').length;
@@ -205,10 +197,10 @@ export function renderTableGrid(options = {}) {
       // 초기 힌트 폭 — autoSize가 실제 콘텐츠에 맞춰 재조정
       const autoW = Math.max(40, labelLen * 10 + 8 + badgeExtra);
       if (col.w) { def.width = col.w; def.minWidth = 40; }
-      else if (col.priceMonth) { def.width = 70; def.minWidth = 40; }
-      else if (WIDE_KEYS.includes(col.key)) { def.width = 140; def.minWidth = 40; }
+      else if (col.priceMonth) { def.width = 75; def.minWidth = 40; }
+      else if (WIDE_KEYS.includes(col.key)) { def.width = 160; def.minWidth = 40; }
       else { def.width = autoW; def.minWidth = 40; }
-      // maxW는 초기 힌트만 — 사용자 리사이즈는 제약 없이 허용 (maxWidth 설정 안 함)
+      // maxWidth 제거 — 콘텐츠 길이만큼 자유롭게 (사용자가 수동 조절 가능)
 
       // 값 가져오기
       def.valueGetter = (params) => {
@@ -216,14 +208,11 @@ export function renderTableGrid(options = {}) {
         return typeof getCellText === 'function' ? getCellText(col, params.data) : '';
       };
 
-      // HTML 셀 렌더링 (뱃지 등)
+      // HTML 셀 렌더링 — AG Grid 기본 렌더 사용 (wrapper 없음)
       if (typeof getCellValue === 'function') {
         def.cellRenderer = (params) => {
           if (!params.data) return '';
-          const html = getCellValue(col, params.data);
-          // 가격 2줄 셀은 그대로, 나머지는 ellipsis span wrapper
-          if (html.includes('pls-price-')) return html;
-          return `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;width:100%">${html}</span>`;
+          return getCellValue(col, params.data);
         };
       }
 
@@ -251,15 +240,12 @@ export function renderTableGrid(options = {}) {
       rowSelection: { mode: 'singleRow', enableClickSelection: true, checkboxes: false },
       animateRows: true,
       suppressCellFocus: true,
-      suppressMenuHide: true,
-      autoSizePadding: 0,
       overlayNoRowsTemplate: `<div style="padding:40px;color:#94a3b8;font-size:12px;">${escapeHtml(emptyText)}</div>`,
       defaultColDef: {
         sortable: false,
         resizable: true,
         suppressMovable: true,
         suppressHeaderMenuButton: true,
-        cellStyle: { fontSize: '12px', display: 'flex', alignItems: 'center' },
       },
       getRowId: (params) => {
         if (!params.data) return String(Math.random());
@@ -290,45 +276,35 @@ export function renderTableGrid(options = {}) {
     // 우클릭용 data-key는 contextmenu 핸들러에서 row-id를 직접 읽도록 했으므로
     // 여기서 setAttribute 하지 않음 (AG Grid DOM 재조정과 충돌 방지)
 
-    // 컬럼 폭 저장/복원 (페이지별 localStorage) — v2: 이전 자동폭 캐시 무효화
+    // 컬럼 폭 저장/복원 (페이지별 localStorage)
     const storageKey = `erp.colWidth.v2.${location.pathname}.${container.id}`;
-    let hasSavedWidths = false;
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
       Object.entries(saved).forEach(([colId, w]) => {
         const colDef = agColDefs.find(c => c.colId === colId);
         if (colDef && w > 0) { colDef.width = w; delete colDef.flex; }
       });
-      if (Object.keys(saved).length) {
-        hasSavedWidths = true;
-        gridApi.setGridOption('columnDefs', agColDefs);
-      }
+      if (Object.keys(saved).length) gridApi.setGridOption('columnDefs', agColDefs);
     } catch (_) {}
 
-    // 저장된 폭 없으면 첫 데이터 로드 후 모든 컬럼을 콘텐츠 길이에 맞춤
-    // skipHeader: true → 헤더는 무시하고 실제 셀 콘텐츠 폭으로만 결정
-    if (!hasSavedWidths) {
-      let _autoFitDone = false;
-      gridApi.addEventListener('firstDataRendered', () => {
-        if (_autoFitDone) return;
-        _autoFitDone = true;
-        setTimeout(() => {
-          try { gridApi.autoSizeAllColumns(true); } catch (_) {}
-        }, 30);
-      });
-    }
+    // 초기 autoSize 비활성 — columns 정의의 w(폭) 값 그대로 사용
+    // 사용자가 헤더 경계 더블클릭 시에만 개별 컬럼 autoSize (엑셀식)
 
-    // 헤더 경계 더블클릭 → 해당 컬럼 자동 폭
+    // 헤더 경계 더블클릭 → 해당 컬럼 엑셀식 자동 폭 (헤더+콘텐츠 max)
     container.addEventListener('dblclick', (e) => {
       const resizeHandle = e.target.closest('.ag-header-cell-resize');
       if (!resizeHandle) return;
       const headerCell = resizeHandle.closest('.ag-header-cell');
       const colId = headerCell?.getAttribute('col-id');
-      if (colId && gridApi) gridApi.autoSizeColumns([colId]);
+      if (colId && gridApi) gridApi.autoSizeColumns([colId], false);
     });
 
     gridApi.addEventListener('columnResized', (event) => {
       if (!event.finished) return;
+      // 사용자 직접 드래그(uiColumnResized) 또는 더블클릭 autoSize만 저장
+      // 초기 api 적용(setGridOption)은 스킵 — col.w 덮어쓰기 방지
+      const src = event.source || '';
+      if (src !== 'uiColumnResized' && src !== 'uiColumnDragged' && src !== 'autosizeColumns') return;
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
         gridApi.getColumns().forEach(col => {
@@ -365,10 +341,37 @@ export function renderTableGrid(options = {}) {
 
   // ── 데이터 업데이트 ──
   // 컬럼 키셋이 바뀌었으면 컬럼 재적용 (기간 토글 등)
+  // — 기존 컬럼의 현재 폭은 그대로 유지, 신규 컬럼만 default 폭 적용
   const prevKeys = (cached.columns || []).map(c => c.key).join('|');
   const nextKeys = columns.map(c => c.key).join('|');
   if (prevKeys !== nextKeys) {
-    cached.gridApi.setGridOption('columnDefs', buildAgColDefs(columns));
+    const newDefs = buildAgColDefs(columns);
+    // 기존 컬럼들의 현재 폭 수집 (실시간 + localStorage)
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(`erp.colWidth.v2.${location.pathname}.${container.id}`) || '{}'); } catch (_) {}
+    try {
+      cached.gridApi.getColumns()?.forEach(col => {
+        const w = col.getActualWidth();
+        if (w > 0) saved[col.getColId()] = w;
+      });
+    } catch (_) {}
+    newDefs.forEach(def => {
+      if (saved[def.colId]) {
+        def.width = saved[def.colId];
+        delete def.flex;
+      }
+    });
+    cached.gridApi.setGridOption('columnDefs', newDefs);
+    // localStorage 갱신
+    try {
+      requestAnimationFrame(() => {
+        const fresh = {};
+        cached.gridApi.getColumns()?.forEach(col => {
+          fresh[col.getColId()] = col.getActualWidth();
+        });
+        localStorage.setItem(`erp.colWidth.v2.${location.pathname}.${container.id}`, JSON.stringify(fresh));
+      });
+    } catch (_) {}
   }
   cached.allData = items;
   cached.columns = columns;
