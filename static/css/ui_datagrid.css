@@ -464,7 +464,7 @@
   --ag-font-size: 12px;
   --ag-row-height: 32px;
   --ag-header-height: 34px;
-  --ag-cell-horizontal-padding: 10px;
+  --ag-cell-horizontal-padding: 6px;
 }
 .erp-grid .ag-floating-filter,
 .erp-grid .ag-header-row-floating-filter { display: none !important; }
