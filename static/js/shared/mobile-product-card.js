@@ -54,6 +54,8 @@ function typeTone(v) {
 export function renderMobileProductCard(p, { href } = {}) {
   const photos = (Array.isArray(p.image_urls) && p.image_urls.length ? p.image_urls : null) || (p.image_url ? [p.image_url] : []);
   const thumb = photos[0] || '';
+  const photoLinkRaw = (p.photo_link || p.photoLink || '').trim();
+  const driveFolderUrl = !thumb && photoLinkRaw && (/\/folders\/[a-zA-Z0-9_-]+/.test(photoLinkRaw) || /moderentcar\.co\.kr/.test(photoLinkRaw)) ? photoLinkRaw : '';
   const maker = p.maker || '';
   const model = p.model_name || '';
   const carNo = p.car_number || '';
@@ -79,7 +81,9 @@ export function renderMobileProductCard(p, { href } = {}) {
 
   const imgInner = thumb
     ? `<img class="m-product-card__img" src="${escapeHtml(thumb)}" loading="lazy" decoding="async" fetchpriority="low" alt="">`
-    : `<div class="m-product-card__no-img"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    : driveFolderUrl
+      ? `<img class="m-product-card__img" data-drive-folder="${escapeHtml(driveFolderUrl)}" loading="lazy" decoding="async" fetchpriority="low" alt="">`
+      : `<div class="m-product-card__no-img"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
   const imgHtml = `<div class="m-product-card__media">${imgInner}${badges ? `<div class="m-product-card__badges">${badges}</div>` : ''}</div>`;
 
   const lineSpec = [year && year + '년', mileage].filter(Boolean).join(' · ');

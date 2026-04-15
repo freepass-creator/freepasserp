@@ -23,6 +23,7 @@ import { renderMobileProductCard } from '../shared/mobile-product-card.js';
 import { normalizeProduct } from '../shared/product-list-detail-data.js';
 import { renderProductDetailMarkup } from '../shared/product-list-detail-markup.js';
 import { renderMobileProductDetail } from '../shared/mobile-product-detail-markup.js';
+import { resolveProductPhotos } from '../core/drive-photos.js';
 
 // ─── DOM refs ──────────────────────────────────────────────────────────────
 
@@ -461,6 +462,17 @@ function renderSingleView(p) {
 
   renderSingleGallery(getImages(p));
   singleBody.innerHTML = renderProductDetail(p);
+  // Drive 폴더 사진 비동기 로드 → 완료되면 갤러리/상세 재렌더
+  if (!getImages(p).length && p.photo_link && !p._drive_folder_resolving) {
+    p._drive_folder_resolving = true;
+    resolveProductPhotos(p).then((urls) => {
+      p._drive_folder_resolving = false;
+      if (urls.length && currentSingleProduct === p) {
+        renderSingleGallery(urls);
+        singleBody.innerHTML = renderProductDetail(p);
+      }
+    }).catch(() => { p._drive_folder_resolving = false; });
+  }
 }
 
 let sGalleryIndex = 0;

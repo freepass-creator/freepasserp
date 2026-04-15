@@ -13,6 +13,7 @@
 // ─── 유틸 ─────────────────────────────────────────────────────────────────
 
 import { escapeHtml as esc } from '../core/management-format.js';
+import { isSupportedPhotoSource } from '../core/drive-photos.js';
 export { esc };
 
 export function has(v) {
@@ -117,9 +118,13 @@ export function renderCatalogCard(p, { periods = ['1','6','12','24','36','48','6
   }
   const monthLabel = cardMonth === '1' ? '월렌트' : cardMonth ? `${cardMonth}개월` : '';
 
+  const photoLinkRaw = rf(p, 'photoLink', 'photo_link');
+  const driveFolderUrl = (!thumb && isSupportedPhotoSource(photoLinkRaw)) ? photoLinkRaw : '';
   const imageHtml = thumb
     ? `<img class="catalog-card__image" src="${esc(thumb)}" alt="${esc(modelText)}" loading="lazy" decoding="async">`
-    : `<div class="catalog-card__no-image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+    : driveFolderUrl
+      ? `<img class="catalog-card__image" data-drive-folder="${esc(driveFolderUrl)}" alt="${esc(modelText)}" loading="lazy" decoding="async">`
+      : `<div class="catalog-card__no-image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
   const cardBadges = [
     vs && vs !== '재고' && vs !== '-' ? { field: 'vehicleStatus', value: vs } : null,

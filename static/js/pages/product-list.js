@@ -13,6 +13,7 @@ import { ensureRoom, watchProducts, resolveTermForProduct, updateProduct } from 
 import { showConfirm, showToast } from "../core/toast.js";
 import { extractTermFields, normalizeProduct, renderProductDetailMarkup } from "../shared/product-list-detail-view.js";
 import { renderMobileProductDetail } from "../shared/mobile-product-detail-markup.js";
+import { resolveProductPhotos } from "../core/drive-photos.js";
 import { renderBadgeRow } from "../shared/badge.js";
 
 const _isMobile = { get matches() { return window.matchMedia('(max-width: 768px)').matches; } };
@@ -1017,6 +1018,17 @@ function renderDetail(){
   requestAnimationFrame(resetScroll);
   bindMobileGalleryEvents($detail, rawProduct);
   ensureTermLoaded(product);
+  // Drive 폴더 사진 비동기 로드 → 완료되면 재렌더
+  if ((!rawProduct.image_urls || !rawProduct.image_urls.length) && rawProduct.photo_link && !rawProduct._drive_folder_resolving) {
+    rawProduct._drive_folder_resolving = true;
+    resolveProductPhotos(rawProduct).then((urls) => {
+      rawProduct._drive_folder_resolving = false;
+      if (urls.length && state.selectedId === product.id) {
+        _detailHtmlCache.delete(product.id);
+        renderDetail();
+      }
+    }).catch(() => { rawProduct._drive_folder_resolving = false; });
+  }
 }
 function applyFilters(){
   // baseSet 1회 계산 후 stale 필터 정리 (선택값이 faceted 결과에서 사라진 경우 자동 해제)
@@ -1340,6 +1352,22 @@ function openMobileDetail(id) {
   const mobileActionsHtml = `<div class="md-actions">${inquiryBtn}${contractBtn}${shareBtn}</div>`;
   $plsMDetailContent.innerHTML = renderProductDetailMarkup(product, { termFields: getTermFields(product), actionsHtml: mobileActionsHtml });
   bindMobileDetailGallery($plsMDetailContent);
+  // Drive 폴더 사진 비동기 로드 → 완료되면 재렌더
+  const rawProductM = product._raw || product;
+  if ((!product.photos || !product.photos.length) && rawProductM.photo_link && !rawProductM._drive_folder_resolving) {
+    rawProductM._drive_folder_resolving = true;
+    resolveProductPhotos(rawProductM).then((urls) => {
+      rawProductM._drive_folder_resolving = false;
+      if (urls.length && state.selectedId === id && !$plsMDetail.hidden) {
+        product.photos = urls;
+        $plsMDetailContent.innerHTML = renderProductDetailMarkup(product, { termFields: getTermFields(product), actionsHtml: mobileActionsHtml });
+        bindMobileDetailGallery($plsMDetailContent);
+        $plsMDetailContent.querySelector('#plsMDetailInquiry')?.addEventListener('click', (e) => handleInquiry(e.currentTarget));
+        $plsMDetailContent.querySelector('#plsMDetailShare')?.addEventListener('click', handleShare);
+        $plsMDetailContent.querySelector('#plsMDetailContract')?.addEventListener('click', handleContract);
+      }
+    }).catch(() => { rawProductM._drive_folder_resolving = false; });
+  }
   $plsMDetailContent.querySelector('#plsMDetailInquiry')?.addEventListener('click', (e) => handleInquiry(e.currentTarget));
   $plsMDetailContent.querySelector('#plsMDetailShare')?.addEventListener('click', handleShare);
   $plsMDetailContent.querySelector('#plsMDetailContract')?.addEventListener('click', handleContract);

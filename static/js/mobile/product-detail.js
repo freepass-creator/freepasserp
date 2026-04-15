@@ -14,6 +14,7 @@ import { watchProducts, watchTerms, ensureRoom } from '../firebase/firebase-db.j
 import { open as openFullscreenViewer } from '../shared/fullscreen-photo-viewer.js';
 import { showToast, showConfirm } from '../core/toast.js';
 import { renderMobileProductDetail } from '../shared/mobile-product-detail-markup.js';
+import { resolveProductPhotos } from '../core/drive-photos.js';
 import { wireHtmlCache } from './page-cache.js';
 
 const $content   = document.getElementById('m-pd-content');
@@ -33,13 +34,15 @@ let currentProfile = null;
 
 
 /* ─── 메인 렌더 ─────────────────────────────────── */
-function render() {
+async function render() {
   if (!$content) return;
   const p = currentProduct;
   if (!p) {
     $content.innerHTML = '<div style="padding:48px 16px;text-align:center;color:#8b95a1;">상품을 찾을 수 없습니다</div>';
     return;
   }
+  // Drive 폴더 사진 자동 로드 (image_urls 비어있고 photo_link 가 폴더일 때)
+  await resolveProductPhotos(p).catch(() => {});
   // 상단바 타이틀: 차량번호 세부모델명
   const $title = document.getElementById('m-pd-title');
   if ($title) {

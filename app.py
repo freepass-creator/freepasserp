@@ -382,6 +382,209 @@ def proxy_image():
         return _api_error('이미지 다운로드에 실패했습니다.')
 
 
+DRIVE_API_KEY = 'AIzaSyBSPo1kZOefX-6NuHoQdUF1htqQDSxXsCs'
+_drive_folder_cache = {}  # folder_id → (ts, urls)
+_DRIVE_CACHE_TTL = 3600  # 1시간
+
+
+def _extract_drive_folder_id(value: str) -> str:
+    if not value:
+        return ''
+    s = str(value).strip()
+    m = re.search(r'/folders/([a-zA-Z0-9_-]+)', s)
+    if m:
+        return m.group(1)
+    m = re.search(r'/drive/.*?/([a-zA-Z0-9_-]{20,})', s)
+    if m:
+        return m.group(1)
+    if re.match(r'^[a-zA-Z0-9_-]{20,}$', s):
+        return s
+    return ''
+
+
+@api_bp.route('/drive-folder-images', methods=['GET'])
+def drive_folder_images():
+    """Google Drive 공개 폴더의 이미지 파일 목록 반환.
+    썸네일 URL(lh3.googleusercontent.com) 형태로 돌려주므로 <img> 태그에 바로 사용 가능.
+    size 파라미터(픽셀, w{size})로 해상도 선택 — 카드는 600, 상세는 1920 권장.
+    폴더가 '링크 있는 누구나 보기'로 공개돼 있어야 함.
+    """
+    import json as _json
+    folder_input = request.args.get('folder', '').strip()
+    try:
+        size = int(request.args.get('size', 1920))
+    except ValueError:
+        size = 1920
+    size = max(200, min(4000, size))
+    folder_id = _extract_drive_folder_id(folder_input)
+    if not folder_id:
+        return _api_error('유효한 폴더 URL/ID가 아닙니다.')
+
+    now = time.time()
+    # 캐시는 file_id 목록만 저장 → 요청 size 에 따라 URL 동적 생성
+    cached = _drive_folder_cache.get(folder_id)
+    if cached and now - cached[0] < _DRIVE_CACHE_TTL:
+        ids = cached[1]
+        urls = [f'https://lh3.googleusercontent.com/d/{fid}=w{size}' for fid in ids]
+        return jsonify({'ok': True, 'urls': urls, 'count': len(urls), 'cached': True})
+
+    try:
+        query = f"'{folder_id}' in parents and mimeType contains 'image/' and trashed = false"
+        api_url = (
+            'https://www.googleapis.com/drive/v3/files'
+            f'?q={quote(query)}&key={DRIVE_API_KEY}'
+            '&fields=files(id,name,mimeType)&pageSize=200&orderBy=name'
+        )
+        req = Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urlopen(req, timeout=20) as resp:
+            data = _json.loads(resp.read().decode('utf-8'))
+        files = data.get('files', [])
+        ids = [f['id'] for f in files if f.get('id')]
+        urls = [f'https://lh3.googleusercontent.com/d/{fid}=w{size}' for fid in ids]
+        _drive_folder_cache[folder_id] = (now, ids)
+        # 캐시 용량 제한 (500건 초과 시 오래된 100건 제거)
+        if len(_drive_folder_cache) > 500:
+            oldest = sorted(_drive_folder_cache.items(), key=lambda kv: kv[1][0])[:100]
+            for k, _ in oldest:
+                _drive_folder_cache.pop(k, None)
+        return jsonify({'ok': True, 'urls': urls, 'count': len(urls)})
+    except HTTPError as e:
+        msg = f'Drive API HTTP {e.code}'
+        if e.code == 403:
+            msg += ' — Drive API 미활성 또는 폴더 비공개'
+        return _api_error(msg, 502)
+    except Exception as e:
+        return _api_error(f'폴더 조회 실패: {e}', 502)
+
+
+_scrape_cache = {}  # url → (ts, urls)
+
+
+def _scrape_page_images(url: str) -> list:
+    """외부 HTML 페이지에서 차량 이미지 추출 (사이트별 휴리스틱).
+    현재 지원: moderentcar.co.kr (moren-images S3 버킷).
+    확장 가능 — 다른 도메인 추가 시 여기에 분기 추가.
+    """
+    parsed = urlparse(url)
+    host = (parsed.hostname or '').lower()
+
+    req = Request(url, headers={
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
+    })
+    with urlopen(req, timeout=20) as resp:
+        html_bytes = resp.read(8 * 1024 * 1024)
+    html = html_bytes.decode('utf-8', errors='replace')
+
+    urls = []
+    seen = set()
+
+    def add(u: str):
+        u = u.strip()
+        if not u or u in seen:
+            return
+        seen.add(u)
+        urls.append(u)
+
+    if 'moderentcar.co.kr' in host:
+        # moren-images S3 원본만 (썸네일/thumb 제외)
+        pattern = r'["\'](https?://moren-images\.s3[^"\'\s]+?\.(?:jpg|jpeg|png|webp))["\']'
+        for m in re.finditer(pattern, html, re.IGNORECASE):
+            u = m.group(1)
+            if '/thumb/' in u:
+                continue
+            # 로고/아이콘 제외 — 차량 업로드 경로만
+            if '/data/files/' not in u:
+                continue
+            add(u)
+    else:
+        # 범용 휴리스틱 — 큰 이미지만 (data-src 우선, 로고/아이콘 제외)
+        for attr in ('data-src', 'data-original', 'data-lazy', 'src'):
+            pattern = rf'{attr}=["\'](https?://[^"\'\s]+?\.(?:jpg|jpeg|png|webp))["\']'
+            for m in re.finditer(pattern, html, re.IGNORECASE):
+                u = m.group(1)
+                low = u.lower()
+                if any(x in low for x in ('logo', 'icon', 'favicon', 'sprite', 'banner', 'btn_', '/adm/', '/assets/ico')):
+                    continue
+                add(u)
+
+    return urls
+
+
+@api_bp.route('/extract-photos', methods=['GET'])
+def extract_photos():
+    """URL 종류에 따라 사진 URL 목록 반환.
+    - drive.google.com 폴더 → Drive API
+    - 일반 페이지 → HTML 스크래핑
+    """
+    url = request.args.get('url', '').strip()
+    if not url:
+        return _api_error('url 파라미터가 필요합니다.')
+    try:
+        size = int(request.args.get('size', 1920))
+    except ValueError:
+        size = 1920
+    size = max(200, min(4000, size))
+
+    # Drive 폴더면 기존 Drive API 로 위임
+    folder_id = _extract_drive_folder_id(url)
+    if folder_id and 'drive.google.com' in url:
+        # 내부 재사용 — drive_folder_images 로직 직접 호출하지 않고 복제
+        import json as _json
+        now = time.time()
+        cached = _drive_folder_cache.get(folder_id)
+        if cached and now - cached[0] < _DRIVE_CACHE_TTL:
+            ids = cached[1]
+            urls = [f'https://lh3.googleusercontent.com/d/{fid}=w{size}' for fid in ids]
+            return jsonify({'ok': True, 'urls': urls, 'count': len(urls), 'source': 'drive', 'cached': True})
+        try:
+            query = f"'{folder_id}' in parents and mimeType contains 'image/' and trashed = false"
+            api_url = (
+                'https://www.googleapis.com/drive/v3/files'
+                f'?q={quote(query)}&key={DRIVE_API_KEY}'
+                '&fields=files(id,name,mimeType)&pageSize=200&orderBy=name'
+            )
+            req = Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urlopen(req, timeout=20) as resp:
+                data = _json.loads(resp.read().decode('utf-8'))
+            files = data.get('files', [])
+            ids = [f['id'] for f in files if f.get('id')]
+            _drive_folder_cache[folder_id] = (now, ids)
+            urls = [f'https://lh3.googleusercontent.com/d/{fid}=w{size}' for fid in ids]
+            return jsonify({'ok': True, 'urls': urls, 'count': len(urls), 'source': 'drive'})
+        except HTTPError as e:
+            msg = f'Drive API HTTP {e.code}'
+            if e.code == 403:
+                msg += ' — Drive API 미활성 또는 폴더 비공개'
+            return _api_error(msg, 502)
+        except Exception as e:
+            return _api_error(f'폴더 조회 실패: {e}', 502)
+
+    # 일반 페이지 — HTML 스크래핑
+    parsed = urlparse(url)
+    if parsed.scheme not in ('http', 'https') or not parsed.hostname:
+        return _api_error('올바른 URL이 아닙니다.')
+
+    now = time.time()
+    cached = _scrape_cache.get(url)
+    if cached and now - cached[0] < _DRIVE_CACHE_TTL:
+        return jsonify({'ok': True, 'urls': cached[1], 'count': len(cached[1]), 'source': 'scrape', 'cached': True})
+
+    try:
+        urls = _scrape_page_images(url)
+        if urls:
+            _scrape_cache[url] = (now, urls)
+            if len(_scrape_cache) > 500:
+                oldest = sorted(_scrape_cache.items(), key=lambda kv: kv[1][0])[:100]
+                for k, _ in oldest:
+                    _scrape_cache.pop(k, None)
+        return jsonify({'ok': True, 'urls': urls, 'count': len(urls), 'source': 'scrape'})
+    except HTTPError as e:
+        return _api_error(f'페이지 로드 실패 HTTP {e.code}', 502)
+    except Exception as e:
+        return _api_error(f'스크래핑 실패: {e}', 502)
+
+
 @api_bp.route('/fetch-remote-image', methods=['POST'])
 def fetch_remote_image():
     """임의의 외부 이미지 URL을 서버가 다운로드해서 바이트로 반환.
