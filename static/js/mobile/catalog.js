@@ -102,6 +102,7 @@ const FILTER_GROUPS = [
   { key: 'vehicle_class', title: '차종구분', icon: 'shape', type: 'check', field: 'vehicle_class' },
   { key: 'screening_criteria', title: '심사기준', icon: 'shield', type: 'policyCheck', field: 'screening_criteria' },
   { key: 'basic_driver_age', title: '최저연령', icon: 'user', type: 'policyCheck', field: 'basic_driver_age' },
+  { key: 'provider_company_code', title: '공급코드', icon: 'building', type: 'check', field: 'provider_company_code' },
 ];
 
 // ─── 렌더 ─────────────────────────────────────────

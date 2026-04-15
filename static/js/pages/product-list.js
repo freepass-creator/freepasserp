@@ -884,13 +884,15 @@ function renderPeriodChipsHtml(/* product */) {
 
 function renderSummarySubmenuHtml(product) {
   const selected = new Set(getSelectedPeriods().map(String));
-  const priceRows = DEFAULT_PERIODS.filter(p => selected.has(String(p))).map(p => {
-    const rent = moneyToNumber(product.price?.[p]?.rent);
-    const dep = moneyToNumber(product.price?.[p]?.deposit);
-    const rentTxt = rent ? rent.toLocaleString('ko-KR') : '-';
-    const depTxt = dep ? dep.toLocaleString('ko-KR') : '-';
-    return `<tr><td class="period">${escapeHtml(p)}개월</td><td class="num">${rentTxt}</td><td class="num dep">${depTxt}</td></tr>`;
-  }).join('');
+  const priceRows = DEFAULT_PERIODS
+    .filter(p => selected.has(String(p)) && moneyToNumber(product.price?.[p]?.rent) > 0)
+    .map(p => {
+      const rent = moneyToNumber(product.price?.[p]?.rent);
+      const dep = moneyToNumber(product.price?.[p]?.deposit);
+      const rentTxt = rent.toLocaleString('ko-KR');
+      const depTxt = dep ? dep.toLocaleString('ko-KR') : '-';
+      return `<tr><td class="period">${escapeHtml(p)}개월</td><td class="num">${rentTxt}</td><td class="num dep">${depTxt}</td></tr>`;
+    }).join('');
   const carNo = product.carNo || '';
   const model = [product.maker, product.model].filter(Boolean).join(' ');
   const title = [carNo, model].filter(Boolean).join(' · ') || '-';

@@ -28,7 +28,7 @@
 .m-cf-group__title {
   flex: 1;
   font-size: var(--m-font-title);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-text-primary);
 }
 .m-cf-group__body {

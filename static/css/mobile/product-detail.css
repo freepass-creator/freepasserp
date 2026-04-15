@@ -202,7 +202,7 @@
 }
 .m-pd-hero__model {
   font-size: var(--m-font-display);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-text-primary);
   line-height: 1.15;
   letter-spacing: -0.025em;
@@ -263,7 +263,7 @@
 .m-pd-group__title {
   flex: 1;
   font-size: var(--m-font-title);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-text-primary);
   letter-spacing: -0.01em;
 }
@@ -396,7 +396,7 @@
   flex: 1 1 auto;
   min-width: 0;
   font-size: var(--m-font-display);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-text-primary);
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -454,7 +454,7 @@
   background: var(--m-text-primary);
   color: #fff;
   font-size: 0.5625rem;
-  font-weight: 800;
+  font-weight: 700;
   border-radius: var(--m-radius-badge);
   letter-spacing: 0;
 }
@@ -473,7 +473,7 @@
   background: var(--m-accent-soft);
   color: var(--m-accent);
   font-size: 0.625rem;
-  font-weight: 800;
+  font-weight: 700;
   border-radius: var(--m-radius-badge);
   letter-spacing: 0;
   text-transform: none;
@@ -599,7 +599,7 @@
 }
 .m-pd-price-hero__amount {
   font-size: var(--m-font-display);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
   color: var(--m-text-primary);
@@ -659,7 +659,7 @@
 }
 .m-pd-price-table__row.is-cheapest strong {
   font-size: var(--m-font-display);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 

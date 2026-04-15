@@ -112,9 +112,9 @@ function enrichContract(c) {
   return {
     ...c,
     _process_status: getProcessStatus(c),
-    _maker:    p?.maker || '',
-    _model:    p?.model_name || '',
-    _sub_model: p?.sub_model || c.sub_model || '',
+    _maker:    c.contract_maker || p?.maker || '',
+    _model:    c.contract_model || p?.model_name || '',
+    _sub_model: c.contract_sub_model || p?.sub_model || c.sub_model || '',
   };
 }
 
@@ -160,7 +160,7 @@ function render(contracts) {
     const partner  = c.partner_code || c.provider_company_code || '';
     const agent    = c.agent_code || '';
     const carNo    = c.car_number || c.vehicle_number || '';
-    const subModel = c._sub_model || c.sub_model || c.model_name || c.vehicle_name || '';
+    const subModel = c._sub_model || c.contract_sub_model || c.sub_model || c.model_name || '';
     const customer = c.customer_name || '고객 미입력';
     const month    = c.rent_month ? `${c.rent_month}개월` : '';
     const rent     = c.rent_amount ? fmtMoney(c.rent_amount) : '';

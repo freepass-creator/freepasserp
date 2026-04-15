@@ -205,7 +205,27 @@ function renderList(members) {
   });
 }
 
-// ─── 우클릭 컨텍스트 메뉴 (승인 / 수정 / 등록삭제) ──────────
+// ─── 우클릭 컨텍스트 메뉴 (요약보기 / 승인 / 수정 / 등록삭제) ──────────
+function renderMemberSummaryHtml(m) {
+  const title = [m.name, m.user_code || m.admin_code].filter(Boolean).join(' · ') || '-';
+  const roleLabel = { admin: '관리자', agent: '영업자', agent_manager: '영업관리자', provider: '공급사' }[m.role] || m.role || '';
+  const rows = [
+    ['역할', roleLabel],
+    ['소속', m.company_name],
+    ['소속코드', m.company_code],
+    ['사용자코드', m.user_code || m.admin_code],
+    ['직급', m.position],
+    ['이메일', m.email],
+    ['연락처', m.phone],
+    ['상태', m.status],
+  ].filter(([, v]) => v && String(v).trim() && String(v).trim() !== '-')
+   .map(([k, v]) => `<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(String(v))}</td></tr>`).join('');
+  return `<div class="pls-summary-sub" style="min-width:240px;padding:10px 12px;">
+    <div class="pls-summary-sub__title">${escapeHtml(title)}</div>
+    <table class="pls-summary-sub__info"><tbody>${rows || '<tr><td style="padding:12px;color:#94a3b8;text-align:center;">정보 없음</td></tr>'}</tbody></table>
+  </div>`;
+}
+
 const STATUS_OPTIONS = [
   { value: 'active', label: '승인' },
   { value: 'pending', label: '대기' },
@@ -228,6 +248,15 @@ document.addEventListener('contextmenu', (e) => {
   const menu = document.createElement('div');
   menu.className = 'pm-ctx-menu';
   menu.innerHTML = `
+    <div class="pm-ctx-sub">
+      <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        요약보기
+        <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div class="pm-ctx-submenu">${renderMemberSummaryHtml(member || {})}</div>
+    </div>
+    <div class="pm-ctx-divider"></div>
     <button type="button" class="pm-ctx-item" data-action="edit">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
       정보수정
@@ -257,6 +286,23 @@ document.addEventListener('contextmenu', (e) => {
     const rect = menu.getBoundingClientRect();
     if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 8}px`;
     if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 8}px`;
+  });
+  // hover-intent
+  const _menuBornAt = performance.now();
+  menu.querySelectorAll('.pm-ctx-sub').forEach(sub => {
+    let tmr = null;
+    sub.addEventListener('mouseenter', () => {
+      if (performance.now() - _menuBornAt < 500) return;
+      tmr = setTimeout(() => {
+        menu.querySelectorAll('.pm-ctx-sub.is-open').forEach(s => s.classList.remove('is-open'));
+        sub.classList.add('is-open');
+        tmr = null;
+      }, 150);
+    });
+    sub.addEventListener('mouseleave', () => {
+      if (tmr) { clearTimeout(tmr); tmr = null; }
+      sub.classList.remove('is-open');
+    });
   });
 
   menu.addEventListener('click', async (ev) => {

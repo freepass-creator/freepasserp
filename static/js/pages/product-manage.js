@@ -900,8 +900,30 @@ function renderList(products) {
 }
 
 
-// ─── 우클릭 컨텍스트 메뉴 (정보수정 / 상태변경 / 등록삭제) ──────────
+// ─── 우클릭 컨텍스트 메뉴 (요약보기 / 사진보기 / 정보수정 / 상태변경 / 등록삭제) ──────────
 const VEHICLE_STATUS_OPTIONS = ['출고가능', '출고협의', '출고불가', '계약대기', '계약완료'];
+
+function renderProductSummaryHtml(product) {
+  const title = [product.car_number, [product.maker, product.model_name].filter(Boolean).join(' ')].filter(Boolean).join(' · ') || '-';
+  const rent48 = Number(product.price?.['48']?.rent || 0);
+  const dep48 = Number(product.price?.['48']?.deposit || 0);
+  const rows = [
+    ['차량상태', product.vehicle_status],
+    ['세부모델', product.sub_model],
+    ['세부트림', product.trim_name],
+    ['연식', product.year],
+    ['주행거리', product.mileage ? `${Number(product.mileage).toLocaleString('ko-KR')}km` : ''],
+    ['연료', product.fuel_type],
+    ['색상', product.color],
+    ['대여료(48)', rent48 ? `${rent48.toLocaleString('ko-KR')}` : ''],
+    ['보증금(48)', dep48 ? `${dep48.toLocaleString('ko-KR')}` : ''],
+  ].filter(([, v]) => v && String(v).trim() && String(v).trim() !== '-')
+   .map(([k, v]) => `<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(String(v))}</td></tr>`).join('');
+  return `<div class="pls-summary-sub" style="min-width:240px;padding:10px 12px;">
+    <div class="pls-summary-sub__title">${escapeHtml(title)}</div>
+    <table class="pls-summary-sub__info"><tbody>${rows || '<tr><td style="padding:12px;color:#94a3b8;text-align:center;">정보 없음</td></tr>'}</tbody></table>
+  </div>`;
+}
 let _ctxMenu = null;
 function removeCtxMenu() { if (_ctxMenu) { _ctxMenu.style.display = 'none'; _ctxMenu.remove(); _ctxMenu = null; } }
 document.addEventListener('pointerdown', (e) => { if (_ctxMenu && !_ctxMenu.contains(e.target)) removeCtxMenu(); }, true);
@@ -922,14 +944,27 @@ function onGridContextMenu(e) {
 
   const menu = document.createElement('div');
   menu.className = 'pm-ctx-menu';
+  const photoHref = product.photo_link || (Array.isArray(product.image_urls) && product.image_urls[0]) || product.image_url || '';
   menu.innerHTML = `
+    <div class="pm-ctx-sub">
+      <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        요약보기
+        <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div class="pm-ctx-submenu">${renderProductSummaryHtml(product)}</div>
+    </div>
+    ${photoHref ? `<button type="button" class="pm-ctx-item" data-action="photos">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+      사진보기</button>` : ''}
+    <div class="pm-ctx-divider"></div>
     <button type="button" class="pm-ctx-item" data-action="edit">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
       정보수정
     </button>
     <div class="pm-ctx-sub">
       <button type="button" class="pm-ctx-item pm-ctx-item--parent">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
         상태변경
         <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
       </button>
@@ -946,6 +981,23 @@ function onGridContextMenu(e) {
     </button>
   `;
   document.body.appendChild(menu);
+  // hover-intent — 500ms 초기 차단 + 150ms 지속호버 후 열림
+  const _menuBornAt = performance.now();
+  menu.querySelectorAll('.pm-ctx-sub').forEach(sub => {
+    let tmr = null;
+    sub.addEventListener('mouseenter', () => {
+      if (performance.now() - _menuBornAt < 500) return;
+      tmr = setTimeout(() => {
+        menu.querySelectorAll('.pm-ctx-sub.is-open').forEach(s => s.classList.remove('is-open'));
+        sub.classList.add('is-open');
+        tmr = null;
+      }, 150);
+    });
+    sub.addEventListener('mouseleave', () => {
+      if (tmr) { clearTimeout(tmr); tmr = null; }
+      sub.classList.remove('is-open');
+    });
+  });
   _ctxMenu = menu;
   // 위치
   menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;`;
@@ -961,6 +1013,12 @@ function onGridContextMenu(e) {
     if (!btn) return;
     const action = btn.dataset.action;
 
+    if (action === 'photos') {
+      removeCtxMenu();
+      const href = product.photo_link || (Array.isArray(product.image_urls) && product.image_urls[0]) || product.image_url || '';
+      if (href) window.open(href, '_blank', 'noopener');
+      return;
+    }
     if (action === 'edit') {
       removeCtxMenu();
       if (product) {

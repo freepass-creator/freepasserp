@@ -28,7 +28,7 @@
 .m-st-group__title {
   flex: 1;
   font-size: var(--m-font-title);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-text-primary);
 }
 .m-st-group__action {
@@ -156,7 +156,7 @@
 }
 .m-st-sheet__title {
   font-size: var(--m-font-title);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-text-primary);
 }
 .m-st-sheet__close {
@@ -179,7 +179,7 @@
 .m-st-help__section:last-child { margin-bottom: 0; }
 .m-st-help__section-title {
   font-size: var(--m-font-body);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-accent);
   margin-bottom: var(--m-space-2);
 }

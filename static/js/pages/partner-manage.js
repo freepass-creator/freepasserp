@@ -132,6 +132,110 @@ const PARTNER_COLS = [
 ];
 const partnerThead = qs('#partner-list-head');
 
+// ─── 우클릭 컨텍스트 메뉴 (요약보기 / 정보수정 / 등록삭제) ──────────
+function renderPartnerSummaryHtml(p) {
+  const title = [p.partner_code, p.partner_name].filter(Boolean).join(' · ') || '-';
+  const typeLabel = p.partner_type === 'provider' ? '공급사' : p.partner_type === 'operator' ? '운영사' : '영업채널';
+  const statusLabel = p.status === 'active' ? '활성' : p.status === 'inactive' ? '비활성' : (p.status || '');
+  const rows = [
+    ['구분', typeLabel],
+    ['상태', statusLabel],
+    ['파트너명', p.partner_name],
+    ['사업자번호', p.business_number],
+    ['대표자', p.ceo_name],
+    ['대표연락처', p.ceo_phone],
+    ['대표전화', p.company_phone],
+    ['담당자', p.manager_name],
+    ['담당자연락처', p.manager_phone],
+    ['이메일', p.email],
+    ['주소', p.address],
+  ].filter(([, v]) => v && String(v).trim() && String(v).trim() !== '-')
+   .map(([k, v]) => `<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(String(v))}</td></tr>`).join('');
+  return `<div class="pls-summary-sub" style="min-width:240px;padding:10px 12px;">
+    <div class="pls-summary-sub__title">${escapeHtml(title)}</div>
+    <table class="pls-summary-sub__info"><tbody>${rows || '<tr><td style="padding:12px;color:#94a3b8;text-align:center;">정보 없음</td></tr>'}</tbody></table>
+  </div>`;
+}
+
+let _partnerCtxMenu = null;
+function removePartnerCtxMenu() { if (_partnerCtxMenu) { _partnerCtxMenu.remove(); _partnerCtxMenu = null; } }
+document.addEventListener('pointerdown', (e) => { if (_partnerCtxMenu && !_partnerCtxMenu.contains(e.target)) removePartnerCtxMenu(); }, true);
+document.addEventListener('scroll', removePartnerCtxMenu, true);
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removePartnerCtxMenu(); });
+
+document.addEventListener('contextmenu', (e) => {
+  const row = e.target.closest('#partner-list [data-key], #partner-list .ag-row[row-id]');
+  if (!row) return;
+  e.preventDefault();
+  removePartnerCtxMenu();
+  const code = row.dataset.key || row.getAttribute('row-id');
+  const partner = currentPartners.find(p => p.partner_code === code);
+  if (!partner) return;
+
+  const menu = document.createElement('div');
+  menu.className = 'pm-ctx-menu';
+  menu.innerHTML = `
+    <div class="pm-ctx-sub">
+      <button type="button" class="pm-ctx-item pm-ctx-item--parent">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        요약보기
+        <svg class="pm-ctx-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <div class="pm-ctx-submenu">${renderPartnerSummaryHtml(partner)}</div>
+    </div>
+    <div class="pm-ctx-divider"></div>
+    <button type="button" class="pm-ctx-item" data-action="edit">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+      정보수정
+    </button>
+    <div class="pm-ctx-divider"></div>
+    <button type="button" class="pm-ctx-item pm-ctx-item--danger" data-action="delete">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+      등록삭제
+    </button>
+  `;
+  document.body.appendChild(menu);
+  _partnerCtxMenu = menu;
+  menu.style.cssText = `position:fixed;top:${e.clientY}px;left:${e.clientX}px;z-index:9999;`;
+  requestAnimationFrame(() => {
+    const rect = menu.getBoundingClientRect();
+    if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 8}px`;
+    if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 8}px`;
+  });
+  // hover-intent
+  const _menuBornAt = performance.now();
+  menu.querySelectorAll('.pm-ctx-sub').forEach(sub => {
+    let tmr = null;
+    sub.addEventListener('mouseenter', () => {
+      if (performance.now() - _menuBornAt < 500) return;
+      tmr = setTimeout(() => {
+        menu.querySelectorAll('.pm-ctx-sub.is-open').forEach(s => s.classList.remove('is-open'));
+        sub.classList.add('is-open');
+        tmr = null;
+      }, 150);
+    });
+    sub.addEventListener('mouseleave', () => {
+      if (tmr) { clearTimeout(tmr); tmr = null; }
+      sub.classList.remove('is-open');
+    });
+  });
+
+  menu.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    removePartnerCtxMenu();
+    if (action === 'edit') {
+      fillForm(partner);
+    }
+    if (action === 'delete') {
+      editingCodeInput.value = partner.partner_code;
+      try { await handleDelete(); } catch (error) { showToast(`삭제 실패: ${error.message}`, 'error'); }
+    }
+  });
+});
+
+
 function renderList(partners) {
   syncTopBarPageCount(partners.length);
   renderTableGrid({

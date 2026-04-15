@@ -128,7 +128,7 @@
 }
 .m-pd--desktop .m-pd-vinfo__head-title {
   font-size: var(--font-size-xl, 17px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.2;
 }
@@ -197,7 +197,7 @@
 /* ─── 최저가 대여료 숫자만 크게 ─────────────── */
 .m-pd--desktop .m-pd-price-table__row.is-cheapest strong {
   font-size: var(--font-size-xl, 17px);
-  font-weight: 800;
+  font-weight: 700;
   color: #0f172a;
 }
 

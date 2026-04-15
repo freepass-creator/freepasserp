@@ -149,14 +149,15 @@ function render(c) {
         <div class="m-cf-fields">
           <div class="m-cf-field m-cf-field--row">
             <span class="m-cf-field__label">차량번호</span>
-            <input class="m-cf-field__input" value="${escapeHtml(c.car_number || '')}" readonly>
+            <input class="m-cf-field__input" value="${escapeHtml(c.car_number || c.vehicle_number || '')}" readonly>
           </div>
           ${(() => {
             const p = productMap.get(c.product_uid) || productMap.get(c.product_code);
-            const maker = c.maker || p?.maker || '';
-            const model = c.model_name || p?.model_name || '';
-            const sub   = c.sub_model || p?.sub_model || '';
-            const trim  = c.trim_name || p?.trim_name || '';
+            // 계약은 contract_* 필드가 스냅샷, product는 원본
+            const maker = c.contract_maker || c.maker || p?.maker || '';
+            const model = c.contract_model || c.model_name || p?.model_name || '';
+            const sub   = c.contract_sub_model || c.sub_model || p?.sub_model || '';
+            const trim  = c.contract_trim || c.trim_name || p?.trim_name || '';
             return `
             <div class="m-cf-field m-cf-field--row">
               <span class="m-cf-field__label">제조사</span>

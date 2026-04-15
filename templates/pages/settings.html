@@ -127,15 +127,30 @@
 </div>
 </section>
 <section class="settings-section-block">
-<div class="section-title-row"><span class="section-title"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>상품목록 기간</span><span class="section-desc">표시할 개월 수 선택 (기본: 전체)</span></div>
-<div id="settings-period-list" class="settings-badge-list"></div>
-</section>
-<section class="settings-section-block">
 <div class="section-title-row"><span class="section-title"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>알림</span><span class="section-desc">사이드바 뱃지 표시 설정</span></div>
 <div id="settings-badge-list" class="settings-badge-list"></div>
 <div class="settings-badge-row">
   <span class="settings-badge-label">알림 소리</span>
   <label class="toggle-switch"><input type="checkbox" id="settings-sound-toggle" checked><span class="toggle-switch-track"></span></label>
+</div>
+<div class="settings-badge-row">
+  <span class="settings-badge-label">알림음 종류</span>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <select id="settings-sound-pack" style="height:26px;padding:0 8px;border:1px solid #e2e8f0;border-radius:var(--radius-sm);font-size:12px;">
+      <option value="native">기본 알림음 (OS)</option>
+      <option value="freepass">프리패스 (한국어)</option>
+      <option value="freepass-eng">프리패스 (영어)</option>
+    </select>
+    <button type="button" id="settings-sound-preview" class="inline-button" style="height:26px;padding:0 10px;font-size:11px;">미리듣기</button>
+  </div>
+</div>
+<div class="settings-badge-row">
+  <span class="settings-badge-label">웹 푸시 알림 <small id="settings-push-status" style="color:#94a3b8;font-size:10px;margin-left:6px;"></small></span>
+  <label class="toggle-switch"><input type="checkbox" id="settings-push-toggle"><span class="toggle-switch-track"></span></label>
+</div>
+<div class="settings-badge-row" id="settings-sms-row" hidden>
+  <span class="settings-badge-label">문자(SMS) 수신</span>
+  <label class="toggle-switch"><input type="checkbox" id="settings-sms-toggle" checked><span class="toggle-switch-track"></span></label>
 </div>
 </section>
 <section class="settings-section-block">

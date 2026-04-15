@@ -67,6 +67,8 @@ export async function requireAuth(options = {}) {
       unsubscribe?.();
       setLogProfile(profile);
       resolve({ user, profile });
+      // FCM 푸시 토큰 등록 (비차단, 관리자만 현재 트리거 대상이지만 모든 역할 등록해둠)
+      import('./push-permission-ui.js').then((m) => m.initPushPermissionFlow(user.uid)).catch(() => {});
     });
   });
 }

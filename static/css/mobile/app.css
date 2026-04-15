@@ -173,7 +173,7 @@ html {
   background: var(--m-accent);
   color: #fff;
   font-size: 0.6875rem;
-  font-weight: 800;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,7 +275,7 @@ html {
 }
 .m-fs__head-count strong {
   color: var(--m-text-primary);
-  font-weight: 800;
+  font-weight: 700;
 }
 .m-fs__head-reset {
   background: transparent;
@@ -346,7 +346,7 @@ html {
   background: var(--m-accent-soft);
   color: var(--m-accent);
   font-size: 0.625rem;
-  font-weight: 800;
+  font-weight: 700;
   padding: 1px 6px;
   border-radius: 999px;
 }
@@ -560,7 +560,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .m-topbar__title {
   font-size: var(--m-font-title);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--m-text-primary);
   letter-spacing: -0.01em;
 }

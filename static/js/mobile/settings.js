@@ -149,7 +149,7 @@ function render() {
         <div class="m-st-fields">
           ${field('이메일',   currentUser?.email, 'email',     true, false)}
           ${field('회원구분', roleKo(p.role),     'role',      true, false)}
-          ${field('계정코드', p.user_code,        'user_code', true, false)}
+          ${field('계정코드', p.user_code || p.admin_code, 'user_code', true, false)}
           ${field('계정상태', statusKo(p.status), 'status',    true, false)}
         </div>
       </div>

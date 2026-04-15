@@ -113,6 +113,19 @@
         ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
       }
     },
+    "fcm_tokens": {
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && $uid === auth.uid",
+        "$token": {
+          ".validate": "newData.hasChild('created_at')"
+        }
+      }
+    },
+    "sms_cooldown": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".write": false
+    },
     "$other": {
       ".read": false,
       ".write": false

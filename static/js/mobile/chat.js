@@ -75,10 +75,10 @@ function enrichRoom(r) {
   return {
     ...r,
     _reply_status: deriveReplyStatus(r) || '',
-    _maker:    p?.maker || '',
-    _model:    p?.model_name || '',
-    _sub_model: p?.sub_model || '',
-    _car_no:   p?.car_number || r.vehicle_number || '',
+    _maker:    p?.maker || r.maker || '',
+    _model:    p?.model_name || r.model_name || '',
+    _sub_model: p?.sub_model || r.sub_model || r.model_name || '',
+    _car_no:   p?.car_number || r.vehicle_number || r.car_number || '',
   };
 }
 

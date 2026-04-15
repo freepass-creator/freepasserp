@@ -324,17 +324,102 @@ function bindAppSettings(profile) {
 
   // 알림 소리 (정적 import 되어있으면 재사용)
   const soundToggle = document.getElementById('settings-sound-toggle');
+  const soundPackSelect = document.getElementById('settings-sound-pack');
+  const soundPreviewBtn = document.getElementById('settings-sound-preview');
   if (soundToggle) {
     try { soundToggle.checked = localStorage.getItem('fp.sound.enabled') !== '0'; } catch {}
-    soundToggle.addEventListener('change', () => {
+    soundToggle.addEventListener('change', async () => {
       try { localStorage.setItem('fp.sound.enabled', soundToggle.checked ? '1' : '0'); } catch {}
       if (soundToggle.checked) {
-        // user gesture 유지를 위해 동기적으로 재생
-        const a = new Audio('/static/sound-msg.wav');
-        a.volume = 0.5;
-        a.play().catch(e => console.warn('[sound]', e.name));
+        const { playSampleSound } = await import('../core/notif-sound.js');
+        const pack = localStorage.getItem('fp.sound.pack') || 'freepass';
+        playSampleSound(pack, 'msg');
       }
     });
+  }
+  if (soundPackSelect) {
+    try { soundPackSelect.value = localStorage.getItem('fp.sound.pack') || 'freepass'; } catch {}
+    soundPackSelect.addEventListener('change', () => {
+      try { localStorage.setItem('fp.sound.pack', soundPackSelect.value); } catch {}
+    });
+  }
+  if (soundPreviewBtn) {
+    soundPreviewBtn.addEventListener('click', async () => {
+      const { playSampleSound } = await import('../core/notif-sound.js');
+      const pack = soundPackSelect?.value || localStorage.getItem('fp.sound.pack') || 'freepass';
+      playSampleSound(pack, 'msg');
+    });
+  }
+
+  // 웹 푸시 알림 (FCM)
+  const pushToggle = document.getElementById('settings-push-toggle');
+  const pushStatus = document.getElementById('settings-push-status');
+  if (pushToggle) {
+    const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+    if (perm === 'unsupported') {
+      pushToggle.disabled = true;
+      if (pushStatus) pushStatus.textContent = '이 브라우저 미지원';
+    } else if (perm === 'denied') {
+      pushToggle.checked = false;
+      pushToggle.disabled = true;
+      if (pushStatus) pushStatus.textContent = '브라우저에서 차단됨 — 주소창 옆 자물쇠 → 알림 허용';
+    } else if (perm === 'granted') {
+      pushToggle.checked = true;
+      if (pushStatus) pushStatus.textContent = '허용됨';
+    } else {
+      pushToggle.checked = false;
+      if (pushStatus) pushStatus.textContent = '꺼져있음';
+    }
+    pushToggle.addEventListener('change', async () => {
+      if (pushToggle.checked) {
+        try {
+          const mod = await import('../core/push-permission-ui.js');
+          const r = await mod.manualEnablePush(currentProfile.uid);
+          if (r.ok) {
+            if (pushStatus) pushStatus.textContent = '허용됨';
+          } else {
+            pushToggle.checked = false;
+            if (pushStatus) pushStatus.textContent = r.reason === 'denied' ? '권한 거부됨' : '등록 실패';
+          }
+        } catch (e) {
+          pushToggle.checked = false;
+          console.warn('[push] 활성화 실패', e);
+        }
+      } else {
+        // 끄기 — 이 기기 토큰 삭제
+        try {
+          const { ref, remove } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js');
+          const { app, db } = await import('../firebase/firebase-config.js');
+          const { getMessaging, getToken, deleteToken } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js');
+          const { VAPID_KEY } = await import('../firebase/firebase-messaging.js');
+          const messaging = getMessaging(app);
+          const swReg = await navigator.serviceWorker.getRegistration('/static/');
+          const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg }).catch(() => null);
+          if (token) {
+            await deleteToken(messaging).catch(() => {});
+            await remove(ref(db, `fcm_tokens/${currentProfile.uid}/${token}`)).catch(() => {});
+          }
+          if (pushStatus) pushStatus.textContent = '꺼짐 (이 기기)';
+        } catch (e) { console.warn('[push] 끄기 실패', e); }
+      }
+    });
+  }
+
+  // SMS 수신 — agent/provider/agent_manager 만 표시
+  const smsRow = document.getElementById('settings-sms-row');
+  const smsToggle = document.getElementById('settings-sms-toggle');
+  if (smsRow && smsToggle) {
+    const smsRoles = ['agent', 'provider', 'agent_manager'];
+    if (smsRoles.includes(profile.role)) {
+      smsRow.hidden = false;
+      const enabled = profile.settings?.sms_enabled !== false; // 기본 켜짐
+      smsToggle.checked = enabled;
+      smsToggle.addEventListener('change', async () => {
+        const newSettings = { ...(currentProfile.settings || {}), sms_enabled: smsToggle.checked };
+        currentProfile.settings = newSettings;
+        try { await updateUserProfile(currentProfile.uid, { settings: newSettings }); } catch (e) { console.warn('[sms] 저장 실패', e); }
+      });
+    }
   }
 
   // 보기 모드 (테마)

@@ -979,6 +979,63 @@ def index():
     return redirect('/product-list')
 
 
+# ─── Solapi 문자 발송 ───────────────────────────────────────────────────────
+import hmac, hashlib, secrets, datetime, json as _json
+SOLAPI_API_KEY = os.environ.get('SOLAPI_API_KEY', 'NCSV5JTOZ121DIDR')
+SOLAPI_API_SECRET = os.environ.get('SOLAPI_API_SECRET', 'EHWRARRBCD9UYQ3HFBM8XINKZD8BHNE0')
+SOLAPI_FROM = os.environ.get('SOLAPI_FROM', '01063930926')  # 사전 등록된 발신번호 (Solapi 콘솔에서 등록)
+
+def _solapi_auth_header():
+    # HMAC-SHA256(date + salt, secret)
+    date = datetime.datetime.utcnow().isoformat(timespec='milliseconds') + 'Z'
+    salt = secrets.token_hex(16)
+    msg = (date + salt).encode('utf-8')
+    sig = hmac.new(SOLAPI_API_SECRET.encode('utf-8'), msg, hashlib.sha256).hexdigest()
+    return f'HMAC-SHA256 apiKey={SOLAPI_API_KEY}, date={date}, salt={salt}, signature={sig}'
+
+SMS_API_ADMIN_KEY = os.environ.get('SMS_API_ADMIN_KEY', '')  # 서버 시작 시 설정 — 없으면 엔드포인트 비활성
+
+@app.route('/api/sms/send', methods=['POST'])
+def api_sms_send():
+    """Solapi 단건 SMS 발송 (관리자 키 필수). body: {to, text, from?}"""
+    # 관리자 키 미설정 시 엔드포인트 차단 (실수로 노출 방지)
+    if not SMS_API_ADMIN_KEY:
+        return jsonify({'ok': False, 'error': 'SMS endpoint disabled (SMS_API_ADMIN_KEY 미설정)'}), 503
+    # 헤더 검증
+    if request.headers.get('X-Admin-Key', '') != SMS_API_ADMIN_KEY:
+        return jsonify({'ok': False, 'error': 'unauthorized'}), 401
+    try:
+        body = request.get_json(silent=True) or {}
+        to = str(body.get('to', '')).replace('-', '').strip()
+        text = str(body.get('text', '')).strip()
+        sender = str(body.get('from', '') or SOLAPI_FROM).replace('-', '').strip()
+        if not to or not text:
+            return jsonify({'ok': False, 'error': 'to/text 필수'}), 400
+        if not sender:
+            return jsonify({'ok': False, 'error': '발신번호 미설정 (SOLAPI_FROM 환경변수 또는 body.from 필요)'}), 400
+
+        payload = _json.dumps({'message': {'to': to, 'from': sender, 'text': text}}).encode('utf-8')
+        req = Request(
+            'https://api.solapi.com/messages/v4/send',
+            data=payload,
+            method='POST',
+            headers={
+                'Authorization': _solapi_auth_header(),
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+        )
+        with urlopen(req, timeout=10) as res:
+            result = _json.loads(res.read().decode('utf-8'))
+        return jsonify({'ok': True, 'result': result})
+    except HTTPError as e:
+        try:
+            err_body = e.read().decode('utf-8')
+        except Exception:
+            err_body = str(e)
+        return jsonify({'ok': False, 'error': f'HTTP {e.code}', 'detail': err_body}), 500
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=os.environ.get('FLASK_DEBUG', '1') == '1', port=int(os.environ.get('PORT', 7000)))
