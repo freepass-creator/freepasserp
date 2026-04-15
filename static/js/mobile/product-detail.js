@@ -118,7 +118,7 @@ $btnChat?.addEventListener('click', async (e) => {
       agentName: currentProfile?.name || '',
       agentChannelCode: currentProfile?.company_code || '',
       vehicleNumber: p.car_number || '',
-      modelName: [p.maker, p.model_name, p.sub_model, p.trim_name].filter(v => v && v !== '-').join(' '),
+      modelName: String(p.sub_model || p.model_name || '').trim(),
     });
     // 채팅방으로 이동 → 입력칸 자동 포커스
     location.href = `/m/chat/${encodeURIComponent(roomId)}`;

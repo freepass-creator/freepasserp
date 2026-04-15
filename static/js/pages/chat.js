@@ -529,7 +529,7 @@ async function bootstrap() {
             agentName: profile.name || '',
             agentChannelCode: profile.company_code || '',
             vehicleNumber: product.carNo,
-            modelName: [product.maker, product.model, product.subModel, product.trim].filter(Boolean).join(' ')
+            modelName: String(product.subModel || product.model || '').trim()
           }).then((roomId) => {
             currentRoomId = roomId;
             // 생성된 방 자동 오픈 + 입력칸 포커스
