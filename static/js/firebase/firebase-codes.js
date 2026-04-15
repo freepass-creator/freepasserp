@@ -76,13 +76,10 @@ export async function createUserCode(role, companyCode = '') {
     if (!normalizedCompanyCode) throw new Error('공급사코드가 필요합니다.');
     return `R${padNumber(await nextSequence('provider_user'), 4)}`;
   }
-  if (role === 'agent') {
+  // 영업자/영업관리자 — 동일 시퀀스(S코드) 공유
+  if (role === 'agent' || role === 'agent_manager') {
     if (!normalizedCompanyCode) throw new Error('영업채널코드가 필요합니다.');
     return `S${padNumber(await nextSequence('agent_user'), 4)}`;
-  }
-  if (role === 'agent_manager') {
-    if (!normalizedCompanyCode) throw new Error('영업채널코드가 필요합니다.');
-    return `M${padNumber(await nextSequence('agent_manager_user'), 4)}`;
   }
   if (role === 'admin') {
     return `A${padNumber(await nextSequence('admin_user'), 4)}`;

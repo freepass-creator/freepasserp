@@ -960,7 +960,7 @@ async function handleInquiry(btnEl) {
       agentName: state.profile.name || state.profile.user_name || '',
       agentChannelCode: state.profile.company_code || '',
       vehicleNumber: product.carNo && product.carNo !== '-' ? product.carNo : '',
-      modelName: [product.maker, product.model, product.subModel, product.trim].filter(v => v && v !== '-').join(' ')
+      modelName: String(product.subModel || product.model || '').trim()
     });
     localStorage.setItem('freepass_pending_chat_room', roomId);
     window.location.href = '/chat';
