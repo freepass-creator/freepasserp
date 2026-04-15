@@ -466,6 +466,9 @@
   --ag-header-height: 34px;
   --ag-cell-horizontal-padding: 6px;
 }
+/* 우측 패딩만 좁게 — 좌 6 / 우 2 */
+.erp-grid .ag-cell,
+.erp-grid .ag-header-cell { padding-right: 2px !important; }
 .erp-grid .ag-floating-filter,
 .erp-grid .ag-header-row-floating-filter { display: none !important; }
 
