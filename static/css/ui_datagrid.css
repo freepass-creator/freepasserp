@@ -464,11 +464,11 @@
   --ag-font-size: 12px;
   --ag-row-height: 32px;
   --ag-header-height: 34px;
-  --ag-cell-horizontal-padding: 3px;
+  --ag-cell-horizontal-padding: 2px;
 }
-/* 좌우 3px 균등 */
+/* 좌우 2px 균등 */
 .erp-grid .ag-cell,
-.erp-grid .ag-header-cell { padding-right: 3px !important; }
+.erp-grid .ag-header-cell { padding-right: 2px !important; }
 /* 가운데 정렬 — 헤더 + 셀 */
 .erp-grid .ag-header-cell.ag-center-aligned-header .ag-header-cell-label { justify-content: center; }
 .erp-grid .ag-cell.ag-center-aligned-cell { text-align: center; justify-content: center; }
