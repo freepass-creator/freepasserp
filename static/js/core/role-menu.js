@@ -23,7 +23,7 @@ const ROUTE_REGISTRY = [
   { href: '/terms',        label: '운영 정책',      pageTitle: '정책관리',   icon: 'shield',    roles: ['provider', 'admin'],          group: 'g3' },
   // 파트너 · 사용자 · 관리자
   { href: '/partner',      label: '파트너사 관리',  pageTitle: '파트너관리', icon: 'building',    roles: ['admin'],                      group: 'g4' },
-  { href: '/member',       label: '사용자 관리',    pageTitle: '사용자관리', icon: 'users',       roles: ['admin'],                      group: 'g4' },
+  { href: '/member',       label: '사용자 관리',    pageTitle: '사용자관리', icon: 'users',       roles: ['admin', 'agent_manager'],     group: 'g4' },
   { href: '/admin',        label: '관리자 페이지',  pageTitle: '관리자',     icon: 'lock-keyhole', roles: ['admin'],                     group: 'g4' },
   // { href: '/upload-center',label: '상품업로드',      pageTitle: '상품업로드', icon: 'upload',       roles: ['admin'],                     group: 'g4' },
   { href: '/download-center', label: '파일센터',    pageTitle: '파일센터',   icon: 'download',     roles: ['provider', 'agent', 'agent_manager', 'admin'], group: 'g2' },

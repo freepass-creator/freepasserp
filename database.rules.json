@@ -3,12 +3,12 @@
     "users": {
       ".read": "auth != null",
       "$uid": {
-        ".write": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'agent_manager' && root.child('users').child($uid).child('company_code').val() === root.child('users').child(auth.uid).child('company_code').val()))",
         "role": {
           ".validate": "!data.exists() || newData.val() === data.val() || root.child('users').child(auth.uid).child('role').val() === 'admin'"
         },
         "status": {
-          ".validate": "root.child('users').child(auth.uid).child('role').val() === 'admin' || newData.val() === data.val() || (!data.exists() && newData.val() === 'pending')"
+          ".validate": "root.child('users').child(auth.uid).child('role').val() === 'admin' || (root.child('users').child(auth.uid).child('role').val() === 'agent_manager' && root.child('users').child($uid).child('company_code').val() === root.child('users').child(auth.uid).child('company_code').val()) || newData.val() === data.val() || (!data.exists() && newData.val() === 'pending')"
         }
       }
     },

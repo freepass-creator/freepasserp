@@ -403,7 +403,7 @@ async function handleDelete() {
 
 async function bootstrap() {
   try {
-    const { profile } = await requireAuth({ roles: ['admin'] });
+    const { profile } = await requireAuth({ roles: ['admin', 'agent_manager'] });
     renderRoleMenu(menu, profile.role);
     bindFilterOverlayToggle(filterToggleButton, filterOverlay, { storageKey: 'fp.member-filter.v1' });
     currentPartners = await fetchPartnersOnce();
@@ -431,7 +431,17 @@ async function bootstrap() {
 
     renderSkeletonRows(list, MEMBER_COLS, 8);
     registerPageCleanup(watchUsers((users) => {
-      currentMembers = users;
+      // 영업관리자는 자기 채널(company_code) 소속 사용자만
+      if (profile.role === 'agent_manager') {
+        const myCh = String(profile.company_code || '').trim();
+        currentMembers = (users || []).filter(u => {
+          if (u.uid === profile.uid) return true; // 본인 포함
+          const ch = String(u.company_code || '').trim();
+          return ch && ch === myCh;
+        });
+      } else {
+        currentMembers = users;
+      }
       renderList(currentMembers);
     }));
     applyMode('idle');

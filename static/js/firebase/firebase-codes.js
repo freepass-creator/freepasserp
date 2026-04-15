@@ -80,6 +80,10 @@ export async function createUserCode(role, companyCode = '') {
     if (!normalizedCompanyCode) throw new Error('영업채널코드가 필요합니다.');
     return `S${padNumber(await nextSequence('agent_user'), 4)}`;
   }
+  if (role === 'agent_manager') {
+    if (!normalizedCompanyCode) throw new Error('영업채널코드가 필요합니다.');
+    return `M${padNumber(await nextSequence('agent_manager_user'), 4)}`;
+  }
   if (role === 'admin') {
     return `A${padNumber(await nextSequence('admin_user'), 4)}`;
   }
