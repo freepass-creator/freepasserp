@@ -232,7 +232,7 @@ const INFO_COLS = [
   { key: 'vehicleStatus', label: '차량상태', align: 'c', filterable: true, w: 100 },
   { key: 'productType',   label: '상품구분', align: 'c', filterable: true, w: 100 },
   { key: 'partnerCode',   label: '공급코드', align: 'c', filterable: true, w: 95 },
-  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, searchable: true, w: 110 },
+  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, searchable: true, w: 110, pinned: 'left' },
   { key: 'maker',         label: '제조사',   align: 'c', filterable: true, w: 80 },
   { key: 'model',         label: '모델명',   align: 'c', filterable: true, w: 100 },
   { key: 'subModel',      label: '세부모델', filterable: true, w: 200 },
@@ -247,9 +247,9 @@ const INFO_COLS = [
   { key: 'minAge',        label: '최저연령', align: 'c', filterable: true, w: 90 },
 ];
 
-// 기간별 대여료 컬럼 — 85px 고정 (1,200,000원 수준 수용)
+// 기간별 대여료 컬럼 — 우측 고정, 85px 기본 폭
 const PRICE_COLS = PRICE_MONTHS.map(m => ({
-  key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, w: 85, num: true, priceMonth: m, sortable: true, filterable: true,
+  key: `price_${m}`, label: m === '1' ? '월렌트' : `${m}개월`, w: 85, num: true, priceMonth: m, sortable: true, filterable: true, pinned: 'right',
 }));
 
 const GRID_COLS = [...INFO_COLS, ...PRICE_COLS];

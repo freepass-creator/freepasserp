@@ -190,6 +190,8 @@ export function renderTableGrid(options = {}) {
         suppressMovable: false,  // 드래그로 컬럼 순서 변경 가능
         suppressHeaderMenuButton: true,
       };
+      // 컬럼 고정 (좌측/우측)
+      if (col.pinned === 'left' || col.pinned === 'right') def.pinned = col.pinned;
       // 폭 설정 — 뱃지/필터 컬럼은 넉넉히, 검색 컬럼만 flex
       const labelLen = (col.label || '').length;
       const hasBadge = col.filterable && !col.searchable && !col.num && !col.priceMonth;
