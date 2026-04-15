@@ -110,6 +110,7 @@
   content: ''; position: absolute; right: -6px; bottom: 8px;
   width: 0; height: 0; border-style: solid;
   border-width: 0 0 8px 8px;
+  border-color: transparent;
 }
 
 /* ── 상대 메시지 (왼쪽) 기본 ── */
@@ -118,6 +119,7 @@
   content: ''; position: absolute; left: -6px; bottom: 8px;
   width: 0; height: 0; border-style: solid;
   border-width: 0 8px 8px 0;
+  border-color: transparent;
 }
 
 /* ── 역할별 색상: 공급사 = 연파랑, 영업자 = 연초록, 관리자 = 슬레이트 ── */
@@ -139,6 +141,12 @@
 .message-wrap.out .message-bubble.role-admin::after { border-color: transparent transparent transparent #e2e8f0; }
 .message-wrap.in .message-bubble.role-admin { background: #f1f5f9; }
 .message-wrap.in .message-bubble.role-admin::after { border-color: transparent #f1f5f9 transparent transparent; }
+
+/* 영업관리자 = 영업자와 동일 톤 */
+.message-bubble.role-agent_manager { background: #fef3c7; }
+.message-wrap.out .message-bubble.role-agent_manager::after { border-color: transparent transparent transparent #fef3c7; }
+.message-wrap.in .message-bubble.role-agent_manager { background: #fefce8; }
+.message-wrap.in .message-bubble.role-agent_manager::after { border-color: transparent #fefce8 transparent transparent; }
 
 /* ─── 역할 뱃지 (보낸 사람 옆) ──────────────────────────────────────────── */
 

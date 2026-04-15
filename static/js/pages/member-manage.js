@@ -238,11 +238,11 @@ document.addEventListener('scroll', removeCtxMenu, true);
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape') removeCtxMenu(); });
 
 document.addEventListener('contextmenu', (e) => {
-  const row = e.target.closest('#member-list [data-key]');
+  const row = e.target.closest('#member-list [data-key], #member-list .ag-row[row-id]');
   if (!row) return;
   e.preventDefault();
   removeCtxMenu();
-  const uid = row.dataset.key;
+  const uid = row.dataset.key || row.getAttribute('row-id');
   const member = currentMembers.find(m => m.uid === uid);
 
   const menu = document.createElement('div');

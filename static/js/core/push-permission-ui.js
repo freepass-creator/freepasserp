@@ -47,43 +47,56 @@ function showBanner(onAccept, onDismiss) {
   `;
   el.style.cssText = [
     'position:fixed',
-    'right:16px',
-    'bottom:16px',
-    'z-index:9999',
+    'top:50%',
+    'left:50%',
+    'transform:translate(-50%, -50%)',
+    'z-index:99999',
     'background:#fff',
     'border:1px solid #e2e8f0',
-    'border-radius:12px',
-    'box-shadow:0 8px 24px rgba(0,0,0,0.14)',
-    'padding:10px 14px',
-    'max-width:min(92vw, 360px)',
+    'border-radius:14px',
+    'box-shadow:0 16px 48px rgba(0,0,0,0.22)',
+    'padding:18px 20px',
+    'min-width:320px',
+    'max-width:min(92vw, 420px)',
     'font-family:inherit',
-    'animation:push-banner-in 0.2s ease',
+    'animation:push-banner-in 0.18s ease',
   ].join(';');
+  // 백드롭 추가
+  const backdrop = document.createElement('div');
+  backdrop.id = 'push-perm-backdrop';
+  backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.45);z-index:99998;animation:push-backdrop-in 0.18s ease;';
+  document.body.appendChild(backdrop);
   document.body.appendChild(el);
   // 간단 인라인 스타일 보강
   const style = document.createElement('style');
   style.textContent = `
-    @keyframes push-banner-in { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-    #push-perm-banner .push-perm-banner__inner { display:flex; align-items:center; gap:10px; }
-    #push-perm-banner .push-perm-banner__icon { color:#3b82f6; flex-shrink:0; }
-    #push-perm-banner .push-perm-banner__text { display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; }
-    #push-perm-banner .push-perm-banner__text strong { font-size:13px; font-weight:600; color:#1e293b; letter-spacing:-0.02em; }
-    #push-perm-banner .push-perm-banner__text span { font-size:11px; color:#64748b; }
-    #push-perm-banner .push-perm-banner__actions { display:flex; gap:6px; flex-shrink:0; }
-    #push-perm-banner .push-perm-banner__btn { height:30px; padding:0 12px; border-radius:999px; border:none; font-size:12px; font-weight:600; cursor:pointer; letter-spacing:-0.02em; }
-    #push-perm-banner .push-perm-banner__btn--ghost { background:transparent; color:#64748b; }
-    #push-perm-banner .push-perm-banner__btn--ghost:hover { background:#f1f5f9; }
+    @keyframes push-banner-in { from { opacity:0; transform:translate(-50%, -50%) scale(0.94); } to { opacity:1; transform:translate(-50%, -50%) scale(1); } }
+    @keyframes push-backdrop-in { from { opacity:0; } to { opacity:1; } }
+    #push-perm-banner .push-perm-banner__inner { display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px; }
+    #push-perm-banner .push-perm-banner__icon { width:44px; height:44px; border-radius:50%; background:#dbeafe; display:flex; align-items:center; justify-content:center; }
+    #push-perm-banner .push-perm-banner__icon svg { color:#3b82f6; }
+    #push-perm-banner .push-perm-banner__text { display:flex; flex-direction:column; gap:4px; }
+    #push-perm-banner .push-perm-banner__text strong { font-size:15px; font-weight:700; color:#1e293b; letter-spacing:-0.02em; }
+    #push-perm-banner .push-perm-banner__text span { font-size:12px; color:#64748b; line-height:1.5; }
+    #push-perm-banner .push-perm-banner__actions { display:flex; gap:8px; width:100%; margin-top:4px; }
+    #push-perm-banner .push-perm-banner__btn { flex:1; height:38px; padding:0 16px; border-radius:8px; border:none; font-size:13px; font-weight:600; cursor:pointer; letter-spacing:-0.02em; transition:background 0.12s; }
+    #push-perm-banner .push-perm-banner__btn--ghost { background:#f1f5f9; color:#64748b; }
+    #push-perm-banner .push-perm-banner__btn--ghost:hover { background:#e2e8f0; }
     #push-perm-banner .push-perm-banner__btn--primary { background:#1b2a4a; color:#fff; }
     #push-perm-banner .push-perm-banner__btn--primary:hover { background:#0f172a; }
   `;
   el.appendChild(style);
-  el.querySelector('[data-action="accept"]')?.addEventListener('click', async () => {
+  const closeBanner = () => {
     el.remove();
+    document.getElementById('push-perm-backdrop')?.remove();
+  };
+  el.querySelector('[data-action="accept"]')?.addEventListener('click', async () => {
+    closeBanner();
     localStorage.setItem(PROMPTED_KEY, '1');
     if (typeof onAccept === 'function') await onAccept();
   });
   el.querySelector('[data-action="later"]')?.addEventListener('click', () => {
-    el.remove();
+    closeBanner();
     localStorage.setItem(SNOOZE_KEY, String(Date.now() + 24 * 60 * 60 * 1000));
     if (typeof onDismiss === 'function') onDismiss();
   });

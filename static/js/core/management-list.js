@@ -182,7 +182,8 @@ export function renderTableGrid(options = {}) {
       // 정렬: 기본 가운데, 특정 컬럼만 셀 좌측
       const isNum = col.num || col.priceMonth || false;
       const LEFT_ALIGN_KEYS = ['subModel', 'sub_model', 'trim', 'trim_name', 'options', 'subTrim', 'detail'];
-      const WIDE_KEYS = ['trim', 'trim_name', 'subTrim', 'options'];
+      // 세부모델/세부트림/선택옵션 — 넓게 유지, 자동맞춤 제외
+      const WIDE_KEYS = ['subModel', 'sub_model', 'trim', 'trim_name', 'subTrim', 'options'];
       const isLeftCell = LEFT_ALIGN_KEYS.includes(col.key);
       const cellAlign = isLeftCell ? 'left' : 'center';
       const cellJustify = isLeftCell ? 'flex-start' : 'center';
@@ -201,13 +202,13 @@ export function renderTableGrid(options = {}) {
       const labelLen = (col.label || '').length;
       const hasBadge = col.filterable && !col.searchable && !col.num && !col.priceMonth;
       const badgeExtra = hasBadge ? 20 : 0; // 뱃지 패딩+테두리 여유
-      const autoW = Math.max(60, labelLen * 12 + 16 + badgeExtra);
-      if (col.w) { def.width = Math.max(col.w, autoW); def.minWidth = Math.max(col.w, autoW); }
-      else if (col.priceMonth) { def.width = 85; def.minWidth = 85; }
-      else if (WIDE_KEYS.includes(col.key)) { def.width = 140; def.minWidth = 80; }
-      else if (col.searchable) { def.minWidth = autoW; def.flex = 1; }
-      else { def.width = autoW; def.minWidth = autoW; }
-      if (col.maxW && !WIDE_KEYS.includes(col.key)) def.maxWidth = col.maxW;
+      // 초기 힌트 폭 — autoSize가 실제 콘텐츠에 맞춰 재조정
+      const autoW = Math.max(40, labelLen * 10 + 8 + badgeExtra);
+      if (col.w) { def.width = col.w; def.minWidth = 40; }
+      else if (col.priceMonth) { def.width = 70; def.minWidth = 40; }
+      else if (WIDE_KEYS.includes(col.key)) { def.width = 140; def.minWidth = 40; }
+      else { def.width = autoW; def.minWidth = 40; }
+      // maxW는 초기 힌트만 — 사용자 리사이즈는 제약 없이 허용 (maxWidth 설정 안 함)
 
       // 값 가져오기
       def.valueGetter = (params) => {
@@ -251,6 +252,7 @@ export function renderTableGrid(options = {}) {
       animateRows: true,
       suppressCellFocus: true,
       suppressMenuHide: true,
+      autoSizePadding: 0,
       overlayNoRowsTemplate: `<div style="padding:40px;color:#94a3b8;font-size:12px;">${escapeHtml(emptyText)}</div>`,
       defaultColDef: {
         sortable: false,
@@ -290,14 +292,31 @@ export function renderTableGrid(options = {}) {
 
     // 컬럼 폭 저장/복원 (페이지별 localStorage) — v2: 이전 자동폭 캐시 무효화
     const storageKey = `erp.colWidth.v2.${location.pathname}.${container.id}`;
+    let hasSavedWidths = false;
     try {
       const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
       Object.entries(saved).forEach(([colId, w]) => {
         const colDef = agColDefs.find(c => c.colId === colId);
         if (colDef && w > 0) { colDef.width = w; delete colDef.flex; }
       });
-      if (Object.keys(saved).length) gridApi.setGridOption('columnDefs', agColDefs);
+      if (Object.keys(saved).length) {
+        hasSavedWidths = true;
+        gridApi.setGridOption('columnDefs', agColDefs);
+      }
     } catch (_) {}
+
+    // 저장된 폭 없으면 첫 데이터 로드 후 모든 컬럼을 콘텐츠 길이에 맞춤
+    // skipHeader: true → 헤더는 무시하고 실제 셀 콘텐츠 폭으로만 결정
+    if (!hasSavedWidths) {
+      let _autoFitDone = false;
+      gridApi.addEventListener('firstDataRendered', () => {
+        if (_autoFitDone) return;
+        _autoFitDone = true;
+        setTimeout(() => {
+          try { gridApi.autoSizeAllColumns(true); } catch (_) {}
+        }, 30);
+      });
+    }
 
     // 헤더 경계 더블클릭 → 해당 컬럼 자동 폭
     container.addEventListener('dblclick', (e) => {
