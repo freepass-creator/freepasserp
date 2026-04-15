@@ -189,15 +189,12 @@ export function renderTableGrid(options = {}) {
         resizable: true,
         suppressMovable: false,  // 드래그로 컬럼 순서 변경 가능
         suppressHeaderMenuButton: true,
+        // 모든 컬럼 가운데 정렬 (헤더 + 셀)
+        headerClass: 'ag-center-aligned-header',
+        cellClass: 'ag-center-aligned-cell',
       };
       // 컬럼 고정 (좌측/우측)
       if (col.pinned === 'left' || col.pinned === 'right') def.pinned = col.pinned;
-      // 대여료/숫자 컬럼 — 헤더+셀 모두 우측 정렬
-      if (col.priceMonth || col.num) {
-        def.type = 'numericColumn';
-        def.headerClass = 'ag-right-aligned-header';
-        def.cellClass = 'ag-right-aligned-cell';
-      }
       // 폭 설정 — 뱃지/필터 컬럼은 넉넉히, 검색 컬럼만 flex
       const labelLen = (col.label || '').length;
       const hasBadge = col.filterable && !col.searchable && !col.num && !col.priceMonth;
