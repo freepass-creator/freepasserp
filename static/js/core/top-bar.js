@@ -32,7 +32,10 @@ requireAuth().then(({ user, profile }) => {
 
   if (org)  org.textContent  = profile?.company_name || '-';
   if (name) name.textContent = profile?.name || user?.displayName || '-';
-  if (rank) rank.textContent = ROLE_LABEL[profile?.role] || profile?.role || '-';
+  if (rank) {
+    const position = String(profile?.position || '').trim();
+    rank.textContent = position || ROLE_LABEL[profile?.role] || '-';
+  }
 
   const logoutBtn = getEl('topBarLogoutBtn');
   if (logoutBtn) {

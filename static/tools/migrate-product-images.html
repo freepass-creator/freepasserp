@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>상품 이미지 이관 도구 — 외부 링크 → Firebase Storage</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+  h1 { margin: 0 0 8px; font-size: 22px; }
+  .sub { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  button { background: #3b82f6; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button:disabled { background: #475569; cursor: not-allowed; }
+  button.secondary { background: #475569; }
+  button.danger { background: #dc2626; }
+  input, select { background: #0f172a; color: #e2e8f0; border: 1px solid #475569; padding: 8px 12px; border-radius: 6px; font-size: 14px; width: 100%; }
+  label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+  .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .row > * { flex: 1; min-width: 200px; }
+  .stat { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 12px; }
+  .stat div { font-size: 13px; }
+  .stat b { display: block; font-size: 22px; margin-top: 2px; color: #fff; }
+  .log { background: #020617; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; max-height: 480px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+  .log .ok { color: #22c55e; }
+  .log .err { color: #ef4444; }
+  .log .warn { color: #f59e0b; }
+  .log .info { color: #60a5fa; }
+  .log .dim { color: #64748b; }
+  .progress { height: 8px; background: #334155; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+  .progress > div { height: 100%; background: #22c55e; transition: width 0.2s; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #cbd5e1; }
+  .check input { width: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>상품 이미지 이관 도구</h1>
+  <div class="sub">외부 링크 이미지 → Firebase Storage 일괄 이관. 관리자 계정으로 로그인 후 실행하세요.</div>
+
+  <div class="card" id="authCard">
+    <div class="row">
+      <div><label>이메일</label><input id="email" type="email" autocomplete="email"/></div>
+      <div><label>비밀번호</label><input id="password" type="password" autocomplete="current-password"/></div>
+      <div style="flex:0"><button id="loginBtn">로그인</button></div>
+    </div>
+    <div id="authStatus" class="sub" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" id="controlCard" style="display:none">
+    <div class="row" style="margin-bottom:12px">
+      <label class="check"><input type="checkbox" id="dryRun" checked/> 드라이런 (다운로드/업로드 없이 대상만 조회)</label>
+      <label class="check"><input type="checkbox" id="keepOriginal" checked/> 원본 URL을 <code>image_urls_original</code>에 백업</label>
+      <label class="check"><input type="checkbox" id="skipMigrated"/> <code>image_urls_original</code> 존재하면 스킵</label>
+    </div>
+    <div class="row">
+      <div><label>상품당 동시 업로드</label><input id="concPerProduct" type="number" min="1" max="8" value="3"/></div>
+      <div><label>상품 동시 처리</label><input id="concProducts" type="number" min="1" max="4" value="1"/></div>
+      <div><label>시작 인덱스</label><input id="startIndex" type="number" min="0" value="0"/></div>
+      <div><label>처리 개수 (0=전체)</label><input id="limitCount" type="number" min="0" value="0"/></div>
+    </div>
+    <div class="toolbar" style="margin-top:16px">
+      <button id="loadBtn">상품 전체 조회</button>
+      <button id="runBtn" disabled>이관 실행</button>
+      <button id="stopBtn" class="danger" disabled>중단</button>
+      <button id="downloadReportBtn" class="secondary" disabled>리포트 CSV 다운로드</button>
+    </div>
+    <div class="stat" id="stats"></div>
+    <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>실행 로그</strong>
+      <button class="secondary" id="clearLogBtn" style="padding:4px 10px;font-size:12px">클리어</button>
+    </div>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script type="module">
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { ref as dbRef, get, update } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js';
+import { auth, db } from '/static/js/firebase/firebase-config.js';
+import { uploadProductImagesDetailed } from '/static/js/firebase/firebase-storage.js';
+
+const $ = (id) => document.getElementById(id);
+const logEl = $('log');
+const statsEl = $('stats');
+const progressBar = $('progressBar');
+
+let allProducts = [];
+let currentUid = '';
+let stopRequested = false;
+const report = [];
+
+function log(msg, cls = '') {
+  const ts = new Date().toLocaleTimeString('ko-KR');
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = `[${ts}] ${msg}`;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function setStats(obj) {
+  statsEl.innerHTML = Object.entries(obj).map(([k, v]) => `<div>${k}<b>${v}</b></div>`).join('');
+}
+
+function isFirebaseStorageUrl(url) {
+  if (!url) return false;
+  return /firebasestorage\.(googleapis\.com|app)/i.test(url) || url.startsWith('gs://');
+}
+
+function normalizeUrls(value) {
+  if (Array.isArray(value)) return value.map((v) => String(v || '').trim()).filter(Boolean);
+  const text = String(value || '').trim();
+  if (!text) return [];
+  if (text.startsWith('[')) {
+    try { const arr = JSON.parse(text); if (Array.isArray(arr)) return arr.map((v) => String(v || '').trim()).filter(Boolean); } catch {}
+  }
+  return text.split(/[\n,]/).map((v) => v.trim()).filter(Boolean);
+}
+
+function guessExtension(contentType) {
+  const ct = String(contentType || '').toLowerCase();
+  if (ct.includes('png')) return 'png';
+  if (ct.includes('webp')) return 'webp';
+  if (ct.includes('gif')) return 'gif';
+  if (ct.includes('svg')) return 'svg';
+  return 'jpg';
+}
+
+async function fetchRemoteAsFile(url, baseName) {
+  const resp = await fetch('/api/fetch-remote-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url })
+  });
+  if (!resp.ok) {
+    let msg = `HTTP ${resp.status}`;
+    try { const j = await resp.json(); if (j?.message) msg = j.message; } catch {}
+    throw new Error(msg);
+  }
+  const blob = await resp.blob();
+  const ext = guessExtension(blob.type || '');
+  const filename = `${baseName}.${ext}`;
+  return new File([blob], filename, { type: blob.type || `image/${ext}` });
+}
+
+// ─── 로그인 ──────────────────────────────────────────────────────────────────
+$('loginBtn').addEventListener('click', async () => {
+  const email = $('email').value.trim();
+  const password = $('password').value;
+  if (!email || !password) { $('authStatus').textContent = '이메일·비밀번호를 입력하세요.'; return; }
+  $('loginBtn').disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (e) {
+    $('authStatus').textContent = '로그인 실패: ' + (e.message || e);
+    $('loginBtn').disabled = false;
+  }
+});
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { $('authStatus').textContent = '로그인이 필요합니다.'; return; }
+  currentUid = user.uid;
+  // admin 권한 확인
+  try {
+    const snap = await get(dbRef(db, `users/${user.uid}`));
+    const profile = snap.val() || {};
+    if (profile.role !== 'admin') {
+      $('authStatus').innerHTML = `<span style="color:#ef4444">관리자 계정만 사용할 수 있습니다. 현재 권한: ${profile.role || '없음'}</span>`;
+      return;
+    }
+    $('authStatus').innerHTML = `<span style="color:#22c55e">로그인됨 (${profile.email || user.email}, admin)</span>`;
+    $('authCard').style.display = 'none';
+    $('controlCard').style.display = '';
+  } catch (e) {
+    $('authStatus').textContent = '프로필 조회 실패: ' + (e.message || e);
+  }
+});
+
+// ─── 상품 조회 ───────────────────────────────────────────────────────────────
+$('loadBtn').addEventListener('click', async () => {
+  $('loadBtn').disabled = true;
+  log('상품 전체 조회 중...', 'info');
+  try {
+    const snap = await get(dbRef(db, 'products'));
+    const raw = snap.val() || {};
+    allProducts = Object.entries(raw).map(([key, data]) => ({ key, ...data }));
+    const total = allProducts.length;
+    const withExternal = allProducts.filter((p) => {
+      const urls = normalizeUrls(p.image_urls || p.image_url);
+      return urls.some((u) => !isFirebaseStorageUrl(u));
+    });
+    log(`총 상품: ${total}건, 외부 링크 포함: ${withExternal.length}건`, 'ok');
+    setStats({ '전체 상품': total, '외부링크 상품': withExternal.length, '이관 성공': 0, '이관 실패': 0, '스킵': 0 });
+    $('runBtn').disabled = false;
+  } catch (e) {
+    log('상품 조회 실패: ' + (e.message || e), 'err');
+  } finally {
+    $('loadBtn').disabled = false;
+  }
+});
+
+// ─── 실행 ─────────────────────────────────────────────────────────────────────
+$('runBtn').addEventListener('click', async () => {
+  if (!allProducts.length) { log('먼저 상품을 조회하세요.', 'warn'); return; }
+  stopRequested = false;
+  report.length = 0;
+  const dryRun = $('dryRun').checked;
+  const keepOriginal = $('keepOriginal').checked;
+  const skipMigrated = $('skipMigrated').checked;
+  const concPerProduct = Math.max(1, Number($('concPerProduct').value) || 3);
+  const concProducts = Math.max(1, Number($('concProducts').value) || 1);
+  const startIndex = Math.max(0, Number($('startIndex').value) || 0);
+  const limitCount = Math.max(0, Number($('limitCount').value) || 0);
+
+  const targets = allProducts.filter((p) => {
+    if (skipMigrated && Array.isArray(p.image_urls_original) && p.image_urls_original.length) return false;
+    const urls = normalizeUrls(p.image_urls || p.image_url);
+    return urls.some((u) => !isFirebaseStorageUrl(u));
+  });
+  const slice = targets.slice(startIndex, limitCount ? startIndex + limitCount : undefined);
+  log(`이관 대상: ${slice.length}건 (전체 ${targets.length}건 중 ${startIndex}부터)`, 'info');
+  if (dryRun) log('DRY-RUN: 실제 다운로드/업로드/DB 갱신은 건너뜁니다.', 'warn');
+
+  $('runBtn').disabled = true;
+  $('stopBtn').disabled = false;
+  $('loadBtn').disabled = true;
+
+  let done = 0, success = 0, failed = 0, skipped = 0;
+  const updateStats = () => {
+    setStats({ '전체': slice.length, '완료': done, '성공': success, '실패': failed, '스킵': skipped });
+    progressBar.style.width = slice.length ? `${Math.round(done / slice.length * 100)}%` : '0%';
+  };
+  updateStats();
+
+  let cursor = 0;
+  async function processOne(product) {
+    const productUid = product.product_uid || product.key;
+    const productLabel = product.car_number || product.product_code || productUid;
+    const urls = normalizeUrls(product.image_urls || product.image_url);
+    const externalUrls = urls.filter((u) => !isFirebaseStorageUrl(u));
+    if (!externalUrls.length) { skipped++; return; }
+
+    log(`[${productLabel}] 외부 URL ${externalUrls.length}개 처리 시작`, 'info');
+
+    if (dryRun) {
+      externalUrls.forEach((u) => report.push({ productUid, productLabel, original: u, migrated: '', status: 'DRY', error: '' }));
+      log(`[${productLabel}] DRY-RUN 완료`, 'dim');
+      success++;
+      return;
+    }
+
+    // 1) 다운로드 (상품 내부 동시성)
+    const fetched = new Array(externalUrls.length);
+    const fetchErrors = new Array(externalUrls.length);
+    let fi = 0;
+    async function fetcher() {
+      while (fi < externalUrls.length) {
+        const idx = fi++;
+        const url = externalUrls[idx];
+        try {
+          fetched[idx] = await fetchRemoteAsFile(url, `${productUid}_${idx + 1}`);
+        } catch (e) {
+          fetchErrors[idx] = e.message || String(e);
+          log(`  [${productLabel}] 다운로드 실패 #${idx + 1}: ${fetchErrors[idx]}`, 'err');
+        }
+      }
+    }
+    await Promise.all(Array.from({ length: concPerProduct }, fetcher));
+
+    const okFiles = fetched.filter(Boolean);
+    if (!okFiles.length) {
+      failed++;
+      externalUrls.forEach((u, i) => report.push({
+        productUid, productLabel, original: u, migrated: '',
+        status: 'FAIL', error: fetchErrors[i] || '다운로드 실패'
+      }));
+      return;
+    }
+
+    // 2) Firebase Storage 업로드 (resize는 prepareProductImageFiles 내부 로직이 자동 적용)
+    let uploadResult;
+    try {
+      uploadResult = await uploadProductImagesDetailed(okFiles, productUid, { concurrency: concPerProduct });
+    } catch (e) {
+      failed++;
+      log(`  [${productLabel}] 업로드 오류: ${e.message || e}`, 'err');
+      externalUrls.forEach((u) => report.push({ productUid, productLabel, original: u, migrated: '', status: 'FAIL', error: 'upload: ' + (e.message || e) }));
+      return;
+    }
+    const newUrls = uploadResult.urls || [];
+    if (uploadResult.failedFiles?.length) {
+      log(`  [${productLabel}] 업로드 실패 ${uploadResult.failedFiles.length}건`, 'err');
+    }
+
+    // 3) image_urls 교체: 기존 Firebase URL + 새로 업로드한 URL
+    const keptFirebaseUrls = urls.filter((u) => isFirebaseStorageUrl(u));
+    const nextUrls = [...keptFirebaseUrls, ...newUrls];
+
+    // 4) DB 갱신 — image_urls, image_url, image_count, (옵션) image_urls_original
+    const updates = {
+      [`products/${product.key}/image_urls`]: nextUrls,
+      [`products/${product.key}/image_url`]: nextUrls[0] || '',
+      [`products/${product.key}/image_count`]: nextUrls.length,
+      [`products/${product.key}/updated_at`]: Date.now()
+    };
+    if (keepOriginal && !Array.isArray(product.image_urls_original)) {
+      updates[`products/${product.key}/image_urls_original`] = urls;
+      updates[`products/${product.key}/image_migrated_at`] = Date.now();
+    }
+    try {
+      await update(dbRef(db), updates);
+    } catch (e) {
+      failed++;
+      log(`  [${productLabel}] DB 갱신 실패: ${e.message || e}`, 'err');
+      externalUrls.forEach((u) => report.push({ productUid, productLabel, original: u, migrated: '', status: 'FAIL', error: 'db: ' + (e.message || e) }));
+      return;
+    }
+
+    success++;
+    log(`  [${productLabel}] 이관 완료 (${newUrls.length}/${externalUrls.length})`, 'ok');
+    // 리포트: 원본 → 새 URL 매핑 (인덱스 순서 기준)
+    let newIdx = 0;
+    externalUrls.forEach((u, i) => {
+      if (fetched[i]) {
+        report.push({ productUid, productLabel, original: u, migrated: newUrls[newIdx] || '', status: 'OK', error: '' });
+        newIdx++;
+      } else {
+        report.push({ productUid, productLabel, original: u, migrated: '', status: 'FAIL', error: fetchErrors[i] || '다운로드 실패' });
+      }
+    });
+  }
+
+  async function worker() {
+    while (cursor < slice.length && !stopRequested) {
+      const idx = cursor++;
+      try {
+        await processOne(slice[idx]);
+      } catch (e) {
+        failed++;
+        log(`[${slice[idx].key}] 처리 중 예외: ${e.message || e}`, 'err');
+      } finally {
+        done++;
+        updateStats();
+      }
+    }
+  }
+
+  const t0 = Date.now();
+  await Promise.all(Array.from({ length: concProducts }, worker));
+  const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+  log(`실행 종료 — 소요 ${elapsed}s, 성공 ${success} / 실패 ${failed} / 스킵 ${skipped}`, stopRequested ? 'warn' : 'ok');
+
+  $('runBtn').disabled = false;
+  $('stopBtn').disabled = true;
+  $('loadBtn').disabled = false;
+  $('downloadReportBtn').disabled = report.length === 0;
+});
+
+$('stopBtn').addEventListener('click', () => {
+  stopRequested = true;
+  log('중단 요청됨 — 진행 중인 상품 완료 후 정지', 'warn');
+});
+
+$('clearLogBtn').addEventListener('click', () => { logEl.innerHTML = ''; });
+
+$('downloadReportBtn').addEventListener('click', () => {
+  if (!report.length) return;
+  const header = ['product_uid', 'product_label', 'original_url', 'migrated_url', 'status', 'error'];
+  const rows = [header.join(',')];
+  report.forEach((r) => {
+    const line = [r.productUid, r.productLabel, r.original, r.migrated, r.status, (r.error || '').replace(/[\r\n,]+/g, ' ')]
+      .map((v) => `"${String(v || '').replace(/"/g, '""')}"`).join(',');
+    rows.push(line);
+  });
+  const blob = new Blob(['\ufeff' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `image-migration-report-${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+</script>
+</body>
+</html>

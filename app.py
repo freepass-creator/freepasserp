@@ -382,6 +382,45 @@ def proxy_image():
         return _api_error('이미지 다운로드에 실패했습니다.')
 
 
+@api_bp.route('/fetch-remote-image', methods=['POST'])
+def fetch_remote_image():
+    """임의의 외부 이미지 URL을 서버가 다운로드해서 바이트로 반환.
+    외부 링크 이미지를 Firebase Storage로 일괄 이관하는 배치 도구용.
+    CORS/Referer 회피, MIME·크기 검증 포함.
+    """
+    err = _require_json()
+    if err: return err
+    payload = request.get_json(silent=True) or {}
+    url = str(payload.get('url', '')).strip()
+    if not url:
+        return _api_error('url 파라미터가 필요합니다.')
+    parsed = urlparse(url)
+    if parsed.scheme not in ('http', 'https') or not parsed.hostname:
+        return _api_error('올바른 URL이 아닙니다.')
+    # Google Drive 공유 링크 → 직접 다운로드 URL로 변환
+    if 'drive.google.com' in url and '/file/d/' in url:
+        m = re.search(r'/file/d/([^/]+)', url)
+        if m:
+            url = f'https://drive.google.com/uc?export=download&id={m.group(1)}'
+    try:
+        req = Request(url, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Referer': f'{parsed.scheme}://{parsed.hostname}/'
+        })
+        with urlopen(req, timeout=30) as resp:
+            ct = (resp.headers.get('Content-Type', 'image/jpeg') or '').split(';')[0].strip().lower()
+            if ct and not ct.startswith('image/') and ct != 'application/octet-stream':
+                return _api_error(f'이미지가 아닙니다. (Content-Type: {ct})', 415)
+            data = resp.read(MAX_DOWNLOAD_BYTES + 1)
+            if len(data) > MAX_DOWNLOAD_BYTES:
+                return _api_error('파일이 너무 큽니다 (최대 10MB).', 413)
+            return app.response_class(data, mimetype=ct or 'image/jpeg')
+    except HTTPError as e:
+        return _api_error(f'HTTP {e.code}: 원본을 가져올 수 없습니다.', 502)
+    except Exception as e:
+        return _api_error(f'다운로드 실패: {e}', 502)
+
+
 @api_bp.route('/integrity/storage-orphans', methods=['POST'])
 def check_storage_orphans():
     """
