@@ -287,8 +287,16 @@ export function renderTableGrid(options = {}) {
       if (Object.keys(saved).length) gridApi.setGridOption('columnDefs', agColDefs);
     } catch (_) {}
 
-    // 초기 autoSize 비활성 — columns 정의의 w(폭) 값 그대로 사용
-    // 사용자가 헤더 경계 더블클릭 시에만 개별 컬럼 autoSize (엑셀식)
+    // 저장된 폭 없으면 첫 렌더 후 AG Grid 자동맞춤 (엑셀식)
+    // — 헤더+콘텐츠 max 폭으로 자동 조정
+    if (!Object.keys(JSON.parse(localStorage.getItem(storageKey) || '{}')).length) {
+      let _autoFitDone = false;
+      gridApi.addEventListener('firstDataRendered', () => {
+        if (_autoFitDone) return;
+        _autoFitDone = true;
+        setTimeout(() => { try { gridApi.autoSizeAllColumns(false); } catch (_) {} }, 100);
+      });
+    }
 
     // 헤더 경계 더블클릭 → 해당 컬럼 엑셀식 자동 폭 (헤더+콘텐츠 max)
     container.addEventListener('dblclick', (e) => {

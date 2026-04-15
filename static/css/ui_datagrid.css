@@ -461,9 +461,9 @@
    AG Grid — 순정 + 타이트 조정
    ═══════════════════════════════════════════════════════════════ */
 .erp-grid {
-  --ag-font-size: 11px;
-  --ag-row-height: 30px;
-  --ag-header-height: 32px;
+  --ag-font-size: 12px;
+  --ag-row-height: 32px;
+  --ag-header-height: 34px;
   --ag-cell-horizontal-padding: 10px;
 }
 .erp-grid .ag-floating-filter,
