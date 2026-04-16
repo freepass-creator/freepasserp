@@ -559,13 +559,13 @@ class CheckboxSetFilter {
 
 // _ft: 'set' = 체크박스, 'search' = 텍스트검색, 'range' = 숫자구간, false = 없음
 const AG_COL_DEFS = [
+  { field: 'car_number', headerName: '차량번호', minWidth: 90, maxWidth: 110, _ft: 'search', pinned: 'left' },
   { field: 'vehicle_status', headerName: '차량상태', minWidth: 72, maxWidth: 80, _ft: 'set',
     cellRenderer: (p) => renderBadgeRow([{ field: 'vehicle_status', value: p.value || '-' }]) },
   { field: 'product_type', headerName: '상품구분', minWidth: 72, maxWidth: 80, _ft: 'set',
     cellRenderer: (p) => renderBadgeRow([{ field: 'product_type', value: p.value || '-' }]) },
   { field: 'partner_code', headerName: '공급사', minWidth: 60, maxWidth: 72, _ft: 'set',
     valueGetter: (p) => p.data?.partner_code || p.data?.provider_company_code || '' },
-  { field: 'car_number', headerName: '차량번호', minWidth: 90, maxWidth: 110, _ft: 'search' },
   { field: 'maker', headerName: '제조사', minWidth: 50, maxWidth: 68, _ft: 'set' },
   { field: 'model_name', headerName: '모델', minWidth: 60, maxWidth: 80, _ft: 'set' },
   { field: 'sub_model', headerName: '세부모델', minWidth: 100, flex: 1, _ft: 'search' },

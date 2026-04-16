@@ -229,10 +229,10 @@ const PRICE_MONTHS = ['1','12','24','36','48','60'];
 const INFO_COLS = [
   // maxW: 최대폭(px). 넘으면 말줄임. 없으면 auto.
   // maxW 없음 = 텍스트에 맞게 자동. ellipsis = 상한만 제한
+  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, searchable: true, w: 110, pinned: 'left' },
   { key: 'vehicleStatus', label: '차량상태', align: 'c', filterable: true, w: 100 },
   { key: 'productType',   label: '상품구분', align: 'c', filterable: true, w: 100 },
   { key: 'partnerCode',   label: '공급코드', align: 'c', filterable: true, w: 95 },
-  { key: 'carNo',         label: '차량번호', align: 'c', sticky: true, searchable: true, w: 110, pinned: 'left' },
   { key: 'maker',         label: '제조사',   align: 'c', filterable: true, w: 80 },
   { key: 'model',         label: '모델명',   align: 'c', filterable: true, w: 100 },
   { key: 'subModel',      label: '세부모델', filterable: true, w: 200 },

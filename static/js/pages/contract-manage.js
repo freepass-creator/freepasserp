@@ -598,12 +598,12 @@ function getProcessStatus(c) {
 }
 
 const CONTRACT_COLS = [
+  { key: 'car',           label: '차량번호',     align: 'c', searchable: true, w: 95, pinned: 'left' },
   { key: 'status',        label: '계약상태',     align: 'c', filterable: true, w: 80 },
   { key: 'process',       label: '처리상태',     align: 'c', filterable: true, w: 80 },
   { key: 'partner',       label: '공급사코드',   align: 'c', filterable: true },
   { key: 'agent',         label: '영업자코드',   align: 'c', filterable: true },
-  { key: 'car',           label: '차량번호',     align: 'c', searchable: true },
-  { key: 'subModel',      label: '세부모델',     align: 'c', searchable: true },
+  { key: 'subModel',      label: '세부모델',     align: 'c', searchable: true, w: 180 },
   { key: 'progress',      label: '처리율',       align: 'c' },
   { key: 'month',         label: '기간',         align: 'c', searchable: true },
   { key: 'rent',          label: '대여료',       align: 'r', num: true },

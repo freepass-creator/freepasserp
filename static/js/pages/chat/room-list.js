@@ -56,12 +56,12 @@ export function isReplyPending(room) {
 }
 
 const ROOM_COLS = [
+  { key: 'carNo',    label: '차량번호',     align: 'c', searchable: true, w: 95, pinned: 'left' },
   { key: 'status',   label: '문의구분',     align: 'c', filterable: true, w: 80 },
   { key: 'reply',    label: '처리상태',     align: 'c', filterable: true, w: 80 },
   { key: 'partner',  label: '공급사코드',   align: 'c', filterable: true },
   { key: 'agent',    label: '영업자코드',   align: 'c', filterable: true },
-  { key: 'carNo',    label: '차량번호',     align: 'c', searchable: true },
-  { key: 'model',    label: '세부모델',     searchable: true },
+  { key: 'model',    label: '세부모델',     searchable: true, w: 180 },
   { key: 'message',  label: '마지막메시지', searchable: true },
   { key: 'datetime', label: '일자 시간',    align: 'c' },
 ];
