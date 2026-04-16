@@ -139,6 +139,7 @@ function setCreateMode(selectedProviderCode = '') {
   detailFields.screening_criteria.value = '무심사';
   detailFields.credit_grade.value = '저신용';
   detailFields.basic_driver_age.value = '만 26세 이상';
+  detailFields.driver_age_upper_limit.value = '만 70세 이하';
   detailFields.annual_mileage.value = '3만Km';
   detailFields.driver_age_lowering.value = '불가';
   detailFields.personal_driver_scope.value = '계약자 본인+직계가족';

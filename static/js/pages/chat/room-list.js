@@ -87,7 +87,7 @@ export function renderChatRoomList({ thead, container, rooms, selectedRoomId, pr
           return reply ? renderBadgeRow([{ field: 'reply_status', value: reply }]) : '';
         }
         case 'carNo': return escapeHtml(product?.carNo || room.vehicle_number || room.car_number || '-');
-        case 'model': return escapeHtml(String(product?.subModel || room.model_name || room.sub_model || '-').replace(/20(\d{2})~/g, '$1~'));
+        case 'model': return escapeHtml(String(product?.subModel || room.sub_model || room.model_name || '-').replace(/20(\d{2})~/g, '$1~'));
         case 'partner': return escapeHtml(product?.partnerCode || room.provider_company_code || room.partner_code || '');
         case 'agent': return escapeHtml(room.agent_code || room.agent_uid || '');
         case 'message': return escapeHtml(truncate(room.last_message || '대화 시작 전', 18));
@@ -102,7 +102,7 @@ export function renderChatRoomList({ thead, container, rooms, selectedRoomId, pr
         case 'status': return deriveStatusLabel(room, myUid);
         case 'reply': return deriveReplyStatus(room);
         case 'carNo': return product?.carNo || room.vehicle_number || room.car_number || '';
-        case 'model': return String(product?.subModel || room.model_name || room.sub_model || '').replace(/20(\d{2})~/g, '$1~');
+        case 'model': return String(product?.subModel || room.sub_model || room.model_name || '').replace(/20(\d{2})~/g, '$1~');
         case 'partner': return product?.partnerCode || room.provider_company_code || room.partner_code || '';
         case 'agent': return room.agent_code || room.agent_uid || '';
         case 'message': return room.last_message || '';

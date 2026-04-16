@@ -636,6 +636,7 @@ function getMergedPolicy(product){
   const term = getTermFields(product);
   return {
     ageText: hasContent(product.ageText) ? product.ageText : (term.basic_driver_age || '-'),
+    ageUpperLimit: term.driver_age_upper_limit || '-',
     ageLowering: hasContent(product.policy.ageLowering) ? product.policy.ageLowering : (term.driver_age_lowering || '-'),
     ageLoweringCost: hasContent(product.policy.ageLoweringCost) ? product.policy.ageLoweringCost : (term.age_lowering_cost || '-'),
     annualMileage: hasContent(product.policy.annualMileage) ? product.policy.annualMileage : (term.annual_mileage || '-'),
@@ -1278,6 +1279,7 @@ function renderMobileCatalogDetail(product, { actionsHtml = '' } = {}) {
     ['추가운전자비용',   first(tf.additional_driver_cost)],
     ['정비서비스',       first(tf.maintenance_service, product.condition?.maintenance)],
     ['최소운전연령',     first(tf.basic_driver_age, product.ageText)],
+    ['운전연령상한',     first(tf.driver_age_upper_limit, pol.ageUpperLimit)],
     ['연간약정주행거리', first(tf.annual_mileage,   pol.annualMileage)],
   ];
 

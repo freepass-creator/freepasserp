@@ -319,6 +319,7 @@ export function renderDriver(policy) {
     ${groupHead(ICO.user, '운전자·연령')}
     <div class="m-pd-group__body">${kvList([
       ['기본운전연령',   t.basic_driver_age],
+      ['운전연령상한',   t.driver_age_upper_limit],
       ['연령하향',       t.driver_age_lowering],
       ['연령하향비용',   t.age_lowering_cost],
       ['추가운전자',     t.additional_driver_allowance_count],

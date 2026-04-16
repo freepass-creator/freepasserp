@@ -122,6 +122,47 @@ let allContracts = [];
 let currentContract = null;
 let mode = 'create';
 let _bootDone = false;
+let sessionDecryptPassword = null;
+let sessionDecryptPromptTried = false;
+
+async function tryAutoReveal(contract) {
+  if (!contract?._secure) return false;
+  const role = currentProfile?.role;
+  if (!['admin', 'provider', 'agent', 'agent_manager'].includes(role)) return false;
+  const secure = contract._secure;
+
+  // 1) 캐시된 비번 시도
+  if (sessionDecryptPassword) {
+    const name = await decryptField(secure.customer_name, sessionDecryptPassword);
+    if (name !== null) {
+      const birth = await decryptField(secure.customer_birth, sessionDecryptPassword);
+      const phone = await decryptField(secure.customer_phone, sessionDecryptPassword);
+      fields.customer_name.value = name || '';
+      fields.customer_birth.value = birth || '';
+      fields.customer_phone.value = phone || '';
+      return true;
+    }
+    sessionDecryptPassword = null;
+  }
+
+  // 2) 세션 내 이미 물어봤으면 재시도 안 함 (취소 후 계속 뜨는 것 방지)
+  if (sessionDecryptPromptTried) return false;
+  sessionDecryptPromptTried = true;
+
+  // 3) 자동 프롬프트
+  const pw = await requestDecryptPassword();
+  if (!pw) return false;
+  const name = await decryptField(secure.customer_name, pw);
+  if (name === null) { showToast('비밀번호가 올바르지 않습니다.', 'error'); return false; }
+  sessionDecryptPassword = pw;
+  const birth = await decryptField(secure.customer_birth, pw);
+  const phone = await decryptField(secure.customer_phone, pw);
+  fields.customer_name.value = name || '';
+  fields.customer_birth.value = birth || '';
+  fields.customer_phone.value = phone || '';
+  showToast('개인정보가 표시됩니다. 세션 내 다른 계약도 자동 표시됩니다.', 'info');
+  return true;
+}
 
 // ─── 우클릭 컨텍스트 메뉴 ──────────
 function renderContractSummaryHtml(c) {
@@ -521,6 +562,7 @@ async function fillForm(contract) {
   fields.customer_name.value = contract.customer_name || '';
   fields.customer_birth.value = contract.customer_birth || '';
   fields.customer_phone.value = contract.customer_phone || '';
+  await tryAutoReveal(contract);
 
   const checks = contract.checks || {};
   CHECK_FIELD_KEYS.forEach((key) => {
@@ -930,7 +972,7 @@ async function bootstrap() {
       closeMobileContractFormView();
     });
 
-    // 개인정보 원본 열람
+    // 개인정보 원본 열람 — 최초 1회 비밀번호 입력 후 세션 내 자동 복호화
     qs('#contract-reveal-btn')?.addEventListener('click', async () => {
       if (!currentContract) return;
       const secure = currentContract._secure;
@@ -941,17 +983,12 @@ async function bootstrap() {
       if (name === null) { showToast('비밀번호가 올바르지 않습니다.', 'error'); return; }
       const birth = await decryptField(secure.customer_birth, pw);
       const phone = await decryptField(secure.customer_phone, pw);
+      sessionDecryptPassword = pw;
+      sessionDecryptPromptTried = true;
       fields.customer_name.value = name || '';
       fields.customer_birth.value = birth || '';
       fields.customer_phone.value = phone || '';
-      showToast('개인정보가 표시됩니다. 30초 후 자동 마스킹됩니다.', 'info');
-      setTimeout(() => {
-        if (currentContract) {
-          fields.customer_name.value = currentContract.customer_name || '';
-          fields.customer_birth.value = currentContract.customer_birth || '';
-          fields.customer_phone.value = currentContract.customer_phone || '';
-        }
-      }, 30000);
+      showToast('개인정보가 표시됩니다. 세션 내 다른 계약도 자동 표시됩니다.', 'info');
     });
 
     // 첨부파일 열람 시 비밀번호 확인

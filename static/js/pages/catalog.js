@@ -240,6 +240,7 @@ function buildPolicy(p) {
     screeningCriteria: first(tf.screening_criteria, p.reviewStatus),
     creditGrade: first(tf.credit_grade, p.creditGrade),
     minDriverAge: first(tf.basic_driver_age, p.baseAge),
+    maxDriverAge: first(tf.driver_age_upper_limit),
     annualMileage: first(tf.annual_mileage, p.annualMileageDisplay),
     driverRange: first(tf.driver_range, tf.driver_scope, p.insuranceIncluded),
     insuranceIncluded: first(tf.insurance_included, p.insuranceIncluded),
@@ -289,7 +290,7 @@ function fmtOwnDamageDeductible(pol) {
 function fmtRentalGuide(pol) {
   if (has(pol.rentalGuideNote) && pol.rentalGuideNote !== '-') return pol.rentalGuideNote;
   const bracket = [pol.screeningCriteria, pol.creditGrade].filter(v => has(v)).join(' / ');
-  const parts = [pol.minDriverAge, pol.annualMileage, pol.insuranceIncluded].filter(v => has(v));
+  const parts = [pol.minDriverAge, pol.maxDriverAge, pol.annualMileage, pol.insuranceIncluded].filter(v => has(v));
   const info = parts.join(', ');
   if (!bracket && !info) return null;
   return `${bracket ? `[${bracket}] ` : ''}${info}`.trim();

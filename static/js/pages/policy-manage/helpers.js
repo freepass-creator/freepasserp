@@ -8,6 +8,7 @@ export const FIELD_META = [
   { key: 'screening_criteria', label: '심사기준' },
   { key: 'credit_grade', label: '신용등급' },
   { key: 'basic_driver_age', label: '기본운전자연령' },
+  { key: 'driver_age_upper_limit', label: '운전연령상한' },
   { key: 'driver_age_lowering', label: '운전연령하향' },
   { key: 'personal_driver_scope', label: '개인운전자범위' },
   { key: 'business_driver_scope', label: '사업자운전자범위' },

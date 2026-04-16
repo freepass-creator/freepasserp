@@ -186,6 +186,7 @@ export function renderProductDetailMarkup(product, { activePhotoIndex = 0, termF
       ${row('1만Km추가비용', first(termFields.mileage_upcharge_per_10000km))}
       ${row('보증금분납', first(termFields.deposit_installment))}
       ${row('보증금카드결제', first(termFields.deposit_card_payment))}
+      ${row('운전연령상한', first(termFields.driver_age_upper_limit))}
       ${row('연령하향', first(termFields.driver_age_lowering, p.ageLowering))}
       ${row('연령하향비용', first(termFields.age_lowering_cost, p.ageLoweringCost))}
       ${row('개인운전범위', first(termFields.personal_driver_scope))}
