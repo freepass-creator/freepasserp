@@ -124,7 +124,7 @@ export function normalizeProduct(raw) {
     carNo: raw?.car_number || '-',
     maker: raw?.maker || '-',
     model: raw?.model_name || '-',
-    subModel: cleanSubModelValue(raw),
+    subModel: String(raw?.sub_model || '-').replace(/20(\d{2})~/g, '$1~'),
     trim: raw?.trim_name || '-',
     fuel: raw?.fuel_type || '-',
     vehiclePrice: raw?.vehicle_price || 0,
