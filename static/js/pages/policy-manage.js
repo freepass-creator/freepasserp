@@ -201,9 +201,9 @@ function fillForm(term) {
 }
 
 const TERM_COLS = [
+  { key: 'code',        label: '정책코드',   align: 'c', searchable: true, w: 95, pinned: 'left' },
   { key: 'status',      label: '정책상태',   align: 'c', filterable: true, w: 80 },
   { key: 'partner',     label: '공급사코드', align: 'c', filterable: true },
-  { key: 'code',        label: '정책코드',   align: 'c', searchable: true },
   { key: 'partnerName', label: '공급사명',   align: 'c', searchable: true },
   { key: 'name',        label: '정책명',     searchable: true },
   { key: 'desc',        label: '정책설명',   maxW: 160, searchable: true },

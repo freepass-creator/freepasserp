@@ -122,9 +122,9 @@ function fillForm(partner) {
 }
 
 const PARTNER_COLS = [
+  { key: 'code',     label: '파트너코드',     align: 'c', searchable: true, w: 95, pinned: 'left' },
   { key: 'status',   label: '파트너상태',     align: 'c', filterable: true, w: 80 },
   { key: 'type',     label: '파트너구분',     align: 'c', filterable: true, w: 80 },
-  { key: 'code',     label: '파트너코드',     align: 'c', searchable: true },
   { key: 'name',     label: '파트너명',       align: 'c', searchable: true },
   { key: 'bizNo',    label: '사업자등록번호', align: 'c', searchable: true },
   { key: 'ceo',      label: '대표자',         align: 'c', searchable: true },

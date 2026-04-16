@@ -600,9 +600,11 @@ const gridOptions = {
   defaultColDef: {
     sortable: false,
     resizable: true,
-    suppressMovable: true,
+    suppressMovable: false,
     suppressHeaderMenuButton: true,
-    cellStyle: { fontSize: '12px', display: 'flex', alignItems: 'center' },
+    headerClass: 'ag-center-aligned-header',
+    cellClass: 'ag-center-aligned-cell',
+    cellStyle: { fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   },
   getRowId: (params) => params.data?.product_uid || params.data?.product_code || '',
   onRowClicked: async (event) => {

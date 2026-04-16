@@ -150,11 +150,11 @@ function fillForm(member) {
 }
 
 const MEMBER_COLS = [
+  { key: 'code',        label: '사용자코드', align: 'c', searchable: true, w: 95, pinned: 'left' },
   { key: 'status',      label: '회원상태',   align: 'c', filterable: true, w: 80 },
   { key: 'role',        label: '회원구분',   align: 'c', filterable: true, w: 80 },
   { key: 'companyCode', label: '회사코드',   align: 'c', filterable: true },
   { key: 'company',     label: '회사명',     align: 'c', searchable: true },
-  { key: 'code',        label: '사용자코드', align: 'c', searchable: true },
   { key: 'email',       label: '이메일',     searchable: true },
   { key: 'name',        label: '이름',       align: 'c', searchable: true },
   { key: 'date',        label: '반영일자',   align: 'c', filterable: true },
