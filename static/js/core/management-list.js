@@ -188,7 +188,7 @@ export function renderTableGrid(options = {}) {
       // 전체 좌측 정렬 통일 (AG Grid 디폴트)
       const isNum = col.num || col.priceMonth || false;
       const WIDE_KEYS = ['subModel', 'sub_model', 'trim', 'trim_name', 'subTrim', 'options'];
-      // 정렬: 기본 가운데, align:'l' 이면 좌측 들여쓰기
+      // 헤더는 항상 가운데, 셀은 align:'l'일 때만 좌측 들여쓰기
       const isLeft = col.align === 'l';
       const def = {
         colId: col.key,
@@ -197,7 +197,7 @@ export function renderTableGrid(options = {}) {
         resizable: true,
         suppressMovable: false,
         suppressHeaderMenuButton: true,
-        headerClass: isLeft ? 'ag-left-aligned-header' : 'ag-center-aligned-header',
+        headerClass: 'ag-center-aligned-header',
         cellClass: isLeft ? 'ag-left-aligned-cell erp-indent' : 'ag-center-aligned-cell',
       };
       // 컬럼 고정 (좌측/우측)
