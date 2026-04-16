@@ -91,18 +91,24 @@ function openFilterDropdown(col, headerEl, ctx) {
       </div>
       <div style="display:flex;gap:4px;padding:6px 10px;border-top:1px solid #e5e8eb;flex-shrink:0;">
         <button type="button" style="flex:1;padding:5px 0;font-size:11px;font-weight:600;border:1px solid #ddd;border-radius:var(--radius-sm,3px);background:#fff;cursor:pointer;" data-action="reset">초기화</button>
-        <button type="button" style="flex:1;padding:5px 0;font-size:11px;font-weight:600;border:none;border-radius:var(--radius-sm,3px);background:#1b2a4a;color:#fff;cursor:pointer;" data-action="apply">적용</button>
+        <button type="button" style="flex:1;padding:5px 0;font-size:11px;font-weight:600;border:none;border-radius:var(--radius-sm,3px);background:#1b2a4a;color:#fff;cursor:pointer;" data-action="apply">닫기</button>
       </div>
     `;
     const input = popup.querySelector('input');
     setTimeout(() => input?.focus(), 50);
-    input?.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') popup.querySelector('[data-action="apply"]')?.click(); });
-    popup.querySelector('[data-action="reset"]')?.addEventListener('click', () => { delete colFilters[colKey]; ctx.refresh(); removeFilterPopup(); });
-    popup.querySelector('[data-action="apply"]')?.addEventListener('click', () => {
-      const q = input?.value?.trim() || '';
-      if (q) colFilters[colKey] = q; else delete colFilters[colKey];
-      ctx.refresh(); removeFilterPopup();
+    // 입력 즉시 반영 — 체크박스 필터와 동일한 UX
+    let _liveTimer = 0;
+    input?.addEventListener('input', () => {
+      clearTimeout(_liveTimer);
+      _liveTimer = setTimeout(() => {
+        const q = input.value.trim();
+        if (q) colFilters[colKey] = q; else delete colFilters[colKey];
+        ctx.refresh();
+      }, 150);
     });
+    input?.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') removeFilterPopup(); });
+    popup.querySelector('[data-action="reset"]')?.addEventListener('click', () => { delete colFilters[colKey]; ctx.refresh(); removeFilterPopup(); });
+    popup.querySelector('[data-action="apply"]')?.addEventListener('click', () => { removeFilterPopup(); });
   } else {
     // 체크박스 Set 필터
     const otherFiltered = getFilteredExcept(colKey, allData, colFilters, columns, getCellText);
