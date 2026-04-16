@@ -469,16 +469,24 @@
 /* 좌우 2px 균등 */
 .erp-grid .ag-cell,
 .erp-grid .ag-header-cell { padding-right: 2px !important; }
-/* 틀고정(pinned) 컬럼 경계선 숨김 */
+/* 틀고정(pinned) 컬럼 경계선 완전 숨김 */
 .erp-grid .ag-pinned-left-cols-container,
 .erp-grid .ag-pinned-right-cols-container,
 .erp-grid .ag-pinned-left-header,
-.erp-grid .ag-pinned-right-header {
+.erp-grid .ag-pinned-right-header,
+.erp-grid .ag-body-horizontal-scroll-viewport,
+.erp-grid [class*="ag-pinned"] {
   border-right: none !important;
   border-left: none !important;
   box-shadow: none !important;
 }
-.erp-grid { --ag-borders-critical: none; --ag-pinned-column-border: transparent; }
+.erp-grid .ag-cell.ag-cell-last-left-pinned,
+.erp-grid .ag-cell.ag-cell-first-right-pinned,
+.erp-grid .ag-header-cell.ag-header-cell-last-left-pinned,
+.erp-grid .ag-header-cell.ag-header-cell-first-right-pinned {
+  border-right: none !important;
+  border-left: none !important;
+}
 /* 가운데 정렬 — 헤더 + 셀 */
 .erp-grid .ag-header-cell.ag-center-aligned-header .ag-header-cell-label { justify-content: center; }
 .erp-grid .ag-cell.ag-center-aligned-cell { text-align: center; justify-content: center; }
