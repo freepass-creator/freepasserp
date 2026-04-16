@@ -26,9 +26,8 @@ function initPage(page) {
   left.after(handle);
 
   const SNAP_THRESHOLD = 12;
-  const STORAGE_KEY = 'fp.panel.ratio';
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) left.style.width = saved + '%';
+  // 페이지 진입 시 항상 50:50 시작 (저장된 비율 복원 안 함)
+  left.style.width = '50%';
 
   let dragging = false;
   let startX = 0;
@@ -62,14 +61,10 @@ function initPage(page) {
     handle.classList.remove('is-dragging');
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
-    const pageW = page.offsetWidth;
-    const gap = parseFloat(getComputedStyle(page).getPropertyValue('--panel-gap')) || 8;
-    const pct = Math.round((left.offsetWidth / (pageW - gap)) * 100);
-    localStorage.setItem(STORAGE_KEY, pct);
+    // 현재 세션 내에서만 비율 유지, 재진입 시 50:50로 초기화
   });
 
   handle.addEventListener('dblclick', () => {
     left.style.width = '50%';
-    localStorage.setItem(STORAGE_KEY, 50);
   });
 }
