@@ -841,30 +841,40 @@ async function handleSave() {
 
   syncContractStatusByChecks();
   const selectedStatus = String(fields.contract_status.value || '계약대기').trim() || '계약대기';
+
+  // 고객정보 — 마스킹 상태(* 포함)면 변경 안 한 것 → 기존 값 유지
+  const rawName = fields.customer_name.value.trim();
+  const rawBirth = fields.customer_birth.value.trim();
+  const rawPhone = fields.customer_phone.value.trim();
+  const nameChanged = rawName && !rawName.includes('*');
+  const birthChanged = rawBirth && !rawBirth.includes('*');
+  const phoneChanged = rawPhone && !rawPhone.includes('*');
+  const anyCustomerChanged = nameChanged || birthChanged || phoneChanged;
+
   const payload = {
     contract_status: allChecksDone() ? '계약완료' : selectedStatus,
     rent_month: String(fields.rent_month.value || '').replace(/[^\d]/g, '') || '',
     rent_amount: parseMoneyValue(fields.rent_amount.value),
     deposit_amount: parseMoneyValue(fields.deposit_amount.value),
-    customer_name: maskName(fields.customer_name.value.trim()),
-    customer_birth: maskBirth(fields.customer_birth.value.trim()),
-    customer_phone: maskPhone(fields.customer_phone.value.trim()),
+    // 고객정보 — 변경된 필드만 마스킹, 미변경이면 기존 값 보존
+    customer_name: nameChanged ? maskName(rawName) : (currentContract?.customer_name || ''),
+    customer_birth: birthChanged ? maskBirth(rawBirth) : (currentContract?.customer_birth || ''),
+    customer_phone: phoneChanged ? maskPhone(rawPhone) : (currentContract?.customer_phone || ''),
     checks: Object.fromEntries(CHECK_FIELD_KEYS.map((key) => [key, !!fields[key]?.checked])),
     docs
   };
 
-  // 원본이 있으면 암호화 저장
-  const rawName = fields.customer_name.value.trim();
-  const rawBirth = fields.customer_birth.value.trim();
-  const rawPhone = fields.customer_phone.value.trim();
-  if (rawName || rawBirth || rawPhone) {
+  // 변경된 고객정보만 암호화 저장, 미변경이면 기존 _secure 유지
+  if (anyCustomerChanged) {
     const pw = await requestDecryptPassword();
     if (!pw) throw new Error('비밀번호를 입력해야 저장할 수 있습니다.');
     payload._secure = {
-      customer_name: rawName ? await encryptField(rawName, pw) : '',
-      customer_birth: rawBirth ? await encryptField(rawBirth, pw) : '',
-      customer_phone: rawPhone ? await encryptField(rawPhone, pw) : '',
+      customer_name: nameChanged ? (rawName ? await encryptField(rawName, pw) : '') : (currentContract?._secure?.customer_name || ''),
+      customer_birth: birthChanged ? (rawBirth ? await encryptField(rawBirth, pw) : '') : (currentContract?._secure?.customer_birth || ''),
+      customer_phone: phoneChanged ? (rawPhone ? await encryptField(rawPhone, pw) : '') : (currentContract?._secure?.customer_phone || ''),
     };
+  } else if (currentContract?._secure) {
+    payload._secure = currentContract._secure; // 기존 암호화 데이터 유지
   }
 
   // 부분 업데이트이므로 payload에 존재하는 필드만 검증
