@@ -118,6 +118,18 @@ function findAgentManagerUsers(users, agentChannelCode, excludeUid) {
     .map(([uid, u]) => ({ uid, role: u.role, name: u.name || '', phone: u.phone || '' }));
 }
 
+// 모든 활성 admin (모니터링 목적 — 초기 운영 단계에서 admin도 SMS 받음)
+function findAdminUsers(users, excludeUid) {
+  return Object.entries(users)
+    .filter(([uid, u]) =>
+      u && uid !== excludeUid &&
+      u.role === 'admin' &&
+      smsEnabled(u) &&
+      u.phone
+    )
+    .map(([uid, u]) => ({ uid, role: u.role, name: u.name || '', phone: u.phone || '' }));
+}
+
 // ─── 1) 새 채팅 메시지 → FCM 푸시 ────────────────────────────────────────
 exports.pushOnNewMessage = onValueCreated(
   {
@@ -244,10 +256,12 @@ exports.smsOnNewRoom = onValueCreated(
     }
 
     const users = await getUsers();
-    const targets = findProviderUsers(users, providerCode, room.agent_uid || '');
+    const providers = findProviderUsers(users, providerCode, room.agent_uid || '');
+    const admins = findAdminUsers(users, room.agent_uid || '');
+    const targets = [...providers, ...admins];
 
     if (!targets.length) {
-      logger.info('[SMS] 신규문의 — 공급사 담당자 없음', { providerCode });
+      logger.info('[SMS] 신규문의 — 대상자 없음', { providerCode });
       return;
     }
 
@@ -289,8 +303,9 @@ exports.smsOnNewContract = onValueCreated(
     const providers = findProviderUsers(users, providerCode, createdByUid);
     const agents = findAgentUser(users, { agentUid, agentCode }, createdByUid);
     const managers = findAgentManagerUsers(users, agentChannelCode, createdByUid);
+    const admins = findAdminUsers(users, createdByUid);
 
-    const targets = [...providers, ...agents, ...managers];
+    const targets = [...providers, ...agents, ...managers, ...admins];
     if (!targets.length) {
       logger.info('[SMS] 신규계약 — 대상자 없음', { code, providerCode, agentCode });
       return;
