@@ -182,16 +182,17 @@ export function renderTableGrid(options = {}) {
       // 전체 좌측 정렬 통일 (AG Grid 디폴트)
       const isNum = col.num || col.priceMonth || false;
       const WIDE_KEYS = ['subModel', 'sub_model', 'trim', 'trim_name', 'subTrim', 'options'];
+      // 정렬: 기본 가운데, align:'l' 이면 좌측 들여쓰기
+      const isLeft = col.align === 'l';
       const def = {
         colId: col.key,
         headerName: col.label || col.key,
         sortable: isNum || false,
         resizable: true,
-        suppressMovable: false,  // 드래그로 컬럼 순서 변경 가능
+        suppressMovable: false,
         suppressHeaderMenuButton: true,
-        // 모든 컬럼 가운데 정렬 (헤더 + 셀)
-        headerClass: 'ag-center-aligned-header',
-        cellClass: 'ag-center-aligned-cell',
+        headerClass: isLeft ? 'ag-left-aligned-header' : 'ag-center-aligned-header',
+        cellClass: isLeft ? 'ag-left-aligned-cell erp-indent' : 'ag-center-aligned-cell',
       };
       // 컬럼 고정 (좌측/우측)
       if (col.pinned === 'left' || col.pinned === 'right') def.pinned = col.pinned;
