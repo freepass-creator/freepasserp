@@ -27,11 +27,16 @@ messaging.onBackgroundMessage((payload) => {
   const title = notif.title || '알림';
   const body = notif.body || '';
   const link = data.link || '/';
+  // tag — 같은 방은 한 개로 병합 (renotify 로 새 메시지마다 알림 표시)
+  const tag = data.room_id
+    ? `chat-${data.room_id}`
+    : (data.tag || `notif-${Date.now()}`);
   self.registration.showNotification(title, {
     body,
     icon: '/static/apple-touch-icon-180.png',
     badge: '/static/favicon.ico',
-    tag: data.tag || `notif-${Date.now()}`,
+    tag,
+    renotify: true,
     data: { link },
   });
 });

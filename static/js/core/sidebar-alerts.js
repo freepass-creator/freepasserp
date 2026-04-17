@@ -74,7 +74,11 @@ function countUnreadRooms(rooms) {
       if (!room.provider_company_code || !companyCode || room.provider_company_code !== companyCode) return false;
     }
     // admin 은 방 필터 없음 (전체 감시)
-    if (!Number(room.last_message_at || 0)) return false;
+    const lastMsgAt = Number(room.last_message_at || 0);
+    if (!lastMsgAt) return false;
+    // 내가 이미 읽었으면 제외 — markRoomRead 이후 자동 감소
+    const myReadAt = Number((room.read_by || {})[uid] || 0);
+    if (myReadAt >= lastMsgAt) return false;
     const eff = room.last_effective_sender_role || '';
     const last = room.last_sender_role || '';
     const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
@@ -170,10 +174,10 @@ async function init() {
     watchRooms((rooms) => {
       counts.chat = countUnreadRooms(rooms);
       // 대화 페이지 + 포커스 상태에선 UI 가 이미 반영하므로 소리 생략.
-      // 다른 창 보고 있거나 탭 백그라운드면 울려야 함.
+      // 사용자가 뱃지 끔 설정이면 소리도 같이 끔.
       const onChatPage = /^\/(chat|m\/chat)(\/|$)/.test(location.pathname);
       const isFocused = document.visibilityState === 'visible' && document.hasFocus();
-      const skip = onChatPage && isFocused;
+      const skip = (onChatPage && isFocused) || !isBadgeEnabled('/chat');
       if (prevChatCount >= 0 && counts.chat > prevChatCount && !skip) {
         playNotifSound({ type: 'message' });
       }
@@ -182,7 +186,9 @@ async function init() {
     });
     watchContracts((items) => {
       counts.contract = countActionContracts(items);
-      if (prevContractCount >= 0 && counts.contract > prevContractCount) playNotifSound({ type: 'contract' });
+      if (prevContractCount >= 0 && counts.contract > prevContractCount && isBadgeEnabled('/contract')) {
+        playNotifSound({ type: 'contract' });
+      }
       prevContractCount = counts.contract;
       scheduleBadges();
     });

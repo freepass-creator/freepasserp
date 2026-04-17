@@ -101,7 +101,16 @@ export function playNotifSound(opts = {}) {
       audio.volume = 0.5;
       const p = audio.play();
       if (p && typeof p.catch === 'function') {
-        p.catch(err => console.warn('[notif-sound]', err.name, err.message));
+        p.catch((err) => {
+          console.warn('[notif-sound]', err?.name, err?.message);
+          // 자동재생 차단 → 세션당 1회 힌트 (토스트) 띄움
+          if (err?.name === 'NotAllowedError' && !window.__fp_autoplay_hint_shown) {
+            window.__fp_autoplay_hint_shown = true;
+            import('./toast.js').then(({ showToast }) => {
+              showToast('알림 소리를 들으려면 페이지를 한 번 클릭해주세요.', 'info', { duration: 5000 });
+            }).catch(() => {});
+          }
+        });
       }
     }
     // 진동 (Android Chrome 등 지원, iOS Safari 미지원)

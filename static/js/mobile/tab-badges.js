@@ -65,18 +65,24 @@ if (document.readyState === 'loading') {
       return false;
     }
 
-    // 대화 안읽음 — 자기 방만 + 역할별 카운트 합산
+    // 대화 안읽음 — desktop sidebar-alerts 와 동일 로직 (last_sender + read_by)
     let prevChat = -1;
     watchRooms((rooms) => {
-      let total = 0;
-      (rooms || []).forEach(r => {
-        if (!r) return;
-        if (r.hidden_by && Object.keys(r.hidden_by).length) return;
-        if (!isMineRoom(r)) return;
-        if (role === 'admin') total += Number(r.unread_for_agent || 0) + Number(r.unread_for_provider || 0);
-        else if (role === 'agent' || role === 'agent_manager') total += Number(r.unread_for_agent || 0);
-        else if (role === 'provider') total += Number(r.unread_for_provider || 0);
-      });
+      const total = (rooms || []).filter((r) => {
+        if (!r) return false;
+        if (r.hidden_by && r.hidden_by[myUid]) return false;
+        if (!isMineRoom(r)) return false;
+        const lastMsgAt = Number(r.last_message_at || 0);
+        if (!lastMsgAt) return false;
+        const myReadAt = Number((r.read_by || {})[myUid] || 0);
+        if (myReadAt >= lastMsgAt) return false;
+        const eff = r.last_effective_sender_role || '';
+        const last = r.last_sender_role || '';
+        const sender = (eff === 'agent' || eff === 'provider') ? eff : ((last === 'agent' || last === 'provider') ? last : '');
+        if (!sender) return false;
+        if (role === 'admin' || role === 'provider') return sender === 'agent';
+        return sender === 'provider';
+      }).length;
       setBadge('m-tab-chat-badge', total);
       const onChatPage = /^\/(chat|m\/chat)(\/|$)/.test(location.pathname);
       const isFocused = document.visibilityState === 'visible' && document.hasFocus();
