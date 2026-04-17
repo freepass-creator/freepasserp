@@ -184,6 +184,7 @@ _NEW_ROUTES = [
     ('/request',       'request-manage.html',           '요청하기'),
     ('/upload-center', 'pages/upload-center.html',      '업로드센터'),
     ('/download-center', 'pages/download-center.html',  '다운로드센터'),
+    ('/contract-send',   'pages/contract-send.html',    '계약서 발송'),
 ]
 
 def _make_new_view(template: str, title: str):

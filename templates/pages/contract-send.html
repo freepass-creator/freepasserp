@@ -1,0 +1,180 @@
+{% extends 'pages/layout/workspace.html' %}
+{% block workspace_page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contract-send.css') }}?v={{ app_version }}" data-page-style="true">
+{% endblock %}
+{% block page_title_text %}계약서 발송{% endblock %}
+{% block workspace_body %}
+<div class="cs-root">
+
+  <!-- ── 본문 · 좌(계약서) · 우(입력) ── -->
+  <main class="cs-body">
+
+    <!-- 좌측: A4 계약서 (중심) -->
+    <section class="cs-stage">
+      <div class="cs-stage__toolbar">
+        <div class="cs-stage__info">
+          <span class="cs-stage__tag">A4</span>
+          <span class="cs-stage__dim">210 × 297 mm</span>
+        </div>
+        <div class="cs-zoom">
+          <button type="button" class="cs-zoom__btn" data-zoom="-">−</button>
+          <span class="cs-zoom__val" id="cs-zoom-val">100%</span>
+          <button type="button" class="cs-zoom__btn" data-zoom="+">+</button>
+        </div>
+      </div>
+      <div class="cs-stage__inner">
+        <iframe id="cs-preview-iframe"
+                class="cs-stage__iframe"
+                src="/static/contract-template/contract-individual.html"
+                scrolling="no"
+                title="계약서 미리보기"></iframe>
+      </div>
+    </section>
+
+    <!-- 우측: 입력 패널 -->
+    <aside class="cs-input">
+      <div class="cs-input__head">
+        <div class="cs-input__head-main">
+          <div class="cs-input__title">계약 정보 입력</div>
+          <div class="cs-input__sub">입력하면 좌측 계약서에 실시간 반영됩니다</div>
+        </div>
+        <button type="button" class="cs-btn cs-btn--ghost" id="cs-btn-reset">초기화</button>
+      </div>
+      <div class="cs-input__actions">
+        <button type="button" class="cs-btn cs-btn--outline" id="cs-btn-pdf">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          PDF 다운로드
+        </button>
+        <button type="button" class="cs-btn cs-btn--primary" id="cs-btn-modusign">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+          모두사인 전송
+        </button>
+      </div>
+      <div class="cs-input__body" id="cs-form-body">
+        <form class="cs-form" autocomplete="off" onsubmit="return false">
+
+          <!-- 계약자 -->
+          <details class="cs-group" open>
+            <summary class="cs-group__sum">
+              <svg class="cs-group__ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>계약자</span>
+              <span class="cs-group__count" data-group-count="계약자">—</span>
+            </summary>
+            <div class="cs-grid">
+              <label class="cs-field"><span>성명</span><input data-bind="customer_name" placeholder="홍길동"></label>
+              <label class="cs-field"><span>주민번호</span><input data-bind="customer_id" placeholder="000000-0000000"></label>
+              <label class="cs-field"><span>면허번호</span><input data-bind="driver_or_biz_no"></label>
+              <label class="cs-field"><span>전화번호</span><input type="tel" data-bind="customer_phone" placeholder="010-0000-0000"></label>
+              <label class="cs-field"><span>이메일</span><input type="email" data-bind="customer_email"></label>
+              <label class="cs-field">
+                <span>거주 형태</span>
+                <select data-bind="residence_type">
+                  <option value="">선택</option><option>자가</option><option>전세</option><option>월세</option><option>기타</option>
+                </select>
+              </label>
+              <label class="cs-field cs-field--full"><span>주소</span><input data-bind="customer_address"></label>
+              <label class="cs-field"><span>비상 연락처 성명</span><input data-bind="emergency_name"></label>
+              <label class="cs-field"><span>관계</span><input data-bind="emergency_relation" placeholder="부·모·배우자 등"></label>
+              <label class="cs-field cs-field--full"><span>비상 연락처 전화</span><input data-bind="emergency_phone" placeholder="010-0000-0000"></label>
+            </div>
+          </details>
+
+          <!-- 차량 -->
+          <details class="cs-group" open>
+            <summary class="cs-group__sum">
+              <svg class="cs-group__ico" viewBox="0 0 24 24"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+              <span>차량</span>
+              <span class="cs-group__count" data-group-count="차량">—</span>
+            </summary>
+            <div class="cs-grid">
+              <label class="cs-field"><span>차량번호</span><input data-bind="car_number" placeholder="12가1234"></label>
+              <label class="cs-field"><span>차대번호</span><input data-bind="vin"></label>
+              <label class="cs-field"><span>제조사</span><input data-bind="maker" placeholder="현대"></label>
+              <label class="cs-field"><span>모델명</span><input data-bind="model" placeholder="G80"></label>
+              <label class="cs-field"><span>세부모델</span><input data-bind="sub_model"></label>
+              <label class="cs-field"><span>세부트림</span><input data-bind="trim"></label>
+              <label class="cs-field"><span>연식</span><input data-bind="model_year" placeholder="2024년식"></label>
+              <label class="cs-field">
+                <span>연료</span>
+                <select data-bind="fuel">
+                  <option value="">선택</option><option>가솔린</option><option>디젤</option><option>LPG</option><option>하이브리드</option><option>전기</option>
+                </select>
+              </label>
+              <label class="cs-field"><span>외장 색상</span><input data-bind="color_exterior"></label>
+              <label class="cs-field"><span>내장 색상</span><input data-bind="color_interior"></label>
+              <label class="cs-field"><span>주행거리(인도)</span><input data-bind="odometer_delivery" placeholder="100,000 km"></label>
+              <label class="cs-field cs-field--full"><span>선택 옵션</span><input data-bind="options" placeholder="선루프 · 썬팅"></label>
+            </div>
+          </details>
+
+          <!-- 대여 조건 -->
+          <details class="cs-group" open>
+            <summary class="cs-group__sum">
+              <svg class="cs-group__ico" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+              <span>대여 조건</span>
+              <span class="cs-group__count" data-group-count="대여 조건">—</span>
+            </summary>
+            <div class="cs-grid">
+              <label class="cs-field">
+                <span>대여 기간</span>
+                <select data-bind="rent_month">
+                  <option value="">선택</option><option>12 개월</option><option>24 개월</option><option>36 개월</option><option>48 개월</option><option>60 개월</option>
+                </select>
+              </label>
+              <label class="cs-field">
+                <span>운전자 연령</span>
+                <select data-bind="driver_age">
+                  <option value="">선택</option><option>만 21세 이상</option><option>만 23세 이상</option><option>만 26세 이상</option>
+                </select>
+              </label>
+              <label class="cs-field"><span>계약 시작일</span><input data-bind="contract_start" placeholder="2026 년 __ 월 __ 일"></label>
+              <label class="cs-field"><span>계약 종료일</span><input data-bind="contract_end"></label>
+              <label class="cs-field"><span>월 대여료</span><input data-bind="rent_amount" placeholder="1,000,000"></label>
+              <label class="cs-field"><span>보증금</span><input data-bind="deposit_amount"></label>
+              <label class="cs-field">
+                <span>분납 여부</span>
+                <select data-bind="deposit_installment">
+                  <option value="">선택</option><option>일시납</option><option>2회 분납</option><option>3회 분납</option><option>5회 분납</option>
+                </select>
+              </label>
+              <label class="cs-field">
+                <span>보증금 반환</span>
+                <select data-bind="deposit_return_policy">
+                  <option value="">선택</option><option>반납 후 1주일 이내</option><option>반납 후 2주일 이내</option><option>반납 후 1개월 이내</option>
+                </select>
+              </label>
+              <label class="cs-field">
+                <span>연간 약정 주행거리</span>
+                <select data-bind="annual_mileage">
+                  <option value="">선택</option><option>20,000 km</option><option>30,000 km</option><option>40,000 km</option><option>50,000 km</option>
+                </select>
+              </label>
+              <label class="cs-field">
+                <span>초과 주행 요율</span>
+                <select data-bind="over_mileage_rate">
+                  <option value="">선택</option><option>1km당 200원</option><option>1km당 300원</option><option>1km당 400원</option>
+                </select>
+              </label>
+              <label class="cs-field">
+                <span>인수 옵션</span>
+                <select data-bind="buyback_option">
+                  <option value="">선택</option><option>반납형</option><option>만기선택형</option>
+                </select>
+              </label>
+              <label class="cs-field"><span>인수 가격</span><input data-bind="buyback_price" placeholder="별도 산정 또는 금액"></label>
+              <label class="cs-field cs-field--full"><span>특약 사항</span><input data-bind="special_terms"></label>
+            </div>
+          </details>
+
+        </form>
+      </div>
+    </aside>
+
+  </main>
+
+</div>
+{% endblock %}
+{% block workspace_page_js %}
+<script type="module" src="{{ url_for('static', filename='js/pages/contract-send.js') }}" data-page-script="true"></script>
+{% endblock %}
+

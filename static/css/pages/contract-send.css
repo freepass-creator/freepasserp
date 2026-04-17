@@ -1,0 +1,323 @@
+/* ══════════════════════════════════════════════════════════════
+   계약서 발송 — 사이드바 유지 · 본문만 A4 중심 커스텀 레이아웃
+   ══════════════════════════════════════════════════════════════ */
+
+/* 본문 영역 여백/스크롤 제거 — A4 스테이지가 관리 */
+body[data-page="계약서 발송"] .main-shell { padding: 0 !important; gap: 0 !important; overflow: hidden; }
+body[data-page="계약서 발송"] .main-shell--new > * { padding: 0; }
+
+/* (이전 full-bleed 커스텀 레이아웃 잔재 방지용 display override 제거 —
+   workspace 표준 grid/flex 레이아웃을 그대로 사용) */
+
+/* (상단바 커스텀 액션 없음 — workspace 표준 상단바 사용) */
+
+/* ══════════════════════════════════════════════════════════════
+   루트 컨테이너 · 좌(A4 스테이지) / 우(입력 패널)
+   ══════════════════════════════════════════════════════════════ */
+.cs-root {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.cs-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── 좌측: A4 스테이지 ── */
+.cs-stage {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom, #e9ecf0 0%, #eef1f5 40%, #eef1f5 100%);
+  min-height: 0;
+}
+.cs-stage__toolbar {
+  flex: 0 0 auto;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.cs-stage__info {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.cs-stage__tag {
+  display: inline-block;
+  padding: 2px 7px;
+  background: #0b1220;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+.cs-stage__dim {
+  font-size: 11px; color: #64748b; font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.cs-stage__inner {
+  flex: 1;
+  overflow: auto;
+  padding: 18px 12px;
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+}
+.cs-stage__iframe {
+  display: block;
+  width: 210mm;
+  min-height: 2970mm; /* 10페이지 폴백 — JS가 실제 높이로 덮어씀 */
+  height: auto;
+  border: none;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15,23,42,.1), 0 12px 32px rgba(15,23,42,.12);
+  transform-origin: top center;
+  transition: transform 0.15s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-bottom: 24px;
+  /* 이중 스크롤 방지 — iframe 내부 스크롤 제거, 외부 stage만 스크롤 */
+  scrollbar-width: none;
+}
+.cs-stage__iframe::-webkit-scrollbar { display: none; }
+
+/* ── 우측: 입력 패널 (고정 폭) ── */
+.cs-input {
+  flex: 0 0 420px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  min-height: 0;
+}
+.cs-input__head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fafbfc;
+}
+.cs-input__head-main { min-width: 0; }
+.cs-input__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0b1220;
+}
+.cs-input__sub {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+.cs-input__actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: #fff;
+}
+.cs-input__actions .cs-btn { flex: 1; height: 34px; font-weight: 700; }
+.cs-input__body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 4px 0;
+}
+
+/* ── 줌 컨트롤 ── */
+.cs-zoom {
+  display: inline-flex; align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  background: #fff;
+  overflow: hidden;
+  height: 30px;
+}
+.cs-zoom__btn {
+  width: 28px; height: 28px;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1e293b;
+  padding: 0;
+}
+.cs-zoom__btn:hover { background: #f4f6f9; }
+.cs-zoom__val {
+  padding: 0 8px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #475569;
+  font-weight: 500;
+  min-width: 44px;
+  text-align: center;
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  line-height: 28px;
+  align-self: stretch;
+}
+
+/* ── 버튼 ── */
+.cs-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 0 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  color: #0b1220;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: -0.2px;
+  transition: background 0.12s, border-color 0.12s;
+  white-space: nowrap;
+  height: 30px;
+  line-height: 1;
+}
+.cs-btn:hover { background: #f4f6f9; }
+.cs-btn--outline { background: #fff; }
+.cs-btn--primary {
+  background: #0b1220; color: #fff; border-color: #0b1220;
+}
+.cs-btn--primary:hover { background: #1e293b; }
+.cs-btn--ghost {
+  background: transparent; border-color: transparent;
+  color: #64748b; font-weight: 500;
+}
+.cs-btn--ghost:hover { background: #f4f6f9; color: #0b1220; }
+.cs-btn svg { flex-shrink: 0; }
+
+/* ── 그룹 (접기/펼치기) ── */
+.cs-group { border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+.cs-group:last-child { border-bottom: none; }
+.cs-group__sum {
+  list-style: none;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  cursor: pointer; user-select: none;
+  font-size: 12px; font-weight: 700; color: #1e293b;
+  background: #fff;
+  transition: background 0.12s;
+}
+.cs-group__sum::-webkit-details-marker { display: none; }
+.cs-group__sum:hover { background: #fafbfc; }
+.cs-group__sum::after {
+  content: '';
+  margin-left: auto;
+  width: 8px; height: 8px;
+  border-right: 1.5px solid #64748b;
+  border-bottom: 1.5px solid #64748b;
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform 0.15s;
+}
+.cs-group[open] > .cs-group__sum::after {
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+.cs-group__ico {
+  width: 14px; height: 14px;
+  stroke: currentColor; stroke-width: 1.8;
+  fill: none; flex-shrink: 0;
+}
+.cs-group__count {
+  font-size: 10.5px; font-weight: 500;
+  color: #94a3b8; letter-spacing: 0;
+}
+
+/* ── 필드 그리드 ── */
+.cs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  padding: 4px 16px 14px;
+}
+.cs-field {
+  display: flex; flex-direction: column;
+  gap: 3px; min-width: 0;
+}
+.cs-field--full { grid-column: 1 / -1; }
+.cs-field > span {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+}
+.cs-field > input,
+.cs-field > select,
+.cs-field > textarea {
+  width: 100%;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid #d6dbe3;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #0b1220;
+  background: #fff;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.cs-field > textarea { height: auto; min-height: 60px; padding: 6px 9px; resize: vertical; }
+.cs-field > input:focus,
+.cs-field > select:focus,
+.cs-field > textarea:focus {
+  outline: none;
+  border-color: #0b1220;
+  box-shadow: 0 0 0 2px rgba(11, 18, 32, 0.06);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   테마 대응
+   ══════════════════════════════════════════════════════════════ */
+html.theme-classic .cs-input { border-left-color: #e5e5e5; }
+html.theme-classic .cs-input__head { background: #fafaf8; border-bottom-color: #e5e5e5; }
+html.theme-classic .cs-group { border-bottom-color: #e5e5e5; }
+html.theme-classic .cs-stage { background: #f5f5f3; }
+html.theme-classic .cs-btn--primary { background: #111; border-color: #111; }
+
+html.theme-dark .cs-zoom { background: #1e2230; border-color: #2e3446; }
+html.theme-dark .cs-zoom__btn { background: #1e2230; color: #e5e7eb; }
+html.theme-dark .cs-zoom__btn:hover { background: #2e3446; }
+html.theme-dark .cs-zoom__val { color: #94a3b8; border-color: #2e3446; }
+html.theme-dark .cs-btn { background: #1e2230; color: #e5e7eb; border-color: #2e3446; }
+html.theme-dark .cs-btn:hover { background: #2e3446; }
+html.theme-dark .cs-btn--ghost { background: transparent; border-color: transparent; }
+html.theme-dark .cs-btn--primary { background: #e5e7eb; color: #0b1220; border-color: #e5e7eb; }
+html.theme-dark .cs-stage { background: linear-gradient(to bottom, #0b1220 0%, #131a2a 100%); }
+html.theme-dark .cs-input { background: #1e2230; border-left-color: #2e3446; }
+html.theme-dark .cs-input__head { background: #131a2a; border-bottom-color: #2e3446; }
+html.theme-dark .cs-input__title { color: #e5e7eb; }
+html.theme-dark .cs-input__sub { color: #94a3b8; }
+html.theme-dark .cs-group { border-bottom-color: #2e3446; }
+html.theme-dark .cs-group__sum { background: #1e2230; color: #e5e7eb; }
+html.theme-dark .cs-group__sum:hover { background: #252a3a; }
+html.theme-dark .cs-group__sum::after { border-color: #94a3b8; }
+html.theme-dark .cs-group__count { color: #64748b; }
+html.theme-dark .cs-field > span { color: #94a3b8; }
+html.theme-dark .cs-field > input,
+html.theme-dark .cs-field > select,
+html.theme-dark .cs-field > textarea {
+  background: #131a2a; color: #e5e7eb; border-color: #2e3446;
+}
+html.theme-dark .cs-field > input:focus,
+html.theme-dark .cs-field > select:focus { border-color: #e5e7eb; box-shadow: 0 0 0 2px rgba(229, 231, 235, 0.12); }
+
+/* ── 좁은 뷰포트 ── */
+@media (max-width: 1200px) {
+  .cs-input { flex-basis: 360px; max-width: 360px; }
+  .cs-grid { grid-template-columns: 1fr; }
+}

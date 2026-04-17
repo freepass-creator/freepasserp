@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>약관 2단 레이아웃 테스트</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Pretendard Variable", sans-serif; font-size: 12px; background: #eef1f5; }
+
+  .page {
+    width: 210mm; min-height: 297mm; padding: 8mm 10mm; margin: 0 auto 12px;
+    background: #fff; position: relative;
+    display: flex; flex-direction: column;
+    overflow: visible;
+  }
+  @media screen {
+    .page {
+      background:
+        linear-gradient(transparent calc(297mm - 1px), rgba(220,38,38,0.4) calc(297mm - 1px), rgba(220,38,38,0.4) 297mm, transparent 297mm),
+        #fff;
+      box-shadow: 0 1px 3px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.08);
+    }
+  }
+
+  .header { padding-bottom: 8px; border-bottom: 1px solid #0b1220; margin-bottom: 10px; font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; }
+  .footer { margin-top: auto; padding-top: 8px; border-top: 1px solid #d6dbe3; font-size: 10px; color: #64748b; display: flex; justify-content: space-between; }
+
+  .terms {
+    column-count: 2;
+    column-gap: 20px;
+    column-fill: auto;
+    height: 250mm;
+    font-size: 10px;
+    line-height: 1.7;
+    color: #1e293b;
+  }
+  .terms p { margin-bottom: 4px; }
+  .terms h3 { font-size: 11px; font-weight: 700; margin: 10px 0 4px; border-bottom: 1px solid #eef0f4; padding-bottom: 3px; }
+  .terms h3:first-child { margin-top: 0; }
+
+  .controls { position: fixed; top: 10px; right: 10px; z-index: 99; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+  .controls label { display: block; margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <strong>높이 조절</strong>
+  <label>height: <input type="range" id="hRange" min="200" max="270" value="250" step="1"> <span id="hVal">250</span>mm</label>
+</div>
+
+<div class="page">
+  <div class="header"><span>손오공렌터카 주식회사</span><span>약관 레이아웃 테스트</span></div>
+  <div class="terms" id="termsBox">
+    <h3>제1조 테스트 조항</h3>
+    <p>1. 이 문단은 약관 2단 레이아웃이 A4 페이지에 좌측 → 우측 순서로 채워지는지 테스트하기 위한 더미 텍스트입니다.</p>
+    <p>2. column-fill: auto 설정 시 왼쪽 컬럼이 먼저 지정된 높이까지 채워진 후 오른쪽 컬럼으로 넘어갑니다.</p>
+    <p>3. 높이(height)를 적절히 설정하면 A4 경계선 안에 딱 맞게 들어가야 합니다.</p>
+
+    <h3>제2조 추가 테스트</h3>
+    <p>1. 담보의 종류 : 보증금 · 선납금 · 보증보험증권 · 신용.</p>
+    <p>2. 계약 체결 후 5영업일 이내 담보를 제공하여야 합니다.</p>
+    <p>3. 계약 정상 종료 시 보증금·보증보험증권은 반환합니다.</p>
+    <p>4. 선납금은 월 대여료에서 분할 차감합니다.</p>
+    <p>5. 계약 종료 시 미이행 채무를 공제한 후 반환합니다.</p>
+    <p>6. 잔존 채무가 있으면 회사는 고객에게 청구할 수 있습니다.</p>
+    <p>7. 차량 인수 시 인수가액에서 보증금을 상계합니다.</p>
+    <p>8. 보증·담보 제공을 이유로 채무 이행을 거절할 수 없습니다.</p>
+
+    <h3>제3조 대여료</h3>
+    <p>1. 대여료는 월 단위 정산합니다.</p>
+    <p>2. 납부 지연 시 연 15% 이내의 연체이자를 청구합니다.</p>
+    <p>3. 1개월 미만은 일 단위 환산합니다.</p>
+    <p>4. 대여료 변동 시 서면 합의합니다.</p>
+    <p>5. 과태료·통행료는 고객 부담입니다.</p>
+    <p>6. 차량 미반환 시 단기 대여 요금 적용합니다.</p>
+    <p>7. 탁송비는 고객 부담입니다.</p>
+
+    <h3>제4조 운전자</h3>
+    <p>1. 운전자 연령 이상 면허 소지자만 운전 가능합니다.</p>
+    <p>2. 운전자 범위에 해당하는 자만 운전할 수 있습니다.</p>
+    <p>3. 미등록 운전자 사고 시 보험 적용 제외됩니다.</p>
+
+    <h3>제5조 차량 인도</h3>
+    <p>1. 회사는 양호한 상태의 차량을 인도합니다.</p>
+    <p>2. 인수증에 서명 후 운행합니다.</p>
+    <p>3. 옵션 오기는 자동차등록증 기준입니다.</p>
+    <p>4. 하자 발견 시 즉시 기재합니다.</p>
+    <p>5. 차량 교체 요구 불가합니다.</p>
+    <p>6. 반납 시 원상 수리합니다.</p>
+    <p>7. 구조 변경 시 원상 복원합니다.</p>
+    <p>8. 연료는 인도 시와 동일하게 반납합니다.</p>
+    <p>9. 만료 30일 전 통보합니다.</p>
+    <p>10. 차량 내 물품은 폐기됩니다.</p>
+
+    <h3>제6조 보험</h3>
+    <p>1. 영업용 자동차보험 가입 차량을 대여합니다.</p>
+    <p>2. 보장 범위 내에서 보상합니다. 고의·금지행위·음주 등은 제외됩니다.</p>
+    <p>3. 자차 면책제도 — 면책금 납부 시 회사 부담합니다. 12대 중과실 시 20% 추가 부담합니다.</p>
+    <p>4. 사고 발생 시 즉시 신고하고 블랙박스 영상을 제공합니다.</p>
+    <p>5. 면책금 미납 시 보험 미처리됩니다.</p>
+    <p>6. 보험 조건 변경은 7일 전 협의합니다.</p>
+  </div>
+  <div class="footer"><span>회사명 · 전화</span><span>테스트 페이지</span></div>
+</div>
+
+<script>
+const range = document.getElementById('hRange');
+const val = document.getElementById('hVal');
+const box = document.getElementById('termsBox');
+range.addEventListener('input', () => {
+  val.textContent = range.value;
+  box.style.height = range.value + 'mm';
+});
+</script>
+</body>
+</html>

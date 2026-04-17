@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>약관 2단 테스트 v3</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Pretendard Variable", sans-serif; font-size: 12px; background: #eef1f5; }
+
+  .page {
+    width: 210mm; height: 297mm; padding: 8mm 10mm; margin: 0 auto 12px;
+    background: #fff; position: relative;
+    page-break-after: always; overflow: hidden;
+  }
+  @media screen {
+    .page {
+      background:
+        linear-gradient(transparent calc(297mm - 1px), rgba(220,38,38,0.4) calc(297mm - 1px), rgba(220,38,38,0.4) 297mm, transparent 297mm),
+        #fff;
+      box-shadow: 0 1px 3px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.08);
+    }
+  }
+
+  .header { padding-bottom: 8px; border-bottom: 1px solid #0b1220; margin-bottom: 8px; font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; }
+  .footer { position: absolute; bottom: 8mm; left: 10mm; right: 10mm; display: flex; justify-content: space-between; font-size: 10px; color: #64748b; border-top: 1px solid #d6dbe3; padding-top: 8px; }
+
+  .cols { display: flex; gap: 0; }
+  .col {
+    width: 50%; overflow: hidden;
+    font-size: 10px; line-height: 1.7; color: #1e293b;
+    position: relative;
+  }
+  .col--l { padding-right: 10px; border-right: 1px solid #eef0f4; }
+  .col--r { padding-left: 10px; }
+
+  .col p { margin-bottom: 3px; }
+  .col .indent { padding-left: 12px; }
+
+  .intro { font-size: 11px; color: #475569; margin-bottom: 10px; line-height: 1.6; }
+  .sign { margin-top: 16px; padding: 10px 14px; border: 1px solid #d6dbe3; border-radius: 2px; background: #f4f6f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+
+  /* 숨김 원본 */
+  #src { display: none; }
+</style>
+</head>
+<body>
+
+<div id="src">
+  <p><strong>제1조 차종 및 대여 요금</strong></p>
+  <p>대여 차량의 차종 및 대여 요금은 본 계약서 [대여 조건]에 기재된 내용에 의하며, 월 대여료에는 자동차세·공과금·자동차보험료 등이 포함되어 있습니다.</p>
+  <p><strong>제2조 계약 기간</strong></p>
+  <p>1. 본 계약의 기간은 계약 체결일로부터 본 계약서 [대여 기간]의 만료일까지입니다.</p>
+  <p>2. 대여 기간 연장은 담보가 유효한 경우에 한하며, 고객이 서면으로 연장 의사를 표명하고 회사가 동의할 때 새로운 임대차계약을 체결합니다.</p>
+  <p>3. 연장 시 인수가액은 연장 계약서상의 인수가액을 따릅니다.</p>
+  <p><strong>제3조 보증·담보 및 위약금</strong></p>
+  <p><strong>1. 보증 또는 담보</strong></p>
+  <p class="indent">1) 고객은 본 계약에 따른 의무 이행을 담보하기 위하여 회사에 담보를 제공합니다.</p>
+  <p class="indent">2) 담보의 종류 : 보증금 · 선납금 · 보증보험증권 · 신용.</p>
+  <p class="indent">3) 계약 체결 후 5영업일 이내 담보를 제공하여야 합니다.</p>
+  <p class="indent">4) 계약 정상 종료 시 보증금·보증보험증권은 반환합니다(이자 미지급).</p>
+  <p class="indent">5) 선납금은 월 대여료에서 분할 차감하며, 만료 시 반환하지 않습니다.</p>
+  <p class="indent">6) 계약 종료 시 미이행 채무를 보증금에서 공제 후 반환합니다.</p>
+  <p class="indent">7) 보증보험금 지급 후에도 잔존 채무 청구 가능.</p>
+  <p class="indent">8) 인수 시 인수가액에서 보증금 상계.</p>
+  <p class="indent">9) 담보 제공을 이유로 채무 이행 거절 불가.</p>
+  <p><strong>2. 위약금</strong></p>
+  <p class="indent">1) 중도 해지 시 잔여 대여료(VAT 제외) × [해지 수수료]율 청구.</p>
+  <p class="indent">2) 신차 출고 후 해지 시 전체 기간을 잔여로 봄.</p>
+  <p class="indent">3) 계약 승계 시 위약금 면제 가능. 회사 승인 필수.</p>
+  <p><strong>3. 통지 의무</strong></p>
+  <p class="indent">정보 변경, 분실·도난, 운전자 변경 등 즉시 통지.</p>
+  <p><strong>제4조 대여료 정산 및 지급</strong></p>
+  <p>1. 월 단위 정산, [결제 방법]에 따라 납부.</p>
+  <p>2. 연체 시 연 15% 이내 연체이자 청구.</p>
+  <p>3. 1개월 미만 일 단위 환산.</p>
+  <p>4. 대여료 변동 시 서면 합의.</p>
+  <p>5. 범칙금·과태료·통행료 고객 부담.</p>
+  <p>6. 미반환 시 단기 대여 요금 적용.</p>
+  <p>7. 탁송비 고객 부담 원칙.</p>
+  <p><strong>제5조 운전자 자격 요건</strong></p>
+  <p>1. [운전자 연령] 이상 면허 소지자만 운전 가능.</p>
+  <p>2. [운전자 범위] 해당자에 한하여 운전 가능.</p>
+  <p>3. 미등록 운전자 사고 시 보험 적용 제외.</p>
+  <p><strong>제6조 차량의 인도 및 반납</strong></p>
+  <p>1. 양호한 상태로 인도, 최초 상태로 반환.</p>
+  <p>2. 인수 시 상태 확인 후 인수증 서명.</p>
+  <p>3. 오기 시 자동차등록증 기준.</p>
+  <p>4. 하자 발견 시 즉시 기재.</p>
+  <p>5. 정상 운행 가능 시 교체 불가.</p>
+  <p>6. 반납 시 파손 원상 수리.</p>
+  <p>7. 미승인 개조 시 원상 복원.</p>
+  <p>8. 연료 동일 수준 반납.</p>
+  <p>9. 만료 30일 전 통보.</p>
+  <p>10. 차량 내 물품 폐기.</p>
+  <p><strong>제7조 차량 보험 및 보상</strong></p>
+  <p>1. 영업용 자동차보험 가입 차량 대여.</p>
+  <p>2. 보험 적용 제외 : 고의, 금지행위, 자격 이탈, 음주·무면허, 종료 후 운행.</p>
+  <p>3. 자차 면책 — 면책금 납부 시 회사 부담. 중과실 20% 추가.</p>
+  <p>4. 사고 시 즉시 신고, 블랙박스 제공, 자체 합의 금지.</p>
+  <p>5. 면책금 미납 시 보험 미처리.</p>
+  <p>6. 보험 조건 변경 7일 전 협의.</p>
+  <p><strong>제8조 금지 행위</strong></p>
+  <p>1. 자격 미달자 운전, 유상 운송, 미승인 개조, 주행거리 조작, 약물 운전, 소유권 침해 등 금지.</p>
+  <p>2. 위반 시 해지·회수 가능.</p>
+  <p>3. 형사 처벌 대상, 손해 전액 배상.</p>
+  <p><strong>제9조 차량 관리</strong></p>
+  <p>1. 선량한 관리자 주의의무.</p>
+  <p>2. 소모품 고객 부담.</p>
+  <p>3. 지정 정비점, 규격 부품 사용.</p>
+  <p>4. 법정 검사 협조.</p>
+  <p><strong>제10조 계약의 해지 및 종료</strong></p>
+  <p>1. 연체·허위·부도·금지행위 등 시 해지 가능.</p>
+  <p>2. 귀책 해지 시 차량 반환·대여료·위약금 이행.</p>
+  <p>3. 장부가액 80% 초과 시 자동 해지.</p>
+  <p><strong>제11조 차량의 멸실·훼손</strong></p>
+  <p>1. 멸실·훼손 고객 배상.</p>
+  <p>2. 도난 시 신고, 1개월 미회수 시 장부가액 배상.</p>
+  <p>3. 훼손 원상 수리.</p>
+  <p><strong>제12조 초과 운행 부담금</strong></p>
+  <p>1. 약정 초과 시 초과 요율 정산.</p>
+  <p>2. 중도 해지 시 일할 환산.</p>
+  <p><strong>제13조 차량 인수</strong></p>
+  <p>1. 만기선택형 시 인수 가능. 30일 전 통지.</p>
+  <p>2. 본인·지정자 한정.</p>
+  <p><strong>제14조 연대보증</strong></p>
+  <p>1. 모든 채무 연대 부담 (민법 제437조).</p>
+  <p>2. 연장 시 보증 자동 연장.</p>
+  <p><strong>제15조 신용 정보</strong></p>
+  <p>1. 신용 정보 조회 가능.</p>
+  <p>2. 연체 시 신용정보기관 등록.</p>
+  <p><strong>제16조 기타</strong></p>
+  <p>1. 부속 서류 계약서 일부.</p>
+  <p>2. 미사용 시에도 채무 의무 유지.</p>
+  <p>3. 미규정 사항 표준약관 적용.</p>
+  <p><strong>제17조 분쟁 해결</strong></p>
+  <p>1. 협의 조정. 소송 시 본점 관할.</p>
+  <p><strong>제18조 계약의 효력</strong></p>
+  <p>1. 서명(전자서명 포함) 시 효력 발생.</p>
+  <p>2. 전자서명 서면 동등 효력.</p>
+  <p>3. 서면 시 2부 작성.</p>
+</div>
+
+<div id="pages"></div>
+
+<script>
+(function() {
+  var src = document.getElementById('src');
+  var pages = document.getElementById('pages');
+  var items = [].slice.call(src.children);
+  var idx = 0;
+  var pgNum = 0;
+
+  function makePage() {
+    pgNum++;
+    var p = document.createElement('div');
+    p.className = 'page';
+
+    // 헤더
+    var hdr = document.createElement('div');
+    hdr.className = 'header';
+    hdr.innerHTML = '<span>손오공렌터카 주식회사</span><span>자동차 임대차 계약 약관</span>';
+    p.appendChild(hdr);
+
+    // 인트로 (1페이지만)
+    if (pgNum === 1) {
+      var intro = document.createElement('p');
+      intro.className = 'intro';
+      intro.innerHTML = '임차인 <strong>홍길동</strong>(이하 "고객")과 임대인 <strong>손오공렌터카 주식회사</strong>(이하 "회사")는 차량의 임대차 계약을 체결함에 있어 다음과 같이 합의합니다.';
+      p.appendChild(intro);
+    }
+
+    // 2단 컨테이너
+    var cols = document.createElement('div');
+    cols.className = 'cols';
+
+    var colL = document.createElement('div');
+    colL.className = 'col col--l';
+
+    var colR = document.createElement('div');
+    colR.className = 'col col--r';
+
+    cols.appendChild(colL);
+    cols.appendChild(colR);
+    p.appendChild(cols);
+
+    // 푸터
+    var ftr = document.createElement('div');
+    ftr.className = 'footer';
+    ftr.innerHTML = '<span>손오공렌터카 주식회사 · 1544-3871</span><span>약관 ' + pgNum + '</span>';
+    p.appendChild(ftr);
+
+    pages.appendChild(p);
+
+    // 컬럼 높이: A4(297mm) - padding(16mm) - header(14mm) - footer(12mm) - 여유(5mm) = 250mm
+    // 1mm = 3.7795px → 250mm ≈ 945px. 1페이지는 인트로 차감.
+    var maxH = 1010;
+    if (pgNum === 1) maxH -= 35;
+
+    // col 높이 설정
+    colL.style.height = maxH + 'px';
+    colR.style.height = maxH + 'px';
+
+    return { left: colL, right: colR, maxH: maxH };
+  }
+
+  function fits(col, maxH) {
+    if (col.children.length === 0) return true;
+    var last = col.lastElementChild;
+    return (last.offsetTop + last.offsetHeight) <= maxH;
+  }
+
+  function fillCol(col, maxH) {
+    while (idx < items.length) {
+      var el = items[idx].cloneNode(true);
+      col.appendChild(el);
+      if (!fits(col, maxH)) {
+        col.removeChild(el);
+        break;
+      }
+      idx++;
+    }
+  }
+
+  // 페이지 반복
+  while (idx < items.length) {
+    var pg = makePage();
+    fillCol(pg.left, pg.maxH);
+    if (idx < items.length) fillCol(pg.right, pg.maxH);
+  }
+
+  // 마지막 페이지: 고정 높이 해제, 푸터 flow로 변경
+  var lastPage = pages.lastElementChild;
+  if (lastPage) {
+    lastPage.style.height = 'auto';
+    lastPage.style.minHeight = '0';
+    lastPage.style.overflow = 'visible';
+
+    // 컬럼 높이도 auto
+    var lastCols = lastPage.querySelectorAll('.col');
+    lastCols.forEach(function(c) { c.style.height = 'auto'; c.style.overflow = 'visible'; });
+
+    // 푸터를 absolute에서 flow로
+    var ft = lastPage.querySelector('.footer');
+    ft.style.position = 'static';
+    ft.style.marginTop = '16px';
+
+    // 서명란 삽입
+    var sign = document.createElement('div');
+    sign.className = 'sign';
+    sign.innerHTML = '<span>☐ 상기 내용에 대해 설명을 듣고 확인 후 서명합니다.</span><span>임차인(계약자) <strong>홍길동</strong> (서명 또는 날인)</span>';
+    lastPage.insertBefore(sign, ft);
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -35,6 +35,7 @@ const PAGE_MODULE_PATHS = {
   '/admin':        '/static/js/pages/admin.js',
   '/settings':     '/static/js/pages/settings.js',
   '/download-center': '/static/js/pages/download-center.js',
+  '/contract-send':   '/static/js/pages/contract-send.js',
 };
 
 // 페이지별 캐시: { container, styles[], doc, title, bodyPage, module }
