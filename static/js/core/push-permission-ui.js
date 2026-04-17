@@ -120,35 +120,40 @@ export async function initPushPermissionFlow(uid) {
       const data = payload.data || {};
       const title = n.title || '알림';
       const body = n.body || '';
-      // 대화 페이지 + 포커스 상태면 UI 가 이미 반영 → 모든 알림 생략
       const onChatPage = /^\/(chat|m\/chat)(\/|$)/.test(location.pathname);
       const isFocused = document.visibilityState === 'visible' && document.hasFocus();
+      // 매트릭스 — 대화페이지 + 포커스 상태면 채팅 UI 에 이미 반영 → 전부 생략
       if (onChatPage && isFocused) return;
 
-      // 다방면 알림 — 토스트 + 소리 + OS 시스템 알림 (탭이 가려져 있어도 뜨게)
-      import('../core/toast.js').then(({ showToast }) => {
-        showToast(`${title}${body ? ' — ' + body : ''}`, 'info');
-      }).catch(() => {});
+      // 토스트 — 사용자가 브라우저 보고 있을 때만 (다른 앱 보면 안 보임)
+      if (isFocused) {
+        import('../core/toast.js').then(({ showToast }) => {
+          showToast(`${title}${body ? ' — ' + body : ''}`, 'info');
+        }).catch(() => {});
+      }
+      // 소리 — 모든 경우 (대화페이지+포커스 케이스만 위에서 이미 return)
       import('./notif-sound.js').then((m) => {
         if (data.type === 'chat' && typeof m.playMessageSound === 'function') m.playMessageSound();
       }).catch(() => {});
-      // Service Worker 를 통해 OS 알림 (Windows/Mac 알림센터)
-      try {
-        if ('Notification' in window && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistration().then((reg) => {
-            if (!reg || typeof reg.showNotification !== 'function') return;
-            reg.showNotification(title, {
-              body,
-              icon: '/static/apple-touch-icon-180.png',
-              badge: '/static/favicon.ico',
-              tag: data.room_id ? `chat-${data.room_id}` : 'fp-notif',
-              renotify: true,
-              silent: true, // 소리는 위 playMessageSound 로 이미 처리
-              data: { link: data.link || '/chat' },
+      // OS 알림 — 사용자가 브라우저 외부 보고 있을 때만 (포커스 있으면 토스트로 충분)
+      if (!isFocused) {
+        try {
+          if ('Notification' in window && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration().then((reg) => {
+              if (!reg || typeof reg.showNotification !== 'function') return;
+              reg.showNotification(title, {
+                body,
+                icon: '/static/apple-touch-icon-180.png',
+                badge: '/static/favicon.ico',
+                tag: data.room_id ? `chat-${data.room_id}` : 'fp-notif',
+                renotify: true,
+                silent: true, // 소리는 playMessageSound 로 이미 재생
+                data: { link: data.link || '/chat' },
+              }).catch(() => {});
             }).catch(() => {});
-          }).catch(() => {});
-        }
-      } catch (_) {}
+          }
+        } catch (_) {}
+      }
     }).catch(() => {});
   }
 
