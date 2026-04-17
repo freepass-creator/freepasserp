@@ -120,16 +120,35 @@ export async function initPushPermissionFlow(uid) {
       const data = payload.data || {};
       const title = n.title || '알림';
       const body = n.body || '';
-      // 대화 페이지이면서 '활성 포커스 상태' 일 때만 생략 — 다른 탭/창 보고 있으면 알림 필요
+      // 대화 페이지 + 포커스 상태면 UI 가 이미 반영 → 모든 알림 생략
       const onChatPage = /^\/(chat|m\/chat)(\/|$)/.test(location.pathname);
       const isFocused = document.visibilityState === 'visible' && document.hasFocus();
       if (onChatPage && isFocused) return;
+
+      // 다방면 알림 — 토스트 + 소리 + OS 시스템 알림 (탭이 가려져 있어도 뜨게)
       import('../core/toast.js').then(({ showToast }) => {
         showToast(`${title}${body ? ' — ' + body : ''}`, 'info');
       }).catch(() => {});
       import('./notif-sound.js').then((m) => {
         if (data.type === 'chat' && typeof m.playMessageSound === 'function') m.playMessageSound();
       }).catch(() => {});
+      // Service Worker 를 통해 OS 알림 (Windows/Mac 알림센터)
+      try {
+        if ('Notification' in window && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistration().then((reg) => {
+            if (!reg || typeof reg.showNotification !== 'function') return;
+            reg.showNotification(title, {
+              body,
+              icon: '/static/apple-touch-icon-180.png',
+              badge: '/static/favicon.ico',
+              tag: data.room_id ? `chat-${data.room_id}` : 'fp-notif',
+              renotify: true,
+              silent: true, // 소리는 위 playMessageSound 로 이미 처리
+              data: { link: data.link || '/chat' },
+            }).catch(() => {});
+          }).catch(() => {});
+        }
+      } catch (_) {}
     }).catch(() => {});
   }
 

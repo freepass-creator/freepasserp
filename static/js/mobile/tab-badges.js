@@ -78,7 +78,10 @@ if (document.readyState === 'loading') {
         else if (role === 'provider') total += Number(r.unread_for_provider || 0);
       });
       setBadge('m-tab-chat-badge', total);
-      if (prevChat >= 0 && total > prevChat) playNotifSound({ type: 'message' });
+      const onChatPage = /^\/(chat|m\/chat)(\/|$)/.test(location.pathname);
+      const isFocused = document.visibilityState === 'visible' && document.hasFocus();
+      const skip = onChatPage && isFocused;
+      if (prevChat >= 0 && total > prevChat && !skip) playNotifSound({ type: 'message' });
       prevChat = total;
     });
 
