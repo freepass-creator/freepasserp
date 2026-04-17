@@ -120,13 +120,13 @@ export async function initPushPermissionFlow(uid) {
       const data = payload.data || {};
       const title = n.title || '알림';
       const body = n.body || '';
-      // 대화 페이지에 있을 때는 채팅 UI 가 이미 반영하므로 토스트 생략 (소리만)
-      const onChatPage = /^\/(chat|m\/chat)(\/|$|\?)/.test(location.pathname + (location.search || ''));
-      if (!onChatPage) {
-        import('../core/toast.js').then(({ showToast }) => {
-          showToast(`${title}${body ? ' — ' + body : ''}`, 'info');
-        }).catch(() => {});
-      }
+      // 대화 페이지이면서 '활성 포커스 상태' 일 때만 생략 — 다른 탭/창 보고 있으면 알림 필요
+      const onChatPage = /^\/(chat|m\/chat)(\/|$)/.test(location.pathname);
+      const isFocused = document.visibilityState === 'visible' && document.hasFocus();
+      if (onChatPage && isFocused) return;
+      import('../core/toast.js').then(({ showToast }) => {
+        showToast(`${title}${body ? ' — ' + body : ''}`, 'info');
+      }).catch(() => {});
       import('./notif-sound.js').then((m) => {
         if (data.type === 'chat' && typeof m.playMessageSound === 'function') m.playMessageSound();
       }).catch(() => {});

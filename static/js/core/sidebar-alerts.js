@@ -162,8 +162,14 @@ async function init() {
     function scheduleBadges() { if (_rafId) return; _rafId = requestAnimationFrame(() => { _rafId = 0; syncAllBadges(); }); }
     watchRooms((rooms) => {
       counts.chat = countUnreadRooms(rooms);
-      // 초기 로드 이후 카운트 증가 시 알림음
-      if (prevChatCount >= 0 && counts.chat > prevChatCount) playNotifSound({ type: 'message' });
+      // 대화 페이지 + 포커스 상태에선 UI 가 이미 반영하므로 소리 생략.
+      // 다른 창 보고 있거나 탭 백그라운드면 울려야 함.
+      const onChatPage = /^\/(chat|m\/chat)(\/|$)/.test(location.pathname);
+      const isFocused = document.visibilityState === 'visible' && document.hasFocus();
+      const skip = onChatPage && isFocused;
+      if (prevChatCount >= 0 && counts.chat > prevChatCount && !skip) {
+        playNotifSound({ type: 'message' });
+      }
       prevChatCount = counts.chat;
       scheduleBadges();
     });
