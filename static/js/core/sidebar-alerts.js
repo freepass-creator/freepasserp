@@ -6,11 +6,15 @@
 
 import { requireAuth } from './auth-guard.js';
 import { watchRooms, watchUsers, watchPartners, watchContracts, watchSettlements } from '../firebase/firebase-db.js';
+import { playNotifSound } from './notif-sound.js';
 
 let profile = null;
 let uid = '';
 let companyCode = '';
 let counts = { chat: 0, member: 0, partner: 0, contract: 0, settlement: 0 };
+// 알림음 — 이전 카운트 대비 증가 시 1회 재생 (초기 로드 제외)
+let prevChatCount = -1;
+let prevContractCount = -1;
 
 // ─── 뱃지 DOM 조작 ──────────────────────────────────────────────────────────
 
@@ -156,9 +160,23 @@ async function init() {
 
     let _rafId = 0;
     function scheduleBadges() { if (_rafId) return; _rafId = requestAnimationFrame(() => { _rafId = 0; syncAllBadges(); }); }
-    watchRooms((rooms) => { counts.chat = countUnreadRooms(rooms); scheduleBadges(); });
-    watchContracts((items) => { counts.contract = countActionContracts(items); scheduleBadges(); });
-    watchSettlements((items) => { counts.settlement = countActionSettlements(items); scheduleBadges(); });
+    watchRooms((rooms) => {
+      counts.chat = countUnreadRooms(rooms);
+      // 초기 로드 이후 카운트 증가 시 알림음
+      if (prevChatCount >= 0 && counts.chat > prevChatCount) playNotifSound({ type: 'message' });
+      prevChatCount = counts.chat;
+      scheduleBadges();
+    });
+    watchContracts((items) => {
+      counts.contract = countActionContracts(items);
+      if (prevContractCount >= 0 && counts.contract > prevContractCount) playNotifSound({ type: 'contract' });
+      prevContractCount = counts.contract;
+      scheduleBadges();
+    });
+    watchSettlements((items) => {
+      counts.settlement = countActionSettlements(items);
+      scheduleBadges();
+    });
 
     if (profile.role === 'admin') {
       watchUsers((items) => { counts.member = countPendingUsers(items); scheduleBadges(); });
