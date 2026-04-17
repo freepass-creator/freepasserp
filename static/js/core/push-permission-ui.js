@@ -120,11 +120,13 @@ export async function initPushPermissionFlow(uid) {
       const data = payload.data || {};
       const title = n.title || '알림';
       const body = n.body || '';
-      // 토스트로 표시 (이미 열려있는 화면)
-      import('../core/toast.js').then(({ showToast }) => {
-        showToast(`${title}${body ? ' — ' + body : ''}`, 'info');
-      }).catch(() => {});
-      // 알림 소리 재생 (기존 notif-sound 모듈)
+      // 대화 페이지에 있을 때는 채팅 UI 가 이미 반영하므로 토스트 생략 (소리만)
+      const onChatPage = /^\/(chat|m\/chat)(\/|$|\?)/.test(location.pathname + (location.search || ''));
+      if (!onChatPage) {
+        import('../core/toast.js').then(({ showToast }) => {
+          showToast(`${title}${body ? ' — ' + body : ''}`, 'info');
+        }).catch(() => {});
+      }
       import('./notif-sound.js').then((m) => {
         if (data.type === 'chat' && typeof m.playMessageSound === 'function') m.playMessageSound();
       }).catch(() => {});
