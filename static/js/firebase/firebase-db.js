@@ -640,7 +640,7 @@ export async function ensureRoom({
     provider_name: providerName || '', agent_uid: agentUid || '',
     agent_code: agentCode || '', agent_name: agentName || '',
     agent_channel_code: agentChannelCode || '',
-    vehicle_number: vehicleNumber || '', model_name: modelName || '',
+    vehicle_number: vehicleNumber || '', model_name: modelName || '', sub_model: modelName || '',
     last_message: '', last_message_at: 0, last_sender_role: '', last_sender_code: '',
     last_effective_sender_role: '', last_effective_sender_code: '',
     unread_for_agent: 0, unread_for_provider: 0, chat_status: '신규',
@@ -661,7 +661,7 @@ export async function ensureRoom({
       provider_name: providerName || current.provider_name || '', agent_uid: agentUid || current.agent_uid || '',
       agent_code: agentCode || current.agent_code || '', agent_name: agentName || current.agent_name || '',
       agent_channel_code: agentChannelCode || current.agent_channel_code || '',
-      vehicle_number: vehicleNumber || current.vehicle_number || '', model_name: modelName || current.model_name || '',
+      vehicle_number: vehicleNumber || current.vehicle_number || '', model_name: modelName || current.model_name || '', sub_model: modelName || current.sub_model || '',
       last_effective_sender_role: current.last_effective_sender_role || (current.last_sender_role === 'admin' ? '' : (current.last_sender_role || '')),
       last_effective_sender_code: current.last_effective_sender_code || (current.last_sender_role === 'admin' ? '' : (current.last_sender_code || '')),
       hidden_by: updatedHiddenBy,
@@ -672,6 +672,24 @@ export async function ensureRoom({
 }
 
 const ROOMS_LIMIT = 200;
+
+/**
+ * 방의 차량 스냅샷 필드(sub_model / model_name) 백필.
+ * 기존 방이 생성 시 담지 못한 재고관리 데이터를 사후 보강.
+ * 값이 있으면서 현재 방이 비어있거나 구 bloated 포맷일 때만 덮어씀.
+ */
+export async function backfillRoomVehicleSnapshot(roomId, { sub_model = '', model_name = '' } = {}) {
+  if (!roomId) return;
+  const patch = {};
+  const cleanSub = String(sub_model || '').trim();
+  const cleanModel = String(model_name || '').trim();
+  if (cleanSub) patch.sub_model = cleanSub;
+  // 방의 기존 model_name 이 bloated (공백으로 4요소 합쳐진 형태) 인지 휴리스틱 판정 후 교체
+  if (cleanModel) patch.model_name = cleanModel;
+  if (!Object.keys(patch).length) return;
+  patch.updated_at = Date.now();
+  await update(ref(db, `rooms/${roomId}`), patch);
+}
 
 export function watchRooms(callback) {
   return watchCollection('rooms', callback, {

@@ -260,8 +260,11 @@ export function renderTableGrid(options = {}) {
         suppressHeaderMenuButton: true,
       },
       getRowId: (params) => {
-        if (!params.data) return String(Math.random());
-        return typeof getKey === 'function' ? String(getKey(params.data, 0) || Math.random()) : String(Math.random());
+        if (!params.data) return `__nodata_${Math.random().toString(36).slice(2, 10)}`;
+        const natural = typeof getKey === 'function' ? getKey(params.data, 0) : '';
+        if (natural) return String(natural);
+        if (!params.data.__agRowId) params.data.__agRowId = `__r_${Math.random().toString(36).slice(2, 10)}`;
+        return params.data.__agRowId;
       },
       onRowClicked: (event) => {
         const ctx = _gridCache.get(container);

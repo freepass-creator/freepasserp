@@ -1,7 +1,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { qs, registerPageCleanup, runPageCleanup, roleLabel } from '../core/utils.js';
 import { renderRoleMenu } from '../core/role-menu.js';
-import { deleteRoomEverywhere, ensureRoom, hideRoomForUser, markRoomRead, resolveTermForProduct, sendMessage, watchContracts, watchMessages, watchProducts, watchRooms } from '../firebase/firebase-db.js';
+import { backfillRoomVehicleSnapshot, deleteRoomEverywhere, ensureRoom, hideRoomForUser, markRoomRead, resolveTermForProduct, sendMessage, watchContracts, watchMessages, watchProducts, watchRooms } from '../firebase/firebase-db.js';
 import { extractTermFields, normalizeProduct } from '../shared/product-list-detail-view.js';
 import { renderMobileProductDetail } from '../shared/mobile-product-detail-markup.js';
 import { createChatRoomSelectionController } from './chat/room-selection.js';
@@ -63,6 +63,7 @@ let _ensureRoomPending = false;
 let roomMap = new Map();
 let openedRoomId = null;
 let visibleRoomsCache = [];
+let rawRoomsCache = [];
 let localHiddenRoomIds = new Set();
 let activePhotoIndex = 0;
 let allContracts = [];
@@ -100,7 +101,7 @@ function renderMobileRooms(rooms) {
   }
   container.innerHTML = rooms.map(room => {
     const product = getRoomProductLookupKeys(room).map(k => productsMap.get(k)).find(Boolean) || null;
-    const model = product?.subModel || product?.model || room.model_name || '';
+    const model = product?.subModel || room.sub_model || '';
     const carNo = product?.carNo || room.car_number || '';
     const mainLine = carNo ? `${carNo}${model ? ` ${model}` : ''}` : (model || '-');
     const at = room.last_message_at || room.created_at;
@@ -154,7 +155,7 @@ function getProductLookupKeys(product = {}) {
 function renderChatSummaryHtml(room) {
   const product = getRoomProductLookupKeys(room).map(k => productsMap.get(k)).find(Boolean) || null;
   const carNo = product?.carNo || room.vehicle_number || room.car_number || '';
-  const model = product?.subModel || room.model_name || room.sub_model || [product?.maker, product?.model].filter(Boolean).join(' ');
+  const model = product?.subModel || room.sub_model || [product?.maker, product?.model].filter(Boolean).join(' ');
   const title = [carNo, model].filter(Boolean).join(' · ') || (room.chat_code || room.room_id || '-');
   const at = room.last_message_at || room.created_at;
   const statusLabel = deriveStatusLabel(room, currentUser?.uid);
@@ -176,11 +177,14 @@ function renderChatSummaryHtml(room) {
 }
 
 function getRoomProductLookupKeys(room = {}) {
-  return [...new Set([
-    room.product_code,
-    room.product_code_snapshot,
-    room.product_uid
-  ].map((item) => normalizeLookupKey(item)).filter(Boolean))];
+  const keys = new Set();
+  [room.product_code, room.product_code_snapshot, room.product_uid, room.vehicle_number, room.car_number]
+    .forEach((v) => { const k = normalizeLookupKey(v); if (k) keys.add(k); });
+  // 합성키 — products 는 `{차량번호}_{공급사코드}` 로 저장됨 (firebase-codes.js buildProductCode)
+  const car = normalizeLookupKey(room.vehicle_number || room.car_number || '');
+  const provider = normalizeLookupKey(room.provider_company_code || room.partner_code || '');
+  if (car && provider) keys.add(`${car}_${provider}`);
+  return [...keys];
 }
 
 function getTermCacheKey(product) {
@@ -505,6 +509,25 @@ async function bootstrap() {
       window.location.href = '/contract';
     });
 
+    const filterVisibleRooms = (rooms) => rooms.filter((room) => {
+      if (!room || !room.room_id) return false;
+      if (localHiddenRoomIds.has(room.room_id)) return false;
+      const hiddenBy = room.hidden_by || {};
+      if (hiddenBy[user.uid]) return false;
+      // 고아 방 숨김 — 차량번호/메시지/매칭상품 전부 없으면 (productsMap 로드 후에만 적용)
+      if (productsMap.size > 0) {
+        const hasVehicle = !!String(room.vehicle_number || '').trim();
+        const hasMessage = Number(room.last_message_at || 0) > 0;
+        const hasProduct = getRoomProductLookupKeys(room).some((k) => productsMap.has(k));
+        if (!hasVehicle && !hasMessage && !hasProduct) return false;
+      }
+      if (profile.role === 'admin') return true;
+      if (profile.role === 'agent_manager') return (room.agent_channel_code || '') === (profile.company_code || '');
+      if (profile.role === 'agent') return room.agent_uid === user.uid || room.agent_code === profile.user_code;
+      if (profile.role === 'provider') return (room.provider_company_code || '') === (profile.company_code || '');
+      return false;
+    });
+
     registerPageCleanup(watchProducts((products) => {
       const normalizedProducts = products.map((p) => Object.assign(normalizeProduct(p), { _raw: p })).filter((item) => item.id);
       productsMap = new Map();
@@ -512,6 +535,9 @@ async function bootstrap() {
         getProductLookupKeys(item).forEach((key) => {
           productsMap.set(key, item);
         });
+        // 차량번호로도 인덱싱 (방의 product_code 가 stale 하거나 legacy 인 경우 폴백 매칭용)
+        const carKey = normalizeLookupKey(item.carNo);
+        if (carKey && carKey !== '-' && !productsMap.has(carKey)) productsMap.set(carKey, item);
       });
 
       if ((profile.role === 'agent' || profile.role === 'agent_manager') && preferredProductCode && !currentRoomId && !_ensureRoomPending) {
@@ -550,8 +576,22 @@ async function bootstrap() {
       if (currentRoomId && roomMap.has(currentRoomId)) {
         roomSelectionController.renderCurrentDetail();
       }
-      // 상품 로드 후 room list 재렌더링 (세부모델 등 상품 매칭 데이터 반영)
-      if (visibleRoomsCache && visibleRoomsCache.length) {
+      // 상품 로드 후 room list 재필터 + 재렌더링 (매칭 못한 고아 방 정리 포함)
+      if (rawRoomsCache.length) {
+        visibleRoomsCache = filterVisibleRooms(rawRoomsCache);
+        roomMap = new Map(visibleRoomsCache.map((room) => [room.room_id, room]));
+        // 백필 — 방에 sub_model 이 없고 매칭 상품에 sub_model 이 있으면 계약관리처럼 직접 저장
+        // (admin / 영업자 접근 시 자연스럽게 정화. permission 없으면 조용히 실패)
+        if (profile.role === 'admin' || profile.role === 'provider' || profile.role === 'agent' || profile.role === 'agent_manager') {
+          visibleRoomsCache.forEach((room) => {
+            if (room.sub_model) return;
+            const product = getRoomProductLookupKeys(room).map((k) => productsMap.get(k)).find(Boolean);
+            const productSub = product?._raw?.sub_model || product?.subModel;
+            const productModel = product?._raw?.model_name || product?.model;
+            if (!productSub || productSub === '-') return;
+            backfillRoomVehicleSnapshot(room.room_id, { sub_model: productSub, model_name: productModel }).catch(() => {});
+          });
+        }
         renderChatRoomList({
           thead: document.getElementById('room-list-head'),
           container: roomList,
@@ -579,17 +619,8 @@ async function bootstrap() {
       { key: 'time', label: '시간' },
     ], 8);
     registerPageCleanup(watchRooms((rooms) => {
-      const visibleRooms = rooms.filter((room) => {
-        if (localHiddenRoomIds.has(room.room_id)) return false;
-        const hiddenBy = room.hidden_by || {};
-        const isHiddenForMe = !!hiddenBy[user.uid];
-        if (isHiddenForMe) return false;
-        if (profile.role === 'admin') return true;
-        if (profile.role === 'agent_manager') return (room.agent_channel_code || '') === (profile.company_code || '');
-        if (profile.role === 'agent') return room.agent_uid === user.uid || room.agent_code === profile.user_code;
-        if (profile.role === 'provider') return (room.provider_company_code || '') === (profile.company_code || '');
-        return false;
-      });
+      rawRoomsCache = rooms;
+      const visibleRooms = filterVisibleRooms(rooms);
 
       visibleRoomsCache = visibleRooms;
       roomMap = new Map(visibleRooms.map((room) => [room.room_id, room]));

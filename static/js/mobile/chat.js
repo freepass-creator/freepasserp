@@ -4,7 +4,7 @@
 import { requireAuth } from '../core/auth-guard.js';
 import { watchRooms, watchProducts } from '../firebase/firebase-db.js';
 import { escapeHtml } from '../core/management-format.js';
-import { deriveReplyStatus } from '../pages/chat/room-list.js';
+import { deriveReplyStatus, normalizeLookupKey } from '../pages/chat/room-list.js';
 import { toggleFilter, applyFilter } from './filter-sheet.js';
 import { wireHtmlCache } from './page-cache.js';
 
@@ -71,13 +71,21 @@ function visibleGroupsForRole(role) {
 }
 
 function enrichRoom(r) {
-  const p = productMap.get(r.product_uid) || productMap.get(r.product_code) || null;
+  const carKey = normalizeLookupKey(r.vehicle_number || r.car_number || '');
+  const providerKey = normalizeLookupKey(r.provider_company_code || r.partner_code || '');
+  const synthKey = carKey && providerKey ? `${carKey}_${providerKey}` : '';
+  const p = productMap.get(normalizeLookupKey(r.product_uid))
+    || productMap.get(normalizeLookupKey(r.product_code))
+    || productMap.get(normalizeLookupKey(r.product_code_snapshot))
+    || (synthKey ? productMap.get(synthKey) : null)
+    || (carKey ? productMap.get(carKey) : null)
+    || null;
   return {
     ...r,
     _reply_status: deriveReplyStatus(r) || '',
     _maker:    p?.maker || r.maker || '',
     _model:    p?.model_name || r.model_name || '',
-    _sub_model: p?.sub_model || r.sub_model || r.model_name || '',
+    _sub_model: (p?.sub_model && p.sub_model !== '-') ? p.sub_model : (r.sub_model || p?.model_name || ''),
     _car_no:   p?.car_number || r.vehicle_number || r.car_number || '',
   };
 }
@@ -201,8 +209,14 @@ $list?.addEventListener('click', (e) => {
 function _hydrateProductMap(products) {
   const map = new Map();
   (products || []).forEach(p => {
-    if (p?.product_uid) map.set(p.product_uid, p);
-    if (p?.product_code) map.set(p.product_code, p);
+    if (!p) return;
+    const uidKey = normalizeLookupKey(p.product_uid);
+    const codeKey = normalizeLookupKey(p.product_code);
+    const carKey = normalizeLookupKey(p.car_number);
+    if (uidKey) map.set(uidKey, p);
+    if (codeKey) map.set(codeKey, p);
+    // 차량번호로도 인덱싱 — 방의 product_code 가 stale 하거나 legacy 인 경우 폴백 매칭용
+    if (carKey && carKey !== '-' && !map.has(carKey)) map.set(carKey, p);
   });
   return map;
 }

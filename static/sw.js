@@ -1,5 +1,5 @@
 // FREEPASS ERP — Service Worker (precache + stale-while-revalidate)
-const CACHE_NAME = 'freepass-v233';
+const CACHE_NAME = 'freepass-v241';
 const IMG_CACHE = 'freepass-img-v1';
 
 // 핵심 자원 — 첫 방문 시 미리 다운로드
@@ -140,18 +140,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 그 외 정적 자산: stale-while-revalidate
-  event.respondWith(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.match(request).then((cached) => {
-        const fetched = fetch(request).then((response) => {
-          if (response.ok && response.type === 'basic') {
-            cache.put(request, response.clone());
-          }
-          return response;
-        }).catch(() => cached);
-        return cached || fetched;
-      })
-    )
-  );
+  // 그 외 정적 자산: stale-while-revalidate (폴백은 반드시 Response 반환)
+  event.respondWith((async () => {
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      const cached = await cache.match(request);
+      if (cached) {
+        // 백그라운드 업데이트
+        fetch(request).then((response) => {
+          if (response.ok && response.type === 'basic') cache.put(request, response.clone());
+        }).catch(() => {});
+        return cached;
+      }
+      const response = await fetch(request);
+      if (response.ok && response.type === 'basic') cache.put(request, response.clone());
+      return response;
+    } catch (_) {
+      return new Response('', { status: 504, statusText: 'offline' });
+    }
+  })());
 });
