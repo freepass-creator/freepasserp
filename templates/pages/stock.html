@@ -36,7 +36,7 @@
 <div class="form-grid">
 <div class="field"><label for="partner_code">공급사코드</label><select id="partner_code" name="partner_code"><option value="">선택</option></select></div>
 <div class="field"><label for="policy_code">정책코드</label><select id="policy_code" name="policy_code"><option value="">선택</option></select></div>
-<div class="field"><label for="car_number">차량번호</label><input id="car_number" name="car_number" required=""/></div>
+<div class="field"><label for="car_number">차량번호</label><input id="car_number" name="car_number" required="" maxlength="8" pattern="\d{2,3}[가-힣]\d{4}" placeholder="12가3456 / 123가4567" title="숫자2~3 + 한글1 + 숫자4 (최대 8자)"/></div>
 <div class="field"><label for="product_code_display">상품코드</label><input id="product_code_display" name="product_code_display" placeholder="저장 시 자동부여" readonly="" type="text"/></div>
 <div class="field"><label for="vehicle_status">차량상태</label><select data-code-group="PRODUCT_VEHICLE_STATUS" id="vehicle_status" name="vehicle_status"><option value="">선택</option></select></div>
 <div class="field"><label for="product_type">상품구분</label><select data-code-group="PRODUCT_TYPE" id="product_type" name="product_type"><option value="">선택</option></select></div>

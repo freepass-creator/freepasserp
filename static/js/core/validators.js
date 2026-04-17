@@ -23,16 +23,12 @@ function isNonNegativeNumber(value) {
 
 /**
  * 차량번호 형식 검증.
- * 한국 차량번호: 숫자2~3 + 한글1~2 + 숫자4 (예: 12가3456, 서울12가3456)
- * 또는 임시/영업용 등 예외 허용 — 최소 4자 이상이면 통과.
+ * 신형 한국 차량번호: 숫자2~3 + 한글1 + 숫자4 (예: 12가3456, 123가4567)
+ * 최대 000가0000 (8자) 를 넘을 수 없음.
  */
 function isValidCarNumber(value) {
   const text = String(value || '').replace(/\s/g, '');
-  if (text.length < 2) return false;
-  // 기본 패턴: 지역명(0~2자) + 숫자(2~3자) + 한글(1~2자) + 숫자(4자)
-  if (/^[가-힣]{0,2}\d{2,3}[가-힣]{1,2}\d{4}$/.test(text)) return true;
-  // 느슨한 허용: 최소 4자 이상 + 숫자 포함
-  return text.length >= 4 && /\d/.test(text);
+  return /^\d{2,3}[가-힣]\d{4}$/.test(text);
 }
 
 /**

@@ -1,4 +1,5 @@
 import { CODE_BOUND_FIELDS, DEFAULT_SELECT_VALUES, LINKED_SPEC_FIELDS, SELECT_PLACEHOLDER_TEXT, STATIC_SELECT_OPTIONS, YEAR_SELECT_OPTIONS } from './fields.js';
+import { EXT_COLORS, INT_COLORS } from '../../data/color-codes.js';
 
 const PRIORITY_ORDER_MAX = 1000000;
 const MAKER_PRIORITY = [
@@ -272,15 +273,22 @@ export function createProductSelectController(deps = {}) {
     const extColorValue = selections.ext_color ?? getField('ext_color')?.value ?? '';
     const intColorValue = selections.int_color ?? getField('int_color')?.value ?? '';
     const vehicleMasterEntries = typeof getVehicleMasterEntries === 'function' ? getVehicleMasterEntries() : [];
+
+    const DEFAULT_EXT = EXT_COLORS.map((v) => ({ value: v, label: v }));
+    const DEFAULT_INT = INT_COLORS.map((v) => ({ value: v, label: v }));
+
+    let extOptions = [];
+    let intOptions = [];
     if (vehicleMasterEntries.length) {
-      const extOptions = buildColorOptionsFromEntries(vehicleMasterEntries, 'exterior_colors');
-      const intOptions = buildColorOptionsFromEntries(vehicleMasterEntries, 'interior_colors');
-      renderSelectOptions('ext_color', extOptions, { selectedValue: extColorValue, placeholder: '선택', disabled: false });
-      renderSelectOptions('int_color', intOptions, { selectedValue: intColorValue, placeholder: '선택', disabled: false });
-      return;
+      extOptions = buildColorOptionsFromEntries(vehicleMasterEntries, 'exterior_colors');
+      intOptions = buildColorOptionsFromEntries(vehicleMasterEntries, 'interior_colors');
     }
-    const extOptions = buildColorOptionsFromProducts('ext_color', () => true);
-    const intOptions = buildColorOptionsFromProducts('int_color', () => true);
+    if (!extOptions.length) extOptions = buildColorOptionsFromProducts('ext_color', () => true);
+    if (!intOptions.length) intOptions = buildColorOptionsFromProducts('int_color', () => true);
+    // 최종 폴백 — 정적 기본 색상표 (color-codes.js)
+    if (!extOptions.length) extOptions = DEFAULT_EXT;
+    if (!intOptions.length) intOptions = DEFAULT_INT;
+
     renderSelectOptions('ext_color', extOptions, { selectedValue: extColorValue, placeholder: '선택', disabled: false });
     renderSelectOptions('int_color', intOptions, { selectedValue: intColorValue, placeholder: '선택', disabled: false });
   }
