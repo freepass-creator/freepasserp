@@ -238,7 +238,14 @@ export function createAgGridList({
       suppressHeaderMenuButton: true,
       cellStyle: { fontSize: '12px', display: 'flex', alignItems: 'center' },
     },
-    getRowId: (params) => params.data?.product_uid || params.data?.product_code || params.data?.contract_code || params.data?.settlement_code || params.data?.room_id || String(Math.random()),
+    getRowId: (params) => {
+      const d = params.data;
+      if (!d) return `__nodata_${Math.random().toString(36).slice(2, 10)}`;
+      const natural = d.product_uid || d.product_code || d.contract_code || d.settlement_code || d.room_id;
+      if (natural) return String(natural);
+      if (!d.__agRowId) d.__agRowId = `__r_${Math.random().toString(36).slice(2, 10)}`;
+      return d.__agRowId;
+    },
     onRowClicked: (event) => { if (event.data) onRowClicked?.(event.data); },
     ...gridOptionsOverride,
   };
