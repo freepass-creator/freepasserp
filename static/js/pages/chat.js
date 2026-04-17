@@ -65,6 +65,8 @@ let openedRoomId = null;
 let visibleRoomsCache = [];
 let rawRoomsCache = [];
 let localHiddenRoomIds = new Set();
+// 백필 중복 방지 — 세션 내 방당 1회만 시도
+const _backfillAttempted = new Set();
 let activePhotoIndex = 0;
 let allContracts = [];
 
@@ -580,15 +582,17 @@ async function bootstrap() {
       if (rawRoomsCache.length) {
         visibleRoomsCache = filterVisibleRooms(rawRoomsCache);
         roomMap = new Map(visibleRoomsCache.map((room) => [room.room_id, room]));
-        // 백필 — 방에 sub_model 이 없고 매칭 상품에 sub_model 이 있으면 계약관리처럼 직접 저장
-        // (admin / 영업자 접근 시 자연스럽게 정화. permission 없으면 조용히 실패)
+        // 백필 — 방에 sub_model 이 없고 매칭 상품에 sub_model 이 있으면 계약관리처럼 직접 저장.
+        // 세션당 방 1회만 시도 (_backfillAttempted) — 권한 없어 실패해도 재시도 안 함.
         if (profile.role === 'admin' || profile.role === 'provider' || profile.role === 'agent' || profile.role === 'agent_manager') {
           visibleRoomsCache.forEach((room) => {
             if (room.sub_model) return;
+            if (_backfillAttempted.has(room.room_id)) return;
             const product = getRoomProductLookupKeys(room).map((k) => productsMap.get(k)).find(Boolean);
             const productSub = product?._raw?.sub_model || product?.subModel;
             const productModel = product?._raw?.model_name || product?.model;
             if (!productSub || productSub === '-') return;
+            _backfillAttempted.add(room.room_id);
             backfillRoomVehicleSnapshot(room.room_id, { sub_model: productSub, model_name: productModel }).catch(() => {});
           });
         }
